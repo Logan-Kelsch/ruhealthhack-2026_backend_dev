@@ -2,23 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import type { Go, VisitNumber } from "../../app/types";
 import { Avatar } from "../../components/Avatar";
 import { Badge, CardHead, GhostButton, Wordmark } from "../../components/ui";
-
-const SCRIPT: [string, string][] = [
-  ["Walter", "Morning. The doctor said I should come talk about my salt."],
-  ["You", "Thanks for coming in, Mr. Greene. I’m Jordan, a dietetics student. What would you like to get out of today?"],
-  ["Walter", "You look like a kid."],
-  ["You", "What do you enjoy about dinner club?"],
-  ["Walter", "Seeing the guys. We do the diner Tuesdays and Fridays."],
-  ["You", "Are you taking anything for pain right now?"],
-  ["Walter", "Advil for my back, a couple times a week."],
-  ["You", "I’m going to listen to your lungs now."],
-];
-
-const EXAMS = [
-  { label: "Check ankles for swelling", text: "Pedal edema 2+ both ankles", flag: true },
-  { label: "Listen to lungs", text: "Fine crackles at both bases", flag: true },
-  { label: "Check skin turgor", text: "Skin turgor normal", flag: false },
-];
+import {
+  WALTER_ENCOUNTER_VITALS,
+  WALTER_EXAMS,
+  WALTER_GOAL,
+  WALTER_MEDS,
+  WALTER_ORDERS,
+  WALTER_SCRIPT,
+} from "../../mock/walter";
 
 // Hands-free encounter. Lines appear on a timer. There is no text box.
 // Mute pauses the clock and the script. End visit opens the debrief.
@@ -40,25 +31,18 @@ export function Encounter({ go, visit }: { go: Go; visit: VisitNumber }) {
   }, []);
 
   const visitTwo = visit === 2;
-  const shown = Math.min(SCRIPT.length, 2 + Math.floor(seconds / 4));
-  const lines = SCRIPT.slice(0, shown);
-  const lastSpeaker = SCRIPT[shown - 1]?.[0];
-  const walterTalking = !muted && shown < SCRIPT.length && lastSpeaker === "You";
-  const advilMentioned = shown >= 7;
+  const shown = Math.min(WALTER_SCRIPT.length, 2 + Math.floor(seconds / 4));
+  const lines = WALTER_SCRIPT.slice(0, shown);
+  const lastSpeaker = WALTER_SCRIPT[shown - 1]?.[0];
+  const walterTalking = !muted && shown < WALTER_SCRIPT.length && lastSpeaker === "You";
+  // The Ibuprofen row lights up once the script line that mentions it has played.
+  const advilLine = WALTER_SCRIPT.findIndex(([, text]) => text.includes("Advil"));
+  const advilMentioned = shown > advilLine;
   // The prototype clock starts a little over a minute in, matching the recorded demo.
   const clockSeconds = seconds + 72;
   const clock = `${String(Math.floor(clockSeconds / 60)).padStart(2, "0")}:${String(clockSeconds % 60).padStart(2, "0")}`;
-  const goal = visitTwo
-    ? "Review what changed since the first visit and adjust the plan."
-    : "Assess diet and medicines; agree on one change.";
-  const vitals = [
-    { k: "BP", v: visitTwo ? "146/88" : "158/92", tone: "danger" },
-    { k: "HR", v: "78", tone: "ink" },
-    { k: "RR", v: "18", tone: "ink" },
-    { k: "Temp", v: "37.0°", tone: "ink" },
-    { k: "SpO₂", v: "96%", tone: "ink" },
-    { k: "Weight", v: "198 lb", tone: "ink" },
-  ];
+  const goal = WALTER_GOAL[visit];
+  const vitals = WALTER_ENCOUNTER_VITALS[visit];
 
   return (
     <div className="flex min-h-full flex-col">
@@ -112,7 +96,7 @@ export function Encounter({ go, visit }: { go: Go; visit: VisitNumber }) {
             />
             {menuOpen ? (
               <div className="flex flex-col border-b border-hair-2 bg-raised">
-                {EXAMS.map((exam, index) =>
+                {WALTER_EXAMS.map((exam, index) =>
                   exams.includes(index) ? null : (
                     <button
                       key={exam.label}
@@ -130,9 +114,9 @@ export function Encounter({ go, visit }: { go: Go; visit: VisitNumber }) {
               </div>
             ) : null}
             {exams.map((index) => (
-              <div key={EXAMS[index].text} className="flex items-center gap-2.5 border-t border-hair px-[18px] py-[11px] text-sm first:border-t-0">
-                <span className="size-1.5 rounded-full" style={{ background: EXAMS[index].flag ? "#e08a3c" : "var(--color-inactive)" }} />
-                {EXAMS[index].text}
+              <div key={WALTER_EXAMS[index].text} className="flex items-center gap-2.5 border-t border-hair px-[18px] py-[11px] text-sm first:border-t-0">
+                <span className="size-1.5 rounded-full" style={{ background: WALTER_EXAMS[index].flag ? "#e08a3c" : "var(--color-inactive)" }} />
+                {WALTER_EXAMS[index].text}
               </div>
             ))}
           </section>
@@ -185,36 +169,32 @@ export function Encounter({ go, visit }: { go: Go; visit: VisitNumber }) {
           </section>
           <section className="overflow-hidden rounded-2xl border border-line bg-card">
             <CardHead title="Medications" className="px-[18px] py-3" />
-            {[
-              { name: "Metformin 500 mg", sub: "Twice daily", mentioned: false },
-              { name: "Lisinopril 20 mg", sub: "Daily", mentioned: false },
-              { name: "Ibuprofen 400 mg", sub: "As needed", mentioned: advilMentioned },
-            ].map((med) => (
-              <div key={med.name} className={`flex items-center justify-between gap-2 border-t border-hair px-[18px] py-[11px] first:border-t-0 ${med.mentioned ? "bg-warn-wash" : "bg-card"}`}>
-                <div>
-                  <div className="text-sm font-semibold">{med.name}</div>
-                  <div className="text-[12.5px] text-muted">{med.sub}</div>
+            {WALTER_MEDS.map((med) => {
+              const mentioned = advilMentioned && med.id === "ibuprofen";
+              return (
+                <div key={med.name} className={`flex items-center justify-between gap-2 border-t border-hair px-[18px] py-[11px] first:border-t-0 ${mentioned ? "bg-warn-wash" : "bg-card"}`}>
+                  <div>
+                    <div className="text-sm font-semibold">{med.name}</div>
+                    <div className="text-[12.5px] text-muted">{med.sub}</div>
+                  </div>
+                  {mentioned ? <Badge tone="warn">Mentioned</Badge> : null}
                 </div>
-                {med.mentioned ? <Badge tone="warn">Mentioned</Badge> : null}
-              </div>
-            ))}
+              );
+            })}
           </section>
           <section className="overflow-hidden rounded-2xl border border-line bg-card">
             <CardHead title="Orders" className="px-[18px] py-3" />
-            {[
-              ["ecg", "12-lead ECG"],
-              ["cxr", "Chest X-ray"],
-            ].map(([key, name]) => {
-              const ready = Boolean(ordered[key]);
+            {WALTER_ORDERS.map(({ id, name }) => {
+              const ready = Boolean(ordered[id]);
               return (
-                <div key={key} className="flex items-center gap-3 border-t border-hair px-[18px] py-2.5 first:border-t-0">
-                  <div className={`h-8 w-11 shrink-0 rounded-md ${ready ? (key === "ecg" ? "bg-[#e7ebf8]" : "bg-[#1c2430]") : "bg-segment"}`} />
+                <div key={id} className="flex items-center gap-3 border-t border-hair px-[18px] py-2.5 first:border-t-0">
+                  <div className={`h-8 w-11 shrink-0 rounded-md ${ready ? (id === "ecg" ? "bg-[#e7ebf8]" : "bg-[#1c2430]") : "bg-segment"}`} />
                   <div className="min-w-0 flex-1">
                     <div className="text-sm font-medium">{name}</div>
                     <div className={`text-xs ${ready ? "text-ok" : "text-muted"}`}>{ready ? "Result available" : "Not ordered"}</div>
                   </div>
                   {ready ? null : (
-                    <GhostButton size="sm" onClick={() => setOrdered({ ...ordered, [key]: true })}>
+                    <GhostButton size="sm" onClick={() => setOrdered({ ...ordered, [id]: true })}>
                       Order
                     </GhostButton>
                   )}

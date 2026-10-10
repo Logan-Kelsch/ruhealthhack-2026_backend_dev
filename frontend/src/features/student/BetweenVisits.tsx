@@ -1,12 +1,7 @@
 import type { Go } from "../../app/types";
 import { ArrowRight } from "../../components/Icons";
 import { Badge, PrimaryButton, Title } from "../../components/ui";
-
-const EVENTS = [
-  { text: "Stopped the Advil", tag: "Followed plan", tone: "ok" as const },
-  { text: "Same dinner-club meals twice a week", tag: "No change", tone: "warn" as const },
-  { text: "Ankle swelling about the same", tag: "No change", tone: "warn" as const },
-];
+import { WALTER_BETWEEN_VISITS_EVENTS } from "../../mock/walter";
 
 // What changed between visits, based on the plan from visit 1. This is the doorway into visit 2.
 export function BetweenVisits({ go }: { go: Go }) {
@@ -29,7 +24,7 @@ export function BetweenVisits({ go }: { go: Go }) {
             <div className="mt-0.5 text-[13px] text-muted">Agreed: cut back on canned soups and stop the Advil</div>
           </div>
         </div>
-        {EVENTS.map((event) => (
+        {WALTER_BETWEEN_VISITS_EVENTS.map((event) => (
           <div key={event.text} className="grid grid-cols-[24px_minmax(0,1fr)_auto] items-start gap-4 py-3">
             <div className="flex flex-col items-center self-stretch">
               <span className={`mt-1 size-2.5 rounded-full border-2 bg-card ${event.tone === "ok" ? "border-ok" : "border-warn"}`} />

@@ -4,6 +4,7 @@ import { Avatar } from "../../components/Avatar";
 import { PlusIcon } from "../../components/Icons";
 import { Badge, BackLink, CardHead, GhostButton, Mark, PrimaryButton, TabNav } from "../../components/ui";
 import { RUBRIC_DOMAINS } from "../../lib/rubric";
+import { STUDIO_CASES, STUDIO_OBJECTIVES, STUDIO_SUGGESTED_FACTS, studioPatientColumns } from "../../mock/studio";
 import { DecisionTree } from "./DecisionTree";
 
 type FactState = "pending" | "approved" | "dismissed";
@@ -30,6 +31,7 @@ export function CaseStudio({ go, tab }: { go: Go; tab: StudioTab }) {
   const pendingFacts = Object.values(facts).filter((state) => state === "pending").length;
   const active = current;
   const tree = active === "tree";
+  const header = tree ? STUDIO_CASES.tree : STUDIO_CASES.patient;
   const checks = [
     { label: "Patient profile", ok: true, note: "", tab: "patient" as const },
     { label: "Medicines recognized", ok: drugFixed, note: "Epirocil not found in RxNorm", tab: "patient" as const },
@@ -52,19 +54,15 @@ export function CaseStudio({ go, tab }: { go: Go; tab: StudioTab }) {
         <BackLink label="Cases" onClick={() => go("f-cases")} />
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
-            <Avatar who={tree ? "generic" : "walter"} size={52} />
+            <Avatar who={header.who} size={52} />
             <div>
               <div className="flex items-center gap-2.5">
-                <h1 className="m-0 font-serif text-[34px] leading-none font-medium tracking-[-0.7px]">
-                  {tree ? "Depression follow-up" : "Walter Greene, 72"}
-                </h1>
+                <h1 className="m-0 font-serif text-[34px] leading-none font-medium tracking-[-0.7px]">{header.name}</h1>
                 <Badge tone="warn" dot>
                   Draft
                 </Badge>
               </div>
-              <div className="mt-1 text-[13px] text-muted">
-                {tree ? "Psychiatry clerkship · 2 visits" : "Dietetics student · 2 visits"} · Saved 2 min ago
-              </div>
+              <div className="mt-1 text-[13px] text-muted">{header.meta} · Saved 2 min ago</div>
             </div>
           </div>
           <div className="flex gap-2">
@@ -125,51 +123,8 @@ export function CaseStudio({ go, tab }: { go: Go; tab: StudioTab }) {
   );
 }
 
-type PatientItem = {
-  name: string;
-  code: string;
-  sub: string;
-  issue?: boolean;
-  danger?: boolean;
-  muted?: boolean;
-};
-
 function PatientTab({ drugFixed, onFix }: { drugFixed: boolean; onFix: () => void }) {
-  const columns: { title: string; count: number; add: string; items: PatientItem[] }[] = [
-    {
-      title: "Diagnoses",
-      count: 3,
-      add: "Add diagnosis",
-      items: [
-        { name: "Type 2 diabetes with hyperglycemia", code: "E11.65", sub: "" },
-        { name: "Chronic systolic heart failure", code: "I50.22", sub: "" },
-        { name: "Essential hypertension", code: "I10", sub: "" },
-      ],
-    },
-    {
-      title: "Medicines",
-      count: 4,
-      add: "Add medicine",
-      items: [
-        { name: "Metformin", code: "", sub: "500 mg twice daily with meals" },
-        { name: "Lisinopril", code: "", sub: "20 mg once daily" },
-        { name: "Eplerenone", code: "", sub: "25 mg once daily" },
-        drugFixed
-          ? { name: "Epirocil", code: "", sub: "Kept as written", muted: true }
-          : { name: "Epirocil", code: "", sub: "Not found in RxNorm. Did you mean eplerenone?", issue: true },
-      ],
-    },
-    {
-      title: "Allergies",
-      count: 3,
-      add: "Add allergy",
-      items: [
-        { name: "Penicillin", code: "", sub: "Hives" },
-        { name: "Shellfish", code: "", sub: "Anaphylaxis", danger: true },
-        { name: "Sulfa", code: "", sub: "Rash" },
-      ],
-    },
-  ];
+  const columns = studioPatientColumns(drugFixed);
 
   return (
     <div className="grid items-start gap-3.5 [grid-template-columns:repeat(auto-fit,minmax(260px,1fr))]">
@@ -213,11 +168,6 @@ function PatientTab({ drugFixed, onFix }: { drugFixed: boolean; onFix: () => voi
 }
 
 function ObjectivesTab() {
-  const objectives = [
-    { n: 1, text: "Connect his medicines to nutrition care, including over-the-counter pain relievers", facts: ["Ibuprofen for back pain", "Skips metformin for nausea"], checks: ["explains the ibuprofen risk"] },
-    { n: 2, text: "Find his eating pattern, beliefs and barriers", facts: ["Dinner club twice a week", "Canned soups"], checks: [] },
-    { n: 3, text: "Identify social and money barriers", facts: ["Fixed income", "Lives alone"], checks: [] },
-  ];
   return (
     <div className="grid items-start gap-3.5 [grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))]">
       <section className="overflow-hidden rounded-2xl border border-line bg-card">
@@ -226,7 +176,7 @@ function ObjectivesTab() {
           className="px-[18px] py-3.5"
           aside={<GhostButton size="sm">Add</GhostButton>}
         />
-        {objectives.map((item) => (
+        {STUDIO_OBJECTIVES.map((item) => (
           <div key={item.n} className="grid grid-cols-[28px_minmax(0,1fr)] gap-3.5 border-t border-hair px-[18px] py-4 first:border-t-0">
             <span className="flex size-7 items-center justify-center rounded-lg bg-indigo-soft text-[13px] font-bold text-indigo">{item.n}</span>
             <div className="flex flex-col gap-2.5">
@@ -270,10 +220,6 @@ function FilesTab({
   facts: Record<"a" | "b", FactState>;
   setFacts: (next: Record<"a" | "b", FactState>) => void;
 }) {
-  const rows: { id: "a" | "b"; page: number; text: string }[] = [
-    { id: "a", page: 42, text: "Sodium under 2,300 mg a day is a common target for people with diabetes and high blood pressure." },
-    { id: "b", page: 56, text: "Ask about over-the-counter pain relievers when kidney function is reduced." },
-  ];
   return (
     <div className="flex flex-col gap-3.5">
       <section className="overflow-hidden rounded-2xl border border-line bg-card">
@@ -282,7 +228,7 @@ function FilesTab({
           className="px-[18px] py-3.5"
           aside={<span className="text-[12.5px] text-muted">From ADA Standards of Care in Diabetes, 2026</span>}
         />
-        {rows.map((row) => {
+        {STUDIO_SUGGESTED_FACTS.map((row) => {
           const state = facts[row.id];
           return (
             <div key={row.id} className={`grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 border-t border-hair px-[18px] py-3.5 first:border-t-0 ${state === "pending" ? "bg-warn-wash" : "bg-card"}`}>

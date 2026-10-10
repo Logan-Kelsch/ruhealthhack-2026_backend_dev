@@ -3,23 +3,7 @@ import type { Go } from "../../app/types";
 import { Avatar } from "../../components/Avatar";
 import { Chevron, PlusIcon } from "../../components/Icons";
 import { Badge, Card, GhostButton, Page, PageHeader, PrimaryButton } from "../../components/ui";
-
-type CaseRow = {
-  name: string;
-  learner: string;
-  visits: number;
-  status: "Published" | "Draft";
-  tag: string;
-  updated: string;
-  who: "walter" | "alina" | "eli" | "generic";
-};
-
-const ALL: CaseRow[] = [
-  { name: "Walter Greene, 72", learner: "Dietetics student", visits: 2, status: "Published", tag: "Typical", updated: "Oct 3", who: "walter" },
-  { name: "Alina Reyes, 21", learner: "Third-year medical student", visits: 2, status: "Published", tag: "Typical", updated: "Sep 28", who: "alina" },
-  { name: "Eli Brooks, 6", learner: "Physician assistant student", visits: 1, status: "Published", tag: "Typical", updated: "Sep 20", who: "eli" },
-  { name: "Depression follow-up", learner: "Psychiatry clerkship", visits: 2, status: "Draft", tag: "Branching · decision tree", updated: "Today", who: "generic" },
-];
+import { CASE_ROWS } from "../../mock/faculty";
 
 const FILTERS = ["All", "Published", "Draft"] as const;
 type Filter = (typeof FILTERS)[number];
@@ -27,7 +11,7 @@ type Filter = (typeof FILTERS)[number];
 // Faculty case list with a status filter. A draft opens the decision-tree tab in Studio.
 export function CaseLibrary({ go }: { go: Go }) {
   const [filter, setFilter] = useState<Filter>("All");
-  const rows = ALL.filter((row) => filter === "All" || row.status === filter);
+  const rows = CASE_ROWS.filter((row) => filter === "All" || row.status === filter);
 
   return (
     <Page>

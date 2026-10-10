@@ -3,9 +3,15 @@ import type { Go, VisitNumber } from "../../app/types";
 import { ArrowRight } from "../../components/Icons";
 import { CardHead, Mark, Page, PageHeader, PrimaryButton, StatCard, TabNav, type TabItem } from "../../components/ui";
 import { RUBRIC_DOMAINS } from "../../lib/rubric";
-
-// Scores for the Walter Greene visit 1 encounter, domain by domain.
-const RUBRIC_SCORES = [3, 3, 3, 2, 2, 3, 1];
+import {
+  DEBRIEF_IMPROVEMENTS,
+  DEBRIEF_NEXT_STEP,
+  DEBRIEF_NOTE_CHECK,
+  DEBRIEF_SAFETY_CHECK,
+  DEBRIEF_STRENGTHS,
+  DEBRIEF_TRANSCRIPT,
+  RUBRIC_SCORES,
+} from "../../mock/debrief";
 
 type TabId = "next" | "scores" | "transcript";
 
@@ -13,16 +19,6 @@ const TABS: TabItem<TabId>[] = [
   { id: "next", label: "Next time" },
   { id: "scores", label: "Scores" },
   { id: "transcript", label: "Transcript" },
-];
-
-const TRANSCRIPT: [string, string, string][] = [
-  ["00:04", "Walter", "Morning. The doctor said I should come talk about my salt."],
-  ["00:11", "You", "Thanks for coming in, Mr. Greene. I’m Jordan, a dietetics student. What would you like to get out of today?"],
-  ["00:20", "Walter", "You look like a kid."],
-  ["01:02", "You", "What do you enjoy about dinner club?"],
-  ["01:09", "Walter", "Seeing the guys. We do the diner Tuesdays and Fridays."],
-  ["03:40", "You", "Are you taking anything for pain right now?"],
-  ["03:44", "Walter", "Advil for my back, a couple times a week."],
 ];
 
 // After the visit: one next step, the 7-domain scores, and the transcript those scores cite.
@@ -44,15 +40,15 @@ export function Debrief({ go, visit }: { go: Go; visit: VisitNumber }) {
         <StatCard label="Rubric total">
           <div className="mt-1.5 flex items-baseline gap-1.5">
             <span className="text-[34px] font-semibold tracking-[-1px]">{total}</span>
-            <span className="text-sm text-muted">/ 28</span>
+            <span className="text-sm text-muted">/ {RUBRIC_DOMAINS.length * 4}</span>
           </div>
         </StatCard>
         <StatCard label="Safety check" accent="ok">
-          <div className="mt-2 text-[15px] leading-snug font-semibold">Ibuprofen risk found and explained</div>
+          <div className="mt-2 text-[15px] leading-snug font-semibold">{DEBRIEF_SAFETY_CHECK}</div>
         </StatCard>
         <StatCard label="Note check" accent="danger">
-          <div className="mt-2 text-[15px] leading-snug font-semibold">1 claim never said in the visit</div>
-          <div className="mt-0.5 text-[13px] text-danger">“Eats breakfast daily”</div>
+          <div className="mt-2 text-[15px] leading-snug font-semibold">{DEBRIEF_NOTE_CHECK.title}</div>
+          <div className="mt-0.5 text-[13px] text-danger">{DEBRIEF_NOTE_CHECK.quote}</div>
         </StatCard>
       </div>
 
@@ -76,12 +72,12 @@ function NextTime() {
         </span>
         <div>
           <div className="text-xs font-semibold tracking-[0.6px] text-indigo uppercase">Try this next time</div>
-          <div className="mt-0.5 font-serif text-[22px] leading-snug">Ask Walter to say the plan back in his own words.</div>
+          <div className="mt-0.5 font-serif text-[22px] leading-snug">{DEBRIEF_NEXT_STEP}</div>
         </div>
       </section>
       <div className="grid items-start gap-3.5 [grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))]">
-        <NoteList title="What you did well" tone="ok" items={["Followed up on the dinner club", "Asked about over-the-counter pain medicine", "Summarized what matters to him"]} />
-        <NoteList title="What to improve" tone="warn" items={["Explain salt in plain words", "Check understanding with teach-back", "Ask about money for groceries"]} />
+        <NoteList title="What you did well" tone="ok" items={DEBRIEF_STRENGTHS} />
+        <NoteList title="What to improve" tone="warn" items={DEBRIEF_IMPROVEMENTS} />
       </div>
     </div>
   );
@@ -134,7 +130,7 @@ function Scores() {
 function Transcript() {
   return (
     <section className="overflow-hidden rounded-2xl border border-line bg-card">
-      {TRANSCRIPT.map(([time, who, text]) => (
+      {DEBRIEF_TRANSCRIPT.map(([time, who, text]) => (
         <div key={time} className="grid grid-cols-[52px_64px_minmax(0,1fr)] items-baseline gap-3 border-t border-hair px-5 py-3 first:border-t-0">
           <span className="text-[12.5px] text-muted tabular-nums">{time}</span>
           <span className="text-[13px] font-semibold text-ink-soft">{who}</span>

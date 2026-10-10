@@ -2,39 +2,12 @@ import { useState } from "react";
 import type { Go } from "../../app/types";
 import { Avatar } from "../../components/Avatar";
 import { Badge, BackLink, Page, PrimaryButton, Title } from "../../components/ui";
-
-type Patient = {
-  name: string;
-  age: number;
-  summary: string;
-  flags: string[];
-};
-
-const PATIENTS: Patient[] = [
-  { name: "Dominic Rivera", age: 22, summary: "College athlete with low energy during training season.", flags: [] },
-  { name: "Yvette Armstrong", age: 64, summary: "Newly diagnosed celiac disease, lives with her daughter.", flags: ["Gluten-free diet started before biopsy date"] },
-  { name: "Nisha Patel", age: 29, summary: "Gestational diabetes at 28 weeks, vegetarian.", flags: [] },
-  { name: "Omar Sinclair", age: 45, summary: "Six months after bariatric surgery. Protein and supplements.", flags: ["B12 listed twice with different doses"] },
-  { name: "Marcus Ramirez", age: 59, summary: "COPD with unintended weight loss.", flags: [] },
-  {
-    name: "Walter Greene",
-    age: 72,
-    summary: "Heart failure, kidney disease and type 2 diabetes.",
-    flags: [
-      "Notes say high sodium, but the lab shows Na 136",
-      "Widowed, but one line mentions his kids",
-      "Unknown drug name: Epirocil",
-      "Weight change described two different ways",
-    ],
-  },
-  { name: "Wyatt Nelson", age: 18, summary: "Type 1 diabetes, moving out for college.", flags: [] },
-  { name: "Vladko Bareche", age: 31, summary: "Crohn’s disease flare, low-residue diet questions.", flags: [] },
-];
+import { SAMPLE_PATIENTS } from "../../mock/faculty";
 
 // Sample-patient importer. Selecting a name shows the consistency notes for that profile.
 export function ImportPatients({ go }: { go: Go }) {
   const [selected, setSelected] = useState("Walter Greene");
-  const patient = PATIENTS.find((item) => item.name === selected) ?? PATIENTS[0];
+  const patient = SAMPLE_PATIENTS.find((item) => item.name === selected) ?? SAMPLE_PATIENTS[0];
   const flagCount = patient.flags.length;
 
   return (
@@ -52,7 +25,7 @@ export function ImportPatients({ go }: { go: Go }) {
       <div className="flex flex-wrap items-start gap-4">
         <section className="max-w-[380px] min-w-[280px] flex-1 overflow-hidden rounded-2xl border border-line bg-card">
           <div className="border-b border-hair-2 px-5 py-3.5 text-[13px] text-muted">8 patients</div>
-          {PATIENTS.map((item) => {
+          {SAMPLE_PATIENTS.map((item) => {
             const on = item.name === selected;
             const count = item.flags.length;
             return (

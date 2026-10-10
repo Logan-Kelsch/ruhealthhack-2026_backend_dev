@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import type { Go, ScreenId } from "../app/types";
+import { FACULTY_USER, STUDENT_USER } from "../mock/session";
 import { ICONS, StrokeIcon, type IconName } from "./Icons";
 import { Wordmark } from "./ui";
 
@@ -56,10 +57,7 @@ export function Shell({ screen, go, children }: ShellProps) {
   const focus = screen === "s-mic" || screen === "s-encounter";
   const section = sectionFor(screen);
   const items = role === "faculty" ? FACULTY_NAV : STUDENT_NAV;
-  const user =
-    role === "faculty"
-      ? { initials: "AO", name: "Dr. Amara Okafor", role: "Nutrition Sciences" }
-      : { initials: "JL", name: "Jordan Lee", role: "Dietetics cohort A" };
+  const user = role === "faculty" ? FACULTY_USER : STUDENT_USER;
 
   return (
     <div className="relative flex h-full min-h-[620px] overflow-hidden bg-paper text-ink">

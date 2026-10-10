@@ -2,26 +2,11 @@ import type { Go } from "../../app/types";
 import { Avatar } from "../../components/Avatar";
 import { Chevron, PlusIcon } from "../../components/Icons";
 import { Badge, Card, CardHead, GhostButton, Page, PageHeader, PrimaryButton, StatCard } from "../../components/ui";
-
-const REVIEWS = [
-  { initials: "14", who: "Student 14", caseName: "Walter Greene, visit 1", when: "Yesterday, 4:12 pm" },
-  { initials: "3", who: "Student 3", caseName: "Walter Greene, visit 1", when: "Yesterday, 11:40 am" },
-  { initials: "21", who: "Student 21", caseName: "Walter Greene, visit 2", when: "Oct 8" },
-];
-
-const ASSIGNMENTS = [
-  { name: "Walter Greene · Dietetics cohort A", done: "18/24", pct: "75%", due: "Oct 17" },
-  { name: "Alina Reyes · Medicine year 3", done: "10/24", pct: "42%", due: "Oct 24" },
-];
+import { ASSIGNMENTS, FACULTY_CASES, FACULTY_STATS, REVIEW_QUEUE, WEAKEST_DOMAIN } from "../../mock/faculty";
 
 // Faculty landing: review queue, assignment progress, and a short case list.
 export function FacultyHome({ go }: { go: Go }) {
   const openStudio = () => go("f-studio", { studioTab: "patient" });
-  const cases = [
-    { name: "Walter Greene, 72", meta: "Published", who: "walter" as const },
-    { name: "Alina Reyes, 21", meta: "Published", who: "alina" as const },
-    { name: "Eli Brooks, 6", meta: "Published", who: "eli" as const },
-  ];
 
   return (
     <Page>
@@ -36,28 +21,24 @@ export function FacultyHome({ go }: { go: Go }) {
       </PageHeader>
 
       <div className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))]">
-        <StatCard label="Needs your review" accent="danger">
-          <div className="mt-1.5 flex items-baseline gap-2">
-            <span className="text-[34px] font-semibold tracking-[-1px]">3</span>
-            <span className="text-[13px] text-muted">visits flagged</span>
-          </div>
-        </StatCard>
-        <StatCard label="Visits completed">
-          <div className="mt-1.5 flex items-baseline gap-2">
-            <span className="text-[34px] font-semibold tracking-[-1px]">28</span>
-            <span className="text-[13px] text-muted">of 48 assigned</span>
-          </div>
-        </StatCard>
-        <StatCard label="Weakest rubric domain">
-          <div className="mt-2 text-base leading-snug font-semibold">Professionalism, safety, and closure</div>
-          <div className="mt-0.5 text-[13px] text-danger">Class average 1.8 of 4</div>
+        {FACULTY_STATS.map((stat) => (
+          <StatCard key={stat.label} label={stat.label} accent={stat.accent}>
+            <div className="mt-1.5 flex items-baseline gap-2">
+              <span className="text-[34px] font-semibold tracking-[-1px]">{stat.value}</span>
+              <span className="text-[13px] text-muted">{stat.note}</span>
+            </div>
+          </StatCard>
+        ))}
+        <StatCard label={WEAKEST_DOMAIN.label}>
+          <div className="mt-2 text-base leading-snug font-semibold">{WEAKEST_DOMAIN.title}</div>
+          <div className="mt-0.5 text-[13px] text-danger">{WEAKEST_DOMAIN.note}</div>
         </StatCard>
       </div>
 
       <div className="grid items-start gap-4 [grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr))]">
         <Card>
           <CardHead title="Needs your review" aside={<span className="text-[13px] text-muted">Scored 1 of 4 in a domain</span>} />
-          {REVIEWS.map((review) => (
+          {REVIEW_QUEUE.map((review) => (
             <div key={review.initials} className="grid grid-cols-[36px_minmax(0,1fr)_auto] items-center gap-3.5 border-t border-hair px-5 py-3.5 first:border-t-0">
               <div className="flex size-9 items-center justify-center rounded-full bg-indigo-soft text-xs font-bold text-indigo">
                 {review.initials}
@@ -104,7 +85,7 @@ export function FacultyHome({ go }: { go: Go }) {
                 </button>
               }
             />
-            {cases.map((item) => (
+            {FACULTY_CASES.map((item) => (
               <button
                 key={item.name}
                 type="button"

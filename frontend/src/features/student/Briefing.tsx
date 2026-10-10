@@ -2,24 +2,13 @@ import type { Go, VisitNumber } from "../../app/types";
 import { Avatar } from "../../components/Avatar";
 import { ArrowRight, MicIcon } from "../../components/Icons";
 import { BackLink, Card, CardHead, Page, PrimaryButton } from "../../components/ui";
+import { WALTER_BRIEFING_FACTS, WALTER_BRIEFING_VITALS, WALTER_GOAL } from "../../mock/walter";
 
 // Doorway briefing before the microphone check. Visit 2 uses the follow-up goal and vitals.
 export function Briefing({ go, visit }: { go: Go; visit: VisitNumber }) {
   const visitTwo = visit === 2;
-  const facts = [
-    { k: "Setting", v: "Outpatient nutrition clinic" },
-    { k: "Your role", v: "Dietetics student" },
-    visitTwo
-      ? { k: "Your note from visit 1", v: "Excessive sodium intake related to frequent restaurant meals and canned soups." }
-      : { k: "From primary care", v: "Heart failure, kidney disease and type 2 diabetes. Review sodium and diet." },
-  ];
-  const vitals = [
-    { k: "BP", v: visitTwo ? "146/88" : "158/92", note: "Elevated", tone: "danger" },
-    { k: "HR", v: "78", note: "bpm", tone: "ink" },
-    { k: "RR", v: "18", note: "/min", tone: "ink" },
-    { k: "Temp", v: "37.0", note: "°C", tone: "ink" },
-    { k: "SpO₂", v: "96%", note: "Room air", tone: "ink" },
-  ];
+  const facts = WALTER_BRIEFING_FACTS[visit];
+  const vitals = WALTER_BRIEFING_VITALS[visit];
 
   return (
     <Page width="max-w-[820px]">
@@ -36,9 +25,7 @@ export function Briefing({ go, visit }: { go: Go; visit: VisitNumber }) {
       </header>
       <section className="rounded-2xl bg-ink px-6 py-5 text-white">
         <div className="text-xs font-semibold tracking-[0.6px] text-indigo-on-ink uppercase">Your goal</div>
-        <div className="mt-1.5 font-serif text-2xl leading-snug text-pretty">
-          {visitTwo ? "Review what changed since the first visit and adjust the plan." : "Assess diet and medicines; agree on one change."}
-        </div>
+        <div className="mt-1.5 font-serif text-2xl leading-snug text-pretty">{WALTER_GOAL[visit]}</div>
       </section>
       <Card>
         {facts.map((fact) => (

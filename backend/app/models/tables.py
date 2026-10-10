@@ -1,4 +1,4 @@
-"""Three tables. The case is one validated JSON document; an encounter keeps its
+"""Production tables plus a separate scripted-demo session table. The case is one validated JSON document; an encounter keeps its
 engine state and outputs as JSON; each turn keeps everything needed for replay."""
 from datetime import datetime, timezone
 
@@ -70,4 +70,15 @@ class TurnRow(Base):
     # Empty until a timing sample is saved. It does not replace latency_ms.
     timing_sample: Mapped[dict | None] = mapped_column(JSONType, nullable=True)
     llm_calls: Mapped[list] = mapped_column(JSONType)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+
+
+class DemoSessionRow(Base):
+    """Pinned rehearsal snapshot and atomic sequence state, separate from graded encounters."""
+    __tablename__ = "demo_sessions"
+
+    id: Mapped[str] = mapped_column(String(40), primary_key=True)
+    status: Mapped[str] = mapped_column(String(20))
+    revision: Mapped[int] = mapped_column(Integer, default=0)
+    payload: Mapped[dict] = mapped_column(JSONType)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)

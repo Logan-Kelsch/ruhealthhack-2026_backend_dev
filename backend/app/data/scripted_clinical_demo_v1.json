@@ -1,0 +1,633 @@
+{
+  "schema_version": "scripted_clinical_demo_v1",
+  "cases": [
+    {
+      "schema_version": "scripted_clinical_demo_v1",
+      "scenario_id": 1,
+      "fixture_version": 1,
+      "title": "Fever and respiratory symptoms",
+      "clinical_review_status": "pending",
+      "provenance": "authored_synthetic_script",
+      "model_execution": "none_scripted_playback",
+      "patient": {
+        "name": "Daniel Mercer",
+        "age_years": 58,
+        "sex": "male",
+        "presenting_concern": "Fever, cough, and shortness of breath",
+        "history": [
+          "Hypertension"
+        ]
+      },
+      "educator": {
+        "goal": "Recognize a pneumonia syndrome, elicit recent travel exposure, consider Legionella testing and appropriate antibiotic coverage under supervision.",
+        "example_description": "Daniel Mercer is a 58-year-old man with hypertension. He has four days of fever, dry cough, shortness of breath, and diarrhea. He attended a convention in Philadelphia and stayed in a hotel nine days ago. He takes lisinopril and has no known drug allergies. The goal is to assess the illness course and investigate pneumonia.",
+        "learner_role": "medical student under supervision",
+        "teaching_notes": [
+          "Use the fixed suggested sequence for a coherent rehearsal.",
+          "This is an authored demonstration, not a diagnosis or grading engine."
+        ],
+        "sources": [
+          {
+            "title": "CDC: clinical guidance",
+            "url": "https://www.cdc.gov/legionella/hcp/clinical-guidance/index.html"
+          },
+          {
+            "title": "CDC: clinical features",
+            "url": "https://www.cdc.gov/legionella/hcp/clinical-signs/index.html"
+          }
+        ]
+      },
+      "facts": {
+        "1.reply.1": {
+          "text": "I am Daniel. I have had a fever and this cough, and now I get winded just walking across the room.",
+          "provenance": "authored_synthetic_dialogue"
+        },
+        "1.reply.2": {
+          "text": "It started four days ago with aches and a fever. The cough came next. My breathing has gotten worse since yesterday.",
+          "provenance": "authored_synthetic_dialogue"
+        },
+        "1.reply.3": {
+          "text": "I have had watery diarrhea and a headache. I have not felt confused, but I am worn out.",
+          "provenance": "authored_synthetic_dialogue"
+        },
+        "1.reply.4": {
+          "text": "Yes. I went to a convention in Philly nine days ago and stayed at a downtown hotel for three nights.",
+          "provenance": "authored_synthetic_dialogue"
+        },
+        "1.reply.5": {
+          "text": "I have high blood pressure and take lisinopril. I do not know of any medicine allergies. I used to smoke but stopped five years ago.",
+          "provenance": "authored_synthetic_dialogue"
+        },
+        "1.reply.6": {
+          "text": "Yes, please. I feel like I cannot get a full breath.",
+          "provenance": "authored_synthetic_dialogue"
+        },
+        "1.reply.7": {
+          "text": "Could something at the hotel have made me sick? I thought this was just the flu.",
+          "provenance": "authored_synthetic_dialogue"
+        },
+        "1.reply.8": {
+          "text": "Okay. I can try to cough up a sample. Will I need an antibiotic?",
+          "provenance": "authored_synthetic_dialogue"
+        },
+        "1.reply.9": {
+          "text": "Please explain the plan as we go. I am worried about how breathless I am.",
+          "provenance": "authored_synthetic_dialogue"
+        },
+        "1.reply.10": {
+          "text": "You think I have pneumonia, and the hotel stay helps decide which tests to do. You are getting the clinician because my breathing needs attention.",
+          "provenance": "authored_synthetic_dialogue"
+        }
+      },
+      "turns": [
+        {
+          "step": 1,
+          "suggested_student_text": "Hello, I am the medical student working with your clinician. What has been bothering you most?",
+          "patient_text": "I am Daniel. I have had a fever and this cough, and now I get winded just walking across the room.",
+          "fact_ids": [
+            "1.reply.1"
+          ],
+          "release_chart_ids": [],
+          "simulated_delay_ms": 1522
+        },
+        {
+          "step": 2,
+          "suggested_student_text": "When did this start, and how has it changed?",
+          "patient_text": "It started four days ago with aches and a fever. The cough came next. My breathing has gotten worse since yesterday.",
+          "fact_ids": [
+            "1.reply.2"
+          ],
+          "release_chart_ids": [],
+          "simulated_delay_ms": 1522
+        },
+        {
+          "step": 3,
+          "suggested_student_text": "Have you had any other symptoms, like stomach problems or confusion?",
+          "patient_text": "I have had watery diarrhea and a headache. I have not felt confused, but I am worn out.",
+          "fact_ids": [
+            "1.reply.3"
+          ],
+          "release_chart_ids": [],
+          "simulated_delay_ms": 1426
+        },
+        {
+          "step": 4,
+          "suggested_student_text": "Have you traveled or stayed away from home in the last two weeks?",
+          "patient_text": "Yes. I went to a convention in Philly nine days ago and stayed at a downtown hotel for three nights.",
+          "fact_ids": [
+            "1.reply.4"
+          ],
+          "release_chart_ids": [],
+          "simulated_delay_ms": 1490
+        },
+        {
+          "step": 5,
+          "suggested_student_text": "Tell me about your health conditions, medicines, and allergies.",
+          "patient_text": "I have high blood pressure and take lisinopril. I do not know of any medicine allergies. I used to smoke but stopped five years ago.",
+          "fact_ids": [
+            "1.reply.5"
+          ],
+          "release_chart_ids": [],
+          "simulated_delay_ms": 1650
+        },
+        {
+          "step": 6,
+          "suggested_student_text": "I would like to check your oxygen level and examine your chest. Is that okay?",
+          "patient_text": "Yes, please. I feel like I cannot get a full breath.",
+          "fact_ids": [
+            "1.reply.6"
+          ],
+          "release_chart_ids": [
+            "pneumonia.vitals"
+          ],
+          "simulated_delay_ms": 1202
+        },
+        {
+          "step": 7,
+          "suggested_student_text": "The examination suggests pneumonia. I will ask my supervising clinician to review you now and arrange chest imaging and tests related to your recent travel.",
+          "patient_text": "Could something at the hotel have made me sick? I thought this was just the flu.",
+          "fact_ids": [
+            "1.reply.7"
+          ],
+          "release_chart_ids": [
+            "pneumonia.imaging"
+          ],
+          "simulated_delay_ms": 1362
+        },
+        {
+          "step": 8,
+          "suggested_student_text": "Hotel travel is a clue, but it does not prove the cause. We will collect urine and a respiratory sample if possible, without delaying needed treatment.",
+          "patient_text": "Okay. I can try to cough up a sample. Will I need an antibiotic?",
+          "fact_ids": [
+            "1.reply.8"
+          ],
+          "release_chart_ids": [
+            "pneumonia.testing"
+          ],
+          "simulated_delay_ms": 1298
+        },
+        {
+          "step": 9,
+          "suggested_student_text": "I will discuss prompt pneumonia treatment with my supervising clinician, including coverage for Legionella, such as a macrolide or a respiratory fluoroquinolone, if appropriate for you.",
+          "patient_text": "Please explain the plan as we go. I am worried about how breathless I am.",
+          "fact_ids": [
+            "1.reply.9"
+          ],
+          "release_chart_ids": [],
+          "simulated_delay_ms": 1330
+        },
+        {
+          "step": 10,
+          "suggested_student_text": "We are arranging monitored care and treatment. What questions do you have, and can you tell me what you understand so far?",
+          "patient_text": "You think I have pneumonia, and the hotel stay helps decide which tests to do. You are getting the clinician because my breathing needs attention.",
+          "fact_ids": [
+            "1.reply.10"
+          ],
+          "release_chart_ids": [],
+          "simulated_delay_ms": 1650
+        }
+      ],
+      "chart": [
+        {
+          "id": "pneumonia.vitals",
+          "release_step": 6,
+          "label": "Vital signs",
+          "text": "Temperature 39.1 C; heart rate 108/min; respiratory rate 26/min; blood pressure 116/72 mmHg; oxygen saturation 91% on room air. Right-sided crackles.",
+          "source": "Authored example values; CDC symptom context: https://www.cdc.gov/legionella/hcp/clinical-signs/index.html",
+          "provenance": "authored_synthetic_finding",
+          "urgent": true
+        },
+        {
+          "id": "pneumonia.imaging",
+          "release_step": 7,
+          "label": "Chest radiograph",
+          "text": "Right lower-lobe air-space opacity, consistent with pneumonia; imaging does not identify the pathogen.",
+          "source": "https://www.cdc.gov/legionella/hcp/clinical-guidance/index.html",
+          "provenance": "authored_synthetic_finding",
+          "urgent": false
+        },
+        {
+          "id": "pneumonia.testing",
+          "release_step": 8,
+          "label": "Specimens",
+          "text": "Urine antigen and lower respiratory specimen requested; results pending. No positive result is assumed.",
+          "source": "https://www.cdc.gov/legionella/hcp/clinical-guidance/index.html",
+          "provenance": "authored_synthetic_finding",
+          "urgent": false
+        }
+      ],
+      "debrief": [
+        {
+          "id": "1.reflection.1",
+          "domain_id": 3,
+          "anchor_step": 4,
+          "question": "What information from the travel history would you carry into your assessment, and what still needs confirmation?"
+        },
+        {
+          "id": "1.reflection.2",
+          "domain_id": 6,
+          "anchor_step": 6,
+          "question": "Which findings affect the urgency of your plan, independent of the eventual cause?"
+        },
+        {
+          "id": "1.reflection.3",
+          "domain_id": 5,
+          "anchor_step": 9,
+          "question": "How would you explain why a treatment is being considered without presenting an unconfirmed cause as certain?"
+        }
+      ]
+    },
+    {
+      "schema_version": "scripted_clinical_demo_v1",
+      "scenario_id": 2,
+      "fixture_version": 1,
+      "title": "Tobacco use and readiness to change",
+      "clinical_review_status": "pending",
+      "provenance": "authored_synthetic_script",
+      "model_execution": "none_scripted_playback",
+      "patient": {
+        "name": "Marcus Hale",
+        "age_years": 42,
+        "sex": "male",
+        "presenting_concern": "Discussion of tobacco use during a routine visit",
+        "history": [
+          "Tobacco use",
+          "Previous unsuccessful quit attempt"
+        ]
+      },
+      "educator": {
+        "goal": "Assess readiness, explore sustain talk and support autonomy; the patient remains unwilling to quit. Do not score success by agreement to cessation.",
+        "example_description": "Marcus Hale is a 42-year-old man who smokes one pack a day. He is not willing to quit smoking. He works rotating shifts, uses cigarettes for stress relief, and had a difficult previous quit attempt. The goal is to explore his willingness to change without pressuring him.",
+        "learner_role": "medical student under supervision",
+        "teaching_notes": [
+          "Use the fixed suggested sequence for a coherent rehearsal.",
+          "This is an authored demonstration, not a diagnosis or grading engine."
+        ],
+        "sources": [
+          {
+            "title": "NCDHHS: motivational interviewing and OARS",
+            "url": "https://www.dph.ncdhhs.gov/programs/chronic-disease-and-injury/tobacco-prevention-and-control/quitlinenc/providers/treatment/motivational-interviewing"
+          }
+        ]
+      },
+      "facts": {
+        "2.reply.1": {
+          "text": "We can talk, but I am telling you now: I am not quitting.",
+          "provenance": "authored_synthetic_dialogue"
+        },
+        "2.reply.2": {
+          "text": "I smoke about a pack a day. With rotating shifts, those breaks are how I settle down.",
+          "provenance": "authored_synthetic_dialogue"
+        },
+        "2.reply.3": {
+          "text": "I do not want to change. I know people say it is bad, but quitting is not on my list right now.",
+          "provenance": "authored_synthetic_dialogue"
+        },
+        "2.reply.4": {
+          "text": "No. That is what everyone says. If this is going to be another lecture, I would rather leave.",
+          "provenance": "authored_synthetic_dialogue"
+        },
+        "2.reply.5": {
+          "text": "I barely slept, I was irritable at work, and I went back to smoking. I do not want to go through that again.",
+          "provenance": "authored_synthetic_dialogue"
+        },
+        "2.reply.6": {
+          "text": "Keeping my job and getting through my shifts. My daughter hates the smell, but that does not mean I am ready to quit.",
+          "provenance": "authored_synthetic_dialogue"
+        },
+        "2.reply.7": {
+          "text": "You can give me something to look at, but I am not promising to call anyone or take medicine.",
+          "provenance": "authored_synthetic_dialogue"
+        },
+        "2.reply.8": {
+          "text": "Just do not make every visit about cigarettes. I want help with my health without being judged.",
+          "provenance": "authored_synthetic_dialogue"
+        }
+      },
+      "turns": [
+        {
+          "step": 1,
+          "suggested_student_text": "Hello, I am the medical student working with your clinician. Would it be okay to talk about smoking for a few minutes?",
+          "patient_text": "We can talk, but I am telling you now: I am not quitting.",
+          "fact_ids": [
+            "2.reply.1"
+          ],
+          "release_chart_ids": [],
+          "simulated_delay_ms": 1266
+        },
+        {
+          "step": 2,
+          "suggested_student_text": "What does smoking do for you during a usual day?",
+          "patient_text": "I smoke about a pack a day. With rotating shifts, those breaks are how I settle down.",
+          "fact_ids": [
+            "2.reply.2"
+          ],
+          "release_chart_ids": [],
+          "simulated_delay_ms": 1394
+        },
+        {
+          "step": 3,
+          "suggested_student_text": "How do you feel about making a change right now?",
+          "patient_text": "I do not want to change. I know people say it is bad, but quitting is not on my list right now.",
+          "fact_ids": [
+            "2.reply.3"
+          ],
+          "release_chart_ids": [
+            "tobacco.readiness"
+          ],
+          "simulated_delay_ms": 1554
+        },
+        {
+          "step": 4,
+          "suggested_student_text": "You really need to stop; could you set a quit date this week?",
+          "patient_text": "No. That is what everyone says. If this is going to be another lecture, I would rather leave.",
+          "fact_ids": [
+            "2.reply.4"
+          ],
+          "release_chart_ids": [],
+          "simulated_delay_ms": 1426
+        },
+        {
+          "step": 5,
+          "suggested_student_text": "I pushed ahead of where you are. You get to decide. What was difficult the last time you tried?",
+          "patient_text": "I barely slept, I was irritable at work, and I went back to smoking. I do not want to go through that again.",
+          "fact_ids": [
+            "2.reply.5"
+          ],
+          "release_chart_ids": [],
+          "simulated_delay_ms": 1586
+        },
+        {
+          "step": 6,
+          "suggested_student_text": "It sounds like smoking helps you manage stress, and the last attempt was miserable. What matters most to you at the moment?",
+          "patient_text": "Keeping my job and getting through my shifts. My daughter hates the smell, but that does not mean I am ready to quit.",
+          "fact_ids": [
+            "2.reply.6"
+          ],
+          "release_chart_ids": [],
+          "simulated_delay_ms": 1586
+        },
+        {
+          "step": 7,
+          "suggested_student_text": "Would you like information about support available if you ever choose to revisit this?",
+          "patient_text": "You can give me something to look at, but I am not promising to call anyone or take medicine.",
+          "fact_ids": [
+            "2.reply.7"
+          ],
+          "release_chart_ids": [],
+          "simulated_delay_ms": 1458
+        },
+        {
+          "step": 8,
+          "suggested_student_text": "I hear that you are not ready. We can revisit it when you want. Is there anything you want us to understand before we finish?",
+          "patient_text": "Just do not make every visit about cigarettes. I want help with my health without being judged.",
+          "fact_ids": [
+            "2.reply.8"
+          ],
+          "release_chart_ids": [],
+          "simulated_delay_ms": 1394
+        }
+      ],
+      "chart": [
+        {
+          "id": "tobacco.readiness",
+          "release_step": 3,
+          "label": "Patient-stated readiness",
+          "text": "The patient explicitly declines cessation at this visit. Readiness is not inferred from agreement to receive information.",
+          "source": "https://www.dph.ncdhhs.gov/programs/chronic-disease-and-injury/tobacco-prevention-and-control/quitlinenc/providers/treatment/motivational-interviewing",
+          "provenance": "authored_synthetic_finding",
+          "urgent": false
+        }
+      ],
+      "debrief": [
+        {
+          "id": "2.reflection.1",
+          "domain_id": 2,
+          "anchor_step": 4,
+          "question": "Compare the patient response before and after the quit-date question. What changed in the conversation?"
+        },
+        {
+          "id": "2.reflection.2",
+          "domain_id": 4,
+          "anchor_step": 6,
+          "question": "Which of the patient priorities could you reflect back without treating them as a commitment to change?"
+        },
+        {
+          "id": "2.reflection.3",
+          "domain_id": 5,
+          "anchor_step": 7,
+          "question": "How would you distinguish permission to receive information from willingness to start treatment?"
+        },
+        {
+          "id": "2.reflection.4",
+          "domain_id": 7,
+          "anchor_step": 8,
+          "question": "What would a useful closing plan look like if the patient still declines change?"
+        }
+      ]
+    },
+    {
+      "schema_version": "scripted_clinical_demo_v1",
+      "scenario_id": 3,
+      "fixture_version": 1,
+      "title": "Nausea, fatigue, and chest unease",
+      "clinical_review_status": "pending",
+      "provenance": "authored_synthetic_script",
+      "model_execution": "none_scripted_playback",
+      "patient": {
+        "name": "Leah Carter",
+        "age_years": 45,
+        "sex": "female",
+        "presenting_concern": "Nausea, sweating, unusual fatigue, and vague chest unease",
+        "history": [
+          "Panic attacks",
+          "Anxiety"
+        ]
+      },
+      "educator": {
+        "goal": "Recognize ST elevation on the released ECG, avoid anchoring on anxiety, and escalate immediately to the supervising emergency team.",
+        "example_description": "Leah Carter is a 45-year-old woman with panic attacks and anxiety. She presents to an emergency department with nausea, sweating, fatigue, and vague chest unease that began 40 minutes ago. Symptoms started while carrying groceries. An ECG shows ST elevation in II, III, and aVF with reciprocal depression in I and aVL. The goal is to recognize a time-critical cardiac presentation despite the anxiety history.",
+        "learner_role": "medical student under supervision",
+        "teaching_notes": [
+          "Use the fixed suggested sequence for a coherent rehearsal.",
+          "This is an authored demonstration, not a diagnosis or grading engine."
+        ],
+        "sources": [
+          {
+            "title": "2025 ACC/AHA acute coronary syndromes guideline",
+            "url": "https://www.jacc.org/doi/10.1016/j.jacc.2024.11.009"
+          },
+          {
+            "title": "AHA: heart attack symptoms in women",
+            "url": "https://www.heart.org/en/health-topics/heart-attack/warning-signs-of-a-heart-attack/heart-attack-symptoms-in-women"
+          }
+        ]
+      },
+      "facts": {
+        "3.reply.1": {
+          "text": "I feel sick to my stomach and sweaty. There is a strange heaviness here, but it is not sharp pain. Maybe it is my anxiety.",
+          "provenance": "authored_synthetic_dialogue"
+        },
+        "3.reply.2": {
+          "text": "About forty minutes ago, carrying groceries. I sat down, but it did not go away. I feel unusually tired and a little short of breath.",
+          "provenance": "authored_synthetic_dialogue"
+        },
+        "3.reply.3": {
+          "text": "All right. I have had panic attacks before, but this feels different.",
+          "provenance": "authored_synthetic_dialogue"
+        },
+        "3.reply.4": {
+          "text": "Usually I get frightened first, my heart races, and it settles down. This started with the sick feeling and heaviness, and it has stayed.",
+          "provenance": "authored_synthetic_dialogue"
+        },
+        "3.reply.5": {
+          "text": "Is something wrong with my heart? I thought I was having another panic attack.",
+          "provenance": "authored_synthetic_dialogue"
+        },
+        "3.reply.6": {
+          "text": "Please stay with me until they get here. I am scared.",
+          "provenance": "authored_synthetic_dialogue"
+        },
+        "3.reply.7": {
+          "text": "No known medicine allergies. I take sertraline every day. I have not taken anything else today.",
+          "provenance": "authored_synthetic_dialogue"
+        },
+        "3.reply.8": {
+          "text": "Thank you for taking me seriously. Please tell them when it started.",
+          "provenance": "authored_synthetic_dialogue"
+        }
+      },
+      "turns": [
+        {
+          "step": 1,
+          "suggested_student_text": "Hello, I am the medical student with the emergency team. Tell me what feels different today.",
+          "patient_text": "I feel sick to my stomach and sweaty. There is a strange heaviness here, but it is not sharp pain. Maybe it is my anxiety.",
+          "fact_ids": [
+            "3.reply.1"
+          ],
+          "release_chart_ids": [],
+          "simulated_delay_ms": 1650
+        },
+        {
+          "step": 2,
+          "suggested_student_text": "When did it begin, and what were you doing?",
+          "patient_text": "About forty minutes ago, carrying groceries. I sat down, but it did not go away. I feel unusually tired and a little short of breath.",
+          "fact_ids": [
+            "3.reply.2"
+          ],
+          "release_chart_ids": [],
+          "simulated_delay_ms": 1650
+        },
+        {
+          "step": 3,
+          "suggested_student_text": "I do not want to assume this is anxiety. I will alert my supervisor and arrange an ECG and vital signs now while we continue.",
+          "patient_text": "All right. I have had panic attacks before, but this feels different.",
+          "fact_ids": [
+            "3.reply.3"
+          ],
+          "release_chart_ids": [
+            "cardiac.vitals",
+            "cardiac.ecg"
+          ],
+          "simulated_delay_ms": 1234
+        },
+        {
+          "step": 4,
+          "suggested_student_text": "While the team reviews the ECG, how does this compare with your past panic attacks?",
+          "patient_text": "Usually I get frightened first, my heart races, and it settles down. This started with the sick feeling and heaviness, and it has stayed.",
+          "fact_ids": [
+            "3.reply.4"
+          ],
+          "release_chart_ids": [],
+          "simulated_delay_ms": 1618
+        },
+        {
+          "step": 5,
+          "suggested_student_text": "The ECG has changes that need immediate review. I am escalating now to the emergency clinician and cardiac team rather than waiting for more questions or blood-test results.",
+          "patient_text": "Is something wrong with my heart? I thought I was having another panic attack.",
+          "fact_ids": [
+            "3.reply.5"
+          ],
+          "release_chart_ids": [],
+          "simulated_delay_ms": 1298
+        },
+        {
+          "step": 6,
+          "suggested_student_text": "The tracing raises concern for a serious heart problem. The team is acting urgently and will explain the next steps. You have done the right thing by coming in.",
+          "patient_text": "Please stay with me until they get here. I am scared.",
+          "fact_ids": [
+            "3.reply.6"
+          ],
+          "release_chart_ids": [],
+          "simulated_delay_ms": 1202
+        },
+        {
+          "step": 7,
+          "suggested_student_text": "I will stay with you while we hand over. Do you have any medication allergies, and what medicines have you taken today?",
+          "patient_text": "No known medicine allergies. I take sertraline every day. I have not taken anything else today.",
+          "fact_ids": [
+            "3.reply.7"
+          ],
+          "release_chart_ids": [],
+          "simulated_delay_ms": 1362
+        },
+        {
+          "step": 8,
+          "suggested_student_text": "I am handing over your symptoms, their timing, and the ECG changes to the emergency clinician now.",
+          "patient_text": "Thank you for taking me seriously. Please tell them when it started.",
+          "fact_ids": [
+            "3.reply.8"
+          ],
+          "release_chart_ids": [],
+          "simulated_delay_ms": 1234
+        }
+      ],
+      "chart": [
+        {
+          "id": "cardiac.vitals",
+          "release_step": 3,
+          "label": "Vital signs",
+          "text": "Blood pressure 132/84 mmHg; heart rate 96/min; respiratory rate 22/min; oxygen saturation 97% on room air. Authored snapshot, not a reassurance of cardiac safety.",
+          "source": "Authored example values",
+          "provenance": "authored_synthetic_finding",
+          "urgent": false
+        },
+        {
+          "id": "cardiac.ecg",
+          "release_step": 3,
+          "label": "12-lead ECG",
+          "text": "Sinus rhythm. ST elevation of 2 mm in II, III, and aVF, with reciprocal ST depression in I and aVL. Synthetic teaching report; no real patient tracing.",
+          "source": "https://www.jacc.org/doi/10.1016/j.jacc.2024.11.009",
+          "provenance": "authored_synthetic_finding",
+          "urgent": true
+        }
+      ],
+      "debrief": [
+        {
+          "id": "3.reflection.1",
+          "domain_id": 6,
+          "anchor_step": 1,
+          "question": "What alternative explanations deserve attention before accepting the patient initial explanation?"
+        },
+        {
+          "id": "3.reflection.2",
+          "domain_id": 3,
+          "anchor_step": 3,
+          "question": "Which parts of the history justified early testing rather than a longer interview first?"
+        },
+        {
+          "id": "3.reflection.3",
+          "domain_id": 6,
+          "anchor_step": 5,
+          "question": "What evidence changed the urgency of your plan, and how would you communicate it in a handover?"
+        },
+        {
+          "id": "3.reflection.4",
+          "domain_id": 2,
+          "anchor_step": 6,
+          "question": "How can you acknowledge fear while avoiding premature reassurance?"
+        }
+      ]
+    }
+  ]
+}

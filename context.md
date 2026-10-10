@@ -878,3 +878,8 @@ Use these exact meanings in code, UI, docs and conversation.
   - image mockups in progress locally (Anuj); coded UI not started;
   - golden case content incomplete (waiting on Ahmad).
 - **Next:** the iteration 1 build per `PRD.md`, then the mentor session, then iteration 2 (Tavus, polish, statistics, video).
+
+
+### Scripted presenter rehearsal (2026-10-10)
+
+A user-requested notebook rehearses three fixed examples: pneumonia after Philadelphia convention/hotel travel, tobacco use with a patient unwilling to quit, and a 45-year-old woman with panic/anxiety history and an early ST-elevation ECG finding. This is separate from the existing golden cases. `/api/demo` uses authored static playback with estimated display delays and no actual model calls or scores. Educator metadata extraction and fixed dialogue are shown separately; the source snapshot is pinned per session. Text inputs exist only in the presenter notebook/automation boundary; no production student typing UI is introduced. Clinical review remains pending.

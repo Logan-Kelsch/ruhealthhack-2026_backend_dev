@@ -1,0 +1,965 @@
+{
+  "schema_version": "scripted_demo_report_v1",
+  "execution": "actual_http_handlers_isolated_sqlite",
+  "patient_generation": "authored_static_playback",
+  "model_calls": 0,
+  "clinical_review": "pending",
+  "student_assessment": "not_scored",
+  "cases": 3,
+  "replies": 26,
+  "http_requests": 39,
+  "runs": [
+    {
+      "scenario_id": 1,
+      "preparation": {
+        "preparation_id": "8487349d-9af7-4337-a708-d0d4197a7c8f",
+        "scenario_id": 1,
+        "fixture_version": 1,
+        "fixture_sha256": "31b6a8037b2bba15f526eb04de021b57f5b56aedae18b4a2fd5f425532f61b00",
+        "patient": {
+          "name": "Daniel Mercer",
+          "age_years": 58,
+          "sex": "male",
+          "presenting_concern": "Fever, cough, and shortness of breath",
+          "history": [
+            "Hypertension"
+          ]
+        },
+        "extracted_metadata": {
+          "schema_version": "demo_metadata_v1",
+          "description": "Daniel Mercer is a 58-year-old man with hypertension. He has four days of fever, dry cough, shortness of breath, and diarrhea. He attended a convention in Philadelphia and stayed in a hotel nine days ago. He takes lisinopril and has no known drug allergies. The goal is to assess the illness course and investigate pneumonia.",
+          "name": "Daniel Mercer",
+          "age_years": 58,
+          "sex": "male",
+          "categorized_spans": [
+            {
+              "category": "history",
+              "text": "Daniel Mercer is a 58-year-old man with hypertension.",
+              "start": 0,
+              "end": 53
+            },
+            {
+              "category": "demographics",
+              "text": "Daniel Mercer is a 58-year-old man with hypertension.",
+              "start": 0,
+              "end": 53
+            },
+            {
+              "category": "presenting_concern",
+              "text": "He has four days of fever, dry cough, shortness of breath, and diarrhea.",
+              "start": 54,
+              "end": 126
+            },
+            {
+              "category": "exposure",
+              "text": "He attended a convention in Philadelphia and stayed in a hotel nine days ago.",
+              "start": 127,
+              "end": 204
+            },
+            {
+              "category": "medications",
+              "text": "He takes lisinopril and has no known drug allergies.",
+              "start": 205,
+              "end": 257
+            },
+            {
+              "category": "allergies",
+              "text": "He takes lisinopril and has no known drug allergies.",
+              "start": 205,
+              "end": 257
+            },
+            {
+              "category": "learning_goal",
+              "text": "The goal is to assess the illness course and investigate pneumonia.",
+              "start": 258,
+              "end": 325
+            }
+          ],
+          "unmatched_spans": [],
+          "method": "deterministic_explicit_text_rules"
+        },
+        "warnings": [
+          "The fixed fixture defines the patient and replies. Extracted text is retained for educator review and does not change the dialogue.",
+          "This is rule-based structuring and scripted playback; no LLM has been called."
+        ],
+        "execution_mode": "scripted_playback",
+        "clinical_review_status": "pending",
+        "simulated_delay_ms": 1600,
+        "actual_model_calls": 0
+      },
+      "session": {
+        "session_id": "8487349d-9af7-4337-a708-d0d4197a7c8f",
+        "scenario_id": 1,
+        "fixture_sha256": "31b6a8037b2bba15f526eb04de021b57f5b56aedae18b4a2fd5f425532f61b00",
+        "status": "ended",
+        "patient_name": "Daniel Mercer",
+        "age_years": 58,
+        "presenting_concern": "Fever, cough, and shortness of breath",
+        "next_step": null,
+        "total_steps": 10,
+        "transcript": [
+          {
+            "step": 1,
+            "student_text": "Hello, I am the medical student working with your clinician. What has been bothering you most?",
+            "patient_text": "I am Daniel. I have had a fever and this cough, and now I get winded just walking across the room.",
+            "fact_ids": [
+              "1.reply.1"
+            ],
+            "simulated_delay_ms": 1522
+          },
+          {
+            "step": 2,
+            "student_text": "When did this start, and how has it changed?",
+            "patient_text": "It started four days ago with aches and a fever. The cough came next. My breathing has gotten worse since yesterday.",
+            "fact_ids": [
+              "1.reply.2"
+            ],
+            "simulated_delay_ms": 1522
+          },
+          {
+            "step": 3,
+            "student_text": "Have you had any other symptoms, like stomach problems or confusion?",
+            "patient_text": "I have had watery diarrhea and a headache. I have not felt confused, but I am worn out.",
+            "fact_ids": [
+              "1.reply.3"
+            ],
+            "simulated_delay_ms": 1426
+          },
+          {
+            "step": 4,
+            "student_text": "Have you traveled or stayed away from home in the last two weeks?",
+            "patient_text": "Yes. I went to a convention in Philly nine days ago and stayed at a downtown hotel for three nights.",
+            "fact_ids": [
+              "1.reply.4"
+            ],
+            "simulated_delay_ms": 1490
+          },
+          {
+            "step": 5,
+            "student_text": "Tell me about your health conditions, medicines, and allergies.",
+            "patient_text": "I have high blood pressure and take lisinopril. I do not know of any medicine allergies. I used to smoke but stopped five years ago.",
+            "fact_ids": [
+              "1.reply.5"
+            ],
+            "simulated_delay_ms": 1650
+          },
+          {
+            "step": 6,
+            "student_text": "I would like to check your oxygen level and examine your chest. Is that okay?",
+            "patient_text": "Yes, please. I feel like I cannot get a full breath.",
+            "fact_ids": [
+              "1.reply.6"
+            ],
+            "simulated_delay_ms": 1202
+          },
+          {
+            "step": 7,
+            "student_text": "The examination suggests pneumonia. I will ask my supervising clinician to review you now and arrange chest imaging and tests related to your recent travel.",
+            "patient_text": "Could something at the hotel have made me sick? I thought this was just the flu.",
+            "fact_ids": [
+              "1.reply.7"
+            ],
+            "simulated_delay_ms": 1362
+          },
+          {
+            "step": 8,
+            "student_text": "Hotel travel is a clue, but it does not prove the cause. We will collect urine and a respiratory sample if possible, without delaying needed treatment.",
+            "patient_text": "Okay. I can try to cough up a sample. Will I need an antibiotic?",
+            "fact_ids": [
+              "1.reply.8"
+            ],
+            "simulated_delay_ms": 1298
+          },
+          {
+            "step": 9,
+            "student_text": "I will discuss prompt pneumonia treatment with my supervising clinician, including coverage for Legionella, such as a macrolide or a respiratory fluoroquinolone, if appropriate for you.",
+            "patient_text": "Please explain the plan as we go. I am worried about how breathless I am.",
+            "fact_ids": [
+              "1.reply.9"
+            ],
+            "simulated_delay_ms": 1330
+          },
+          {
+            "step": 10,
+            "student_text": "We are arranging monitored care and treatment. What questions do you have, and can you tell me what you understand so far?",
+            "patient_text": "You think I have pneumonia, and the hotel stay helps decide which tests to do. You are getting the clinician because my breathing needs attention.",
+            "fact_ids": [
+              "1.reply.10"
+            ],
+            "simulated_delay_ms": 1650
+          }
+        ],
+        "chart": [
+          {
+            "id": "pneumonia.vitals",
+            "label": "Vital signs",
+            "text": "Temperature 39.1 C; heart rate 108/min; respiratory rate 26/min; blood pressure 116/72 mmHg; oxygen saturation 91% on room air. Right-sided crackles.",
+            "source": "Authored example values; CDC symptom context: https://www.cdc.gov/legionella/hcp/clinical-signs/index.html",
+            "provenance": "authored_synthetic_finding",
+            "urgent": true
+          },
+          {
+            "id": "pneumonia.imaging",
+            "label": "Chest radiograph",
+            "text": "Right lower-lobe air-space opacity, consistent with pneumonia; imaging does not identify the pathogen.",
+            "source": "https://www.cdc.gov/legionella/hcp/clinical-guidance/index.html",
+            "provenance": "authored_synthetic_finding",
+            "urgent": false
+          },
+          {
+            "id": "pneumonia.testing",
+            "label": "Specimens",
+            "text": "Urine antigen and lower respiratory specimen requested; results pending. No positive result is assumed.",
+            "source": "https://www.cdc.gov/legionella/hcp/clinical-guidance/index.html",
+            "provenance": "authored_synthetic_finding",
+            "urgent": false
+          }
+        ],
+        "execution_mode": "scripted_playback",
+        "input_handling": "sequence_position_only",
+        "actual_model_calls": 0
+      },
+      "debrief": {
+        "session_id": "8487349d-9af7-4337-a708-d0d4197a7c8f",
+        "method": "scripted_guided_reflection",
+        "reflections": [
+          {
+            "id": "1.reflection.1",
+            "domain_id": 3,
+            "domain_name": "Information gathering",
+            "question": "What information from the travel history would you carry into your assessment, and what still needs confirmation?",
+            "anchor_step": 4,
+            "student_quote": "Have you traveled or stayed away from home in the last two weeks?",
+            "patient_quote": "Yes. I went to a convention in Philly nine days ago and stayed at a downtown hotel for three nights."
+          },
+          {
+            "id": "1.reflection.2",
+            "domain_id": 6,
+            "domain_name": "Clinical reasoning and synthesis",
+            "question": "Which findings affect the urgency of your plan, independent of the eventual cause?",
+            "anchor_step": 6,
+            "student_quote": "I would like to check your oxygen level and examine your chest. Is that okay?",
+            "patient_quote": "Yes, please. I feel like I cannot get a full breath."
+          },
+          {
+            "id": "1.reflection.3",
+            "domain_id": 5,
+            "domain_name": "Explanation and shared decisions",
+            "question": "How would you explain why a treatment is being considered without presenting an unconfirmed cause as certain?",
+            "anchor_step": 9,
+            "student_quote": "I will discuss prompt pneumonia treatment with my supervising clinician, including coverage for Legionella, such as a macrolide or a respiratory fluoroquinolone, if appropriate for you.",
+            "patient_quote": "Please explain the plan as we go. I am worried about how breathless I am."
+          }
+        ],
+        "completed_steps": 10,
+        "total_steps": 10,
+        "follows_rehearsal_script": true,
+        "assessment_status": "not_scored",
+        "interpretation": "These are authored reflection questions, not a judgment that you made an error. Replies depend on sequence position, not interpretation of your input. No rubric score or learning outcome is assigned.",
+        "safety_notice": "Time-critical teaching finding: obtain immediate supervising-clinician review and escalation. Reflection must not delay urgent care."
+      }
+    },
+    {
+      "scenario_id": 2,
+      "preparation": {
+        "preparation_id": "efb4e715-fe53-46ee-9c7f-5c8818dc65e2",
+        "scenario_id": 2,
+        "fixture_version": 1,
+        "fixture_sha256": "4980512aebf6b5a1f26adc3edaf4e7266823bfb854e6adaac1cdbc5bb3133858",
+        "patient": {
+          "name": "Marcus Hale",
+          "age_years": 42,
+          "sex": "male",
+          "presenting_concern": "Discussion of tobacco use during a routine visit",
+          "history": [
+            "Tobacco use",
+            "Previous unsuccessful quit attempt"
+          ]
+        },
+        "extracted_metadata": {
+          "schema_version": "demo_metadata_v1",
+          "description": "Marcus Hale is a 42-year-old man who smokes one pack a day. He is not willing to quit smoking. He works rotating shifts, uses cigarettes for stress relief, and had a difficult previous quit attempt. The goal is to explore his willingness to change without pressuring him.",
+          "name": "Marcus Hale",
+          "age_years": 42,
+          "sex": "male",
+          "categorized_spans": [
+            {
+              "category": "tobacco_and_readiness",
+              "text": "Marcus Hale is a 42-year-old man who smokes one pack a day.",
+              "start": 0,
+              "end": 59
+            },
+            {
+              "category": "demographics",
+              "text": "Marcus Hale is a 42-year-old man who smokes one pack a day.",
+              "start": 0,
+              "end": 59
+            },
+            {
+              "category": "tobacco_and_readiness",
+              "text": "He is not willing to quit smoking.",
+              "start": 60,
+              "end": 94
+            },
+            {
+              "category": "history",
+              "text": "He works rotating shifts, uses cigarettes for stress relief, and had a difficult previous quit attempt.",
+              "start": 95,
+              "end": 198
+            },
+            {
+              "category": "tobacco_and_readiness",
+              "text": "He works rotating shifts, uses cigarettes for stress relief, and had a difficult previous quit attempt.",
+              "start": 95,
+              "end": 198
+            },
+            {
+              "category": "tobacco_and_readiness",
+              "text": "The goal is to explore his willingness to change without pressuring him.",
+              "start": 199,
+              "end": 271
+            },
+            {
+              "category": "learning_goal",
+              "text": "The goal is to explore his willingness to change without pressuring him.",
+              "start": 199,
+              "end": 271
+            }
+          ],
+          "unmatched_spans": [],
+          "method": "deterministic_explicit_text_rules"
+        },
+        "warnings": [
+          "The fixed fixture defines the patient and replies. Extracted text is retained for educator review and does not change the dialogue.",
+          "This is rule-based structuring and scripted playback; no LLM has been called."
+        ],
+        "execution_mode": "scripted_playback",
+        "clinical_review_status": "pending",
+        "simulated_delay_ms": 1600,
+        "actual_model_calls": 0
+      },
+      "session": {
+        "session_id": "efb4e715-fe53-46ee-9c7f-5c8818dc65e2",
+        "scenario_id": 2,
+        "fixture_sha256": "4980512aebf6b5a1f26adc3edaf4e7266823bfb854e6adaac1cdbc5bb3133858",
+        "status": "ended",
+        "patient_name": "Marcus Hale",
+        "age_years": 42,
+        "presenting_concern": "Discussion of tobacco use during a routine visit",
+        "next_step": null,
+        "total_steps": 8,
+        "transcript": [
+          {
+            "step": 1,
+            "student_text": "Hello, I am the medical student working with your clinician. Would it be okay to talk about smoking for a few minutes?",
+            "patient_text": "We can talk, but I am telling you now: I am not quitting.",
+            "fact_ids": [
+              "2.reply.1"
+            ],
+            "simulated_delay_ms": 1266
+          },
+          {
+            "step": 2,
+            "student_text": "What does smoking do for you during a usual day?",
+            "patient_text": "I smoke about a pack a day. With rotating shifts, those breaks are how I settle down.",
+            "fact_ids": [
+              "2.reply.2"
+            ],
+            "simulated_delay_ms": 1394
+          },
+          {
+            "step": 3,
+            "student_text": "How do you feel about making a change right now?",
+            "patient_text": "I do not want to change. I know people say it is bad, but quitting is not on my list right now.",
+            "fact_ids": [
+              "2.reply.3"
+            ],
+            "simulated_delay_ms": 1554
+          },
+          {
+            "step": 4,
+            "student_text": "You really need to stop; could you set a quit date this week?",
+            "patient_text": "No. That is what everyone says. If this is going to be another lecture, I would rather leave.",
+            "fact_ids": [
+              "2.reply.4"
+            ],
+            "simulated_delay_ms": 1426
+          },
+          {
+            "step": 5,
+            "student_text": "I pushed ahead of where you are. You get to decide. What was difficult the last time you tried?",
+            "patient_text": "I barely slept, I was irritable at work, and I went back to smoking. I do not want to go through that again.",
+            "fact_ids": [
+              "2.reply.5"
+            ],
+            "simulated_delay_ms": 1586
+          },
+          {
+            "step": 6,
+            "student_text": "It sounds like smoking helps you manage stress, and the last attempt was miserable. What matters most to you at the moment?",
+            "patient_text": "Keeping my job and getting through my shifts. My daughter hates the smell, but that does not mean I am ready to quit.",
+            "fact_ids": [
+              "2.reply.6"
+            ],
+            "simulated_delay_ms": 1586
+          },
+          {
+            "step": 7,
+            "student_text": "Would you like information about support available if you ever choose to revisit this?",
+            "patient_text": "You can give me something to look at, but I am not promising to call anyone or take medicine.",
+            "fact_ids": [
+              "2.reply.7"
+            ],
+            "simulated_delay_ms": 1458
+          },
+          {
+            "step": 8,
+            "student_text": "I hear that you are not ready. We can revisit it when you want. Is there anything you want us to understand before we finish?",
+            "patient_text": "Just do not make every visit about cigarettes. I want help with my health without being judged.",
+            "fact_ids": [
+              "2.reply.8"
+            ],
+            "simulated_delay_ms": 1394
+          }
+        ],
+        "chart": [
+          {
+            "id": "tobacco.readiness",
+            "label": "Patient-stated readiness",
+            "text": "The patient explicitly declines cessation at this visit. Readiness is not inferred from agreement to receive information.",
+            "source": "https://www.dph.ncdhhs.gov/programs/chronic-disease-and-injury/tobacco-prevention-and-control/quitlinenc/providers/treatment/motivational-interviewing",
+            "provenance": "authored_synthetic_finding",
+            "urgent": false
+          }
+        ],
+        "execution_mode": "scripted_playback",
+        "input_handling": "sequence_position_only",
+        "actual_model_calls": 0
+      },
+      "debrief": {
+        "session_id": "efb4e715-fe53-46ee-9c7f-5c8818dc65e2",
+        "method": "scripted_guided_reflection",
+        "reflections": [
+          {
+            "id": "2.reflection.1",
+            "domain_id": 2,
+            "domain_name": "Rapport, respect, and empathy",
+            "question": "Compare the patient response before and after the quit-date question. What changed in the conversation?",
+            "anchor_step": 4,
+            "student_quote": "You really need to stop; could you set a quit date this week?",
+            "patient_quote": "No. That is what everyone says. If this is going to be another lecture, I would rather leave."
+          },
+          {
+            "id": "2.reflection.2",
+            "domain_id": 4,
+            "domain_name": "Listening and response to cues",
+            "question": "Which of the patient priorities could you reflect back without treating them as a commitment to change?",
+            "anchor_step": 6,
+            "student_quote": "It sounds like smoking helps you manage stress, and the last attempt was miserable. What matters most to you at the moment?",
+            "patient_quote": "Keeping my job and getting through my shifts. My daughter hates the smell, but that does not mean I am ready to quit."
+          },
+          {
+            "id": "2.reflection.3",
+            "domain_id": 5,
+            "domain_name": "Explanation and shared decisions",
+            "question": "How would you distinguish permission to receive information from willingness to start treatment?",
+            "anchor_step": 7,
+            "student_quote": "Would you like information about support available if you ever choose to revisit this?",
+            "patient_quote": "You can give me something to look at, but I am not promising to call anyone or take medicine."
+          },
+          {
+            "id": "2.reflection.4",
+            "domain_id": 7,
+            "domain_name": "Professionalism, safety, and closure",
+            "question": "What would a useful closing plan look like if the patient still declines change?",
+            "anchor_step": 8,
+            "student_quote": "I hear that you are not ready. We can revisit it when you want. Is there anything you want us to understand before we finish?",
+            "patient_quote": "Just do not make every visit about cigarettes. I want help with my health without being judged."
+          }
+        ],
+        "completed_steps": 8,
+        "total_steps": 8,
+        "follows_rehearsal_script": true,
+        "assessment_status": "not_scored",
+        "interpretation": "These are authored reflection questions, not a judgment that you made an error. Replies depend on sequence position, not interpretation of your input. No rubric score or learning outcome is assigned.",
+        "safety_notice": null
+      }
+    },
+    {
+      "scenario_id": 3,
+      "preparation": {
+        "preparation_id": "6d9de2ed-c135-4ab4-a984-e6bda2257e1f",
+        "scenario_id": 3,
+        "fixture_version": 1,
+        "fixture_sha256": "6d92887a3eb28b91274d5b867559be6840a781213e4c264fc81d4cdabdcd97c3",
+        "patient": {
+          "name": "Leah Carter",
+          "age_years": 45,
+          "sex": "female",
+          "presenting_concern": "Nausea, sweating, unusual fatigue, and vague chest unease",
+          "history": [
+            "Panic attacks",
+            "Anxiety"
+          ]
+        },
+        "extracted_metadata": {
+          "schema_version": "demo_metadata_v1",
+          "description": "Leah Carter is a 45-year-old woman with panic attacks and anxiety. She presents to an emergency department with nausea, sweating, fatigue, and vague chest unease that began 40 minutes ago. Symptoms started while carrying groceries. An ECG shows ST elevation in II, III, and aVF with reciprocal depression in I and aVL. The goal is to recognize a time-critical cardiac presentation despite the anxiety history.",
+          "name": "Leah Carter",
+          "age_years": 45,
+          "sex": "female",
+          "categorized_spans": [
+            {
+              "category": "history",
+              "text": "Leah Carter is a 45-year-old woman with panic attacks and anxiety.",
+              "start": 0,
+              "end": 66
+            },
+            {
+              "category": "demographics",
+              "text": "Leah Carter is a 45-year-old woman with panic attacks and anxiety.",
+              "start": 0,
+              "end": 66
+            },
+            {
+              "category": "presenting_concern",
+              "text": "She presents to an emergency department with nausea, sweating, fatigue, and vague chest unease that began 40 minutes ago.",
+              "start": 67,
+              "end": 188
+            },
+            {
+              "category": "presenting_concern",
+              "text": "Symptoms started while carrying groceries.",
+              "start": 189,
+              "end": 231
+            },
+            {
+              "category": "findings",
+              "text": "An ECG shows ST elevation in II, III, and aVF with reciprocal depression in I and aVL.",
+              "start": 232,
+              "end": 318
+            },
+            {
+              "category": "history",
+              "text": "The goal is to recognize a time-critical cardiac presentation despite the anxiety history.",
+              "start": 319,
+              "end": 409
+            },
+            {
+              "category": "learning_goal",
+              "text": "The goal is to recognize a time-critical cardiac presentation despite the anxiety history.",
+              "start": 319,
+              "end": 409
+            }
+          ],
+          "unmatched_spans": [],
+          "method": "deterministic_explicit_text_rules"
+        },
+        "warnings": [
+          "The fixed fixture defines the patient and replies. Extracted text is retained for educator review and does not change the dialogue.",
+          "This is rule-based structuring and scripted playback; no LLM has been called."
+        ],
+        "execution_mode": "scripted_playback",
+        "clinical_review_status": "pending",
+        "simulated_delay_ms": 1600,
+        "actual_model_calls": 0
+      },
+      "session": {
+        "session_id": "6d9de2ed-c135-4ab4-a984-e6bda2257e1f",
+        "scenario_id": 3,
+        "fixture_sha256": "6d92887a3eb28b91274d5b867559be6840a781213e4c264fc81d4cdabdcd97c3",
+        "status": "ended",
+        "patient_name": "Leah Carter",
+        "age_years": 45,
+        "presenting_concern": "Nausea, sweating, unusual fatigue, and vague chest unease",
+        "next_step": null,
+        "total_steps": 8,
+        "transcript": [
+          {
+            "step": 1,
+            "student_text": "Hello, I am the medical student with the emergency team. Tell me what feels different today.",
+            "patient_text": "I feel sick to my stomach and sweaty. There is a strange heaviness here, but it is not sharp pain. Maybe it is my anxiety.",
+            "fact_ids": [
+              "3.reply.1"
+            ],
+            "simulated_delay_ms": 1650
+          },
+          {
+            "step": 2,
+            "student_text": "When did it begin, and what were you doing?",
+            "patient_text": "About forty minutes ago, carrying groceries. I sat down, but it did not go away. I feel unusually tired and a little short of breath.",
+            "fact_ids": [
+              "3.reply.2"
+            ],
+            "simulated_delay_ms": 1650
+          },
+          {
+            "step": 3,
+            "student_text": "I do not want to assume this is anxiety. I will alert my supervisor and arrange an ECG and vital signs now while we continue.",
+            "patient_text": "All right. I have had panic attacks before, but this feels different.",
+            "fact_ids": [
+              "3.reply.3"
+            ],
+            "simulated_delay_ms": 1234
+          },
+          {
+            "step": 4,
+            "student_text": "While the team reviews the ECG, how does this compare with your past panic attacks?",
+            "patient_text": "Usually I get frightened first, my heart races, and it settles down. This started with the sick feeling and heaviness, and it has stayed.",
+            "fact_ids": [
+              "3.reply.4"
+            ],
+            "simulated_delay_ms": 1618
+          },
+          {
+            "step": 5,
+            "student_text": "The ECG has changes that need immediate review. I am escalating now to the emergency clinician and cardiac team rather than waiting for more questions or blood-test results.",
+            "patient_text": "Is something wrong with my heart? I thought I was having another panic attack.",
+            "fact_ids": [
+              "3.reply.5"
+            ],
+            "simulated_delay_ms": 1298
+          },
+          {
+            "step": 6,
+            "student_text": "The tracing raises concern for a serious heart problem. The team is acting urgently and will explain the next steps. You have done the right thing by coming in.",
+            "patient_text": "Please stay with me until they get here. I am scared.",
+            "fact_ids": [
+              "3.reply.6"
+            ],
+            "simulated_delay_ms": 1202
+          },
+          {
+            "step": 7,
+            "student_text": "I will stay with you while we hand over. Do you have any medication allergies, and what medicines have you taken today?",
+            "patient_text": "No known medicine allergies. I take sertraline every day. I have not taken anything else today.",
+            "fact_ids": [
+              "3.reply.7"
+            ],
+            "simulated_delay_ms": 1362
+          },
+          {
+            "step": 8,
+            "student_text": "I am handing over your symptoms, their timing, and the ECG changes to the emergency clinician now.",
+            "patient_text": "Thank you for taking me seriously. Please tell them when it started.",
+            "fact_ids": [
+              "3.reply.8"
+            ],
+            "simulated_delay_ms": 1234
+          }
+        ],
+        "chart": [
+          {
+            "id": "cardiac.vitals",
+            "label": "Vital signs",
+            "text": "Blood pressure 132/84 mmHg; heart rate 96/min; respiratory rate 22/min; oxygen saturation 97% on room air. Authored snapshot, not a reassurance of cardiac safety.",
+            "source": "Authored example values",
+            "provenance": "authored_synthetic_finding",
+            "urgent": false
+          },
+          {
+            "id": "cardiac.ecg",
+            "label": "12-lead ECG",
+            "text": "Sinus rhythm. ST elevation of 2 mm in II, III, and aVF, with reciprocal ST depression in I and aVL. Synthetic teaching report; no real patient tracing.",
+            "source": "https://www.jacc.org/doi/10.1016/j.jacc.2024.11.009",
+            "provenance": "authored_synthetic_finding",
+            "urgent": true
+          }
+        ],
+        "execution_mode": "scripted_playback",
+        "input_handling": "sequence_position_only",
+        "actual_model_calls": 0
+      },
+      "debrief": {
+        "session_id": "6d9de2ed-c135-4ab4-a984-e6bda2257e1f",
+        "method": "scripted_guided_reflection",
+        "reflections": [
+          {
+            "id": "3.reflection.1",
+            "domain_id": 6,
+            "domain_name": "Clinical reasoning and synthesis",
+            "question": "What alternative explanations deserve attention before accepting the patient initial explanation?",
+            "anchor_step": 1,
+            "student_quote": "Hello, I am the medical student with the emergency team. Tell me what feels different today.",
+            "patient_quote": "I feel sick to my stomach and sweaty. There is a strange heaviness here, but it is not sharp pain. Maybe it is my anxiety."
+          },
+          {
+            "id": "3.reflection.2",
+            "domain_id": 3,
+            "domain_name": "Information gathering",
+            "question": "Which parts of the history justified early testing rather than a longer interview first?",
+            "anchor_step": 3,
+            "student_quote": "I do not want to assume this is anxiety. I will alert my supervisor and arrange an ECG and vital signs now while we continue.",
+            "patient_quote": "All right. I have had panic attacks before, but this feels different."
+          },
+          {
+            "id": "3.reflection.3",
+            "domain_id": 6,
+            "domain_name": "Clinical reasoning and synthesis",
+            "question": "What evidence changed the urgency of your plan, and how would you communicate it in a handover?",
+            "anchor_step": 5,
+            "student_quote": "The ECG has changes that need immediate review. I am escalating now to the emergency clinician and cardiac team rather than waiting for more questions or blood-test results.",
+            "patient_quote": "Is something wrong with my heart? I thought I was having another panic attack."
+          },
+          {
+            "id": "3.reflection.4",
+            "domain_id": 2,
+            "domain_name": "Rapport, respect, and empathy",
+            "question": "How can you acknowledge fear while avoiding premature reassurance?",
+            "anchor_step": 6,
+            "student_quote": "The tracing raises concern for a serious heart problem. The team is acting urgently and will explain the next steps. You have done the right thing by coming in.",
+            "patient_quote": "Please stay with me until they get here. I am scared."
+          }
+        ],
+        "completed_steps": 8,
+        "total_steps": 8,
+        "follows_rehearsal_script": true,
+        "assessment_status": "not_scored",
+        "interpretation": "These are authored reflection questions, not a judgment that you made an error. Replies depend on sequence position, not interpretation of your input. No rubric score or learning outcome is assigned.",
+        "safety_notice": "Time-critical teaching finding: obtain immediate supervising-clinician review and escalation. Reflection must not delay urgent care."
+      }
+    }
+  ],
+  "calls": [
+    {
+      "method": "GET",
+      "path": "/api/demo/educator/scenarios",
+      "status": 200,
+      "http_handler_ms": 33.869
+    },
+    {
+      "method": "POST",
+      "path": "/api/demo/educator/preparations",
+      "status": 201,
+      "http_handler_ms": 10.31
+    },
+    {
+      "method": "POST",
+      "path": "/api/demo/sessions",
+      "status": 200,
+      "http_handler_ms": 10.598
+    },
+    {
+      "method": "POST",
+      "path": "/api/demo/sessions/8487349d-9af7-4337-a708-d0d4197a7c8f/turns",
+      "status": 200,
+      "http_handler_ms": 3.937
+    },
+    {
+      "method": "POST",
+      "path": "/api/demo/sessions/8487349d-9af7-4337-a708-d0d4197a7c8f/turns",
+      "status": 200,
+      "http_handler_ms": 3.205
+    },
+    {
+      "method": "POST",
+      "path": "/api/demo/sessions/8487349d-9af7-4337-a708-d0d4197a7c8f/turns",
+      "status": 200,
+      "http_handler_ms": 4.119
+    },
+    {
+      "method": "POST",
+      "path": "/api/demo/sessions/8487349d-9af7-4337-a708-d0d4197a7c8f/turns",
+      "status": 200,
+      "http_handler_ms": 4.64
+    },
+    {
+      "method": "POST",
+      "path": "/api/demo/sessions/8487349d-9af7-4337-a708-d0d4197a7c8f/turns",
+      "status": 200,
+      "http_handler_ms": 3.123
+    },
+    {
+      "method": "POST",
+      "path": "/api/demo/sessions/8487349d-9af7-4337-a708-d0d4197a7c8f/turns",
+      "status": 200,
+      "http_handler_ms": 3.492
+    },
+    {
+      "method": "POST",
+      "path": "/api/demo/sessions/8487349d-9af7-4337-a708-d0d4197a7c8f/turns",
+      "status": 200,
+      "http_handler_ms": 3.039
+    },
+    {
+      "method": "POST",
+      "path": "/api/demo/sessions/8487349d-9af7-4337-a708-d0d4197a7c8f/turns",
+      "status": 200,
+      "http_handler_ms": 3.965
+    },
+    {
+      "method": "POST",
+      "path": "/api/demo/sessions/8487349d-9af7-4337-a708-d0d4197a7c8f/turns",
+      "status": 200,
+      "http_handler_ms": 51.463
+    },
+    {
+      "method": "POST",
+      "path": "/api/demo/sessions/8487349d-9af7-4337-a708-d0d4197a7c8f/turns",
+      "status": 200,
+      "http_handler_ms": 4.025
+    },
+    {
+      "method": "POST",
+      "path": "/api/demo/sessions/8487349d-9af7-4337-a708-d0d4197a7c8f/end",
+      "status": 200,
+      "http_handler_ms": 3.735
+    },
+    {
+      "method": "GET",
+      "path": "/api/demo/sessions/8487349d-9af7-4337-a708-d0d4197a7c8f/debrief",
+      "status": 200,
+      "http_handler_ms": 3.101
+    },
+    {
+      "method": "POST",
+      "path": "/api/demo/educator/preparations",
+      "status": 201,
+      "http_handler_ms": 5.354
+    },
+    {
+      "method": "POST",
+      "path": "/api/demo/sessions",
+      "status": 200,
+      "http_handler_ms": 4.602
+    },
+    {
+      "method": "POST",
+      "path": "/api/demo/sessions/efb4e715-fe53-46ee-9c7f-5c8818dc65e2/turns",
+      "status": 200,
+      "http_handler_ms": 3.497
+    },
+    {
+      "method": "POST",
+      "path": "/api/demo/sessions/efb4e715-fe53-46ee-9c7f-5c8818dc65e2/turns",
+      "status": 200,
+      "http_handler_ms": 3.692
+    },
+    {
+      "method": "POST",
+      "path": "/api/demo/sessions/efb4e715-fe53-46ee-9c7f-5c8818dc65e2/turns",
+      "status": 200,
+      "http_handler_ms": 4.074
+    },
+    {
+      "method": "POST",
+      "path": "/api/demo/sessions/efb4e715-fe53-46ee-9c7f-5c8818dc65e2/turns",
+      "status": 200,
+      "http_handler_ms": 4.165
+    },
+    {
+      "method": "POST",
+      "path": "/api/demo/sessions/efb4e715-fe53-46ee-9c7f-5c8818dc65e2/turns",
+      "status": 200,
+      "http_handler_ms": 4.042
+    },
+    {
+      "method": "POST",
+      "path": "/api/demo/sessions/efb4e715-fe53-46ee-9c7f-5c8818dc65e2/turns",
+      "status": 200,
+      "http_handler_ms": 3.101
+    },
+    {
+      "method": "POST",
+      "path": "/api/demo/sessions/efb4e715-fe53-46ee-9c7f-5c8818dc65e2/turns",
+      "status": 200,
+      "http_handler_ms": 3.401
+    },
+    {
+      "method": "POST",
+      "path": "/api/demo/sessions/efb4e715-fe53-46ee-9c7f-5c8818dc65e2/turns",
+      "status": 200,
+      "http_handler_ms": 3.644
+    },
+    {
+      "method": "POST",
+      "path": "/api/demo/sessions/efb4e715-fe53-46ee-9c7f-5c8818dc65e2/end",
+      "status": 200,
+      "http_handler_ms": 3.848
+    },
+    {
+      "method": "GET",
+      "path": "/api/demo/sessions/efb4e715-fe53-46ee-9c7f-5c8818dc65e2/debrief",
+      "status": 200,
+      "http_handler_ms": 2.61
+    },
+    {
+      "method": "POST",
+      "path": "/api/demo/educator/preparations",
+      "status": 201,
+      "http_handler_ms": 3.613
+    },
+    {
+      "method": "POST",
+      "path": "/api/demo/sessions",
+      "status": 200,
+      "http_handler_ms": 3.369
+    },
+    {
+      "method": "POST",
+      "path": "/api/demo/sessions/6d9de2ed-c135-4ab4-a984-e6bda2257e1f/turns",
+      "status": 200,
+      "http_handler_ms": 3.15
+    },
+    {
+      "method": "POST",
+      "path": "/api/demo/sessions/6d9de2ed-c135-4ab4-a984-e6bda2257e1f/turns",
+      "status": 200,
+      "http_handler_ms": 3.651
+    },
+    {
+      "method": "POST",
+      "path": "/api/demo/sessions/6d9de2ed-c135-4ab4-a984-e6bda2257e1f/turns",
+      "status": 200,
+      "http_handler_ms": 3.065
+    },
+    {
+      "method": "POST",
+      "path": "/api/demo/sessions/6d9de2ed-c135-4ab4-a984-e6bda2257e1f/turns",
+      "status": 200,
+      "http_handler_ms": 3.524
+    },
+    {
+      "method": "POST",
+      "path": "/api/demo/sessions/6d9de2ed-c135-4ab4-a984-e6bda2257e1f/turns",
+      "status": 200,
+      "http_handler_ms": 2.923
+    },
+    {
+      "method": "POST",
+      "path": "/api/demo/sessions/6d9de2ed-c135-4ab4-a984-e6bda2257e1f/turns",
+      "status": 200,
+      "http_handler_ms": 3.498
+    },
+    {
+      "method": "POST",
+      "path": "/api/demo/sessions/6d9de2ed-c135-4ab4-a984-e6bda2257e1f/turns",
+      "status": 200,
+      "http_handler_ms": 3.375
+    },
+    {
+      "method": "POST",
+      "path": "/api/demo/sessions/6d9de2ed-c135-4ab4-a984-e6bda2257e1f/turns",
+      "status": 200,
+      "http_handler_ms": 3.296
+    },
+    {
+      "method": "POST",
+      "path": "/api/demo/sessions/6d9de2ed-c135-4ab4-a984-e6bda2257e1f/end",
+      "status": 200,
+      "http_handler_ms": 3.626
+    },
+    {
+      "method": "GET",
+      "path": "/api/demo/sessions/6d9de2ed-c135-4ab4-a984-e6bda2257e1f/debrief",
+      "status": 200,
+      "http_handler_ms": 2.202
+    }
+  ],
+  "limitations": [
+    "Delay values are presentation assumptions; handlers do not sleep.",
+    "Input consumes sequence position without semantic classification.",
+    "Cases are authored synthetic examples, not clinically approved cases.",
+    "No live LLM, voice, frontend screen, or human-learning outcome is exercised."
+  ]
+}

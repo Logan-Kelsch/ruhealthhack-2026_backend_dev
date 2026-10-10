@@ -1,0 +1,9 @@
+{
+  "execution": "IPython cells in sequence; native kernel transport blocked by runtime",
+  "code_cells_passed": 6,
+  "figures": 1,
+  "all_case_rehearsals": 3,
+  "manual_controls": "educator prepare, start, suggested question, send, early end verified",
+  "model_calls": 0,
+  "delay_mode": "disabled for validation; enabled by default in notebook"
+}

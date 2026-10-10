@@ -64,6 +64,125 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/demo/educator/preparations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Prepare */
+        post: operations["prepare_api_demo_educator_preparations_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/demo/educator/scenarios": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Scenarios */
+        get: operations["scenarios_api_demo_educator_scenarios_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/demo/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Start */
+        post: operations["start_api_demo_sessions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/demo/sessions/{sid}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read */
+        get: operations["read_api_demo_sessions__sid__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/demo/sessions/{sid}/debrief": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Debrief */
+        get: operations["debrief_api_demo_sessions__sid__debrief_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/demo/sessions/{sid}/end": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** End */
+        post: operations["end_api_demo_sessions__sid__end_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/demo/sessions/{sid}/turns": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Turn */
+        post: operations["turn_api_demo_sessions__sid__turns_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/encounters": {
         parameters: {
             query?: never;
@@ -1106,6 +1225,24 @@ export interface components {
             /** Keywords */
             keywords?: string[];
         };
+        /** ChartItem */
+        ChartItem: {
+            /** Id */
+            id: string;
+            /** Label */
+            label: string;
+            /**
+             * Provenance
+             * @constant
+             */
+            provenance: "authored_synthetic_finding";
+            /** Source */
+            source: string;
+            /** Text */
+            text: string;
+            /** Urgent */
+            urgent: boolean;
+        };
         /**
          * CitedNote
          * @description A strength or improvement. The quote is omitted when it was not in the transcript.
@@ -1263,6 +1400,114 @@ export interface components {
             /** Rubric Domain */
             rubric_domain?: string | null;
         };
+        /** DemoDebrief */
+        DemoDebrief: {
+            /**
+             * Assessment Status
+             * @default not_scored
+             * @constant
+             */
+            assessment_status: "not_scored";
+            /** Completed Steps */
+            completed_steps: number;
+            /** Follows Rehearsal Script */
+            follows_rehearsal_script: boolean;
+            /** Interpretation */
+            interpretation: string;
+            /**
+             * Method
+             * @default scripted_guided_reflection
+             * @constant
+             */
+            method: "scripted_guided_reflection";
+            /** Reflections */
+            reflections: components["schemas"]["Reflection"][];
+            /** Safety Notice */
+            safety_notice: string | null;
+            /** Session Id */
+            session_id: string;
+            /** Total Steps */
+            total_steps: number;
+        };
+        /** DemoSession */
+        DemoSession: {
+            /**
+             * Actual Model Calls
+             * @default 0
+             */
+            actual_model_calls: number;
+            /** Age Years */
+            age_years: number;
+            /** Chart */
+            chart: components["schemas"]["ChartItem"][];
+            /**
+             * Execution Mode
+             * @default scripted_playback
+             * @constant
+             */
+            execution_mode: "scripted_playback";
+            /** Fixture Sha256 */
+            fixture_sha256: string;
+            /**
+             * Input Handling
+             * @default sequence_position_only
+             * @constant
+             */
+            input_handling: "sequence_position_only";
+            /** Next Step */
+            next_step: number | null;
+            /** Patient Name */
+            patient_name: string;
+            /** Presenting Concern */
+            presenting_concern: string;
+            /** Scenario Id */
+            scenario_id: number;
+            /** Session Id */
+            session_id: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "student" | "ready_to_end" | "ended";
+            /** Total Steps */
+            total_steps: number;
+            /** Transcript */
+            transcript: components["schemas"]["TranscriptTurn"][];
+        };
+        /** DemoTurnRequest */
+        DemoTurnRequest: {
+            /** Expected Step */
+            expected_step: number;
+            /** Request Id */
+            request_id: string;
+            /** Text */
+            text: string;
+        };
+        /** DemoTurnResult */
+        DemoTurnResult: {
+            /**
+             * Actual Model Calls
+             * @default 0
+             */
+            actual_model_calls: number;
+            /** Chart Added */
+            chart_added: components["schemas"]["ChartItem"][];
+            /** Complete */
+            complete: boolean;
+            /**
+             * Execution Mode
+             * @default scripted_playback
+             * @constant
+             */
+            execution_mode: "scripted_playback";
+            /** Next Step */
+            next_step: number | null;
+            /** Safety Notice */
+            safety_notice: string | null;
+            /** Session Id */
+            session_id: string;
+            turn: components["schemas"]["TranscriptTurn"];
+        };
         /** Diagnosis */
         Diagnosis: {
             /** Codes */
@@ -1385,6 +1630,32 @@ export interface components {
              * @default
              */
             strength_demonstrated: string;
+        };
+        /** EducatorScenario */
+        EducatorScenario: {
+            /**
+             * Clinical Review Status
+             * @default pending
+             * @constant
+             */
+            clinical_review_status: "pending";
+            /** Example Description */
+            example_description: string;
+            /** Fixture Version */
+            fixture_version: number;
+            /** Goal */
+            goal: string;
+            patient: components["schemas"]["PatientMetadata"];
+            /** Scenario Id */
+            scenario_id: number;
+            /** Sources */
+            sources: {
+                [key: string]: string;
+            }[];
+            /** Suggested Student Sequence */
+            suggested_student_sequence: string[];
+            /** Title */
+            title: string;
         };
         /**
          * EncounterList
@@ -1762,6 +2033,33 @@ export interface components {
              */
             status: "draft" | "approved";
         };
+        /** MetadataExtraction */
+        MetadataExtraction: {
+            /** Age Years */
+            age_years: number | null;
+            /** Categorized Spans */
+            categorized_spans: components["schemas"]["SourceSpan"][];
+            /** Description */
+            description: string;
+            /**
+             * Method
+             * @default deterministic_explicit_text_rules
+             * @constant
+             */
+            method: "deterministic_explicit_text_rules";
+            /** Name */
+            name: string | null;
+            /**
+             * Schema Version
+             * @default demo_metadata_v1
+             * @constant
+             */
+            schema_version: "demo_metadata_v1";
+            /** Sex */
+            sex: ("male" | "female") | null;
+            /** Unmatched Spans */
+            unmatched_spans: components["schemas"]["SourceSpan"][];
+        };
         /**
          * MissedFact
          * @description An expected discovery that stayed undisclosed, with a question the student could ask.
@@ -1839,6 +2137,22 @@ export interface components {
             /** Objective Id */
             objective_id: string;
         };
+        /** PatientMetadata */
+        PatientMetadata: {
+            /** Age Years */
+            age_years: number;
+            /** History */
+            history: string[];
+            /** Name */
+            name: string;
+            /** Presenting Concern */
+            presenting_concern: string;
+            /**
+             * Sex
+             * @enum {string}
+             */
+            sex: "male" | "female";
+        };
         /** Personality */
         Personality: {
             /**
@@ -1896,6 +2210,50 @@ export interface components {
             order?: string | null;
             /** Topic */
             topic?: string | null;
+        };
+        /** Preparation */
+        Preparation: {
+            /**
+             * Actual Model Calls
+             * @default 0
+             */
+            actual_model_calls: number;
+            /**
+             * Clinical Review Status
+             * @default pending
+             * @constant
+             */
+            clinical_review_status: "pending";
+            /**
+             * Execution Mode
+             * @default scripted_playback
+             * @constant
+             */
+            execution_mode: "scripted_playback";
+            extracted_metadata: components["schemas"]["MetadataExtraction"];
+            /** Fixture Sha256 */
+            fixture_sha256: string;
+            /** Fixture Version */
+            fixture_version: number;
+            patient: components["schemas"]["PatientMetadata"];
+            /** Preparation Id */
+            preparation_id: string;
+            /** Scenario Id */
+            scenario_id: number;
+            /**
+             * Simulated Delay Ms
+             * @default 1600
+             */
+            simulated_delay_ms: number;
+            /** Warnings */
+            warnings: string[];
+        };
+        /** PrepareRequest */
+        PrepareRequest: {
+            /** Description */
+            description: string;
+            /** Scenario Id */
+            scenario_id: number;
         };
         /** Preview */
         Preview: {
@@ -2319,6 +2677,23 @@ export interface components {
             /** Label */
             label: string;
         };
+        /** Reflection */
+        Reflection: {
+            /** Anchor Step */
+            anchor_step: number;
+            /** Domain Id */
+            domain_id: number;
+            /** Domain Name */
+            domain_name: string;
+            /** Id */
+            id: string;
+            /** Patient Quote */
+            patient_quote: string;
+            /** Question */
+            question: string;
+            /** Student Quote */
+            student_quote: string;
+        };
         /** Release */
         Release: {
             /** Fact Id */
@@ -2414,6 +2789,17 @@ export interface components {
             /** Ref */
             ref?: string | null;
         };
+        /** SourceSpan */
+        SourceSpan: {
+            /** Category */
+            category: string;
+            /** End */
+            end: number;
+            /** Start */
+            start: number;
+            /** Text */
+            text: string;
+        };
         /** StartEncounter */
         StartEncounter: {
             /** Case Id */
@@ -2429,6 +2815,16 @@ export interface components {
             version?: number | null;
             /** Visit Id */
             visit_id?: string | null;
+        };
+        /** StartRequest */
+        StartRequest: {
+            /**
+             * Accept Fixed Script
+             * @constant
+             */
+            accept_fixed_script: true;
+            /** Preparation Id */
+            preparation_id: string;
         };
         /**
          * StudioAutofillResult
@@ -2596,6 +2992,19 @@ export interface components {
             turn: number;
             /** Words */
             words?: components["schemas"]["WordTimestamp"][];
+        };
+        /** TranscriptTurn */
+        TranscriptTurn: {
+            /** Fact Ids */
+            fact_ids: string[];
+            /** Patient Text */
+            patient_text: string;
+            /** Simulated Delay Ms */
+            simulated_delay_ms: number;
+            /** Step */
+            step: number;
+            /** Student Text */
+            student_text: string;
         };
         /** TrustConfig */
         TrustConfig: {
@@ -2945,6 +3354,346 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PublicConfig"];
+                };
+            };
+        };
+    };
+    prepare_api_demo_educator_preparations_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PrepareRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Preparation"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    scenarios_api_demo_educator_scenarios_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EducatorScenario"][];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    start_api_demo_sessions_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StartRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DemoSession"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    read_api_demo_sessions__sid__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                sid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DemoSession"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    debrief_api_demo_sessions__sid__debrief_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                sid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DemoDebrief"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    end_api_demo_sessions__sid__end_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                sid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DemoSession"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    turn_api_demo_sessions__sid__turns_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                sid: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DemoTurnRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DemoTurnResult"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
         };

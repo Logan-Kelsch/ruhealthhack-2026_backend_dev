@@ -34,3 +34,8 @@ The [V-01 pipeline probe](docs/validation/live_grounding_v1.md) runs with `LLM_E
 The [private reviewer workflow](docs/private_reviewer_workflow.md) wraps Notebook 06's 287 locked packets in independent offline reviewer files, source facts, exact-span evidence tools and third-party adjudication. All generated files and submissions must live outside Git. Run `python -m backend_kelsch.scripts.review_workflow prepare --workspace /your/private/new-directory` with `LLM_ENABLED=false PYTHONPATH=backend`; `demo` demonstrates toy transport only. New live candidates are excluded until separately versioned. See [workflow validation](docs/validation/private_reviewer_workflow.md).
 
 The [clinical review kit](docs/clinical_review_kit.md) adds a 12-packet instruction rehearsal and separately locked 12-candidate semantic supplement. Run `LLM_ENABLED=false PYTHONPATH=backend python -m backend_kelsch.scripts.clinical_review_kit report`. The [AI-authored clinical critique and steps 3–6 plan](docs/clinical_reasoning_review.md) are for human review; no clinical approval, learner evidence or new patient facts are supplied.
+
+
+## Three-case scripted presenter rehearsal
+
+Notebook `notebooks/11_scripted_clinical_demo.ipynb` runs educator text structuring, fixed conversations for pneumonia/tobacco/cardiac examples, progressive findings, and indirect debrief questions. It includes interactive presenter controls and a complete replay. See [setup, endpoints, and replacement guide](docs/scripted_clinical_demo.md). The opt-in `/api/demo` routes are separate from graded encounters and never call Bedrock or assign scores.

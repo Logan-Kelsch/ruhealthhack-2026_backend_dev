@@ -18,7 +18,7 @@ StudentText = Annotated[Text, StringConstraints(max_length=2000)]
 Description = Annotated[Text, StringConstraints(max_length=12000)]
 FIXTURE = BACKEND_DIR / "app/data/scripted_clinical_demo_v1.json"
 REVIEW_DIR = BACKEND_DIR.parent / "backend_kelsch/docs/scripted_scenarios"
-FILENAMES = {1: "01_legionella.json", 2: "02_smoking_cessation.json", 3: "03_cardiac.json"}
+FILENAMES = {1: "01_legionella_final_debrief.json", 2: "02_smoking_cessation_final_debrief.json", 3: "03_cardiac_final_debrief.json"}
 
 
 class ReviewModel(BaseModel):

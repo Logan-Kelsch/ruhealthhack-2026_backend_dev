@@ -5,9 +5,9 @@ clinician, and edit the wording inside quotation marks. No Python edits are need
 
 | File | Scenario |
 |---|---|
-| `01_legionella.json` | Pneumonia after a Philadelphia convention; assessment and antibiotic discussion |
-| `02_smoking_cessation.json` | Smoking cessation; the patient remains unwilling to change |
-| `03_cardiac.json` | A 45-year-old woman with anxiety history and ST elevation on an electrocardiogram |
+| `01_legionella_final_debrief.json` | Pneumonia after a Philadelphia convention; assessment and antibiotic discussion |
+| `02_smoking_cessation_final_debrief.json` | Smoking cessation; the patient remains unwilling to change |
+| `03_cardiac_final_debrief.json` | A 45-year-old woman with anxiety history and ST elevation on an electrocardiogram |
 
 These are authored synthetic teaching scripts awaiting clinical review. Each file ends with a single debrief for the entire completed dialogue.
 
@@ -50,18 +50,18 @@ the case. First check the edited files:
 
 ```bash
 PYTHONPATH=backend python -m scripts.update_scripted_clinical_demo --check \
-  backend_kelsch/docs/scripted_scenarios/01_legionella.json \
-  backend_kelsch/docs/scripted_scenarios/02_smoking_cessation.json \
-  backend_kelsch/docs/scripted_scenarios/03_cardiac.json
+  backend_kelsch/docs/scripted_scenarios/01_legionella_final_debrief.json \
+  backend_kelsch/docs/scripted_scenarios/02_smoking_cessation_final_debrief.json \
+  backend_kelsch/docs/scripted_scenarios/03_cardiac_final_debrief.json
 ```
 
 Remove `--check` to apply them:
 
 ```bash
 PYTHONPATH=backend python -m scripts.update_scripted_clinical_demo \
-  backend_kelsch/docs/scripted_scenarios/01_legionella.json \
-  backend_kelsch/docs/scripted_scenarios/02_smoking_cessation.json \
-  backend_kelsch/docs/scripted_scenarios/03_cardiac.json
+  backend_kelsch/docs/scripted_scenarios/01_legionella_final_debrief.json \
+  backend_kelsch/docs/scripted_scenarios/02_smoking_cessation_final_debrief.json \
+  backend_kelsch/docs/scripted_scenarios/03_cardiac_final_debrief.json
 ```
 
 The script validates the whole batch before writing anything. It updates
@@ -82,7 +82,7 @@ Python callers can use the same function:
 from pathlib import Path
 from app.demo.authoring import import_scripts
 
-result = import_scripts([Path("returned/01_legionella.json")])
+result = import_scripts([Path("returned/01_legionella_final_debrief.json")])
 ```
 
 ## Export the current scripts again

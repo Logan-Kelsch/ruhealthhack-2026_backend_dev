@@ -1,0 +1,7301 @@
+{
+  "components": {
+    "schemas": {
+      "Allergy": {
+        "properties": {
+          "reaction": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reaction"
+          },
+          "release": {
+            "$ref": "#/components/schemas/Release"
+          },
+          "source": {
+            "$ref": "#/components/schemas/Source"
+          },
+          "status": {
+            "default": "draft",
+            "enum": [
+              "draft",
+              "approved"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "substance": {
+            "title": "Substance",
+            "type": "string"
+          }
+        },
+        "required": [
+          "substance"
+        ],
+        "title": "Allergy",
+        "type": "object"
+      },
+      "Approve": {
+        "description": "Which saved items change review state. keys limits the change to those ids.",
+        "properties": {
+          "group": {
+            "enum": [
+              "facts",
+              "vitals",
+              "labs",
+              "exam",
+              "artifacts",
+              "diagnoses",
+              "medications",
+              "allergies",
+              "objectives",
+              "branches",
+              "visit_changes"
+            ],
+            "title": "Group",
+            "type": "string"
+          },
+          "keys": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Keys"
+          },
+          "status": {
+            "default": "approved",
+            "enum": [
+              "approved",
+              "draft"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "group"
+        ],
+        "title": "Approve",
+        "type": "object"
+      },
+      "Artifact": {
+        "properties": {
+          "attribution": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attribution"
+          },
+          "body": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "default": "other",
+            "enum": [
+              "prior_note",
+              "referral",
+              "lab_report",
+              "ecg",
+              "xray",
+              "ct",
+              "image",
+              "questionnaire",
+              "other"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "license": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "License"
+          },
+          "release": {
+            "$ref": "#/components/schemas/Release"
+          },
+          "source": {
+            "$ref": "#/components/schemas/Source"
+          },
+          "status": {
+            "default": "draft",
+            "enum": [
+              "draft",
+              "approved"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          }
+        },
+        "required": [
+          "id",
+          "title"
+        ],
+        "title": "Artifact",
+        "type": "object"
+      },
+      "Autofill": {
+        "properties": {
+          "panels": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Panels",
+            "type": "array"
+          },
+          "vitals": {
+            "default": true,
+            "title": "Vitals",
+            "type": "boolean"
+          }
+        },
+        "title": "Autofill",
+        "type": "object"
+      },
+      "AutofillAdded": {
+        "description": "Lab ids and vital keys this auto-fill run proposed. Faculty entries are not listed.",
+        "properties": {
+          "labs": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Labs",
+            "type": "array"
+          },
+          "vitals": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Vitals",
+            "type": "array"
+          }
+        },
+        "required": [
+          "labs",
+          "vitals"
+        ],
+        "title": "AutofillAdded",
+        "type": "object"
+      },
+      "Belief": {
+        "description": "What the patient believes when it differs from the chart (unreliable narrator).",
+        "properties": {
+          "say": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Say"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "Belief",
+        "type": "object"
+      },
+      "Branch": {
+        "description": "A faculty-written outcome applied to the next visit when its conditions match.",
+        "properties": {
+          "after_branches": {
+            "items": {
+              "type": "string"
+            },
+            "title": "After Branches",
+            "type": "array"
+          },
+          "changes": {
+            "$ref": "#/components/schemas/VisitChanges"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "status": {
+            "default": "draft",
+            "enum": [
+              "draft",
+              "approved"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "summary": {
+            "default": "",
+            "title": "Summary",
+            "type": "string"
+          },
+          "tag": {
+            "anyOf": [
+              {
+                "enum": [
+                  "common",
+                  "rare"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tag"
+          },
+          "when": {
+            "additionalProperties": {
+              "type": "boolean"
+            },
+            "title": "When",
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "label"
+        ],
+        "title": "Branch",
+        "type": "object"
+      },
+      "BranchSummary": {
+        "description": "One faculty-written outcome. Later-visit fact changes and likelihood tags are not on it.",
+        "properties": {
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/EvidenceQuote"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "summary": {
+            "default": "",
+            "title": "Summary",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label"
+        ],
+        "title": "BranchSummary",
+        "type": "object"
+      },
+      "Briefing": {
+        "properties": {
+          "goal": {
+            "default": "",
+            "title": "Goal",
+            "type": "string"
+          },
+          "reason_for_visit": {
+            "default": "",
+            "title": "Reason For Visit",
+            "type": "string"
+          },
+          "setting": {
+            "default": "",
+            "title": "Setting",
+            "type": "string"
+          },
+          "show_doorway_vitals": {
+            "default": true,
+            "title": "Show Doorway Vitals",
+            "type": "boolean"
+          },
+          "student_role": {
+            "default": "",
+            "title": "Student Role",
+            "type": "string"
+          }
+        },
+        "title": "Briefing",
+        "type": "object"
+      },
+      "BuilderAllergy": {
+        "properties": {
+          "reaction": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reaction"
+          },
+          "substance": {
+            "title": "Substance",
+            "type": "string"
+          }
+        },
+        "required": [
+          "substance"
+        ],
+        "title": "BuilderAllergy",
+        "type": "object"
+      },
+      "BuilderCondition": {
+        "properties": {
+          "code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Code"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "BuilderCondition",
+        "type": "object"
+      },
+      "BuilderForm": {
+        "description": "Everything the builder asks. Empty strings mean the faculty member left it blank.",
+        "properties": {
+          "age": {
+            "anyOf": [
+              {
+                "maximum": 120.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Age"
+          },
+          "allergies": {
+            "items": {
+              "$ref": "#/components/schemas/BuilderAllergy"
+            },
+            "title": "Allergies",
+            "type": "array"
+          },
+          "chief_complaint": {
+            "default": "",
+            "title": "Chief Complaint",
+            "type": "string"
+          },
+          "communication_style": {
+            "default": "",
+            "title": "Communication Style",
+            "type": "string"
+          },
+          "conditions": {
+            "items": {
+              "$ref": "#/components/schemas/BuilderCondition"
+            },
+            "title": "Conditions",
+            "type": "array"
+          },
+          "description": {
+            "maxLength": 8000,
+            "minLength": 10,
+            "title": "Description",
+            "type": "string"
+          },
+          "difficulty": {
+            "default": "typical",
+            "enum": [
+              "straightforward",
+              "typical",
+              "difficult"
+            ],
+            "title": "Difficulty",
+            "type": "string"
+          },
+          "documentation_template": {
+            "default": "SOAP",
+            "enum": [
+              "PES",
+              "ADIME",
+              "SBAR",
+              "SOAP"
+            ],
+            "title": "Documentation Template",
+            "type": "string"
+          },
+          "goal": {
+            "default": "",
+            "title": "Goal",
+            "type": "string"
+          },
+          "goals_fears": {
+            "default": "",
+            "title": "Goals Fears",
+            "type": "string"
+          },
+          "health_literacy": {
+            "default": "medium",
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ],
+            "title": "Health Literacy",
+            "type": "string"
+          },
+          "hidden": {
+            "default": "",
+            "title": "Hidden",
+            "type": "string"
+          },
+          "medications": {
+            "items": {
+              "$ref": "#/components/schemas/BuilderMedication"
+            },
+            "title": "Medications",
+            "type": "array"
+          },
+          "mood": {
+            "default": "",
+            "title": "Mood",
+            "type": "string"
+          },
+          "name": {
+            "default": "",
+            "title": "Name",
+            "type": "string"
+          },
+          "no_known_allergies": {
+            "default": false,
+            "title": "No Known Allergies",
+            "type": "boolean"
+          },
+          "notes": {
+            "default": "",
+            "maxLength": 8000,
+            "title": "Notes",
+            "type": "string"
+          },
+          "objectives": {
+            "default": "",
+            "title": "Objectives",
+            "type": "string"
+          },
+          "occupation": {
+            "default": "",
+            "title": "Occupation",
+            "type": "string"
+          },
+          "personal_cue": {
+            "default": "",
+            "title": "Personal Cue",
+            "type": "string"
+          },
+          "personality": {
+            "default": "",
+            "title": "Personality",
+            "type": "string"
+          },
+          "pronouns": {
+            "default": "",
+            "title": "Pronouns",
+            "type": "string"
+          },
+          "reason_for_visit": {
+            "default": "",
+            "title": "Reason For Visit",
+            "type": "string"
+          },
+          "setting": {
+            "default": "",
+            "title": "Setting",
+            "type": "string"
+          },
+          "sex": {
+            "default": "other",
+            "enum": [
+              "male",
+              "female",
+              "other"
+            ],
+            "title": "Sex",
+            "type": "string"
+          },
+          "show_doorway_vitals": {
+            "default": true,
+            "title": "Show Doorway Vitals",
+            "type": "boolean"
+          },
+          "social": {
+            "default": "",
+            "title": "Social",
+            "type": "string"
+          },
+          "speaker": {
+            "default": "",
+            "title": "Speaker",
+            "type": "string"
+          },
+          "student_role": {
+            "default": "",
+            "title": "Student Role",
+            "type": "string"
+          },
+          "vitals": {
+            "items": {
+              "$ref": "#/components/schemas/BuilderVital"
+            },
+            "title": "Vitals",
+            "type": "array"
+          }
+        },
+        "required": [
+          "description"
+        ],
+        "title": "BuilderForm",
+        "type": "object"
+      },
+      "BuilderMedication": {
+        "properties": {
+          "dose": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dose"
+          },
+          "frequency": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Frequency"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "purpose": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Purpose"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "BuilderMedication",
+        "type": "object"
+      },
+      "BuilderSuggestRequest": {
+        "properties": {
+          "description": {
+            "maxLength": 8000,
+            "minLength": 10,
+            "title": "Description",
+            "type": "string"
+          },
+          "notes": {
+            "default": "",
+            "maxLength": 8000,
+            "title": "Notes",
+            "type": "string"
+          }
+        },
+        "required": [
+          "description"
+        ],
+        "title": "BuilderSuggestRequest",
+        "type": "object"
+      },
+      "BuilderSuggestResult": {
+        "properties": {
+          "form": {
+            "$ref": "#/components/schemas/BuilderForm"
+          },
+          "llm_calls": {
+            "items": {
+              "$ref": "#/components/schemas/LlmCallRecord"
+            },
+            "title": "Llm Calls",
+            "type": "array"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "used_model": {
+            "title": "Used Model",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "form",
+          "used_model",
+          "llm_calls"
+        ],
+        "title": "BuilderSuggestResult",
+        "type": "object"
+      },
+      "BuilderVital": {
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "source": {
+            "$ref": "#/components/schemas/Source"
+          },
+          "unit": {
+            "default": "",
+            "title": "Unit",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "value"
+        ],
+        "title": "BuilderVital",
+        "type": "object"
+      },
+      "BuilderVitalsRequest": {
+        "properties": {
+          "age": {
+            "maximum": 120.0,
+            "minimum": 0.0,
+            "title": "Age",
+            "type": "integer"
+          },
+          "conditions": {
+            "items": {
+              "$ref": "#/components/schemas/BuilderCondition"
+            },
+            "title": "Conditions",
+            "type": "array"
+          },
+          "description": {
+            "default": "",
+            "title": "Description",
+            "type": "string"
+          },
+          "sex": {
+            "default": "other",
+            "enum": [
+              "male",
+              "female",
+              "other"
+            ],
+            "title": "Sex",
+            "type": "string"
+          }
+        },
+        "required": [
+          "age"
+        ],
+        "title": "BuilderVitalsRequest",
+        "type": "object"
+      },
+      "BuilderVitalsResult": {
+        "properties": {
+          "notes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Notes",
+            "type": "array"
+          },
+          "vitals": {
+            "items": {
+              "$ref": "#/components/schemas/BuilderVital"
+            },
+            "title": "Vitals",
+            "type": "array"
+          }
+        },
+        "required": [
+          "vitals",
+          "notes"
+        ],
+        "title": "BuilderVitalsResult",
+        "type": "object"
+      },
+      "Case": {
+        "properties": {
+          "actions": {
+            "items": {
+              "$ref": "#/components/schemas/CaseVocabItem"
+            },
+            "title": "Actions",
+            "type": "array"
+          },
+          "allergies": {
+            "items": {
+              "$ref": "#/components/schemas/Allergy"
+            },
+            "title": "Allergies",
+            "type": "array"
+          },
+          "artifacts": {
+            "items": {
+              "$ref": "#/components/schemas/Artifact"
+            },
+            "title": "Artifacts",
+            "type": "array"
+          },
+          "briefing": {
+            "$ref": "#/components/schemas/Briefing"
+          },
+          "case_id": {
+            "title": "Case Id",
+            "type": "string"
+          },
+          "consistency_findings": {
+            "items": {
+              "$ref": "#/components/schemas/ConsistencyFinding"
+            },
+            "title": "Consistency Findings",
+            "type": "array"
+          },
+          "created_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By"
+          },
+          "credits": {
+            "items": {
+              "$ref": "#/components/schemas/Credit"
+            },
+            "title": "Credits",
+            "type": "array"
+          },
+          "description": {
+            "default": "",
+            "title": "Description",
+            "type": "string"
+          },
+          "diagnoses": {
+            "items": {
+              "$ref": "#/components/schemas/Diagnosis"
+            },
+            "title": "Diagnoses",
+            "type": "array"
+          },
+          "difficulty": {
+            "$ref": "#/components/schemas/Difficulty"
+          },
+          "documentation_template": {
+            "default": "SOAP",
+            "enum": [
+              "PES",
+              "ADIME",
+              "SBAR",
+              "SOAP"
+            ],
+            "title": "Documentation Template",
+            "type": "string"
+          },
+          "exam": {
+            "items": {
+              "$ref": "#/components/schemas/ExamFinding"
+            },
+            "title": "Exam",
+            "type": "array"
+          },
+          "facts": {
+            "items": {
+              "$ref": "#/components/schemas/Fact"
+            },
+            "title": "Facts",
+            "type": "array"
+          },
+          "golden": {
+            "default": false,
+            "title": "Golden",
+            "type": "boolean"
+          },
+          "labs": {
+            "items": {
+              "$ref": "#/components/schemas/LabResult"
+            },
+            "title": "Labs",
+            "type": "array"
+          },
+          "medications": {
+            "items": {
+              "$ref": "#/components/schemas/Medication"
+            },
+            "title": "Medications",
+            "type": "array"
+          },
+          "objectives": {
+            "items": {
+              "$ref": "#/components/schemas/Objective"
+            },
+            "title": "Objectives",
+            "type": "array"
+          },
+          "profile": {
+            "$ref": "#/components/schemas/Profile"
+          },
+          "rubric_id": {
+            "default": "shp_patient_encounter_v1",
+            "title": "Rubric Id",
+            "type": "string"
+          },
+          "seed": {
+            "default": 1,
+            "title": "Seed",
+            "type": "integer"
+          },
+          "status": {
+            "default": "draft",
+            "enum": [
+              "draft",
+              "published",
+              "archived"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "topics": {
+            "items": {
+              "$ref": "#/components/schemas/CaseVocabItem"
+            },
+            "title": "Topics",
+            "type": "array"
+          },
+          "trust": {
+            "$ref": "#/components/schemas/TrustConfig"
+          },
+          "version": {
+            "default": 1,
+            "title": "Version",
+            "type": "integer"
+          },
+          "visits": {
+            "items": {
+              "$ref": "#/components/schemas/Visit"
+            },
+            "title": "Visits",
+            "type": "array"
+          },
+          "vitals": {
+            "items": {
+              "$ref": "#/components/schemas/Vital"
+            },
+            "title": "Vitals",
+            "type": "array"
+          }
+        },
+        "required": [
+          "case_id",
+          "title",
+          "profile"
+        ],
+        "title": "Case",
+        "type": "object"
+      },
+      "CaseVocabItem": {
+        "description": "A case-specific topic or action, added to the classifier's closed label set.",
+        "properties": {
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "keywords": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Keywords",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "description"
+        ],
+        "title": "CaseVocabItem",
+        "type": "object"
+      },
+      "CitedNote": {
+        "description": "A strength or improvement. The quote is omitted when it was not in the transcript.",
+        "properties": {
+          "quote": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quote"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "turn": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Turn"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "CitedNote",
+        "type": "object"
+      },
+      "Code": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "display": {
+            "title": "Display",
+            "type": "string"
+          },
+          "system": {
+            "enum": [
+              "ICD-10-CM",
+              "LOINC",
+              "RxNorm",
+              "SNOMED-CT"
+            ],
+            "title": "System",
+            "type": "string"
+          }
+        },
+        "required": [
+          "system",
+          "code",
+          "display"
+        ],
+        "title": "Code",
+        "type": "object"
+      },
+      "CommentOverride": {
+        "additionalProperties": false,
+        "description": "A faculty comment on one domain field. The generated comment stays on the rubric.",
+        "properties": {
+          "domain": {
+            "enum": [
+              "opening_and_purpose",
+              "rapport_respect_empathy",
+              "information_gathering",
+              "listening_and_response_to_cues",
+              "explanation_and_shared_decisions",
+              "clinical_reasoning_and_synthesis",
+              "professionalism_safety_closure"
+            ],
+            "title": "Domain",
+            "type": "string"
+          },
+          "field": {
+            "enum": [
+              "strength_demonstrated",
+              "important_gap_or_missed_opportunity",
+              "safety_or_accuracy_concern"
+            ],
+            "title": "Field",
+            "type": "string"
+          },
+          "text": {
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "domain",
+          "field",
+          "text"
+        ],
+        "title": "CommentOverride",
+        "type": "object"
+      },
+      "CommunicationMetrics": {
+        "description": "Counts from the tagged turns. A ratio stays null when there were no questions to count.",
+        "properties": {
+          "closed_questions": {
+            "title": "Closed Questions",
+            "type": "integer"
+          },
+          "interruptions": {
+            "title": "Interruptions",
+            "type": "integer"
+          },
+          "open_questions": {
+            "title": "Open Questions",
+            "type": "integer"
+          },
+          "percent_open": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Percent Open"
+          },
+          "reflection_to_question_ratio": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reflection To Question Ratio"
+          },
+          "reflections": {
+            "title": "Reflections",
+            "type": "integer"
+          },
+          "student_talk_share": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Student Talk Share"
+          },
+          "turns": {
+            "title": "Turns",
+            "type": "integer"
+          },
+          "unexplained_jargon": {
+            "items": {
+              "$ref": "#/components/schemas/JargonMetric"
+            },
+            "title": "Unexplained Jargon",
+            "type": "array"
+          },
+          "validations": {
+            "title": "Validations",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "turns",
+          "open_questions",
+          "closed_questions",
+          "reflections",
+          "validations",
+          "interruptions"
+        ],
+        "title": "CommunicationMetrics",
+        "type": "object"
+      },
+      "ConsistencyFinding": {
+        "properties": {
+          "dismissed": {
+            "default": false,
+            "title": "Dismissed",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "refs": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Refs",
+            "type": "array"
+          },
+          "rule": {
+            "title": "Rule",
+            "type": "string"
+          },
+          "severity": {
+            "default": "review",
+            "enum": [
+              "review",
+              "info"
+            ],
+            "title": "Severity",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "rule",
+          "message"
+        ],
+        "title": "ConsistencyFinding",
+        "type": "object"
+      },
+      "Credit": {
+        "properties": {
+          "license": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "License"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "what": {
+            "title": "What",
+            "type": "string"
+          }
+        },
+        "required": [
+          "what",
+          "source"
+        ],
+        "title": "Credit",
+        "type": "object"
+      },
+      "DebriefTurn": {
+        "description": "One exchange the debrief can point at. mode says whether the reply used the template.",
+        "properties": {
+          "mode": {
+            "default": "template",
+            "enum": [
+              "template",
+              "llm"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "patient": {
+            "title": "Patient",
+            "type": "string"
+          },
+          "student": {
+            "title": "Student",
+            "type": "string"
+          },
+          "turn": {
+            "title": "Turn",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "turn",
+          "student",
+          "patient"
+        ],
+        "title": "DebriefTurn",
+        "type": "object"
+      },
+      "DecisionPathView": {
+        "description": "The outcome this visit selected, the other authored outcomes, and the evidence for both.",
+        "properties": {
+          "decisions": {
+            "items": {
+              "$ref": "#/components/schemas/PublicDecision"
+            },
+            "title": "Decisions",
+            "type": "array"
+          },
+          "ghosts": {
+            "items": {
+              "$ref": "#/components/schemas/BranchSummary"
+            },
+            "title": "Ghosts",
+            "type": "array"
+          },
+          "needs_faculty_review": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Needs Faculty Review",
+            "type": "array"
+          },
+          "taken": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BranchSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "visit_id": {
+            "title": "Visit Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "visit_id"
+        ],
+        "title": "DecisionPathView",
+        "type": "object"
+      },
+      "DecisionPoint": {
+        "description": "A yes/no condition checked at the end of a visit (PRD L-03).\n\nThe predicate is one supported operator, not a free-text rule.",
+        "properties": {
+          "affects": {
+            "default": "patient",
+            "enum": [
+              "patient",
+              "score"
+            ],
+            "title": "Affects",
+            "type": "string"
+          },
+          "feedback_if_no": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Feedback If No"
+          },
+          "feedback_if_yes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Feedback If Yes"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "predicate": {
+            "$ref": "#/components/schemas/Predicate"
+          },
+          "rubric_domain": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rubric Domain"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "predicate"
+        ],
+        "title": "DecisionPoint",
+        "type": "object"
+      },
+      "Diagnosis": {
+        "properties": {
+          "codes": {
+            "items": {
+              "$ref": "#/components/schemas/Code"
+            },
+            "title": "Codes",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "release": {
+            "$ref": "#/components/schemas/Release"
+          },
+          "source": {
+            "$ref": "#/components/schemas/Source"
+          },
+          "status": {
+            "default": "draft",
+            "enum": [
+              "draft",
+              "approved"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "Diagnosis",
+        "type": "object"
+      },
+      "Difficulty": {
+        "properties": {
+          "params": {
+            "additionalProperties": true,
+            "title": "Params",
+            "type": "object"
+          },
+          "preset": {
+            "default": "typical",
+            "enum": [
+              "straightforward",
+              "typical",
+              "difficult",
+              "custom"
+            ],
+            "title": "Preset",
+            "type": "string"
+          }
+        },
+        "title": "Difficulty",
+        "type": "object"
+      },
+      "Documentation": {
+        "properties": {
+          "fields": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Fields",
+            "type": "object"
+          }
+        },
+        "required": [
+          "fields"
+        ],
+        "title": "Documentation",
+        "type": "object"
+      },
+      "DocumentationCheck": {
+        "description": "The fabrication check. unsupported and missing keep the evidence they were judged against.",
+        "properties": {
+          "method": {
+            "enum": [
+              "rule-based",
+              "llm"
+            ],
+            "title": "Method",
+            "type": "string"
+          },
+          "missing": {
+            "items": {
+              "$ref": "#/components/schemas/MissingFinding"
+            },
+            "title": "Missing",
+            "type": "array"
+          },
+          "supported": {
+            "items": {
+              "$ref": "#/components/schemas/SupportedStatement"
+            },
+            "title": "Supported",
+            "type": "array"
+          },
+          "unsupported": {
+            "items": {
+              "$ref": "#/components/schemas/UnsupportedClaim"
+            },
+            "title": "Unsupported",
+            "type": "array"
+          }
+        },
+        "required": [
+          "method"
+        ],
+        "title": "DocumentationCheck",
+        "type": "object"
+      },
+      "DocumentationField": {
+        "description": "One blank in the note the student dictates after the visit.",
+        "properties": {
+          "hint": {
+            "title": "Hint",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "hint"
+        ],
+        "title": "DocumentationField",
+        "type": "object"
+      },
+      "DocumentationTemplate": {
+        "description": "The template stored on the case. The student does not fetch the Studio case to learn it.",
+        "properties": {
+          "fields": {
+            "items": {
+              "$ref": "#/components/schemas/DocumentationField"
+            },
+            "title": "Fields",
+            "type": "array"
+          },
+          "id": {
+            "enum": [
+              "PES",
+              "ADIME",
+              "SBAR",
+              "SOAP"
+            ],
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "fields"
+        ],
+        "title": "DocumentationTemplate",
+        "type": "object"
+      },
+      "DomainScore": {
+        "description": "One official domain. A number is only valid when evidence quotes the transcript.",
+        "properties": {
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/EvidenceQuote"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "important_gap_or_missed_opportunity": {
+            "default": "",
+            "title": "Important Gap Or Missed Opportunity",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "method": {
+            "enum": [
+              "rule-based",
+              "llm"
+            ],
+            "title": "Method",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "rule_based_score": {
+            "enum": [
+              1,
+              2,
+              3,
+              4,
+              "N/A"
+            ],
+            "title": "Rule Based Score"
+          },
+          "safety_or_accuracy_concern": {
+            "default": "",
+            "title": "Safety Or Accuracy Concern",
+            "type": "string"
+          },
+          "score": {
+            "enum": [
+              1,
+              2,
+              3,
+              4,
+              "N/A"
+            ],
+            "title": "Score"
+          },
+          "strength_demonstrated": {
+            "default": "",
+            "title": "Strength Demonstrated",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "name",
+          "id",
+          "score",
+          "method",
+          "rule_based_score"
+        ],
+        "title": "DomainScore",
+        "type": "object"
+      },
+      "EncounterList": {
+        "description": "Saved encounters. total counts every match, including rows past limit.",
+        "properties": {
+          "encounters": {
+            "items": {
+              "$ref": "#/components/schemas/EncounterSummary"
+            },
+            "title": "Encounters",
+            "type": "array"
+          },
+          "limit": {
+            "title": "Limit",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "encounters",
+          "total",
+          "limit"
+        ],
+        "title": "EncounterList",
+        "type": "object"
+      },
+      "EncounterSummary": {
+        "description": "One saved encounter in a list. The transcript stays on the encounter view.",
+        "properties": {
+          "case_id": {
+            "title": "Case Id",
+            "type": "string"
+          },
+          "case_title": {
+            "default": "",
+            "title": "Case Title",
+            "type": "string"
+          },
+          "encounter_id": {
+            "title": "Encounter Id",
+            "type": "string"
+          },
+          "patient_name": {
+            "default": "",
+            "title": "Patient Name",
+            "type": "string"
+          },
+          "previous_encounter_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous Encounter Id"
+          },
+          "review_flag": {
+            "default": false,
+            "title": "Review Flag",
+            "type": "boolean"
+          },
+          "rubric_total": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rubric Total"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "status": {
+            "enum": [
+              "active",
+              "ended",
+              "complete"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "student_name": {
+            "title": "Student Name",
+            "type": "string"
+          },
+          "visit_id": {
+            "title": "Visit Id",
+            "type": "string"
+          },
+          "visit_label": {
+            "default": "",
+            "title": "Visit Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "encounter_id",
+          "case_id",
+          "visit_id",
+          "student_name",
+          "status"
+        ],
+        "title": "EncounterSummary",
+        "type": "object"
+      },
+      "ErrorItem": {
+        "description": "One validation problem. loc is the same path FastAPI already reported, such as [\"body\", \"description\"].",
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Loc",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Msg",
+            "type": "string"
+          },
+          "type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Type"
+          }
+        },
+        "required": [
+          "msg"
+        ],
+        "title": "ErrorItem",
+        "type": "object"
+      },
+      "ErrorResponse": {
+        "description": "One error body for validation failures and application failures. The HTTP status stays on the response.",
+        "properties": {
+          "blockers": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Blockers",
+            "type": "array"
+          },
+          "errors": {
+            "items": {
+              "$ref": "#/components/schemas/ErrorItem"
+            },
+            "title": "Errors",
+            "type": "array"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "title": "ErrorResponse",
+        "type": "object"
+      },
+      "EvidenceQuote": {
+        "description": "A transcript span a score or trust event is allowed to cite.",
+        "properties": {
+          "quote": {
+            "minLength": 1,
+            "title": "Quote",
+            "type": "string"
+          },
+          "turn": {
+            "title": "Turn",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "turn",
+          "quote"
+        ],
+        "title": "EvidenceQuote",
+        "type": "object"
+      },
+      "ExamFinding": {
+        "properties": {
+          "abnormal": {
+            "default": true,
+            "title": "Abnormal",
+            "type": "boolean"
+          },
+          "finding": {
+            "title": "Finding",
+            "type": "string"
+          },
+          "maneuver": {
+            "title": "Maneuver",
+            "type": "string"
+          },
+          "source": {
+            "$ref": "#/components/schemas/Source"
+          },
+          "status": {
+            "default": "draft",
+            "enum": [
+              "draft",
+              "approved"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "maneuver",
+          "finding"
+        ],
+        "title": "ExamFinding",
+        "type": "object"
+      },
+      "Fact": {
+        "properties": {
+          "belief": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Belief"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "category": {
+            "default": "history",
+            "title": "Category",
+            "type": "string"
+          },
+          "chart_section": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chart Section"
+          },
+          "codes": {
+            "items": {
+              "$ref": "#/components/schemas/Code"
+            },
+            "title": "Codes",
+            "type": "array"
+          },
+          "cue": {
+            "default": false,
+            "title": "Cue",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "safety": {
+            "default": false,
+            "title": "Safety",
+            "type": "boolean"
+          },
+          "say": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Say"
+          },
+          "source": {
+            "$ref": "#/components/schemas/Source"
+          },
+          "status": {
+            "default": "draft",
+            "enum": [
+              "draft",
+              "approved"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "tier": {
+            "default": "discoverable",
+            "enum": [
+              "initial",
+              "discoverable",
+              "reluctant",
+              "hidden"
+            ],
+            "title": "Tier",
+            "type": "string"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit"
+          },
+          "unlock": {
+            "$ref": "#/components/schemas/Unlock"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "id",
+          "text"
+        ],
+        "title": "Fact",
+        "type": "object"
+      },
+      "FactPatch": {
+        "additionalProperties": false,
+        "description": "Fields a later visit may replace on a fact that already exists.\n\nAny other key is not a change. This does not add a new clinical fact.",
+        "properties": {
+          "say": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Say"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "enum": [
+                  "draft",
+                  "approved"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          },
+          "tier": {
+            "anyOf": [
+              {
+                "enum": [
+                  "initial",
+                  "discoverable",
+                  "reluctant",
+                  "hidden"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tier"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "title": "FactPatch",
+        "type": "object"
+      },
+      "FeedbackOverrideRequest": {
+        "additionalProperties": false,
+        "description": "The only body a faculty override accepts: scores, comments, or both.",
+        "properties": {
+          "comments": {
+            "items": {
+              "$ref": "#/components/schemas/CommentOverride"
+            },
+            "title": "Comments",
+            "type": "array"
+          },
+          "scores": {
+            "items": {
+              "$ref": "#/components/schemas/ScoreOverride"
+            },
+            "title": "Scores",
+            "type": "array"
+          }
+        },
+        "title": "FeedbackOverrideRequest",
+        "type": "object"
+      },
+      "FeedbackOverrides": {
+        "additionalProperties": false,
+        "description": "Saved faculty changes. They sit beside the generated debrief.",
+        "properties": {
+          "comments": {
+            "items": {
+              "$ref": "#/components/schemas/CommentOverride"
+            },
+            "title": "Comments",
+            "type": "array"
+          },
+          "scores": {
+            "items": {
+              "$ref": "#/components/schemas/ScoreOverride"
+            },
+            "title": "Scores",
+            "type": "array"
+          },
+          "updated_at": {
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "updated_at"
+        ],
+        "title": "FeedbackOverrides",
+        "type": "object"
+      },
+      "FeedbackResponse": {
+        "description": "The saved debrief: rubric, evidence, trust, the note check, and the counts behind them.",
+        "properties": {
+          "communication_notes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Communication Notes",
+            "type": "array"
+          },
+          "decision_path": {
+            "$ref": "#/components/schemas/DecisionPathView"
+          },
+          "documentation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DocumentationCheck"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "elicited": {
+            "items": {
+              "$ref": "#/components/schemas/ObjectiveProgress"
+            },
+            "title": "Elicited",
+            "type": "array"
+          },
+          "fallback_used": {
+            "default": false,
+            "title": "Fallback Used",
+            "type": "boolean"
+          },
+          "generated_at": {
+            "title": "Generated At",
+            "type": "string"
+          },
+          "llm_calls": {
+            "items": {
+              "$ref": "#/components/schemas/LlmCallRecord"
+            },
+            "title": "Llm Calls",
+            "type": "array"
+          },
+          "metrics": {
+            "$ref": "#/components/schemas/CommunicationMetrics"
+          },
+          "overrides": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FeedbackOverrides"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "rubric": {
+            "$ref": "#/components/schemas/RubricResult"
+          },
+          "safety": {
+            "items": {
+              "$ref": "#/components/schemas/SafetyItem"
+            },
+            "title": "Safety",
+            "type": "array"
+          },
+          "transcript": {
+            "items": {
+              "$ref": "#/components/schemas/DebriefTurn"
+            },
+            "title": "Transcript",
+            "type": "array"
+          },
+          "trust_timeline": {
+            "items": {
+              "$ref": "#/components/schemas/TrustPoint"
+            },
+            "title": "Trust Timeline",
+            "type": "array"
+          }
+        },
+        "required": [
+          "rubric",
+          "metrics",
+          "elicited",
+          "trust_timeline",
+          "decision_path",
+          "transcript",
+          "generated_at"
+        ],
+        "title": "FeedbackResponse",
+        "type": "object"
+      },
+      "FoundFact": {
+        "description": "An expected discovery the student actually elicited, with the turn that released it.",
+        "properties": {
+          "fact_id": {
+            "title": "Fact Id",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "turn": {
+            "title": "Turn",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "fact_id",
+          "text",
+          "turn"
+        ],
+        "title": "FoundFact",
+        "type": "object"
+      },
+      "HealthResponse": {
+        "description": "Liveness. True means this process can answer; it does not check the database.",
+        "properties": {
+          "ok": {
+            "title": "Ok",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok"
+        ],
+        "title": "HealthResponse",
+        "type": "object"
+      },
+      "Icd10Match": {
+        "description": "One diagnosis from the existing lookup. code and display are what faculty store.",
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "display": {
+            "title": "Display",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "display"
+        ],
+        "title": "Icd10Match",
+        "type": "object"
+      },
+      "IntakeAnswer": {
+        "properties": {
+          "faculty": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Faculty"
+          },
+          "gap_id": {
+            "title": "Gap Id",
+            "type": "string"
+          },
+          "text": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "gap_id",
+          "text"
+        ],
+        "title": "IntakeAnswer",
+        "type": "object"
+      },
+      "IntakeGap": {
+        "description": "One guided question still open. The list is what remains, not a history of answers.",
+        "properties": {
+          "blocking": {
+            "title": "Blocking",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "field",
+              "facts",
+              "objectives",
+              "autofill"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "question": {
+            "title": "Question",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "question",
+          "kind",
+          "blocking"
+        ],
+        "title": "IntakeGap",
+        "type": "object"
+      },
+      "JargonMetric": {
+        "description": "A term the student used without a plain-language explanation, with the words they said.",
+        "properties": {
+          "quote": {
+            "title": "Quote",
+            "type": "string"
+          },
+          "term": {
+            "title": "Term",
+            "type": "string"
+          }
+        },
+        "required": [
+          "term",
+          "quote"
+        ],
+        "title": "JargonMetric",
+        "type": "object"
+      },
+      "LabResult": {
+        "properties": {
+          "collected": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Collected"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "loinc": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Loinc"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "panel": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Panel"
+          },
+          "range": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ValueRange"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ref_high": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ref High"
+          },
+          "ref_low": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ref Low"
+          },
+          "ref_source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ref Source"
+          },
+          "release": {
+            "$ref": "#/components/schemas/Release"
+          },
+          "source": {
+            "$ref": "#/components/schemas/Source"
+          },
+          "status": {
+            "default": "draft",
+            "enum": [
+              "draft",
+              "approved"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "unit": {
+            "default": "",
+            "title": "Unit",
+            "type": "string"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "id",
+          "key",
+          "name",
+          "value"
+        ],
+        "title": "LabResult",
+        "type": "object"
+      },
+      "LlmCallRecord": {
+        "description": "One logged model call. Offline drafting and intake leave the list empty.",
+        "properties": {
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "latency_ms": {
+            "title": "Latency Ms",
+            "type": "integer"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "ok": {
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "prompt": {
+            "title": "Prompt",
+            "type": "string"
+          },
+          "prompt_version": {
+            "title": "Prompt Version",
+            "type": "string"
+          },
+          "purpose": {
+            "title": "Purpose",
+            "type": "string"
+          }
+        },
+        "required": [
+          "purpose",
+          "model",
+          "prompt",
+          "prompt_version",
+          "latency_ms",
+          "ok"
+        ],
+        "title": "LlmCallRecord",
+        "type": "object"
+      },
+      "Medication": {
+        "properties": {
+          "codes": {
+            "items": {
+              "$ref": "#/components/schemas/Code"
+            },
+            "title": "Codes",
+            "type": "array"
+          },
+          "dose": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dose"
+          },
+          "frequency": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Frequency"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "purpose": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Purpose"
+          },
+          "release": {
+            "$ref": "#/components/schemas/Release"
+          },
+          "source": {
+            "$ref": "#/components/schemas/Source"
+          },
+          "status": {
+            "default": "draft",
+            "enum": [
+              "draft",
+              "approved"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "Medication",
+        "type": "object"
+      },
+      "MissedFact": {
+        "description": "An expected discovery that stayed undisclosed, with a question the student could ask.",
+        "properties": {
+          "fact_id": {
+            "title": "Fact Id",
+            "type": "string"
+          },
+          "suggestion": {
+            "default": "",
+            "title": "Suggestion",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "fact_id",
+          "text"
+        ],
+        "title": "MissedFact",
+        "type": "object"
+      },
+      "MissingFinding": {
+        "description": "A key finding the student learned and left out of the note. id is the fact or chart reference.",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "text"
+        ],
+        "title": "MissingFinding",
+        "type": "object"
+      },
+      "NewDraft": {
+        "properties": {
+          "description": {
+            "maxLength": 8000,
+            "minLength": 10,
+            "title": "Description",
+            "type": "string"
+          },
+          "faculty": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Faculty"
+          }
+        },
+        "required": [
+          "description"
+        ],
+        "title": "NewDraft",
+        "type": "object"
+      },
+      "Objective": {
+        "properties": {
+          "expected_actions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Expected Actions",
+            "type": "array"
+          },
+          "expected_discoveries": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Expected Discoveries",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "rubric_domains": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Rubric Domains",
+            "type": "array"
+          },
+          "status": {
+            "default": "draft",
+            "enum": [
+              "draft",
+              "approved"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "text"
+        ],
+        "title": "Objective",
+        "type": "object"
+      },
+      "ObjectiveAction": {
+        "description": "Whether the student performed one expected action.",
+        "properties": {
+          "action": {
+            "title": "Action",
+            "type": "string"
+          },
+          "done": {
+            "title": "Done",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "action",
+          "done"
+        ],
+        "title": "ObjectiveAction",
+        "type": "object"
+      },
+      "ObjectiveProgress": {
+        "description": "Elicited and missed items for one learning objective.",
+        "properties": {
+          "actions": {
+            "items": {
+              "$ref": "#/components/schemas/ObjectiveAction"
+            },
+            "title": "Actions",
+            "type": "array"
+          },
+          "found": {
+            "items": {
+              "$ref": "#/components/schemas/FoundFact"
+            },
+            "title": "Found",
+            "type": "array"
+          },
+          "missed": {
+            "items": {
+              "$ref": "#/components/schemas/MissedFact"
+            },
+            "title": "Missed",
+            "type": "array"
+          },
+          "objective": {
+            "title": "Objective",
+            "type": "string"
+          },
+          "objective_id": {
+            "title": "Objective Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "objective_id",
+          "objective"
+        ],
+        "title": "ObjectiveProgress",
+        "type": "object"
+      },
+      "Personality": {
+        "properties": {
+          "communication_style": {
+            "default": "",
+            "title": "Communication Style",
+            "type": "string"
+          },
+          "example_lines": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Example Lines",
+            "type": "array"
+          },
+          "health_literacy": {
+            "default": "medium",
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ],
+            "title": "Health Literacy",
+            "type": "string"
+          },
+          "mood": {
+            "default": "neutral",
+            "title": "Mood",
+            "type": "string"
+          },
+          "summary": {
+            "default": "",
+            "title": "Summary",
+            "type": "string"
+          },
+          "traits": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "Traits",
+            "type": "object"
+          }
+        },
+        "title": "Personality",
+        "type": "object"
+      },
+      "Predicate": {
+        "additionalProperties": false,
+        "description": "One supported yes/no check. Exactly one operator is set.\n\nA sentence, or a second key beside an operator, is not a predicate. The\nevaluator reads these same keys and does not infer a rule from other text.",
+        "properties": {
+          "action": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Action"
+          },
+          "all": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Predicate"
+                },
+                "minItems": 1,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "All"
+          },
+          "any": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Predicate"
+                },
+                "minItems": 1,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Any"
+          },
+          "before": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Predicate"
+                },
+                "maxItems": 2,
+                "minItems": 2,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Before"
+          },
+          "fact_disclosed": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fact Disclosed"
+          },
+          "maneuver": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Maneuver"
+          },
+          "not": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Predicate"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "open_question": {
+            "anyOf": [
+              {
+                "const": true,
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Open Question"
+          },
+          "order": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Order"
+          },
+          "topic": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Topic"
+          }
+        },
+        "title": "Predicate",
+        "type": "object"
+      },
+      "Preview": {
+        "properties": {
+          "driver": {
+            "default": "scripted",
+            "enum": [
+              "scripted",
+              "llm"
+            ],
+            "title": "Driver",
+            "type": "string"
+          },
+          "level": {
+            "default": "competent",
+            "enum": [
+              "novice",
+              "competent",
+              "expert",
+              "adversarial"
+            ],
+            "title": "Level",
+            "type": "string"
+          },
+          "visit_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Visit Id"
+          }
+        },
+        "title": "Preview",
+        "type": "object"
+      },
+      "PreviewBlockedReply": {
+        "description": "A reply the verifier refused. reply is the text that was not delivered.",
+        "properties": {
+          "problems": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Problems",
+            "type": "array"
+          },
+          "reply": {
+            "title": "Reply",
+            "type": "string"
+          },
+          "student": {
+            "title": "Student",
+            "type": "string"
+          },
+          "turn": {
+            "title": "Turn",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "turn",
+          "student",
+          "reply",
+          "problems"
+        ],
+        "title": "PreviewBlockedReply",
+        "type": "object"
+      },
+      "PreviewDiscovery": {
+        "description": "A case fact the test student elicited. text is that fact's authored text.",
+        "properties": {
+          "fact_id": {
+            "title": "Fact Id",
+            "type": "string"
+          },
+          "objective_id": {
+            "title": "Objective Id",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "turn": {
+            "title": "Turn",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "fact_id",
+          "text",
+          "turn",
+          "objective_id"
+        ],
+        "title": "PreviewDiscovery",
+        "type": "object"
+      },
+      "PreviewDomainScore": {
+        "description": "One official rubric domain for this preview. N/A means the visit did not call for that domain.",
+        "properties": {
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/PreviewEvidence"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "const": "N/A",
+                "type": "string"
+              }
+            ],
+            "title": "Score"
+          }
+        },
+        "required": [
+          "key",
+          "name",
+          "score"
+        ],
+        "title": "PreviewDomainScore",
+        "type": "object"
+      },
+      "PreviewEvidence": {
+        "description": "A transcript quote the rubric used for this domain.",
+        "properties": {
+          "quote": {
+            "title": "Quote",
+            "type": "string"
+          },
+          "turn": {
+            "title": "Turn",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "turn",
+          "quote"
+        ],
+        "title": "PreviewEvidence",
+        "type": "object"
+      },
+      "PreviewFallback": {
+        "description": "Set when the requested driver did not run. used is the driver that produced the transcript.",
+        "properties": {
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "requested": {
+            "enum": [
+              "scripted",
+              "llm"
+            ],
+            "title": "Requested",
+            "type": "string"
+          },
+          "used": {
+            "enum": [
+              "scripted",
+              "llm"
+            ],
+            "title": "Used",
+            "type": "string"
+          }
+        },
+        "required": [
+          "requested",
+          "used",
+          "reason"
+        ],
+        "title": "PreviewFallback",
+        "type": "object"
+      },
+      "PreviewFeedback": {
+        "description": "Rubric result for the preview. interpretation is the rubric's own discussion-aid wording.",
+        "properties": {
+          "domains": {
+            "items": {
+              "$ref": "#/components/schemas/PreviewDomainScore"
+            },
+            "title": "Domains",
+            "type": "array"
+          },
+          "interpretation": {
+            "title": "Interpretation",
+            "type": "string"
+          },
+          "max_total": {
+            "title": "Max Total",
+            "type": "integer"
+          },
+          "review_flag": {
+            "title": "Review Flag",
+            "type": "boolean"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total",
+          "max_total",
+          "interpretation",
+          "review_flag",
+          "domains"
+        ],
+        "title": "PreviewFeedback",
+        "type": "object"
+      },
+      "PreviewRun": {
+        "description": "One test-student preview. The transcript, discoveries, and scores are from that run.",
+        "properties": {
+          "blocked_replies": {
+            "items": {
+              "$ref": "#/components/schemas/PreviewBlockedReply"
+            },
+            "title": "Blocked Replies",
+            "type": "array"
+          },
+          "discoveries": {
+            "items": {
+              "$ref": "#/components/schemas/PreviewDiscovery"
+            },
+            "title": "Discoveries",
+            "type": "array"
+          },
+          "driver": {
+            "enum": [
+              "scripted",
+              "llm"
+            ],
+            "title": "Driver",
+            "type": "string"
+          },
+          "fallback": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PreviewFallback"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "feedback": {
+            "$ref": "#/components/schemas/PreviewFeedback"
+          },
+          "level": {
+            "enum": [
+              "novice",
+              "competent",
+              "expert",
+              "adversarial"
+            ],
+            "title": "Level",
+            "type": "string"
+          },
+          "replies_failing_audit": {
+            "title": "Replies Failing Audit",
+            "type": "integer"
+          },
+          "transcript": {
+            "items": {
+              "$ref": "#/components/schemas/PreviewTranscriptTurn"
+            },
+            "title": "Transcript",
+            "type": "array"
+          },
+          "visit_id": {
+            "title": "Visit Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "level",
+          "driver",
+          "visit_id",
+          "transcript",
+          "discoveries",
+          "blocked_replies",
+          "feedback",
+          "replies_failing_audit"
+        ],
+        "title": "PreviewRun",
+        "type": "object"
+      },
+      "PreviewTranscriptTurn": {
+        "description": "One exchange from the test-student run. The words are what the pipeline produced.",
+        "properties": {
+          "patient": {
+            "title": "Patient",
+            "type": "string"
+          },
+          "student": {
+            "title": "Student",
+            "type": "string"
+          },
+          "turn": {
+            "title": "Turn",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "turn",
+          "student",
+          "patient"
+        ],
+        "title": "PreviewTranscriptTurn",
+        "type": "object"
+      },
+      "Profile": {
+        "properties": {
+          "age": {
+            "title": "Age",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "occupation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Occupation"
+          },
+          "personality": {
+            "$ref": "#/components/schemas/Personality"
+          },
+          "portrait": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Portrait"
+          },
+          "pronouns": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pronouns"
+          },
+          "sex": {
+            "default": "other",
+            "enum": [
+              "male",
+              "female",
+              "other"
+            ],
+            "title": "Sex",
+            "type": "string"
+          },
+          "speaker": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speaker"
+          },
+          "summary": {
+            "default": "",
+            "title": "Summary",
+            "type": "string"
+          },
+          "voice_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Voice Id"
+          }
+        },
+        "required": [
+          "name",
+          "age"
+        ],
+        "title": "Profile",
+        "type": "object"
+      },
+      "PublicBriefing": {
+        "description": "What the student reads before starting. This is the doorway card, not the chart.",
+        "properties": {
+          "goal": {
+            "default": "",
+            "title": "Goal",
+            "type": "string"
+          },
+          "reason_for_visit": {
+            "default": "",
+            "title": "Reason For Visit",
+            "type": "string"
+          },
+          "setting": {
+            "default": "",
+            "title": "Setting",
+            "type": "string"
+          },
+          "show_doorway_vitals": {
+            "default": true,
+            "title": "Show Doorway Vitals",
+            "type": "boolean"
+          },
+          "student_role": {
+            "default": "",
+            "title": "Student Role",
+            "type": "string"
+          }
+        },
+        "title": "PublicBriefing",
+        "type": "object"
+      },
+      "PublicCase": {
+        "description": "One published case as a student lists or opens it.",
+        "properties": {
+          "briefing": {
+            "$ref": "#/components/schemas/PublicBriefing"
+          },
+          "case_id": {
+            "title": "Case Id",
+            "type": "string"
+          },
+          "doorway_vitals": {
+            "items": {
+              "$ref": "#/components/schemas/PublicDoorwayVital"
+            },
+            "title": "Doorway Vitals",
+            "type": "array"
+          },
+          "golden": {
+            "title": "Golden",
+            "type": "boolean"
+          },
+          "patient": {
+            "$ref": "#/components/schemas/PublicPatient"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          },
+          "visits": {
+            "items": {
+              "$ref": "#/components/schemas/PublicVisitSummary"
+            },
+            "title": "Visits",
+            "type": "array"
+          }
+        },
+        "required": [
+          "case_id",
+          "version",
+          "title",
+          "golden",
+          "patient",
+          "briefing",
+          "visits"
+        ],
+        "title": "PublicCase",
+        "type": "object"
+      },
+      "PublicChartEntry": {
+        "description": "One released chart or exam row. source_fact cites the fact that released it, when one did.",
+        "properties": {
+          "body": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body"
+          },
+          "flag": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Flag"
+          },
+          "kind": {
+            "enum": [
+              "vital",
+              "lab",
+              "exam",
+              "artifact",
+              "diagnosis",
+              "medication",
+              "allergy",
+              "fact"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "ref": {
+            "title": "Ref",
+            "type": "string"
+          },
+          "section": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Section"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PublicSource"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source_fact": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Fact"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "kind",
+          "ref",
+          "label"
+        ],
+        "title": "PublicChartEntry",
+        "type": "object"
+      },
+      "PublicConfig": {
+        "description": "Voice settings the browser may see. The long-lived key is not a field on this object.",
+        "properties": {
+          "commit_strategy": {
+            "const": "vad",
+            "title": "Commit Strategy",
+            "type": "string"
+          },
+          "include_timestamps": {
+            "title": "Include Timestamps",
+            "type": "boolean"
+          },
+          "llm": {
+            "title": "Llm",
+            "type": "boolean"
+          },
+          "stt_model_id": {
+            "title": "Stt Model Id",
+            "type": "string"
+          },
+          "stt_provider": {
+            "const": "elevenlabs",
+            "title": "Stt Provider",
+            "type": "string"
+          },
+          "tts": {
+            "title": "Tts",
+            "type": "boolean"
+          },
+          "tts_model_id": {
+            "title": "Tts Model Id",
+            "type": "string"
+          },
+          "vad_silence_secs": {
+            "title": "Vad Silence Secs",
+            "type": "number"
+          },
+          "vad_threshold": {
+            "title": "Vad Threshold",
+            "type": "number"
+          },
+          "voice_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Voice Id"
+          }
+        },
+        "required": [
+          "llm",
+          "tts",
+          "stt_provider",
+          "stt_model_id",
+          "tts_model_id",
+          "vad_silence_secs",
+          "vad_threshold",
+          "commit_strategy",
+          "include_timestamps"
+        ],
+        "title": "PublicConfig",
+        "type": "object"
+      },
+      "PublicDecision": {
+        "description": "A yes/no result the student can read. The predicate that produced it stays on the case.",
+        "properties": {
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/EvidenceQuote"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "feedback": {
+            "default": "",
+            "title": "Feedback",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "result": {
+            "enum": [
+              "yes",
+              "no",
+              "unclear"
+            ],
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "result"
+        ],
+        "title": "PublicDecision",
+        "type": "object"
+      },
+      "PublicDoorwayVital": {
+        "description": "A vital shown before the visit starts, with the source faculty recorded.",
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "source": {
+            "$ref": "#/components/schemas/PublicSource"
+          },
+          "unit": {
+            "default": "",
+            "title": "Unit",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "value",
+          "source"
+        ],
+        "title": "PublicDoorwayVital",
+        "type": "object"
+      },
+      "PublicEncounter": {
+        "description": "The encounter a refresh restores. Trust and engine state are not fields on this object.",
+        "properties": {
+          "briefing": {
+            "$ref": "#/components/schemas/PublicBriefing"
+          },
+          "case_id": {
+            "title": "Case Id",
+            "type": "string"
+          },
+          "case_version": {
+            "title": "Case Version",
+            "type": "integer"
+          },
+          "chart": {
+            "items": {
+              "$ref": "#/components/schemas/PublicChartEntry"
+            },
+            "title": "Chart",
+            "type": "array"
+          },
+          "documentation_template": {
+            "$ref": "#/components/schemas/DocumentationTemplate"
+          },
+          "encounter_id": {
+            "title": "Encounter Id",
+            "type": "string"
+          },
+          "ended_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ended At"
+          },
+          "has_next_visit": {
+            "title": "Has Next Visit",
+            "type": "boolean"
+          },
+          "last_turn": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Turn"
+          },
+          "patient": {
+            "$ref": "#/components/schemas/PublicPatient"
+          },
+          "previous_encounter_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous Encounter Id"
+          },
+          "saved_documentation": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Saved Documentation"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "status": {
+            "enum": [
+              "active",
+              "ended",
+              "complete"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "transcript": {
+            "items": {
+              "$ref": "#/components/schemas/TranscriptEntry"
+            },
+            "title": "Transcript",
+            "type": "array"
+          },
+          "visit_id": {
+            "title": "Visit Id",
+            "type": "string"
+          },
+          "visit_label": {
+            "title": "Visit Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "encounter_id",
+          "status",
+          "case_id",
+          "case_version",
+          "visit_id",
+          "visit_label",
+          "has_next_visit",
+          "patient",
+          "briefing",
+          "documentation_template"
+        ],
+        "title": "PublicEncounter",
+        "type": "object"
+      },
+      "PublicNotice": {
+        "description": "A short note the student can read, such as an exam that this case does not include.",
+        "properties": {
+          "kind": {
+            "enum": [
+              "exam_unavailable",
+              "order_unavailable",
+              "fallback",
+              "info"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "text"
+        ],
+        "title": "PublicNotice",
+        "type": "object"
+      },
+      "PublicPatient": {
+        "description": "The person on the briefing card. Faculty notes and voice settings are not included.",
+        "properties": {
+          "age": {
+            "title": "Age",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "portrait": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Portrait"
+          },
+          "pronouns": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pronouns"
+          },
+          "sex": {
+            "enum": [
+              "male",
+              "female",
+              "other"
+            ],
+            "title": "Sex",
+            "type": "string"
+          },
+          "speaker": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speaker"
+          }
+        },
+        "required": [
+          "name",
+          "age",
+          "sex"
+        ],
+        "title": "PublicPatient",
+        "type": "object"
+      },
+      "PublicSource": {
+        "description": "Where a released value came from, so the chart can show its citation.",
+        "properties": {
+          "kind": {
+            "enum": [
+              "faculty",
+              "vhs_import",
+              "reference",
+              "rule",
+              "computed",
+              "default",
+              "llm_draft",
+              "nhanes"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "ref": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ref"
+          }
+        },
+        "required": [
+          "kind"
+        ],
+        "title": "PublicSource",
+        "type": "object"
+      },
+      "PublicVisitSummary": {
+        "description": "A visit the student can choose. Decision points and branch changes are not on it.",
+        "properties": {
+          "day": {
+            "title": "Day",
+            "type": "integer"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "day"
+        ],
+        "title": "PublicVisitSummary",
+        "type": "object"
+      },
+      "Release": {
+        "properties": {
+          "fact_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fact Id"
+          },
+          "on": {
+            "default": "order",
+            "enum": [
+              "visit_start",
+              "order",
+              "topic",
+              "fact"
+            ],
+            "title": "On",
+            "type": "string"
+          },
+          "topics": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Topics",
+            "type": "array"
+          }
+        },
+        "title": "Release",
+        "type": "object"
+      },
+      "RubricResult": {
+        "description": "The seven-domain result. The interpretation is the official discussion-aid wording.",
+        "properties": {
+          "domains": {
+            "items": {
+              "$ref": "#/components/schemas/DomainScore"
+            },
+            "title": "Domains",
+            "type": "array"
+          },
+          "improvements": {
+            "items": {
+              "$ref": "#/components/schemas/CitedNote"
+            },
+            "title": "Improvements",
+            "type": "array"
+          },
+          "interpretation": {
+            "title": "Interpretation",
+            "type": "string"
+          },
+          "max_total": {
+            "title": "Max Total",
+            "type": "integer"
+          },
+          "next_attempt": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Next Attempt",
+            "type": "array"
+          },
+          "review_flag": {
+            "title": "Review Flag",
+            "type": "boolean"
+          },
+          "review_reasons": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Review Reasons",
+            "type": "array"
+          },
+          "rubric_title": {
+            "title": "Rubric Title",
+            "type": "string"
+          },
+          "strengths": {
+            "items": {
+              "$ref": "#/components/schemas/CitedNote"
+            },
+            "title": "Strengths",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "rubric_title",
+          "domains",
+          "total",
+          "max_total",
+          "review_flag",
+          "interpretation"
+        ],
+        "title": "RubricResult",
+        "type": "object"
+      },
+      "SafetyItem": {
+        "description": "A case safety fact and whether the student found it and addressed it.",
+        "properties": {
+          "addressed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Addressed"
+          },
+          "discovered": {
+            "title": "Discovered",
+            "type": "boolean"
+          },
+          "fact_id": {
+            "title": "Fact Id",
+            "type": "string"
+          },
+          "patient_words": {
+            "default": "",
+            "title": "Patient Words",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "fact_id",
+          "text",
+          "discovered"
+        ],
+        "title": "SafetyItem",
+        "type": "object"
+      },
+      "ScoreOverride": {
+        "additionalProperties": false,
+        "description": "A faculty score for one official domain. It does not replace the generated score.",
+        "properties": {
+          "domain": {
+            "enum": [
+              "opening_and_purpose",
+              "rapport_respect_empathy",
+              "information_gathering",
+              "listening_and_response_to_cues",
+              "explanation_and_shared_decisions",
+              "clinical_reasoning_and_synthesis",
+              "professionalism_safety_closure"
+            ],
+            "title": "Domain",
+            "type": "string"
+          },
+          "score": {
+            "enum": [
+              1,
+              2,
+              3,
+              4,
+              "N/A"
+            ],
+            "title": "Score"
+          }
+        },
+        "required": [
+          "domain",
+          "score"
+        ],
+        "title": "ScoreOverride",
+        "type": "object"
+      },
+      "ScribeToken": {
+        "description": "One single-use Scribe token. It expires at the provider and is not the API key.",
+        "properties": {
+          "token": {
+            "title": "Token",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
+        ],
+        "title": "ScribeToken",
+        "type": "object"
+      },
+      "Source": {
+        "properties": {
+          "by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "By"
+          },
+          "kind": {
+            "default": "faculty",
+            "enum": [
+              "faculty",
+              "vhs_import",
+              "reference",
+              "rule",
+              "computed",
+              "default",
+              "llm_draft",
+              "nhanes"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "ref": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ref"
+          }
+        },
+        "title": "Source",
+        "type": "object"
+      },
+      "StartEncounter": {
+        "properties": {
+          "case_id": {
+            "title": "Case Id",
+            "type": "string"
+          },
+          "previous_encounter_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous Encounter Id"
+          },
+          "student_name": {
+            "default": "",
+            "title": "Student Name",
+            "type": "string"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          },
+          "visit_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Visit Id"
+          }
+        },
+        "required": [
+          "case_id"
+        ],
+        "title": "StartEncounter",
+        "type": "object"
+      },
+      "StudioAutofillResult": {
+        "description": "The saved case after auto-fill, plus the notes and which values were proposed.",
+        "properties": {
+          "added": {
+            "$ref": "#/components/schemas/AutofillAdded"
+          },
+          "blockers": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Blockers",
+            "type": "array"
+          },
+          "case": {
+            "$ref": "#/components/schemas/Case"
+          },
+          "gaps": {
+            "items": {
+              "$ref": "#/components/schemas/IntakeGap"
+            },
+            "title": "Gaps",
+            "type": "array"
+          },
+          "notes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Notes",
+            "type": "array"
+          },
+          "status": {
+            "enum": [
+              "draft",
+              "published",
+              "archived"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "case",
+          "status",
+          "gaps",
+          "blockers",
+          "added",
+          "notes"
+        ],
+        "title": "StudioAutofillResult",
+        "type": "object"
+      },
+      "StudioCaseDetail": {
+        "description": "A saved case in the authoritative case format, with its remaining gaps and blockers.",
+        "properties": {
+          "blockers": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Blockers",
+            "type": "array"
+          },
+          "case": {
+            "$ref": "#/components/schemas/Case"
+          },
+          "gaps": {
+            "items": {
+              "$ref": "#/components/schemas/IntakeGap"
+            },
+            "title": "Gaps",
+            "type": "array"
+          },
+          "status": {
+            "enum": [
+              "draft",
+              "published",
+              "archived"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "case",
+          "status",
+          "gaps",
+          "blockers"
+        ],
+        "title": "StudioCaseDetail",
+        "type": "object"
+      },
+      "StudioCaseSummary": {
+        "description": "One saved case as the Case Library lists it. Hidden facts stay out of this object.",
+        "properties": {
+          "blockers": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Blockers",
+            "type": "array"
+          },
+          "case_id": {
+            "title": "Case Id",
+            "type": "string"
+          },
+          "golden": {
+            "title": "Golden",
+            "type": "boolean"
+          },
+          "patient": {
+            "title": "Patient",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "draft",
+              "published",
+              "archived"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "case_id",
+          "version",
+          "status",
+          "title",
+          "golden",
+          "patient",
+          "updated_at"
+        ],
+        "title": "StudioCaseSummary",
+        "type": "object"
+      },
+      "StudioDraftResult": {
+        "description": "Draft creation and intake. Same case view, plus any model calls used to produce it.",
+        "properties": {
+          "blockers": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Blockers",
+            "type": "array"
+          },
+          "case": {
+            "$ref": "#/components/schemas/Case"
+          },
+          "gaps": {
+            "items": {
+              "$ref": "#/components/schemas/IntakeGap"
+            },
+            "title": "Gaps",
+            "type": "array"
+          },
+          "llm_calls": {
+            "items": {
+              "$ref": "#/components/schemas/LlmCallRecord"
+            },
+            "title": "Llm Calls",
+            "type": "array"
+          },
+          "status": {
+            "enum": [
+              "draft",
+              "published",
+              "archived"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "case",
+          "status",
+          "gaps",
+          "blockers",
+          "llm_calls"
+        ],
+        "title": "StudioDraftResult",
+        "type": "object"
+      },
+      "StudioVocab": {
+        "description": "Closed lists for the studio. The values come from the vocab files and the lab catalog.",
+        "properties": {
+          "actions": {
+            "items": {
+              "$ref": "#/components/schemas/StudioVocabLabel"
+            },
+            "title": "Actions",
+            "type": "array"
+          },
+          "lab_panels": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Lab Panels",
+            "type": "array"
+          },
+          "maneuvers": {
+            "items": {
+              "$ref": "#/components/schemas/StudioVocabManeuver"
+            },
+            "title": "Maneuvers",
+            "type": "array"
+          },
+          "topics": {
+            "items": {
+              "$ref": "#/components/schemas/StudioVocabLabel"
+            },
+            "title": "Topics",
+            "type": "array"
+          }
+        },
+        "required": [
+          "topics",
+          "actions",
+          "maneuvers",
+          "lab_panels"
+        ],
+        "title": "StudioVocab",
+        "type": "object"
+      },
+      "StudioVocabLabel": {
+        "description": "A topic or action the editor can offer. The id is what a fact or objective stores.",
+        "properties": {
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "description"
+        ],
+        "title": "StudioVocabLabel",
+        "type": "object"
+      },
+      "StudioVocabManeuver": {
+        "description": "An exam maneuver. normal is the catalog sentence, not a finding invented for this patient.",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "normal": {
+            "title": "Normal",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "normal"
+        ],
+        "title": "StudioVocabManeuver",
+        "type": "object"
+      },
+      "SupportedStatement": {
+        "description": "A sentence tied to fact ids from the disclosure log, or marked as the student's own plan.",
+        "properties": {
+          "assessment_or_plan": {
+            "default": false,
+            "title": "Assessment Or Plan",
+            "type": "boolean"
+          },
+          "statement": {
+            "title": "Statement",
+            "type": "string"
+          },
+          "supported_by": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Supported By",
+            "type": "array"
+          }
+        },
+        "required": [
+          "statement"
+        ],
+        "title": "SupportedStatement",
+        "type": "object"
+      },
+      "TTSRequest": {
+        "properties": {
+          "audio_tags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Audio Tags",
+            "type": "array"
+          },
+          "text": {
+            "maxLength": 1500,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          },
+          "voice_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Voice Id"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "TTSRequest",
+        "type": "object"
+      },
+      "TranscriptEntry": {
+        "description": "One saved exchange. is_last marks the newest turn so refresh can show where the visit stopped.",
+        "properties": {
+          "is_last": {
+            "default": false,
+            "title": "Is Last",
+            "type": "boolean"
+          },
+          "mode": {
+            "default": "template",
+            "enum": [
+              "template",
+              "llm"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "reply_text": {
+            "title": "Reply Text",
+            "type": "string"
+          },
+          "student_end_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Student End Ms"
+          },
+          "student_start_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Student Start Ms"
+          },
+          "student_text": {
+            "title": "Student Text",
+            "type": "string"
+          },
+          "turn": {
+            "title": "Turn",
+            "type": "integer"
+          },
+          "words": {
+            "items": {
+              "$ref": "#/components/schemas/WordTimestamp"
+            },
+            "title": "Words",
+            "type": "array"
+          }
+        },
+        "required": [
+          "turn",
+          "student_text",
+          "reply_text"
+        ],
+        "title": "TranscriptEntry",
+        "type": "object"
+      },
+      "TrustConfig": {
+        "properties": {
+          "start": {
+            "default": 0,
+            "title": "Start",
+            "type": "integer"
+          },
+          "thresholds": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Thresholds",
+            "type": "object"
+          }
+        },
+        "title": "TrustConfig",
+        "type": "object"
+      },
+      "TrustPoint": {
+        "description": "Trust after one turn. Shown in the debrief, not while the visit is going on.",
+        "properties": {
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/TrustTimelineEvent"
+            },
+            "title": "Events",
+            "type": "array"
+          },
+          "trust": {
+            "title": "Trust",
+            "type": "integer"
+          },
+          "turn": {
+            "title": "Turn",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "turn",
+          "trust"
+        ],
+        "title": "TrustPoint",
+        "type": "object"
+      },
+      "TrustTimelineEvent": {
+        "description": "One trust change. The span is the words that caused it.",
+        "properties": {
+          "delta": {
+            "title": "Delta",
+            "type": "integer"
+          },
+          "event": {
+            "title": "Event",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "span": {
+            "title": "Span",
+            "type": "string"
+          },
+          "turn": {
+            "title": "Turn",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "event",
+          "delta",
+          "span",
+          "turn"
+        ],
+        "title": "TrustTimelineEvent",
+        "type": "object"
+      },
+      "TurnResult": {
+        "description": "The verified reply and the chart rows that turn released. The engine log stays stored.",
+        "properties": {
+          "audio_tags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Audio Tags",
+            "type": "array"
+          },
+          "chart_releases": {
+            "items": {
+              "$ref": "#/components/schemas/PublicChartEntry"
+            },
+            "title": "Chart Releases",
+            "type": "array"
+          },
+          "exam_results": {
+            "items": {
+              "$ref": "#/components/schemas/PublicChartEntry"
+            },
+            "title": "Exam Results",
+            "type": "array"
+          },
+          "latency_ms": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Latency Ms",
+            "type": "object"
+          },
+          "mode": {
+            "enum": [
+              "template",
+              "llm"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "notices": {
+            "items": {
+              "$ref": "#/components/schemas/PublicNotice"
+            },
+            "title": "Notices",
+            "type": "array"
+          },
+          "reply_text": {
+            "title": "Reply Text",
+            "type": "string"
+          },
+          "speaker": {
+            "title": "Speaker",
+            "type": "string"
+          },
+          "turn": {
+            "title": "Turn",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "turn",
+          "reply_text",
+          "speaker",
+          "mode"
+        ],
+        "title": "TurnResult",
+        "type": "object"
+      },
+      "TurnTimingCapture": {
+        "description": "Offsets in milliseconds from the committed utterance. Omit a mark that was not observed.",
+        "properties": {
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "first_audio_bytes_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Audio Bytes Ms"
+          },
+          "first_playback_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Playback Ms"
+          },
+          "origin": {
+            "enum": [
+              "live",
+              "fixture"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "speech_path": {
+            "anyOf": [
+              {
+                "enum": [
+                  "vendor",
+                  "browser",
+                  "none"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speech Path"
+          },
+          "speech_request_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speech Request Ms"
+          },
+          "verified_reply_arrival_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verified Reply Arrival Ms"
+          }
+        },
+        "required": [
+          "origin"
+        ],
+        "title": "TurnTimingCapture",
+        "type": "object"
+      },
+      "TurnTimingSample": {
+        "description": "The saved sample. pipeline_ms is the existing per-step breakdown, unchanged.",
+        "properties": {
+          "encounter_id": {
+            "title": "Encounter Id",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "fallback": {
+            "default": false,
+            "title": "Fallback",
+            "type": "boolean"
+          },
+          "fallback_kinds": {
+            "items": {
+              "enum": [
+                "template",
+                "browser_voice"
+              ],
+              "type": "string"
+            },
+            "title": "Fallback Kinds",
+            "type": "array"
+          },
+          "first_audio_bytes_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Audio Bytes Ms"
+          },
+          "first_playback_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Playback Ms"
+          },
+          "origin": {
+            "enum": [
+              "live",
+              "fixture"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "pipeline_ms": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Pipeline Ms",
+            "type": "object"
+          },
+          "retries": {
+            "default": 0,
+            "title": "Retries",
+            "type": "integer"
+          },
+          "speech_path": {
+            "anyOf": [
+              {
+                "enum": [
+                  "vendor",
+                  "browser",
+                  "none"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speech Path"
+          },
+          "speech_request_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speech Request Ms"
+          },
+          "turn_id": {
+            "title": "Turn Id",
+            "type": "integer"
+          },
+          "unavailable": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Unavailable",
+            "type": "array"
+          },
+          "verified_reply_arrival_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verified Reply Arrival Ms"
+          }
+        },
+        "required": [
+          "encounter_id",
+          "turn_id",
+          "origin"
+        ],
+        "title": "TurnTimingSample",
+        "type": "object"
+      },
+      "Unlock": {
+        "properties": {
+          "min_trust": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min Trust"
+          },
+          "requires_facts": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Requires Facts",
+            "type": "array"
+          },
+          "topics": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Topics",
+            "type": "array"
+          }
+        },
+        "title": "Unlock",
+        "type": "object"
+      },
+      "UnsupportedClaim": {
+        "description": "A sentence in the note that the disclosure log and chart do not back.",
+        "properties": {
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "statement": {
+            "title": "Statement",
+            "type": "string"
+          }
+        },
+        "required": [
+          "statement",
+          "reason"
+        ],
+        "title": "UnsupportedClaim",
+        "type": "object"
+      },
+      "Utterance": {
+        "properties": {
+          "barge_in_remaining_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Barge In Remaining Ms"
+          },
+          "end_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Ms"
+          },
+          "start_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Ms"
+          },
+          "text": {
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          },
+          "words": {
+            "items": {
+              "$ref": "#/components/schemas/WordTimestamp"
+            },
+            "title": "Words",
+            "type": "array"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "Utterance",
+        "type": "object"
+      },
+      "ValueRange": {
+        "properties": {
+          "high": {
+            "title": "High",
+            "type": "number"
+          },
+          "low": {
+            "title": "Low",
+            "type": "number"
+          }
+        },
+        "required": [
+          "low",
+          "high"
+        ],
+        "title": "ValueRange",
+        "type": "object"
+      },
+      "VhsImportResponse": {
+        "description": "Drafts saved from the bundled sponsor sample set. count is how many drafts were saved.",
+        "properties": {
+          "cases": {
+            "items": {
+              "$ref": "#/components/schemas/StudioCaseSummary"
+            },
+            "title": "Cases",
+            "type": "array"
+          },
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "count",
+          "cases"
+        ],
+        "title": "VhsImportResponse",
+        "type": "object"
+      },
+      "Visit": {
+        "properties": {
+          "branches": {
+            "items": {
+              "$ref": "#/components/schemas/Branch"
+            },
+            "title": "Branches",
+            "type": "array"
+          },
+          "changes": {
+            "$ref": "#/components/schemas/VisitChanges"
+          },
+          "day": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Day",
+            "type": "integer"
+          },
+          "decision_points": {
+            "items": {
+              "$ref": "#/components/schemas/DecisionPoint"
+            },
+            "title": "Decision Points",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label"
+        ],
+        "title": "Visit",
+        "type": "object"
+      },
+      "VisitChanges": {
+        "properties": {
+          "add_facts": {
+            "items": {
+              "$ref": "#/components/schemas/Fact"
+            },
+            "title": "Add Facts",
+            "type": "array"
+          },
+          "artifacts": {
+            "items": {
+              "$ref": "#/components/schemas/Artifact"
+            },
+            "title": "Artifacts",
+            "type": "array"
+          },
+          "briefing": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Briefing"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "exam": {
+            "items": {
+              "$ref": "#/components/schemas/ExamFinding"
+            },
+            "title": "Exam",
+            "type": "array"
+          },
+          "labs": {
+            "items": {
+              "$ref": "#/components/schemas/LabResult"
+            },
+            "title": "Labs",
+            "type": "array"
+          },
+          "medications": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Medication"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Medications"
+          },
+          "mood": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mood"
+          },
+          "remove_facts": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Remove Facts",
+            "type": "array"
+          },
+          "update_facts": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/FactPatch"
+            },
+            "title": "Update Facts",
+            "type": "object"
+          },
+          "vitals": {
+            "items": {
+              "$ref": "#/components/schemas/Vital"
+            },
+            "title": "Vitals",
+            "type": "array"
+          }
+        },
+        "title": "VisitChanges",
+        "type": "object"
+      },
+      "Vital": {
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "source": {
+            "$ref": "#/components/schemas/Source"
+          },
+          "status": {
+            "default": "draft",
+            "enum": [
+              "draft",
+              "approved"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "unit": {
+            "default": "",
+            "title": "Unit",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "value"
+        ],
+        "title": "Vital",
+        "type": "object"
+      },
+      "WordTimestamp": {
+        "description": "One recognized word and when it was spoken. Times are milliseconds from the start of capture.",
+        "properties": {
+          "end_ms": {
+            "title": "End Ms",
+            "type": "integer"
+          },
+          "start_ms": {
+            "title": "Start Ms",
+            "type": "integer"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text",
+          "start_ms",
+          "end_ms"
+        ],
+        "title": "WordTimestamp",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "title": "[Product name] API",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/cases": {
+      "get": {
+        "description": "Published cases a student can open. Drafts and hidden facts are left out.",
+        "operationId": "list_cases_api_cases_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PublicCase"
+                  },
+                  "title": "Response List Cases Api Cases Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Cases",
+        "tags": [
+          "encounters"
+        ]
+      }
+    },
+    "/api/cases/{case_id}": {
+      "get": {
+        "description": "Briefing for one published visit. This is not the Studio case.",
+        "operationId": "get_case_api_cases__case_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "title": "Case Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "version",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Version"
+            }
+          },
+          {
+            "in": "query",
+            "name": "visit_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Visit Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicCase"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No published case with that id."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Get Case",
+        "tags": [
+          "encounters"
+        ]
+      }
+    },
+    "/api/config": {
+      "get": {
+        "description": "What the browser needs to open Scribe. The long-lived key is not included.",
+        "operationId": "config_api_config_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicConfig"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Config"
+      }
+    },
+    "/api/encounters": {
+      "get": {
+        "description": "Saved encounters. total counts rows past the limit so a short page is not the whole history.",
+        "operationId": "list_encounters_api_encounters_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "case_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Case Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "student_name",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Student Name"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 200,
+              "maximum": 200,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EncounterList"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "List Encounters",
+        "tags": [
+          "encounters"
+        ]
+      },
+      "post": {
+        "description": "Saves a new encounter. Refresh must call the encounter read, not this route.",
+        "operationId": "start_encounter_api_encounters_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartEncounter"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicEncounter"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "The case or visit was not found."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "The encounter cannot be started."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Start Encounter",
+        "tags": [
+          "encounters"
+        ]
+      }
+    },
+    "/api/encounters/{enc_id}": {
+      "get": {
+        "description": "The saved encounter, with its transcript and released chart. Does not create one.",
+        "operationId": "get_encounter_api_encounters__enc_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "enc_id",
+            "required": true,
+            "schema": {
+              "title": "Enc Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicEncounter"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No saved encounter with that id."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Get Encounter",
+        "tags": [
+          "encounters"
+        ]
+      }
+    },
+    "/api/encounters/{enc_id}/documentation": {
+      "post": {
+        "description": "Save the dictated note and return the debrief, including the fabrication check.",
+        "operationId": "submit_documentation_api_encounters__enc_id__documentation_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "enc_id",
+            "required": true,
+            "schema": {
+              "title": "Enc Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Documentation"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedbackResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No saved encounter with that id."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Submit Documentation",
+        "tags": [
+          "encounters"
+        ]
+      }
+    },
+    "/api/encounters/{enc_id}/end": {
+      "post": {
+        "description": "Marks the encounter ended and returns the same saved view.",
+        "operationId": "end_encounter_api_encounters__enc_id__end_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "enc_id",
+            "required": true,
+            "schema": {
+              "title": "Enc Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicEncounter"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No saved encounter with that id."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "End Encounter",
+        "tags": [
+          "encounters"
+        ]
+      }
+    },
+    "/api/encounters/{enc_id}/feedback": {
+      "get": {
+        "description": "The saved debrief. A missing encounter is 404. An active visit is 409.",
+        "operationId": "get_feedback_api_encounters__enc_id__feedback_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "enc_id",
+            "required": true,
+            "schema": {
+              "title": "Enc Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedbackResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No saved encounter with that id."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "End the encounter before requesting feedback."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Get Feedback",
+        "tags": [
+          "encounters"
+        ]
+      },
+      "patch": {
+        "description": "Save a faculty score or comment beside the generated debrief. The generated scores stay as they were.",
+        "operationId": "override_feedback_api_encounters__enc_id__feedback_patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "enc_id",
+            "required": true,
+            "schema": {
+              "title": "Enc Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FeedbackOverrideRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedbackResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No saved encounter with that id."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "End the encounter before changing feedback."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Override Feedback",
+        "tags": [
+          "encounters"
+        ]
+      }
+    },
+    "/api/encounters/{enc_id}/turns/{turn}/speech": {
+      "post": {
+        "description": "Stream the saved verified reply for one turn. Client text is not spoken.",
+        "operationId": "speak_turn_api_encounters__enc_id__turns__turn__speech_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "enc_id",
+            "required": true,
+            "schema": {
+              "title": "Enc Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "turn",
+            "required": true,
+            "schema": {
+              "title": "Turn",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "audio/mpeg": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "MPEG audio of the saved verified reply, streamed as chunks. This body is not JSON."
+          },
+          "204": {
+            "description": "No voice service is configured, so there is no audio."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No saved encounter or turn with that id."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "This reply was not verified and will not be spoken."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Speech is taken from the saved verified reply."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "The speech service failed or returned no audio."
+          }
+        },
+        "summary": "Speak Turn",
+        "tags": [
+          "encounters"
+        ]
+      }
+    },
+    "/api/encounters/{enc_id}/turns/{turn}/timings": {
+      "get": {
+        "description": "The timing sample stored for this turn. A turn with no sample is not filled with zeros.",
+        "operationId": "get_turn_timing_api_encounters__enc_id__turns__turn__timings_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "enc_id",
+            "required": true,
+            "schema": {
+              "title": "Enc Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "turn",
+            "required": true,
+            "schema": {
+              "title": "Turn",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TurnTimingSample"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No saved encounter, turn, or timing sample with that id."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Get Turn Timing",
+        "tags": [
+          "encounters"
+        ]
+      },
+      "post": {
+        "description": "Save client timings for one saved turn. This does not run the pipeline again.",
+        "operationId": "record_turn_timing_api_encounters__enc_id__turns__turn__timings_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "enc_id",
+            "required": true,
+            "schema": {
+              "title": "Enc Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "turn",
+            "required": true,
+            "schema": {
+              "title": "Turn",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TurnTimingCapture"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TurnTimingSample"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No saved encounter or turn with that id."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Record Turn Timing",
+        "tags": [
+          "encounters"
+        ]
+      }
+    },
+    "/api/encounters/{enc_id}/utterances": {
+      "post": {
+        "description": "Runs one committed utterance. The response is the reply and released rows, not the engine log.",
+        "operationId": "add_utterance_api_encounters__enc_id__utterances_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "enc_id",
+            "required": true,
+            "schema": {
+              "title": "Enc Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Utterance"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TurnResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No saved encounter with that id."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "The encounter is not accepting a turn."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Add Utterance",
+        "tags": [
+          "encounters"
+        ]
+      }
+    },
+    "/api/health": {
+      "get": {
+        "description": "Lets a laptop or deploy check that the API process is up.",
+        "operationId": "health_api_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health"
+      }
+    },
+    "/api/stt/token": {
+      "post": {
+        "description": "Issue one single-use Scribe token. Building the OpenAPI schema does not call this.",
+        "operationId": "scribe_token_api_stt_token_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScribeToken"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Speech transcription is not configured."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "The transcription service did not provide a token."
+          }
+        },
+        "summary": "Scribe Token",
+        "tags": [
+          "encounters"
+        ]
+      }
+    },
+    "/api/studio/builder": {
+      "post": {
+        "description": "Save the finished builder form as one draft case. It opens in Studio for approval and publish.",
+        "operationId": "builder_create_api_studio_builder_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BuilderForm"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudioDraftResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Builder Create",
+        "tags": [
+          "studio"
+        ]
+      }
+    },
+    "/api/studio/builder/suggest": {
+      "post": {
+        "description": "Proposed words for the builder form. Nothing is saved; faculty edit the fields first.",
+        "operationId": "builder_suggest_api_studio_builder_suggest_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BuilderSuggestRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BuilderSuggestResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Builder Suggest",
+        "tags": [
+          "studio"
+        ]
+      }
+    },
+    "/api/studio/builder/vitals": {
+      "post": {
+        "description": "Typical resting vitals from the reference bands and condition rules. Each one names its source.",
+        "operationId": "builder_vitals_api_studio_builder_vitals_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BuilderVitalsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BuilderVitalsResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Builder Vitals",
+        "tags": [
+          "studio"
+        ]
+      }
+    },
+    "/api/studio/cases": {
+      "get": {
+        "description": "Newest saved version of each case, for the faculty Case Library.",
+        "operationId": "list_cases_api_studio_cases_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/StudioCaseSummary"
+                  },
+                  "title": "Response List Cases Api Studio Cases Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Cases",
+        "tags": [
+          "studio"
+        ]
+      }
+    },
+    "/api/studio/cases/{case_id}": {
+      "get": {
+        "description": "Return one saved version. Reading the case does not create another one.",
+        "operationId": "get_case_api_studio_cases__case_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "title": "Case Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "version",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudioCaseDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No saved case with that id."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Get Case",
+        "tags": [
+          "studio"
+        ]
+      },
+      "put": {
+        "description": "Store faculty edits on the draft. The body is the same case a refresh loads.",
+        "operationId": "save_case_api_studio_cases__case_id__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "title": "Case Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Case"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudioCaseDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No saved case with that id."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "A fact is still referenced."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Save Case",
+        "tags": [
+          "studio"
+        ]
+      }
+    },
+    "/api/studio/cases/{case_id}/approve": {
+      "post": {
+        "description": "Set review state on saved items. The returned case is what a refresh loads.",
+        "operationId": "approve_api_studio_cases__case_id__approve_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "title": "Case Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Approve"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudioCaseDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No saved case with that id."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Approve",
+        "tags": [
+          "studio"
+        ]
+      }
+    },
+    "/api/studio/cases/{case_id}/autofill": {
+      "post": {
+        "description": "Add proposed values as drafts. Faculty-set labs and vitals are left as they were.",
+        "operationId": "autofill_api_studio_cases__case_id__autofill_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "title": "Case Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Autofill"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudioAutofillResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No saved case with that id."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Autofill",
+        "tags": [
+          "studio"
+        ]
+      }
+    },
+    "/api/studio/cases/{case_id}/consistency": {
+      "get": {
+        "description": "Recompute findings and mark the ones faculty already dismissed. Ids are not stored as the source of truth.",
+        "operationId": "consistency_check_api_studio_cases__case_id__consistency_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "title": "Case Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ConsistencyFinding"
+                  },
+                  "title": "Response Consistency Check Api Studio Cases  Case Id  Consistency Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No saved case with that id."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Consistency Check",
+        "tags": [
+          "studio"
+        ]
+      }
+    },
+    "/api/studio/cases/{case_id}/consistency/{finding_id}/dismiss": {
+      "post": {
+        "description": "Faculty marks a finding as intended. Stored by message, since ids are recomputed on each check.",
+        "operationId": "dismiss_finding_api_studio_cases__case_id__consistency__finding_id__dismiss_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "title": "Case Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "finding_id",
+            "required": true,
+            "schema": {
+              "title": "Finding Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudioCaseDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "The case or finding was not found."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Dismiss Finding",
+        "tags": [
+          "studio"
+        ]
+      }
+    },
+    "/api/studio/cases/{case_id}/intake": {
+      "post": {
+        "description": "Apply one answer to its gap and save that same draft. Intake rules decide what changes.",
+        "operationId": "intake_answer_api_studio_cases__case_id__intake_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "title": "Case Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IntakeAnswer"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudioDraftResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No saved case with that id."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Intake Answer",
+        "tags": [
+          "studio"
+        ]
+      }
+    },
+    "/api/studio/cases/{case_id}/preview": {
+      "post": {
+        "description": "Runs a test student through the draft. This does not save an encounter.",
+        "operationId": "preview_case_api_studio_cases__case_id__preview_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "title": "Case Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Preview"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreviewRun"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "The case or visit was not found."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Preview Case",
+        "tags": [
+          "studio"
+        ]
+      }
+    },
+    "/api/studio/cases/{case_id}/publish": {
+      "post": {
+        "description": "Publish the latest draft when every check passes. The response is the version that was saved.",
+        "operationId": "publish_case_api_studio_cases__case_id__publish_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "title": "Case Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudioCaseDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No saved case with that id."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "The case is not ready to publish."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Publish Case",
+        "tags": [
+          "studio"
+        ]
+      }
+    },
+    "/api/studio/drafts": {
+      "post": {
+        "description": "Save one draft from the faculty description. The drafting service chooses the content.",
+        "operationId": "new_draft_api_studio_drafts_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewDraft"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudioDraftResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "New Draft",
+        "tags": [
+          "studio"
+        ]
+      }
+    },
+    "/api/studio/import/vhs": {
+      "post": {
+        "description": "Imports the full sponsor sample set as drafts. Each saved case stays in review until faculty approve it.",
+        "operationId": "import_vhs_api_studio_import_vhs_post",
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VhsImportResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "The sponsor sample set could not be imported."
+          }
+        },
+        "summary": "Import Vhs",
+        "tags": [
+          "studio"
+        ]
+      }
+    },
+    "/api/studio/lookup/icd10": {
+      "get": {
+        "description": "Diagnosis matches from the existing lookup. A one-character query is too broad to search.",
+        "operationId": "lookup_icd10_api_studio_lookup_icd10_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": true,
+            "schema": {
+              "title": "Q",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Icd10Match"
+                  },
+                  "title": "Response Lookup Icd10 Api Studio Lookup Icd10 Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Lookup Icd10",
+        "tags": [
+          "studio"
+        ]
+      }
+    },
+    "/api/studio/vocab": {
+      "get": {
+        "description": "Closed label sets the editor offers. Maneuver normals come from the exam catalog.",
+        "operationId": "vocab_api_studio_vocab_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudioVocab"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Vocab",
+        "tags": [
+          "studio"
+        ]
+      }
+    },
+    "/api/tts": {
+      "post": {
+        "operationId": "tts_api_tts_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TTSRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "audio/mpeg": {}
+            },
+            "description": "Successful Response"
+          },
+          "204": {
+            "description": "No voice service; the browser voice is used instead."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Tts",
+        "tags": [
+          "encounters"
+        ]
+      }
+    }
+  }
+}

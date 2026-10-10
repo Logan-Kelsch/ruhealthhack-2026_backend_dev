@@ -57,6 +57,8 @@ class TurnRow(Base):
     student_text: Mapped[str] = mapped_column(Text)
     student_start_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
     student_end_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    # Word times from Scribe, when the provider sent them. Empty when the turn had none.
+    student_words: Mapped[list | None] = mapped_column(JSONType, nullable=True)
     intent: Mapped[dict] = mapped_column(JSONType)
     engine: Mapped[dict] = mapped_column(JSONType)
     reply_text: Mapped[str] = mapped_column(Text)
@@ -64,5 +66,8 @@ class TurnRow(Base):
     verifier: Mapped[dict] = mapped_column(JSONType)
     audio_tags: Mapped[list] = mapped_column(JSONType)
     latency_ms: Mapped[dict] = mapped_column(JSONType)
+    # Client clock for this turn: reply arrival, speech request, first bytes, first playback.
+    # Empty until a timing sample is saved. It does not replace latency_ms.
+    timing_sample: Mapped[dict | None] = mapped_column(JSONType, nullable=True)
     llm_calls: Mapped[list] = mapped_column(JSONType)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)

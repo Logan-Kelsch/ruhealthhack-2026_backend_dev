@@ -1,11 +1,21 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.openapi.utils import get_openapi
 from fastapi.staticfiles import StaticFiles
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.api import encounters, studio
+from app.api.errors import (
+    handle_conflict,
+    handle_http_exception,
+    handle_not_found,
+    handle_validation,
+    publish_shared_errors,
+)
 from app.integrations import elevenlabs
 from app.integrations.bedrock import llm_available
+from app.schemas.http import HealthResponse, PublicConfig
 from app.services import Conflict, NotFound
 from app.settings import BACKEND_DIR, get_settings
 
@@ -22,32 +32,49 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    @app.exception_handler(NotFound)
-    async def not_found(_: Request, exc: NotFound):
-        return JSONResponse(status_code=404, content={"detail": str(exc)})
+    # One body for every application and validation error. Status codes stay as they were.
+    app.add_exception_handler(RequestValidationError, handle_validation)
+    app.add_exception_handler(StarletteHTTPException, handle_http_exception)
+    app.add_exception_handler(NotFound, handle_not_found)
+    app.add_exception_handler(Conflict, handle_conflict)
 
-    @app.exception_handler(Conflict)
-    async def conflict(_: Request, exc: Conflict):
-        return JSONResponse(status_code=409, content={"detail": str(exc)})
+    @app.get("/api/health", response_model=HealthResponse)
+    def health() -> HealthResponse:
+        """Lets a laptop or deploy check that the API process is up."""
+        return HealthResponse(ok=True)
 
-    @app.get("/api/health")
-    def health() -> dict:
-        return {"ok": True}
-
-    @app.get("/api/config")
-    def config() -> dict:
-        """What the frontend needs to pick its voice path. No secrets."""
-        return {
-            "llm": llm_available(),
-            "tts": elevenlabs.tts_available(),
-            "stt_provider": settings.stt_provider,
-            "stt_commit_silence_ms": settings.stt_commit_silence_ms,
-        }
+    @app.get("/api/config", response_model=PublicConfig)
+    def config() -> PublicConfig:
+        """What the browser needs to open Scribe. The long-lived key is not included."""
+        # Read settings on each request so a changed environment is what the client sees.
+        current = get_settings()
+        return PublicConfig(
+            llm=llm_available(),
+            tts=elevenlabs.tts_available(),
+            stt_provider="elevenlabs",
+            stt_model_id=current.elevenlabs_stt_model,
+            voice_id=current.elevenlabs_default_voice_id,
+            tts_model_id=current.elevenlabs_tts_model_live,
+            vad_silence_secs=current.stt_vad_silence_secs,
+            vad_threshold=current.stt_vad_threshold,
+            commit_strategy="vad",
+            include_timestamps=True,
+        )
 
     app.include_router(encounters.router)
     app.include_router(studio.router)
     PORTRAITS_DIR.mkdir(parents=True, exist_ok=True)
     app.mount("/portraits", StaticFiles(directory=PORTRAITS_DIR), name="portraits")
+
+    def openapi() -> dict:
+        """Schema for export. Building it does not serve a request or open the database."""
+        if app.openapi_schema:
+            return app.openapi_schema
+        schema = get_openapi(title=app.title, version=app.version, routes=app.routes)
+        app.openapi_schema = publish_shared_errors(schema)
+        return app.openapi_schema
+
+    app.openapi = openapi
     return app
 
 

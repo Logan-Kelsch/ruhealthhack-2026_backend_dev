@@ -1,0 +1,1046 @@
+{
+  "case_id": "frank_russo",
+  "version": 1,
+  "status": "published",
+  "title": "Frank Russo: pneumonia, and a wife who needs him home",
+  "description": "67-year-old retired bus mechanic with type 2 diabetes. Four days of productive cough, fever and right-sided chest pain. Urgent care chest X-ray shows right lower lobe pneumonia. He is his wife's caregiver and fears admission. The good outcome is a safe home plan he understands, with allergy checked and clear reasons to return.",
+  "seed": 67,
+  "profile": {
+    "name": "Frank Russo",
+    "age": 67,
+    "sex": "male",
+    "pronouns": "he/him",
+    "occupation": "Retired city bus mechanic",
+    "summary": "Original synthetic golden case written by the team for the demo. TODO(clinical-review)",
+    "personality": {
+      "summary": "Stoic and practical. Downplays how sick he feels. Warms up when the learner asks about June.",
+      "communication_style": "Short answers, a dry joke now and then. Gets guarded if he hears the word hospital.",
+      "traits": {
+        "irritability": 0.3,
+        "verbosity": 0.4,
+        "humor": 0.5,
+        "openness": 0.4
+      },
+      "health_literacy": "medium",
+      "mood": "tired and a little guarded",
+      "example_lines": [
+        "I've had worse.",
+        "Just tell me what I need to do."
+      ]
+    }
+  },
+  "briefing": {
+    "setting": "Primary care clinic, same-day visit",
+    "reason_for_visit": "Cough and fever; urgent care chest X-ray this morning",
+    "goal": "Assess Frank, decide with him where he can be treated safely, and make a plan he can follow at home.",
+    "student_role": "Third-year medical student",
+    "show_doorway_vitals": true
+  },
+  "facts": [
+    {
+      "id": "f_cc",
+      "category": "presenting",
+      "text": "Cough for 4 days bringing up yellow-brown phlegm, now with fever and getting winded.",
+      "say": "I've had this cough four days now. Bringing up yellow, kind of rusty stuff. And now I get winded.",
+      "tier": "initial",
+      "unlock": {
+        "topics": [
+          "chief_complaint",
+          "hpi_onset",
+          "hpi_duration"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_urgent_care",
+      "category": "history",
+      "text": "Went to urgent care this morning. They took a chest X-ray and told him to see his own clinic today.",
+      "say": "I went to urgent care this morning. They took an X-ray of my chest and said to come see you folks today.",
+      "tier": "initial",
+      "unlock": {
+        "topics": [
+          "testing_done",
+          "purpose_agenda",
+          "chief_complaint"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_onset",
+      "category": "history",
+      "text": "Started like a head cold about a week ago, then the cough got deeper.",
+      "say": "Started like a regular cold, maybe a week ago. Then it went down into my chest.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "hpi_timing",
+          "hpi_onset"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_fever",
+      "category": "ros",
+      "text": "Fever up to 101.5 °F at home, with shaking chills last night.",
+      "say": "I had a fever, 101 and a half last night. Shaking under the blankets.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "ros_general",
+          "hpi_associated"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_chest_pain",
+      "category": "ros",
+      "text": "Sharp pain on the right side of his chest when he coughs or takes a deep breath. No pressure and no pain with walking.",
+      "say": "It's a sharp pain, right here on the right side, when I cough or take a big breath. Not like a pressure.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "ros_cardiac",
+          "hpi_location",
+          "hpi_character"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_dyspnea",
+      "category": "ros",
+      "text": "Short of breath climbing one flight of stairs. Fine sitting still. No trouble lying flat.",
+      "say": "Stairs get me. One flight and I need a minute. Sitting here I'm alright.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "ros_respiratory",
+          "hpi_severity"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_eating",
+      "category": "ros",
+      "text": "Not eating much, but drinking water and juice. Home sugar readings in the 200s this week.",
+      "say": "I'm not hungry. I'm drinking okay though. My sugars have been in the two hundreds.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "diet_general",
+          "ros_gi"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_meds",
+      "category": "medication",
+      "text": "Takes metformin twice a day and lisinopril once a day. Took an over-the-counter night-time cold medicine two nights.",
+      "say": "Metformin twice a day and the blood pressure pill, lisinopril. I took some of that NyQuil a couple nights.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "medication_list",
+          "otc_medications",
+          "hpi_modifying"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_allergy",
+      "category": "allergy",
+      "text": "Allergic to penicillin: a rash as a child.",
+      "say": "Penicillin. I broke out in a rash as a kid.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "allergies"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_history",
+      "category": "history",
+      "text": "Type 2 diabetes for 8 years and high blood pressure. Never had pneumonia before.",
+      "say": "I've got the diabetes, eight years now, and blood pressure. Never had pneumonia.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "medical_history"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_no_recent_abx",
+      "category": "history",
+      "text": "No hospital stays and no antibiotics in the past year.",
+      "say": "No hospital, no antibiotics. Not in a long time.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "hospitalizations",
+          "prior_antibiotics"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_smoking",
+      "category": "social",
+      "text": "Quit smoking 10 years ago after about 30 years of a pack a day.",
+      "say": "I quit smoking ten years ago. Pack a day for thirty years before that.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "tobacco"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_alcohol",
+      "category": "social",
+      "text": "Two or three beers on weekends.",
+      "say": "A couple beers on the weekend. That's it.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "alcohol"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_vaccines",
+      "category": "history",
+      "text": "Has never had a pneumonia vaccine and skipped this year's flu shot. Thinks the shots can give you the illness.",
+      "say": "Never had the pneumonia shot. Skipped the flu shot too. Those things make you sick, if you ask me.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "vaccination",
+          "beliefs_understanding"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved",
+      "belief": {
+        "text": "Believes vaccines can cause the illness they prevent."
+      }
+    },
+    {
+      "id": "f_home",
+      "category": "social",
+      "text": "Retired bus mechanic. Lives with his wife, June, who has early dementia. He is her main caregiver.",
+      "say": "I'm retired, fixed buses for the city. It's me and my wife, June. She's got some memory trouble, so I look after her.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "social_living",
+          "occupation",
+          "social_support"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_fear_admit",
+      "category": "fear",
+      "text": "Afraid of being admitted to the hospital because nobody would be home with June.",
+      "say": "If you're going to put me in the hospital, I can't. Who's going to be with June?",
+      "tier": "reluctant",
+      "unlock": {
+        "topics": [
+          "fears_worries",
+          "patient_expectations"
+        ],
+        "requires_facts": [],
+        "min_trust": 1
+      },
+      "cue": true,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_daughter",
+      "category": "social",
+      "text": "His daughter lives an hour away and could stay for a few days if he asked.",
+      "say": "My daughter could come stay a few days, I suppose. I hate to ask her.",
+      "tier": "reluctant",
+      "unlock": {
+        "topics": [
+          "social_support",
+          "finances_access"
+        ],
+        "requires_facts": [],
+        "min_trust": 1
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    }
+  ],
+  "vitals": [
+    {
+      "key": "temp_c",
+      "label": "Temperature",
+      "value": "38.4",
+      "unit": "°C",
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "key": "hr",
+      "label": "Heart rate",
+      "value": "104",
+      "unit": "bpm",
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "key": "rr",
+      "label": "Breathing rate",
+      "value": "24",
+      "unit": "breaths/min",
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "key": "bp",
+      "label": "Blood pressure",
+      "value": "132/78",
+      "unit": "mmHg",
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "key": "spo2",
+      "label": "Oxygen saturation",
+      "value": "93",
+      "unit": "%",
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "key": "height",
+      "label": "Height",
+      "value": "70",
+      "unit": "in",
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "key": "weight",
+      "label": "Weight",
+      "value": "192",
+      "unit": "lb",
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    }
+  ],
+  "labs": [
+    {
+      "id": "lab_wbc",
+      "key": "wbc",
+      "name": "White blood cells (WBC)",
+      "loinc": "6690-2",
+      "panel": "cbc",
+      "value": 15.2,
+      "unit": "10^3/uL",
+      "ref_low": 4.5,
+      "ref_high": 11.0,
+      "ref_source": "Typical adult reference interval (varies by lab); see docs/credits.md",
+      "collected": "today",
+      "release": {
+        "on": "order",
+        "topics": []
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "lab_hgb",
+      "key": "hgb",
+      "name": "Hemoglobin",
+      "loinc": "718-7",
+      "panel": "cbc",
+      "value": 14.1,
+      "unit": "g/dL",
+      "ref_low": 13.5,
+      "ref_high": 17.5,
+      "ref_source": "Typical adult reference interval (varies by lab); see docs/credits.md",
+      "collected": "today",
+      "release": {
+        "on": "order",
+        "topics": []
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "lab_plt",
+      "key": "plt",
+      "name": "Platelets",
+      "loinc": "777-3",
+      "panel": "cbc",
+      "value": 268,
+      "unit": "10^3/uL",
+      "ref_low": 150,
+      "ref_high": 450,
+      "ref_source": "Typical adult reference interval (varies by lab); see docs/credits.md",
+      "collected": "today",
+      "release": {
+        "on": "order",
+        "topics": []
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "lab_na",
+      "key": "na",
+      "name": "Sodium",
+      "loinc": "2951-2",
+      "panel": "bmp",
+      "value": 136,
+      "unit": "mmol/L",
+      "ref_low": 135,
+      "ref_high": 145,
+      "ref_source": "Typical adult reference interval (varies by lab); see docs/credits.md",
+      "collected": "today",
+      "release": {
+        "on": "order",
+        "topics": []
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "lab_k",
+      "key": "k",
+      "name": "Potassium",
+      "loinc": "2823-3",
+      "panel": "bmp",
+      "value": 4.2,
+      "unit": "mmol/L",
+      "ref_low": 3.5,
+      "ref_high": 5.0,
+      "ref_source": "Typical adult reference interval (varies by lab); see docs/credits.md",
+      "collected": "today",
+      "release": {
+        "on": "order",
+        "topics": []
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "lab_bun",
+      "key": "bun",
+      "name": "Blood urea nitrogen (BUN)",
+      "loinc": "3094-0",
+      "panel": "bmp",
+      "value": 18,
+      "unit": "mg/dL",
+      "ref_low": 7,
+      "ref_high": 20,
+      "ref_source": "Typical adult reference interval (varies by lab); see docs/credits.md",
+      "collected": "today",
+      "release": {
+        "on": "order",
+        "topics": []
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "lab_cr",
+      "key": "cr",
+      "name": "Creatinine",
+      "loinc": "2160-0",
+      "panel": "bmp",
+      "value": 1.02,
+      "unit": "mg/dL",
+      "ref_low": 0.74,
+      "ref_high": 1.35,
+      "ref_source": "Typical adult reference interval (varies by lab); see docs/credits.md",
+      "collected": "today",
+      "release": {
+        "on": "order",
+        "topics": []
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "lab_glu",
+      "key": "glu",
+      "name": "Glucose",
+      "loinc": "2345-7",
+      "panel": "bmp",
+      "value": 188,
+      "unit": "mg/dL",
+      "ref_low": 70,
+      "ref_high": 99,
+      "ref_source": "Typical adult reference interval (varies by lab); see docs/credits.md",
+      "collected": "today",
+      "release": {
+        "on": "order",
+        "topics": []
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    }
+  ],
+  "exam": [
+    {
+      "maneuver": "general_appearance",
+      "finding": "Tired-looking older man who coughs every few minutes. Alert, oriented, and answering clearly.",
+      "abnormal": true,
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "maneuver": "lung_auscultation",
+      "finding": "Crackles at the right lung base, with louder, harsher breath sounds over the same area. Left side clear.",
+      "abnormal": true,
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "maneuver": "chest_percussion",
+      "finding": "Dull to percussion over the right lower back.",
+      "abnormal": true,
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "maneuver": "work_of_breathing",
+      "finding": "Breathing a little fast. Speaks in full sentences. No use of neck muscles to breathe.",
+      "abnormal": true,
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "cxr_urgent_care",
+      "kind": "xray",
+      "title": "Chest X-ray report (urgent care, this morning)",
+      "body": "Two views of the chest. Patchy opacity in the right lower lobe, consistent with pneumonia. No fluid around the lung. Heart size normal. Referred to primary care for same-day follow-up.",
+      "release": {
+        "on": "visit_start",
+        "topics": []
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    }
+  ],
+  "diagnoses": [
+    {
+      "name": "Community-acquired pneumonia",
+      "codes": [
+        {
+          "system": "ICD-10-CM",
+          "code": "J18.9",
+          "display": "Pneumonia, unspecified organism"
+        }
+      ],
+      "release": {
+        "on": "fact",
+        "topics": [],
+        "fact_id": "f_urgent_care"
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "name": "Type 2 diabetes",
+      "codes": [
+        {
+          "system": "ICD-10-CM",
+          "code": "E11.9",
+          "display": "Type 2 diabetes mellitus without complications"
+        }
+      ],
+      "release": {
+        "on": "visit_start",
+        "topics": []
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "name": "Hypertension",
+      "codes": [
+        {
+          "system": "ICD-10-CM",
+          "code": "I10",
+          "display": "Essential (primary) hypertension"
+        }
+      ],
+      "release": {
+        "on": "visit_start",
+        "topics": []
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    }
+  ],
+  "medications": [
+    {
+      "name": "Metformin",
+      "dose": "1000 mg",
+      "frequency": "twice daily",
+      "purpose": "diabetes",
+      "codes": [],
+      "release": {
+        "on": "visit_start",
+        "topics": []
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "name": "Lisinopril",
+      "dose": "10 mg",
+      "frequency": "once daily",
+      "purpose": "blood pressure",
+      "codes": [],
+      "release": {
+        "on": "visit_start",
+        "topics": []
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    }
+  ],
+  "allergies": [
+    {
+      "substance": "Penicillin",
+      "reaction": "Rash in childhood",
+      "release": {
+        "on": "fact",
+        "topics": [],
+        "fact_id": "f_allergy"
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    }
+  ],
+  "objectives": [
+    {
+      "id": "obj_history",
+      "text": "Take a focused respiratory history, including the details that decide where he can be treated safely.",
+      "expected_discoveries": [
+        "f_cc",
+        "f_fever",
+        "f_chest_pain",
+        "f_dyspnea",
+        "f_eating",
+        "f_history"
+      ],
+      "expected_actions": [],
+      "rubric_domains": [
+        "information_gathering"
+      ],
+      "status": "approved"
+    },
+    {
+      "id": "obj_safe_plan",
+      "text": "Ask about allergies and medications before any treatment is discussed.",
+      "expected_discoveries": [
+        "f_allergy",
+        "f_meds",
+        "f_no_recent_abx"
+      ],
+      "expected_actions": [],
+      "rubric_domains": [
+        "clinical_reasoning_and_synthesis"
+      ],
+      "status": "approved"
+    },
+    {
+      "id": "obj_home",
+      "text": "Find out what is at stake for him at home and build a plan he can follow, with clear reasons to come back.",
+      "expected_discoveries": [
+        "f_home",
+        "f_fear_admit",
+        "f_daughter"
+      ],
+      "expected_actions": [
+        "explain_diagnosis",
+        "home_plan",
+        "safety_netting"
+      ],
+      "rubric_domains": [
+        "explanation_and_shared_decisions",
+        "professionalism_safety_closure"
+      ],
+      "status": "approved"
+    },
+    {
+      "id": "obj_prevention",
+      "text": "Raise pneumonia and flu vaccines once he is better, without lecturing.",
+      "expected_discoveries": [
+        "f_vaccines",
+        "f_smoking"
+      ],
+      "expected_actions": [
+        "vaccine_counsel"
+      ],
+      "rubric_domains": [
+        "explanation_and_shared_decisions"
+      ],
+      "status": "approved"
+    }
+  ],
+  "topics": [],
+  "actions": [
+    {
+      "id": "explain_diagnosis",
+      "description": "Tells him in plain words that the X-ray and exam point to pneumonia, an infection in the lung",
+      "keywords": [
+        "pneumonia",
+        "lung infection",
+        "infection in (your|the) (right )?lung"
+      ]
+    },
+    {
+      "id": "home_plan",
+      "description": "Explains that he can be treated at home with medicine and a recheck soon, given how he looks today",
+      "keywords": [
+        "(treat|manage) (this|you|it) at home",
+        "(don.?t|do not) (think you )?need to (be admitted|stay in the hospital|go to the hospital)",
+        "home with (antibiotics|medicine)",
+        "(check|see) you (again )?in (2|two|3|three) days",
+        "recheck"
+      ]
+    },
+    {
+      "id": "vaccine_counsel",
+      "description": "Recommends the pneumonia and flu vaccines when he has recovered",
+      "keywords": [
+        "pneumonia (shot|vaccine)",
+        "pneumococcal",
+        "flu (shot|vaccine)",
+        "vaccin"
+      ]
+    }
+  ],
+  "rubric_id": "shp_patient_encounter_v1",
+  "documentation_template": "SOAP",
+  "trust": {
+    "start": 0,
+    "thresholds": {
+      "reluctant": 3,
+      "hidden": 5
+    }
+  },
+  "difficulty": {
+    "preset": "typical",
+    "params": {}
+  },
+  "visits": [
+    {
+      "id": "v1",
+      "label": "Same-day visit",
+      "day": 0,
+      "changes": {
+        "add_facts": [],
+        "update_facts": {},
+        "remove_facts": [],
+        "vitals": [],
+        "labs": [],
+        "exam": [],
+        "artifacts": []
+      },
+      "decision_points": [
+        {
+          "id": "dp_allergy",
+          "label": "Asked about allergies",
+          "predicate": {
+            "topic": "allergies"
+          },
+          "affects": "patient",
+          "rubric_domain": "clinical_reasoning_and_synthesis",
+          "feedback_if_yes": "You found his penicillin allergy before treatment came up.",
+          "feedback_if_no": "He is allergic to penicillin. Ask about allergies before any antibiotic is chosen."
+        },
+        {
+          "id": "dp_home",
+          "label": "Agreed on a plan he can manage at home",
+          "predicate": {
+            "action": "home_plan"
+          },
+          "affects": "patient",
+          "rubric_domain": "explanation_and_shared_decisions",
+          "feedback_if_yes": "You explained that he can be treated at home and when he will be seen again.",
+          "feedback_if_no": "He never heard whether he could go home. His fear about leaving June stayed unanswered."
+        },
+        {
+          "id": "dp_return",
+          "label": "Gave clear reasons to come back",
+          "predicate": {
+            "action": "safety_netting"
+          },
+          "affects": "score",
+          "rubric_domain": "professionalism_safety_closure",
+          "feedback_if_no": "Tell him what means coming back the same day: worse breathing, confusion, not keeping fluids down, or fever that does not improve in 2 to 3 days."
+        },
+        {
+          "id": "dp_vaccine",
+          "label": "Raised vaccines",
+          "predicate": {
+            "action": "vaccine_counsel"
+          },
+          "affects": "score",
+          "rubric_domain": "explanation_and_shared_decisions",
+          "feedback_if_no": "He has never had a pneumonia vaccine. A short, respectful mention plants the idea for when he is well."
+        }
+      ],
+      "branches": [
+        {
+          "id": "b_home",
+          "label": "Treated at home with a plan he understands",
+          "when": {
+            "dp_allergy": true,
+            "dp_home": true
+          },
+          "after_branches": [],
+          "summary": "He goes home on an antibiotic chosen around his allergy. His daughter stays with June for a few days. His fever breaks on day 3.",
+          "changes": {
+            "add_facts": [],
+            "update_facts": {},
+            "remove_facts": [],
+            "vitals": [],
+            "labs": [],
+            "exam": [],
+            "artifacts": []
+          },
+          "status": "approved"
+        },
+        {
+          "id": "b_unclear",
+          "label": "Left unsure where he should be treated",
+          "when": {
+            "dp_home": false
+          },
+          "after_branches": [],
+          "summary": "He leaves unsure whether he should be in the hospital. That night he gets worried and goes to the emergency department, with June in the waiting room.",
+          "changes": {
+            "add_facts": [],
+            "update_facts": {},
+            "remove_facts": [],
+            "vitals": [],
+            "labs": [],
+            "exam": [],
+            "artifacts": []
+          },
+          "status": "approved"
+        },
+        {
+          "id": "b_allergy",
+          "label": "Allergy never asked",
+          "when": {
+            "dp_allergy": false
+          },
+          "after_branches": [],
+          "summary": "The pharmacist catches the penicillin allergy and calls the clinic. Treatment starts a day late.",
+          "changes": {
+            "add_facts": [],
+            "update_facts": {},
+            "remove_facts": [],
+            "vitals": [],
+            "labs": [],
+            "exam": [],
+            "artifacts": []
+          },
+          "status": "approved"
+        }
+      ]
+    }
+  ],
+  "consistency_findings": [],
+  "credits": [
+    {
+      "what": "Case content",
+      "source": "Original synthetic case written by the team; TODO(clinical-review)"
+    }
+  ],
+  "created_by": "Team (golden case) TODO(clinical-review)",
+  "golden": true
+}

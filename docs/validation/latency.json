@@ -1,0 +1,247 @@
+{
+ "counts": {
+  "samples": 5,
+  "live": 1,
+  "fixture": 4
+ },
+ "retries": [
+  {
+   "encounter_id": "enc-partial",
+   "turn_id": 2,
+   "retries": 1
+  }
+ ],
+ "fallbacks": [
+  {
+   "encounter_id": "enc-fallback",
+   "turn_id": 1,
+   "fallback_kinds": [
+    "template",
+    "browser_voice"
+   ]
+  }
+ ],
+ "errors": [
+  {
+   "encounter_id": "enc-partial",
+   "turn_id": 2,
+   "error": "The reply could not be played."
+  }
+ ],
+ "commit_to_first_audio_goal_ms": 2000,
+ "target_claimed_met": false,
+ "http_versus_websocket_ms": null,
+ "live_vendor_performance": false,
+ "limitations": [
+  "Samples marked fixture use a controlled clock. They are not live vendor performance.",
+  "The median commit-to-first-audio target is a measured goal. This report does not claim it is met.",
+  "No HTTP-versus-WebSocket delay was measured.",
+  "The live sample has no commit-to-first-playback measurement, so live vendor performance is not shown."
+ ],
+ "by_origin": {
+  "fixture": {
+   "samples": 4,
+   "verified_reply_arrival_ms": {
+    "count": 3,
+    "median": 400,
+    "p90": 500
+   },
+   "speech_request_ms": {
+    "count": 2,
+    "median": 505,
+    "p90": 560
+   },
+   "first_audio_bytes_ms": {
+    "count": 2,
+    "median": 710,
+    "p90": 800
+   },
+   "first_playback_ms": {
+    "count": 2,
+    "median": 800,
+    "p90": 900
+   },
+   "unavailable": {
+    "verified_reply_arrival_ms": 1,
+    "speech_request_ms": 2,
+    "first_audio_bytes_ms": 2,
+    "first_playback_ms": 2
+   },
+   "pipeline_ms": {
+    "classify": {
+     "count": 4,
+     "median": 25,
+     "p90": 40
+    },
+    "disclosure": {
+     "count": 4,
+     "median": 9,
+     "p90": 12
+    },
+    "phrase_1": null,
+    "phrase_2": null,
+    "verify_1": null,
+    "verify_2": null,
+    "total": {
+     "count": 4,
+     "median": 75,
+     "p90": 90
+    }
+   }
+  },
+  "live": {
+   "samples": 1,
+   "verified_reply_arrival_ms": null,
+   "speech_request_ms": null,
+   "first_audio_bytes_ms": null,
+   "first_playback_ms": null,
+   "unavailable": {
+    "verified_reply_arrival_ms": 1,
+    "speech_request_ms": 1,
+    "first_audio_bytes_ms": 1,
+    "first_playback_ms": 1
+   },
+   "pipeline_ms": {
+    "classify": {
+     "count": 1,
+     "median": 100,
+     "p90": 100
+    },
+    "disclosure": {
+     "count": 1,
+     "median": 50,
+     "p90": 50
+    },
+    "phrase_1": null,
+    "phrase_2": null,
+    "verify_1": null,
+    "verify_2": null,
+    "total": {
+     "count": 1,
+     "median": 200,
+     "p90": 200
+    }
+   }
+  }
+ },
+ "samples": [
+  {
+   "encounter_id": "enc-ok",
+   "turn_id": 1,
+   "verified_reply_arrival_ms": 400,
+   "speech_request_ms": 450,
+   "first_audio_bytes_ms": 620,
+   "first_playback_ms": 700,
+   "pipeline_ms": {
+    "classify": 30,
+    "disclosure": 10,
+    "total": 80
+   },
+   "retries": 0,
+   "fallback": false,
+   "fallback_kinds": [],
+   "error": null,
+   "speech_path": "vendor",
+   "unavailable": [],
+   "origin": "fixture"
+  },
+  {
+   "encounter_id": "enc-partial",
+   "turn_id": 2,
+   "verified_reply_arrival_ms": 500,
+   "speech_request_ms": 560,
+   "first_audio_bytes_ms": 800,
+   "first_playback_ms": null,
+   "pipeline_ms": {
+    "classify": 40,
+    "disclosure": 12,
+    "total": 90
+   },
+   "retries": 1,
+   "fallback": false,
+   "fallback_kinds": [],
+   "error": "The reply could not be played.",
+   "speech_path": "vendor",
+   "unavailable": [
+    "first_playback_ms"
+   ],
+   "origin": "fixture"
+  },
+  {
+   "encounter_id": "enc-fallback",
+   "turn_id": 1,
+   "verified_reply_arrival_ms": 300,
+   "speech_request_ms": null,
+   "first_audio_bytes_ms": null,
+   "first_playback_ms": 900,
+   "pipeline_ms": {
+    "classify": 20,
+    "disclosure": 8,
+    "total": 70
+   },
+   "retries": 0,
+   "fallback": true,
+   "fallback_kinds": [
+    "template",
+    "browser_voice"
+   ],
+   "error": null,
+   "speech_path": "browser",
+   "unavailable": [
+    "speech_request_ms",
+    "first_audio_bytes_ms"
+   ],
+   "origin": "fixture"
+  },
+  {
+   "encounter_id": "enc-skew",
+   "turn_id": 4,
+   "verified_reply_arrival_ms": null,
+   "speech_request_ms": null,
+   "first_audio_bytes_ms": null,
+   "first_playback_ms": null,
+   "pipeline_ms": {
+    "classify": 15,
+    "disclosure": 5,
+    "total": 40
+   },
+   "retries": 0,
+   "fallback": false,
+   "fallback_kinds": [],
+   "error": null,
+   "speech_path": "vendor",
+   "unavailable": [
+    "verified_reply_arrival_ms",
+    "speech_request_ms",
+    "first_audio_bytes_ms",
+    "first_playback_ms"
+   ],
+   "origin": "fixture"
+  },
+  {
+   "encounter_id": "enc-live",
+   "turn_id": 1,
+   "verified_reply_arrival_ms": null,
+   "speech_request_ms": null,
+   "first_audio_bytes_ms": null,
+   "first_playback_ms": null,
+   "pipeline_ms": {
+    "classify": 100,
+    "disclosure": 50,
+    "total": 200
+   },
+   "retries": 0,
+   "fallback": false,
+   "fallback_kinds": [],
+   "error": null,
+   "speech_path": null,
+   "unavailable": [
+    "verified_reply_arrival_ms",
+    "speech_request_ms",
+    "first_audio_bytes_ms",
+    "first_playback_ms"
+   ],
+   "origin": "live"
+  }
+ ]
+}

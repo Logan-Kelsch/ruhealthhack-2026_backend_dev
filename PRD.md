@@ -676,7 +676,7 @@ Every event stores its span and rule ID. No span, no event.
 Browser (React + TS, Vite)
   ├─ Studio UI, Encounter UI, Debrief, Dashboard
   ├─ Mic → ElevenLabs Scribe v2 Realtime (WebSocket, single-use token from our backend)
-  └─ REST/WebSocket ↔ FastAPI backend
+  └─ REST ↔ FastAPI backend (committed turns use HTTP; Scribe stays a browser WebSocket)
 FastAPI (Python)
   ├─ studio/ (drafting, intake, auto-fill, consistency, publish, VHS import)
   ├─ encounter/ (turn pipeline: classifier → engine → phraser → verifier → TTS)
@@ -714,9 +714,9 @@ Postgres (Docker locally → AWS RDS)   S3 (audio, images)   AWS Bedrock (Claude
 
 **Encounter**
 - `POST /api/encounters`: `{assignment_id | case_id+version, visit_id}` → `{encounter_id, briefing, initial_chart}`
-- `POST /api/stt/token` → a single-use Scribe realtime token (keeps the API key server-side)
-- `WS /api/encounters/{id}/stream`: client sends `{type:"utterance", text, words[], start_ms, end_ms}` and `{type:"barge_in", at_ms}`. The server sends `{type:"reply", text, audio_url|audio_chunk, chart_releases[], exam_results[]}` and `{type:"notice", ...}`.
-- `POST /api/encounters/{id}/utterance` (P-02 text entry point, same pipeline; for test students and scripts)
+- `GET /api/config` → public voice settings (speech model id, voice id, voice-activity silence). No API key.
+- `POST /api/stt/token` → `{token}` one single-use Scribe realtime token. The long-lived key stays on the server. Exporting OpenAPI does not request a token.
+- `POST /api/encounters/{id}/utterances` → one committed utterance `{text, start_ms, end_ms, words[], barge_in_remaining_ms}` runs the pipeline and returns the verified reply, chart releases, exam results, and notices. This is the encounter transport. The browser's Scribe connection is a WebSocket to ElevenLabs, not a second encounter socket. The same route is the text entry point for test students and scripts (P-02); the student UI has no text box.
 - `POST /api/encounters/{id}/end` → `{documentation_template}`
 - `POST /api/encounters/{id}/documentation`: `{fields}` → `{check}`
 
@@ -733,6 +733,7 @@ Postgres (Docker locally → AWS RDS)   S3 (audio, images)   AWS Bedrock (Claude
 
 - **STT:** ElevenLabs Scribe v2 Realtime over WebSocket from the browser, using a single-use token from our backend.
   - Settings: `commit_strategy=vad`; silence threshold about 1.0–1.5 s; VAD threshold about 0.4; word timestamps on.
+  - A committed utterance is posted to `POST /api/encounters/{id}/utterances`. Partial text stays in the browser. There is no second encounter WebSocket.
   - Fallback: Amazon Transcribe streaming.
   - Partial text shows live in the transcript; only committed text goes to the pipeline.
 - **TTS:** Eleven v4 Turbo for live replies; Eleven v4 for pre-rendered audio (for example narration).

@@ -24,11 +24,11 @@ export function StrokeIcon({ d, className }: IconProps) {
 }
 
 export const ICONS = {
-  home: "M3 11l9-7 9 7v9h-6v-6H9v6H3z",
-  cases: "M6 3h8l4 4v14H6zM9 12h6M9 16h6",
+  home: "M3.5 10.5L12 3.8l8.5 6.7V20h-5.6v-5.8H9.1V20H3.5z",
+  cases: "M6.5 3h7.5l4.5 4.5V21h-12zM14 3v4.5h4.5M9.5 12.5h5M9.5 16h5",
   cohorts:
     "M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM3 20c0-3.5 2.7-6 6-6s6 2.5 6 6M17 11a2.5 2.5 0 1 0 0-5M17 14c2.6.4 4 2.4 4 5",
-  insights: "M6 20v-5M12 20V9M18 20V4",
+  insights: "M6 20v-6M12 20V10M18 20V5",
   visits: "M4 6h16M4 12h16M4 18h10",
   settings:
     "M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1",
@@ -92,6 +92,16 @@ export function MoonIcon() {
   return (
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
       <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
+    </svg>
+  );
+}
+
+// Page with a folded corner and two lines, for documents and visits.
+export function DocIcon({ size = 22 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinejoin="round" strokeLinecap="round" aria-hidden>
+      <path d="M6 3h8l4.5 4.5V21H6z" />
+      <path d="M14 3v4.5h4.5M9 12h6M9 15.5h6" />
     </svg>
   );
 }

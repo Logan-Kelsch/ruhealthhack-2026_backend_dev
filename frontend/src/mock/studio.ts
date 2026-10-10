@@ -92,12 +92,12 @@ export type TreeNode = {
 export type TreeNodeId = "start" | "q1" | "o1" | "q2" | "o2" | "o3";
 
 export const TREE_START_NODES: Record<TreeNodeId, TreeNode> = {
-  start: { kind: "start", x: 370, y: 30, w: 200, title: "Visit 1 begins", detail: "Outpatient psychiatry follow-up." },
-  q1: { kind: "decision", x: 340, y: 130, w: 260, title: "Asked about mania history?", detail: "The student asks about past high-energy or manic periods." },
-  o1: { kind: "outcome", x: 50, y: 300, w: 280, title: "Visit 2", detail: "Mood improving, no signs of hypomania." },
-  q2: { kind: "decision", x: 520, y: 300, w: 270, title: "Assessed for suicidal ideation?", detail: "The student asks directly about thoughts of self-harm or suicide." },
-  o2: { kind: "outcome", x: 330, y: 470, w: 270, title: "Visit 2", detail: "Sleeping less, talking fast, PHQ-9 improved." },
-  o3: { kind: "outcome", x: 640, y: 470, w: 280, title: "Visit 2", detail: "Same hypomanic signs, and suicidal thoughts were never checked." },
+  start: { kind: "start", x: 380, y: 24, w: 200, title: "Visit 1 begins", detail: "Outpatient psychiatry follow-up." },
+  q1: { kind: "decision", x: 340, y: 112, w: 280, title: "Asked about mania history?", detail: "The student asks about past high-energy or manic periods." },
+  o1: { kind: "outcome", x: 70, y: 300, w: 300, title: "Visit 2", detail: "Mood improving, no signs of hypomania." },
+  q2: { kind: "decision", x: 560, y: 300, w: 290, title: "Assessed for suicidal ideation?", detail: "The student asks directly about thoughts of self-harm or suicide." },
+  o2: { kind: "outcome", x: 330, y: 500, w: 290, title: "Visit 2", detail: "Sleeping less, talking fast, PHQ-9 improved." },
+  o3: { kind: "outcome", x: 700, y: 500, w: 290, title: "Visit 2", detail: "Same hypomanic signs, and suicidal thoughts were never checked." },
 };
 
 export const TREE_EDGES: [TreeNodeId, TreeNodeId, string][] = [

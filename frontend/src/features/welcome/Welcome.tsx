@@ -1,37 +1,45 @@
-import type { ReactNode } from "react";
+import type { MouseEvent, ReactNode } from "react";
 import type { Go } from "../../app/types";
-import { useTheme } from "../../lib/theme";
-import { ThemeToggle } from "../../components/ui";
+import { useModeSwitch, type Role } from "../../components/ModeTransition";
+import { Wordmark } from "../../components/ui";
 
-// Role picker. Teaching opens the faculty home; learning opens the student home.
+// Role picker. Educators come first: they build the cases learners practice on.
 export function Welcome({ go }: { go: Go }) {
-  const { theme, toggle } = useTheme();
+  const switchMode = useModeSwitch();
+
+  function pick(role: Role) {
+    return () => switchMode(role, () => go(role === "faculty" ? "f-home" : "s-home"));
+  }
 
   return (
     <div className="relative h-full overflow-auto">
-      <div className="absolute inset-0 bg-painting" />
-      <div className="absolute top-6 right-6 z-10">
-        <ThemeToggle theme={theme} onToggle={toggle} />
-      </div>
-      <div className="relative flex min-h-full flex-col items-center justify-center gap-11 px-8 py-12 text-center text-ink">
-        <div className="flex flex-col items-center gap-3.5">
-          <div className="font-serif text-[clamp(72px,10vw,132px)] leading-[0.9] font-medium tracking-[-3px]">Rounds</div>
-          <div className="font-serif text-[clamp(20px,2.2vw,28px)] text-indigo">
-            Practice patient conversations out loud.
+      <div className="bg-painting absolute inset-0" />
+      <div
+        className="absolute inset-0"
+        style={{ background: "radial-gradient(ellipse 60% 55% at 50% 50%, rgba(255,253,250,.92), rgba(255,253,250,.55) 60%, transparent 85%)" }}
+      />
+      <div className="relative flex min-h-full flex-col items-center justify-center gap-12 px-8 py-12 text-center text-ink">
+        <div className="flex flex-col items-center gap-4">
+          <Wordmark size={Math.round(Math.min(148, Math.max(80, window.innerWidth * 0.085)))} />
+          <div className="font-serif text-[clamp(26px,2.8vw,44px)] leading-tight tracking-[-0.6px] text-ink">
+            Talk through a patient visit before the real one.
+          </div>
+          <div className="max-w-[560px] font-sans text-[clamp(15px,1.2vw,18px)] leading-snug text-ink-soft">
+            Practice the conversations that <span className="whitespace-nowrap">value-based</span> care depends on.
           </div>
         </div>
-        <div className="grid w-full max-w-[760px] justify-center gap-4 [grid-template-columns:repeat(auto-fit,minmax(260px,360px))]">
+        <div className="grid w-full max-w-[960px] justify-center gap-[clamp(20px,3vw,48px)] [grid-template-columns:repeat(auto-fit,minmax(280px,450px))]">
           <RoleCard
-            title="I teach"
-            body="Build patients, assign cases, see where your class struggles."
+            title="Educator"
+            body="Build a patient in minutes, then see where your learners get stuck."
             icon={<TeachIcon />}
-            onClick={() => go("f-home")}
+            onClick={pick("faculty")}
           />
           <RoleCard
-            title="I’m a student"
-            body="Talk with your patient, then see what you found and missed."
+            title="Learner"
+            body="Talk to your patient out loud, then see what you caught and missed."
             icon={<LearnIcon />}
-            onClick={() => go("s-home")}
+            onClick={pick("student")}
           />
         </div>
       </div>
@@ -48,34 +56,39 @@ function RoleCard({
   title: string;
   body: string;
   icon: ReactNode;
-  onClick: () => void;
+  onClick: (event: MouseEvent<HTMLButtonElement>) => void;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="flex flex-col items-start gap-2.5 rounded-[20px] border border-card/90 bg-card/90 p-6 text-left shadow-[0_20px_50px_-24px_rgba(20,27,77,.35)] transition-transform hover:-translate-y-0.5"
+      className="group flex flex-col items-center gap-3 rounded-[18px] border border-indigo-line/40 bg-card/85 px-8 pt-8 pb-9 text-center shadow-[0_24px_60px_-34px_rgba(25,31,92,.45)] backdrop-blur-sm transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-[0_30px_70px_-30px_rgba(25,31,92,.5)]"
     >
-      <span className="flex size-11 items-center justify-center rounded-xl bg-panel text-white">{icon}</span>
-      <span className="mt-1.5 font-serif text-[28px] font-medium tracking-[-0.4px]">{title}</span>
-      <span className="text-[14.5px] leading-snug text-ink-soft">{body}</span>
+      <span
+        className="flex size-[132px] items-center justify-center rounded-full text-[#1f2a9c] transition-transform duration-500 group-hover:scale-105"
+        style={{ background: "radial-gradient(circle at 50% 45%, rgba(255,255,255,.7), transparent 60%), url(/assets/bloom.jpg) 30% 20% / 500% auto" }}
+      >
+        {icon}
+      </span>
+      <span className="mt-2 font-serif text-[clamp(32px,2.8vw,46px)] leading-none tracking-[-0.8px]">{title}</span>
+      <span className="max-w-[340px] font-serif text-[clamp(17px,1.4vw,22px)] leading-snug text-ink">{body}</span>
     </button>
   );
 }
 
 function TeachIcon() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-      <path d="M12 3L1 9l11 6 9-4.9V17h2V9z" />
-      <path d="M5 13.2v3.6c0 .5 3 2.7 7 2.7s7-2.2 7-2.7v-3.6l-7 3.8z" />
+    <svg width="72" height="72" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M12 4L1.5 9.2 12 14.4l8.6-4.3v5.6h1.6V9.2z" />
+      <path d="M5.6 12.6v3.6c0 .6 2.9 2.8 6.4 2.8s6.4-2.2 6.4-2.8v-3.6L12 15.8z" />
     </svg>
   );
 }
 
 function LearnIcon() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" aria-hidden>
-      <path d="M12 6c-2-1.5-5-2-9-2v14c4 0 7 .5 9 2 2-1.5 5-2 9-2V4c-4 0-7 .5-9 2zM12 6v14" />
+    <svg width="66" height="66" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" aria-hidden>
+      <path d="M12 6.2C10 4.8 7 4.3 3 4.3v13.6c4 0 7 .5 9 1.9 2-1.4 5-1.9 9-1.9V4.3c-4 0-7 .5-9 1.9zM12 6.2v13.6" />
     </svg>
   );
 }

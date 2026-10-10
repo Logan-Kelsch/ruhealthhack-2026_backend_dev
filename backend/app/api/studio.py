@@ -14,12 +14,14 @@ from app.db import get_session
 from app.integrations.bedrock import llm_available
 from app.integrations.nlm_tables import search_icd10
 from app.models import CaseRow
-from app.schemas.case import Case, ConsistencyFinding
+from app.schemas.case import Case, ConsistencyFinding, Visit
 from app.schemas.http import (
     AutofillAdded,
     Icd10Match,
     IntakeGap,
     LlmCallRecord,
+    PreviewFallback,
+    PreviewRun,
     StudioAutofillResult,
     StudioCaseDetail,
     StudioCaseSummary,
@@ -79,11 +81,6 @@ def _result(row: CaseRow, calls: list[dict]) -> StudioDraftResult:
         blockers=detail.blockers,
         llm_calls=[LlmCallRecord.model_validate(call) for call in calls],
     )
-
-
-def _full(row: CaseRow) -> dict:
-    """JSON for Studio routes that still return a plain object. Same fields as the case detail."""
-    return _detail(row).model_dump(mode="json")
 
 
 def _draft(db: Session, case_id: str) -> Case:
@@ -220,23 +217,31 @@ def autofill(case_id: str, body: Autofill, db: Session = Depends(get_session)) -
     )
 
 
-@router.get("/cases/{case_id}/consistency")
-def consistency_check(case_id: str, db: Session = Depends(get_session)) -> list[dict]:
+@router.get("/cases/{case_id}/consistency", response_model=list[ConsistencyFinding])
+def consistency_check(case_id: str, db: Session = Depends(get_session)) -> list[ConsistencyFinding]:
+    """Recompute findings and mark the ones faculty already dismissed. Ids are not stored as the source of truth."""
     case = _draft(db, case_id)
     dismissed = {f.message for f in case.consistency_findings if f.dismissed}
-    return [{**f.model_dump(), "dismissed": f.message in dismissed} for f in consistency.check(case)]
+    # The same message stays dismissed after a refresh, even when the check assigns a new id.
+    return [finding.model_copy(update={"dismissed": finding.message in dismissed}) for finding in consistency.check(case)]
 
 
-@router.post("/cases/{case_id}/consistency/{finding_id}/dismiss")
-def dismiss_finding(case_id: str, finding_id: str, db: Session = Depends(get_session)) -> dict:
+@router.post("/cases/{case_id}/consistency/{finding_id}/dismiss", response_model=StudioCaseDetail)
+def dismiss_finding(case_id: str, finding_id: str, db: Session = Depends(get_session)) -> StudioCaseDetail:
     """Faculty marks a finding as intended. Stored by message, since ids are recomputed on each check."""
     case = _draft(db, case_id)
     finding = next((f for f in consistency.check(case) if f.id == finding_id), None)
     if finding is None:
         raise HTTPException(404, "finding not found; run the check again")
-    if not any(f.message == finding.message for f in case.consistency_findings):
-        case.consistency_findings.append(ConsistencyFinding(**{**finding.model_dump(), "dismissed": True}))
-    return _full(services.save_draft(db, case))
+    marked = False
+    for stored in case.consistency_findings:
+        # Import and an earlier save can already hold this finding with dismissed false.
+        if stored.message == finding.message:
+            stored.dismissed = True
+            marked = True
+    if not marked:
+        case.consistency_findings.append(finding.model_copy(update={"dismissed": True}))
+    return _detail(services.save_draft(db, case))
 
 
 class Preview(BaseModel):
@@ -245,22 +250,61 @@ class Preview(BaseModel):
     visit_id: str | None = None
 
 
-@router.post("/cases/{case_id}/preview")
-def preview_case(case_id: str, body: Preview, db: Session = Depends(get_session)) -> dict:
-    """Runs a test student through the case without saving an encounter."""
+def _preview_visit(case: Case, visit_id: str | None) -> Visit:
+    """The visit faculty selected. With no selection, the first visit is the one that runs."""
+    if visit_id:
+        visit = case.visit(visit_id)
+        if visit is None:
+            raise HTTPException(404, f"visit {visit_id} not found")
+        return visit
+    if not case.visits:
+        raise HTTPException(404, "visit not found")
+    return case.visits[0]
+
+
+def _preview_driver(requested: Literal["scripted", "llm"]) -> tuple[Literal["scripted", "llm"], PreviewFallback | None]:
+    """Keep the requested driver when it can run. Otherwise say the scripted student ran instead."""
+    if requested == "llm" and not llm_available():
+        return (
+            "scripted",
+            PreviewFallback(
+                requested="llm",
+                used="scripted",
+                reason="The language model is not available, so the scripted test student ran instead.",
+            ),
+        )
+    return requested, None
+
+
+@router.post("/cases/{case_id}/preview", response_model=PreviewRun)
+def preview_case(case_id: str, body: Preview, db: Session = Depends(get_session)) -> PreviewRun:
+    """Runs a test student through the draft. This does not save an encounter."""
     case = _draft(db, case_id)
-    if body.visit_id and case.visit(body.visit_id) is None:
-        raise HTTPException(404, f"visit {body.visit_id} not found")
-    driver = body.driver if llm_available() else "scripted"
-    return preview.run_test_student(case, body.level, driver=driver, visit_id=body.visit_id)
+    visit = _preview_visit(case, body.visit_id)
+    driver, fallback = _preview_driver(body.driver)
+    raw = preview.run_test_student(case, body.level, driver=driver, visit_id=visit.id)
+    return PreviewRun.model_validate(
+        {
+            "level": body.level,
+            "driver": driver,
+            "visit_id": visit.id,
+            "fallback": None if fallback is None else fallback.model_dump(),
+            "transcript": raw["transcript"],
+            "discoveries": raw["discoveries"],
+            "blocked_replies": raw["blocked_replies"],
+            "feedback": raw["feedback"],
+            "replies_failing_audit": raw["replies_failing_audit"],
+        }
+    )
 
 
-@router.post("/cases/{case_id}/publish")
-def publish_case(case_id: str, db: Session = Depends(get_session)) -> dict:
+@router.post("/cases/{case_id}/publish", response_model=StudioCaseDetail)
+def publish_case(case_id: str, db: Session = Depends(get_session)) -> StudioCaseDetail:
+    """Publish the latest draft when every check passes. The response is the version that was saved."""
     row, blockers = services.publish_case(db, case_id)
     if row is None:
         raise HTTPException(409, {"message": "This case is not ready to publish.", "blockers": blockers})
-    return _full(row)
+    return _detail(row)
 
 
 @router.post("/import/vhs", status_code=201, response_model=VhsImportResponse)

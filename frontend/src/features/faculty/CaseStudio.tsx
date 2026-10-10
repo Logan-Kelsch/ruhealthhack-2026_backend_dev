@@ -8,6 +8,7 @@ import {
   loadStudioCase,
   loadStudioVocab,
   lookupDiagnosis,
+  publishStudioCase,
   saveStudioCase,
   setItemApproval,
   type ApiClient,
@@ -21,6 +22,7 @@ import {
   type StudioVocab,
 } from "../../api/client";
 import { factReferenceNotes, saveProblem } from "./caseDraft";
+import { CaseReview } from "./CaseReview";
 import { CaseEditor, ObjectiveEditor, type SavePhase } from "./caseForm";
 import type { Go, StudioTab } from "../../app/types";
 import { Avatar, type Portrait } from "../../components/Avatar";
@@ -31,6 +33,7 @@ const TABS: { id: StudioTab; label: string }[] = [
   { id: "objectives", label: "Learning objectives" },
   { id: "files", label: "Files and sources" },
   { id: "tree", label: "Decision tree" },
+  { id: "review", label: "Review" },
 ];
 
 type CreatePhase = { kind: "editing" } | { kind: "saving" } | { kind: "error"; message: string };
@@ -44,6 +47,12 @@ type AnswerPhase =
   | { kind: "idle" }
   | { kind: "saving"; gapId: string }
   | { kind: "error"; gapId: string; message: string };
+
+type PublishPhase =
+  | { kind: "idle" }
+  | { kind: "publishing" }
+  | { kind: "rejected"; message: string; blockers: string[] }
+  | { kind: "error"; message: string };
 
 // Patient Studio. Supported case content can be edited and approved. Files and the decision tree cannot.
 export function CaseStudio({
@@ -76,6 +85,7 @@ export function CaseStudio({
   const [vocabError, setVocabError] = useState<string | null>(null);
   const [lookupResults, setLookupResults] = useState<Icd10Match[]>([]);
   const [lookupMessage, setLookupMessage] = useState<string | null>(null);
+  const [publishPhase, setPublishPhase] = useState<PublishPhase>({ kind: "idle" });
 
   // Follow the shell when another screen opens Studio on a chosen tab.
   useEffect(() => {
@@ -191,6 +201,27 @@ export function CaseStudio({
     setDraft(next);
     setDirty(true);
     setSavePhase({ kind: "idle" });
+  }
+
+  // Publish only moves the badge when the server saved a published version. A rejection stays on the draft.
+  async function publishDraft() {
+    if (!caseId || load.kind !== "ready") return;
+    if (dirty) {
+      setPublishPhase({ kind: "error", message: "Save these edits before publishing." });
+      return;
+    }
+    setPublishPhase({ kind: "publishing" });
+    try {
+      const result = await publishStudioCase(client, caseId);
+      setPublishPhase({ kind: "idle" });
+      remember(result);
+    } catch (error: unknown) {
+      if (error instanceof ApiError && (error.status === 409 || error.blockers.length > 0)) {
+        setPublishPhase({ kind: "rejected", message: error.message, blockers: error.blockers });
+        return;
+      }
+      setPublishPhase({ kind: "error", message: failureMessage(error, "The case could not be published.") });
+    }
   }
 
   // Point the address bar at the case the server just stored, so a refresh opens that version.
@@ -361,21 +392,28 @@ export function CaseStudio({
               <div className="mt-1 text-[13px] text-muted">{metaLine(detail)}</div>
             </div>
           </div>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              disabled
-              className="inline-flex h-10 cursor-not-allowed items-center rounded-[10px] border border-line-2 bg-card px-4 text-sm font-medium text-muted"
-            >
-              Preview unavailable
-            </button>
-            <button
-              type="button"
-              disabled
-              className="h-10 cursor-not-allowed rounded-[10px] bg-inactive px-[18px] text-sm font-medium text-white"
-            >
-              Publish unavailable
-            </button>
+          <div className="flex flex-col items-end gap-2">
+            <div className="flex gap-2">
+              <button
+                type="button"
+                disabled={!caseId || load.kind !== "ready"}
+                onClick={() => setCurrent("review")}
+                className="inline-flex h-10 items-center rounded-[10px] border border-line-2 bg-card px-4 text-sm font-medium text-ink disabled:cursor-not-allowed disabled:text-muted"
+              >
+                {caseId && load.kind === "ready" ? "Preview" : "Preview unavailable"}
+              </button>
+              <button
+                type="button"
+                disabled={!caseId || load.kind !== "ready" || publishPhase.kind === "publishing"}
+                onClick={() => {
+                  void publishDraft();
+                }}
+                className="h-10 rounded-[10px] bg-panel px-[18px] text-sm font-medium text-white disabled:cursor-not-allowed disabled:bg-inactive"
+              >
+                {publishLabel(Boolean(caseId) && load.kind === "ready", publishPhase)}
+              </button>
+            </div>
+            <PublishNotice phase={publishPhase} />
           </div>
         </div>
         <TabNav items={TABS} active={current} onChange={setCurrent} />
@@ -415,6 +453,12 @@ export function CaseStudio({
             onSave={editorProps.onSave}
             onApprove={editorProps.onApprove}
           />
+        ) : (
+          <LoadStatus load={load} onRetry={() => setAttempt((value) => value + 1)} />
+        )
+      ) : current === "review" ? (
+        load.kind === "ready" && caseId ? (
+          <CaseReview client={client} caseId={caseId} visits={load.detail.case.visits ?? []} />
         ) : (
           <LoadStatus load={load} onRetry={() => setAttempt((value) => value + 1)} />
         )
@@ -644,6 +688,35 @@ function sexLabel(sex: StudioCaseDetail["case"]["profile"]["sex"]): string {
       return unreachable;
     }
   }
+}
+
+// The publish control names the state it is in. A draft that can be sent does not say it is already published.
+function publishLabel(ready: boolean, phase: PublishPhase): string {
+  if (!ready) return "Publish unavailable";
+  if (phase.kind === "publishing") return "Publishing";
+  return "Publish";
+}
+
+// Blockers stay sentences from the server. A rejection is not shown as a published case.
+function PublishNotice({ phase }: { phase: PublishPhase }) {
+  if (phase.kind === "idle" || phase.kind === "publishing") return null;
+  if (phase.kind === "rejected") {
+    return (
+      <div role="alert" className="max-w-md text-sm text-ink">
+        <p>{phase.message}</p>
+        <ul className="mt-1 flex flex-col gap-1">
+          {phase.blockers.map((blocker) => (
+            <li key={blocker}>{blocker}</li>
+          ))}
+        </ul>
+      </div>
+    );
+  }
+  return (
+    <p role="alert" className="max-w-md text-sm text-ink">
+      {phase.message}
+    </p>
+  );
 }
 
 // Status text matches the saved value. The badge color repeats it.

@@ -148,6 +148,80 @@ class StudioVocab(BaseModel):
     lab_panels: list[str]
 
 
+class PreviewTranscriptTurn(BaseModel):
+    """One exchange from the test-student run. The words are what the pipeline produced."""
+
+    turn: int
+    student: str
+    patient: str
+
+
+class PreviewDiscovery(BaseModel):
+    """A case fact the test student elicited. text is that fact's authored text."""
+
+    fact_id: str
+    text: str
+    turn: int
+    objective_id: str
+
+
+class PreviewBlockedReply(BaseModel):
+    """A reply the verifier refused. reply is the text that was not delivered."""
+
+    turn: int
+    student: str
+    reply: str
+    problems: list[str]
+
+
+class PreviewEvidence(BaseModel):
+    """A transcript quote the rubric used for this domain."""
+
+    turn: int
+    quote: str
+
+
+class PreviewDomainScore(BaseModel):
+    """One official rubric domain for this preview. N/A means the visit did not call for that domain."""
+
+    key: str
+    name: str
+    score: int | Literal["N/A"]
+    evidence: list[PreviewEvidence] = Field(default_factory=list)
+
+
+class PreviewFeedback(BaseModel):
+    """Rubric result for the preview. interpretation is the rubric's own discussion-aid wording."""
+
+    total: int
+    max_total: int
+    interpretation: str
+    review_flag: bool
+    domains: list[PreviewDomainScore]
+
+
+class PreviewFallback(BaseModel):
+    """Set when the requested driver did not run. used is the driver that produced the transcript."""
+
+    requested: Literal["scripted", "llm"]
+    used: Literal["scripted", "llm"]
+    reason: str
+
+
+class PreviewRun(BaseModel):
+    """One test-student preview. The transcript, discoveries, and scores are from that run."""
+
+    level: Literal["novice", "competent", "expert", "adversarial"]
+    driver: Literal["scripted", "llm"]
+    visit_id: str
+    fallback: PreviewFallback | None = None
+    transcript: list[PreviewTranscriptTurn]
+    discoveries: list[PreviewDiscovery]
+    blocked_replies: list[PreviewBlockedReply]
+    feedback: PreviewFeedback
+    replies_failing_audit: int
+
+
 class ErrorItem(BaseModel):
     """One validation problem. loc is the same path FastAPI already reported, such as ["body", "description"]."""
 

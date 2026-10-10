@@ -235,6 +235,22 @@ def add_utterance(
     )
 
 
+def verified_speech(db: Session, enc_id: str, turn: int) -> tuple[str, list[str], str | None]:
+    """The saved reply, the tags the engine chose, and the case voice.
+
+    Client text never reaches this function. A reply that did not pass verification
+    is refused so an unchecked phrasing cannot be spoken.
+    """
+    enc = get_encounter(db, enc_id)
+    row = db.scalars(select(TurnRow).where(TurnRow.encounter_id == enc.id, TurnRow.idx == turn)).first()
+    if row is None:
+        raise NotFound(f"turn {turn} not found")
+    if row.verifier.get("passed") is not True:
+        raise Conflict("This reply was not verified and will not be spoken.")
+    case = Case.model_validate(enc.visit_doc)
+    return row.reply_text, list(row.audio_tags or []), case.profile.voice_id
+
+
 def end_encounter(db: Session, enc_id: str) -> EncounterRow:
     """Mark the visit ended. A second end leaves the saved row as it is."""
     enc = get_encounter(db, enc_id)

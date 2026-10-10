@@ -69,7 +69,7 @@ def test_studio_draft_to_publish(client):
     assert all(lab["status"] == "approved" for lab in approved["case"]["labs"])
 
     run = client.post("/api/studio/cases/walter_greene/preview", json={"level": "expert"}).json()
-    assert run["grounding"]["replies_failing_audit"] == 0
+    assert run["replies_failing_audit"] == 0
 
 
 def test_editing_published_case_starts_new_version(client):

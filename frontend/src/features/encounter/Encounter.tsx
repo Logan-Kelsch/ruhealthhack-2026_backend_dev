@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { asApiError, api, type ApiClient, type PublicChartEntry, type PublicEncounter } from "../../api/client";
 import type { components } from "../../api/schema";
 import type { Go, StudentRoute } from "../../app/types";
@@ -8,6 +8,13 @@ import { CardHead, GhostButton, Wordmark } from "../../components/ui";
 import { portraitFor } from "../student/portrait";
 import { stopOwnedAudio as stopPageAudio, type ScribeConnector, type ScribeEvent } from "../../voice/scribe";
 import { connectElevenLabsScribe } from "../../voice/scribeLive";
+import {
+  createBrowserVoice,
+  createMpegPlayback,
+  verifiedAudioSource,
+  type BrowserVoice,
+  type SpeechPlayback,
+} from "../../voice/speech";
 
 type TurnResult = components["schemas"]["TurnResult"];
 type TranscriptEntry = components["schemas"]["TranscriptEntry"];
@@ -28,16 +35,23 @@ export function Encounter({
   client = api,
   connectScribe = connectElevenLabsScribe,
   stopOwnedAudio = stopPageAudio,
+  playSpeech,
+  browserVoice,
   go,
 }: {
   route: StudentRoute;
   client?: ApiClient;
   connectScribe?: ScribeConnector;
   stopOwnedAudio?: () => void;
+  playSpeech?: SpeechPlayback;
+  browserVoice?: BrowserVoice;
   go?: Go;
 }) {
   const [attempt, setAttempt] = useState(0);
   const [load, setLoad] = useState<LoadState>(route.encounterId ? { kind: "loading" } : { kind: "missing" });
+  // One player and one browser voice for this screen. Tests pass their own.
+  const playback = useMemo(() => playSpeech ?? createMpegPlayback(), [playSpeech]);
+  const spoken = useMemo(() => browserVoice ?? createBrowserVoice(), [browserVoice]);
 
   useEffect(() => {
     if (!route.encounterId) {
@@ -87,6 +101,8 @@ export function Encounter({
       client={client}
       connectScribe={connectScribe}
       stopOwnedAudio={stopOwnedAudio}
+      playback={playback}
+      browserVoice={spoken}
       go={go}
     />
   );
@@ -98,12 +114,16 @@ function EncounterLive({
   client,
   connectScribe,
   stopOwnedAudio,
+  playback,
+  browserVoice,
   go,
 }: {
   initial: PublicEncounter;
   client: ApiClient;
   connectScribe: ScribeConnector;
   stopOwnedAudio: () => void;
+  playback: SpeechPlayback;
+  browserVoice: BrowserVoice;
   go?: Go;
 }) {
   const [view, setView] = useState(initial);
@@ -111,11 +131,27 @@ function EncounterLive({
   const [partial, setPartial] = useState("");
   const [banner, setBanner] = useState<string | null>(null);
   const [notices, setNotices] = useState<string[]>([]);
+  const [voiceLabel, setVoiceLabel] = useState<string | null>(null);
   const sessionRef = useRef<Awaited<ReturnType<ScribeConnector>> | null>(null);
   const queueRef = useRef(Promise.resolve());
   const closedRef = useRef(false);
   const mutedRef = useRef(false);
+  const ttsRef = useRef(false);
+  const speechQueueRef = useRef<{ turn: number; text: string }[]>([]);
+  const drainingRef = useRef(false);
+  const speechActiveRef = useRef(false);
+  const bargeMsRef = useRef<number | undefined>(undefined);
+  const abortRef = useRef<AbortController | null>(null);
   const encounterId = view.encounter_id;
+
+  // Drops queued replies and the stream that is playing. Leaving is not an interruption.
+  function stopSpeech() {
+    speechQueueRef.current = [];
+    speechActiveRef.current = false;
+    abortRef.current?.abort();
+    playback.stop();
+    browserVoice.cancel();
+  }
 
   useEffect(() => {
     return () => {
@@ -123,16 +159,20 @@ function EncounterLive({
       closedRef.current = true;
       sessionRef.current?.stop();
       sessionRef.current = null;
+      stopSpeech();
       stopOwnedAudio();
     };
-  }, [stopOwnedAudio]);
+  }, [browserVoice, playback, stopOwnedAudio]);
 
   // Turns one Scribe event into a caption, a queued turn, or a visible failure.
   function onEvent(event: ScribeEvent) {
     if (closedRef.current) return;
     switch (event.type) {
       case "partial":
-        if (!mutedRef.current) setPartial(event.text);
+        if (mutedRef.current) return;
+        // Student speech stops the patient. The microphone stays open.
+        if (speechActiveRef.current || drainingRef.current) interruptSpeech();
+        setPartial(event.text);
         return;
       case "committed":
         if (mutedRef.current) return;
@@ -197,6 +237,7 @@ function EncounterLive({
       }
       sessionRef.current = session;
       mutedRef.current = false;
+      ttsRef.current = config.tts;
       setVoice("live");
     } catch (error) {
       setVoice("off");
@@ -226,12 +267,7 @@ function EncounterLive({
     try {
       const result = await client.POST("/api/encounters/{enc_id}/utterances", {
         params: { path: { enc_id: encounterId } },
-        body: {
-          text: event.text,
-          start_ms: event.startMs,
-          end_ms: event.endMs,
-          words: event.words.map((word) => ({ text: word.text, start_ms: word.startMs, end_ms: word.endMs })),
-        },
+        body: utteranceBody(event),
       });
       if (closedRef.current) return;
       if (!result.response || result.data === undefined) {
@@ -275,6 +311,90 @@ function EncounterLive({
       };
       return { ...current, chart, transcript: [...previous, entry], last_turn: turn.turn };
     });
+    enqueueSpeech(turn.turn, turn.reply_text);
+  }
+
+  // Builds the saved-turn request. Remaining audio is included only when playback reported it.
+  function utteranceBody(event: Extract<ScribeEvent, { type: "committed" }>) {
+    const body: {
+      text: string;
+      start_ms: number | null;
+      end_ms: number | null;
+      words: { text: string; start_ms: number; end_ms: number }[];
+      barge_in_remaining_ms?: number;
+    } = {
+      text: event.text,
+      start_ms: event.startMs,
+      end_ms: event.endMs,
+      words: event.words.map((word) => ({ text: word.text, start_ms: word.startMs, end_ms: word.endMs })),
+    };
+    if (typeof bargeMsRef.current === "number") {
+      body.barge_in_remaining_ms = bargeMsRef.current;
+      bargeMsRef.current = undefined;
+    }
+    return body;
+  }
+
+  // Keeps the reply that just arrived behind any reply still playing.
+  function enqueueSpeech(turn: number, text: string) {
+    speechQueueRef.current.push({ turn, text });
+    speechActiveRef.current = true;
+    void drainSpeech();
+  }
+
+  // Plays one saved reply at a time. A barge-in clears the queue from under this loop.
+  async function drainSpeech() {
+    if (drainingRef.current) return;
+    drainingRef.current = true;
+    while (speechQueueRef.current.length > 0 && !closedRef.current) {
+      const next = speechQueueRef.current.shift();
+      if (!next) break;
+      await playVerified(next.turn, next.text);
+    }
+    drainingRef.current = false;
+    speechActiveRef.current = speechQueueRef.current.length > 0;
+  }
+
+  // Stops what is playing and what is waiting. Transcription is left running.
+  function interruptSpeech() {
+    const remaining = playback.remainingMs();
+    // No duration means we do not invent how much of a sentence was left.
+    if (typeof remaining === "number") bargeMsRef.current = remaining;
+    stopSpeech();
+  }
+
+  // Speaks one verified reply. The caption is already on screen before this runs.
+  async function playVerified(turn: number, text: string) {
+    if (closedRef.current) return;
+    if (!ttsRef.current) {
+      browserVoice.speak(text);
+      setVoiceLabel("Browser voice");
+      return;
+    }
+    const controller = new AbortController();
+    abortRef.current = controller;
+    setVoiceLabel(null);
+    try {
+      const result = await client.POST("/api/encounters/{enc_id}/turns/{turn}/speech", {
+        params: { path: { enc_id: encounterId, turn } },
+        parseAs: "stream",
+        signal: controller.signal,
+      });
+      if (controller.signal.aborted || closedRef.current) return;
+      if (result.response?.status === 204) {
+        browserVoice.speak(text);
+        setVoiceLabel("Browser voice");
+        return;
+      }
+      if (!result.response?.ok || !result.data) {
+        setBanner(asApiError(result.response?.status ?? 0, result.error).message);
+        return;
+      }
+      await playback.play(verifiedAudioSource(result.data, controller));
+    } catch {
+      if (controller.signal.aborted || closedRef.current) return;
+      setBanner("The reply could not be played. The caption is still shown.");
+    }
   }
 
   // Ending drops queued speech and anything still playing, then marks the visit ended.
@@ -284,6 +404,7 @@ function EncounterLive({
     sessionRef.current = null;
     setVoice("off");
     setPartial("");
+    stopSpeech();
     stopOwnedAudio();
     const result = await client.POST("/api/encounters/{enc_id}/end", { params: { path: { enc_id: encounterId } } });
     if (result.data) setView(result.data);
@@ -383,6 +504,7 @@ function EncounterLive({
           </section>
           <section aria-label="Transcript" className="flex flex-col gap-3 rounded-2xl border border-line bg-card px-5 py-4">
             {banner ? <p className="text-sm text-ink">{banner}</p> : null}
+            {voiceLabel ? <p className="text-sm text-ink">{voiceLabel}</p> : null}
             {simplified || notices.includes("Simplified responses") ? (
               <p className="text-sm text-ink-soft">Simplified responses</p>
             ) : null}

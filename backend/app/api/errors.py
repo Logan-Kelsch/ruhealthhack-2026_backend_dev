@@ -38,6 +38,12 @@ SHARED_ERROR_RESPONSES = {
     ("/api/encounters", "post"): {404: "The case or visit was not found.", 409: "The encounter cannot be started."},
     ("/api/encounters/{enc_id}", "get"): {404: "No saved encounter with that id."},
     ("/api/encounters/{enc_id}/utterances", "post"): {404: "No saved encounter with that id.", 409: "The encounter is not accepting a turn."},
+    ("/api/encounters/{enc_id}/turns/{turn}/speech", "post"): {
+        404: "No saved encounter or turn with that id.",
+        409: "This reply was not verified and will not be spoken.",
+        422: "Speech is taken from the saved verified reply.",
+        503: "The speech service failed or returned no audio.",
+    },
     ("/api/encounters/{enc_id}/end", "post"): {404: "No saved encounter with that id."},
     ("/api/encounters/{enc_id}/documentation", "post"): {404: "No saved encounter with that id."},
     ("/api/encounters/{enc_id}/feedback", "get"): {
@@ -132,6 +138,15 @@ def publish_shared_errors(schema: dict) -> dict:
                 responses["422"] = _error_response_doc("Validation error")
             for status, description in SHARED_ERROR_RESPONSES.get((path, method), {}).items():
                 responses[str(status)] = _error_response_doc(description)
+
+    # FastAPI adds an empty JSON success beside streamed audio. This route's body is audio only.
+    for path_item in schema.get("paths", {}).values():
+        for method, operation in path_item.items():
+            if method not in {"get", "post", "put", "patch", "delete"} or not isinstance(operation, dict):
+                continue
+            content = operation.get("responses", {}).get("200", {}).get("content")
+            if isinstance(content, dict) and "audio/mpeg" in content:
+                content.pop("application/json", None)
 
     # The old validation components are unused once every 422 points at ErrorResponse.
     referenced = json.dumps(schema.get("paths", {}))

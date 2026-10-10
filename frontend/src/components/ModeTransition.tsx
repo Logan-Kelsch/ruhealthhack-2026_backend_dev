@@ -3,8 +3,7 @@ import { createContext, useCallback, useContext, useRef, useState, type ReactNod
 
 export type Role = "faculty" | "student";
 
-type Origin = { x: number; y: number };
-type Play = (role: Role, origin: Origin, swap: () => void) => void;
+type Play = (role: Role, swap: () => void) => void;
 
 const COPY: Record<Role, { title: string; line: string }> = {
   faculty: { title: "Faculty", line: "Build patients, assign cases, see where your class struggles." },
@@ -83,7 +82,7 @@ void main() {
 
   float d = length(frag - uCenter);
   float amp = mix(3.0, 80.0, clamp(uRadius / (900.0 * s), 0.0, 1.0)) * s;
-  float edge = d + (fbm(uv * 3.2 + vec2(t * 0.12, 0.0)) - 0.5) * 2.0 * amp;
+  float edge = d + (fbm(uv * 3.2 + vec2(t * 0.04, 0.0)) - 0.5) * 2.0 * amp;
   float feather = 14.0 * s;
   float a = (1.0 - smoothstep(uRadius - feather, uRadius, edge)) * step(0.5, uRadius);
   float rim = smoothstep(feather * 3.0, 0.0, abs(edge - uRadius + feather)) ;
@@ -133,9 +132,16 @@ function createWash(canvas: HTMLCanvasElement): Wash | null {
   };
 }
 
+// Center of the wordmark's dawn disc, in CSS pixels.
+function logoDisc() {
+  const box = document.querySelector("[data-logo-disc]")?.getBoundingClientRect();
+  return box ? { x: box.left + box.width / 2, y: box.top + box.height / 2 } : { x: 120, y: 60 };
+}
+
 // Full-screen change between faculty and student modes: a watercolor wash bleeds out of the
-// button that was pressed, the new mode's name rises in, and the wash draws back into the
-// wordmark's disc in the top-left corner, revealing the new home screen.
+// wordmark's disc, the new mode's name rises in, and the wash draws back into the disc,
+// revealing the new home screen. The wash grows and shrinks around one fixed point with
+// gentle eases; a moving center over the whole screen made people queasy.
 export function ModeTransitionProvider({ children }: { children: ReactNode }) {
   const root = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
@@ -143,7 +149,7 @@ export function ModeTransitionProvider({ children }: { children: ReactNode }) {
   const [role, setRole] = useState<Role>("faculty");
   const busy = useRef(false);
 
-  const play = useCallback<Play>((next, origin, swap) => {
+  const play = useCallback<Play>((next, swap) => {
     const el = root.current;
     const cv = canvas.current;
     if (!el || !cv || busy.current) return;
@@ -167,7 +173,7 @@ export function ModeTransitionProvider({ children }: { children: ReactNode }) {
           .timeline({ onComplete: done })
           .set(el, { display: "block", opacity: 0 })
           .set(q(".mt-fallback"), { display: "block" })
-          .set(q(".mt-char, .mt-line"), { opacity: 1, y: 0, yPercent: 0, filter: "none" })
+          .set(q(".mt-char, .mt-line"), { opacity: 1, y: 0, yPercent: 0 })
           .to(el, { opacity: 1, duration: 0.25 })
           .add(swap)
           .to(el, { opacity: 0, duration: 0.35, delay: 0.5 });
@@ -182,10 +188,9 @@ export function ModeTransitionProvider({ children }: { children: ReactNode }) {
       w.gl.viewport(0, 0, W, H);
 
       // GL's y axis points up, so screen coordinates are flipped once here.
-      const logo = document.querySelector("[data-logo-disc]")?.getBoundingClientRect();
-      const end = logo ? { x: logo.left + logo.width / 2, y: logo.top + logo.height / 2 } : { x: 120, y: 60 };
-      const state = { r: 0, x: origin.x * dpr, y: H - origin.y * dpr, time: Math.random() * 50 };
-      const cover = Math.hypot(Math.max(state.x, W - state.x), Math.max(state.y, H - state.y)) + 200 * dpr;
+      const toGL = (p: { x: number; y: number }) => ({ x: p.x * dpr, y: H - p.y * dpr });
+      const reach = (c: { x: number; y: number }) => Math.hypot(Math.max(c.x, W - c.x), Math.max(c.y, H - c.y)) + 200 * dpr;
+      const state = { r: 0, ...toGL(logoDisc()), time: Math.random() * 50 };
 
       let last = performance.now();
       const render = () => {
@@ -212,15 +217,21 @@ export function ModeTransitionProvider({ children }: { children: ReactNode }) {
         .set(el, { display: "block", opacity: 1 })
         .set(q(".mt-fallback"), { display: "none" })
         .set(q(".mt-label"), { opacity: 0, y: 10 })
-        .set(q(".mt-char"), { opacity: 0, yPercent: 60, filter: "blur(10px)" })
+        .set(q(".mt-char"), { opacity: 0, yPercent: 40 })
         .set(q(".mt-line"), { opacity: 0, y: 14 })
-        .to(state, { r: cover, duration: 0.9, ease: "power2.inOut" }, 0)
-        .to(q(".mt-label"), { opacity: 0.75, y: 0, duration: 0.5, ease: "power2.out" }, 0.55)
-        .to(q(".mt-char"), { opacity: 1, yPercent: 0, filter: "blur(0px)", duration: 0.75, stagger: 0.04, ease: "expo.out" }, 0.6)
-        .to(q(".mt-line"), { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }, 0.8)
-        .add(swap, 1.2)
-        .to(q(".mt-label, .mt-char, .mt-line"), { opacity: 0, y: -12, duration: 0.35, stagger: 0.012, ease: "power2.in" }, 1.45)
-        .to(state, { r: 0, x: end.x * dpr, y: H - end.y * dpr, duration: 0.85, ease: "power3.inOut" }, 1.6)
+        .to(state, { r: reach(state), duration: 1.05, ease: "sine.inOut" }, 0)
+        .to(q(".mt-label"), { opacity: 0.75, y: 0, duration: 0.5, ease: "power2.out" }, 0.5)
+        .to(q(".mt-char"), { opacity: 1, yPercent: 0, duration: 0.8, stagger: 0.03, ease: "power3.out" }, 0.55)
+        .to(q(".mt-line"), { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }, 0.75)
+        .add(swap, 1.55)
+        .add(() => {
+          // The new screen has rendered by now. Re-anchor on its logo while the wash still
+          // covers everything, so the jump can't be seen (Welcome's logo sits mid-screen).
+          const end = toGL(logoDisc());
+          Object.assign(state, end, { r: reach(end) });
+        }, 1.7)
+        .to(q(".mt-label, .mt-char, .mt-line"), { opacity: 0, y: -8, duration: 0.3, stagger: 0.01, ease: "power1.in" }, 1.6)
+        .to(state, { r: 0, duration: 0.95, ease: "sine.inOut" }, 1.85)
         .add(() => {
           // The new screen's content rises in as the wash draws back into the logo.
           gsap.fromTo(
@@ -228,7 +239,7 @@ export function ModeTransitionProvider({ children }: { children: ReactNode }) {
             { y: 20, opacity: 0 },
             { y: 0, opacity: 1, duration: 0.7, stagger: 0.06, ease: "power3.out", clearProps: "all" },
           );
-        }, 1.85);
+        }, 2.3);
     }));
   }, []);
 

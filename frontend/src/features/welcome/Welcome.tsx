@@ -8,12 +8,7 @@ export function Welcome({ go }: { go: Go }) {
   const switchMode = useModeSwitch();
 
   function pick(role: Role) {
-    return (event: MouseEvent<HTMLButtonElement>) => {
-      const box = event.currentTarget.getBoundingClientRect();
-      switchMode(role, { x: box.left + box.width / 2, y: box.top + box.height / 2 }, () =>
-        go(role === "faculty" ? "f-home" : "s-home"),
-      );
-    };
+    return () => switchMode(role, () => go(role === "faculty" ? "f-home" : "s-home"));
   }
 
   return (

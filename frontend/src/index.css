@@ -136,9 +136,16 @@ body {
   background: var(--color-select);
 }
 
-/* Signed-in backdrop: dawn sky and hills across the top, trees in the corners, paper elsewhere. */
+/* Signed-in backdrop: dawn sky and hills across the top, trees in the corners. The painting is
+   blank paper on the right and bottom, so soft washes there keep the sheet's edge from
+   blending into white. */
 .bg-backdrop {
-  background: var(--color-paper) url("/assets/backdrop.jpg") center top / cover no-repeat;
+  background:
+    radial-gradient(42% 220px at 100% 100%, rgba(140, 132, 226, 0.7), transparent),
+    radial-gradient(50% 170px at 58% 100%, rgba(255, 184, 130, 0.58), transparent),
+    radial-gradient(240px 55% at 100% 62%, rgba(165, 150, 230, 0.58), transparent),
+    radial-gradient(200px 30% at 100% 30%, rgba(246, 166, 172, 0.42), transparent),
+    var(--color-paper) url("/assets/backdrop.jpg") center top / cover no-repeat;
 }
 
 /* Full watercolor world behind the encounter, and the street behind the briefing. */

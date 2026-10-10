@@ -1,4 +1,4 @@
-import { useEffect, useState, type MouseEvent, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import type { Go, ScreenId } from "../app/types";
 import { FACULTY_USER, STUDENT_USER } from "../mock/session";
 import { useModeSwitch, type Role } from "./ModeTransition";
@@ -71,12 +71,9 @@ export function Shell({ screen, go, children }: ShellProps) {
     return () => window.clearTimeout(timer);
   }, [note]);
 
-  function swap(event: MouseEvent<HTMLButtonElement>) {
-    const box = event.currentTarget.getBoundingClientRect();
+  function swap() {
     const next: Role = role === "faculty" ? "student" : "faculty";
-    switchMode(next, { x: box.left + box.width / 2, y: box.top + box.height / 2 }, () =>
-      go(next === "faculty" ? "f-home" : "s-home"),
-    );
+    switchMode(next, () => go(next === "faculty" ? "f-home" : "s-home"));
   }
 
   return (

@@ -17,7 +17,7 @@ type NavDef = {
 };
 
 const FACULTY_NAV: NavDef[] = [
-  { key: "home", label: "Home", icon: "home", target: "f-home", count: 3 },
+  { key: "home", label: "Home", icon: "home", target: "f-home" },
   { key: "cases", label: "Cases", icon: "cases", target: "f-cases" },
   { key: "cohorts", label: "Cohorts", icon: "cohorts" },
   { key: "insights", label: "Insights", icon: "insights" },
@@ -34,6 +34,7 @@ const STUDENT_NAV: NavDef[] = [
 function sectionFor(screen: ScreenId): string | undefined {
   const map: Partial<Record<ScreenId, string>> = {
     "f-home": "home",
+    "f-review": "home",
     "f-cases": "cases",
     "f-import": "cases",
     "f-studio": "cases",

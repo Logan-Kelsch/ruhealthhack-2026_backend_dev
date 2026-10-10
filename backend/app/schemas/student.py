@@ -160,6 +160,18 @@ class EncounterSummary(BaseModel):
     rubric_total: int | None = None
     review_flag: bool = False
     previous_encounter_id: str | None = None
+    # Names from the saved visit, so a list can be read without opening the Studio case.
+    patient_name: str = ""
+    case_title: str = ""
+    visit_label: str = ""
+
+
+class EncounterList(BaseModel):
+    """Saved encounters. total counts every match, including rows past limit."""
+
+    encounters: list[EncounterSummary]
+    total: int
+    limit: int
 
 
 class PublicNotice(BaseModel):

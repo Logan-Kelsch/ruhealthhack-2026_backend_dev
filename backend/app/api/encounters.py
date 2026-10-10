@@ -5,7 +5,7 @@ from __future__ import annotations
 import asyncio
 import json
 
-from fastapi import APIRouter, Depends, HTTPException, Request, Response
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
@@ -13,9 +13,9 @@ from sqlalchemy.orm import Session
 from app import services
 from app.db import get_session
 from app.integrations import elevenlabs
-from app.schemas.feedback import FeedbackResponse
+from app.schemas.feedback import FeedbackOverrideRequest, FeedbackResponse
 from app.schemas.http import ScribeToken
-from app.schemas.student import EncounterSummary, PublicCase, PublicEncounter, TurnResult, WordTimestamp
+from app.schemas.student import EncounterList, PublicCase, PublicEncounter, TurnResult, WordTimestamp
 from app.settings import get_settings
 from app.student_view import public_case
 
@@ -73,10 +73,15 @@ def start_encounter(body: StartEncounter, db: Session = Depends(get_session)) ->
     return services.encounter_view(db, enc)
 
 
-@router.get("/encounters", response_model=list[EncounterSummary])
-def list_encounters(case_id: str | None = None, db: Session = Depends(get_session)) -> list[EncounterSummary]:
-    """Saved encounters. The list does not include the transcript or hidden engine state."""
-    return services.list_encounters(db, case_id)
+@router.get("/encounters", response_model=EncounterList)
+def list_encounters(
+    case_id: str | None = None,
+    student_name: str | None = None,
+    limit: int = Query(default=200, ge=1, le=200),
+    db: Session = Depends(get_session),
+) -> EncounterList:
+    """Saved encounters. total counts rows past the limit so a short page is not the whole history."""
+    return services.list_encounters(db, case_id, student_name, limit)
 
 
 @router.get("/encounters/{enc_id}", response_model=PublicEncounter)
@@ -133,10 +138,10 @@ def get_feedback(enc_id: str, db: Session = Depends(get_session)) -> dict:
     return services.get_feedback(db, enc_id)
 
 
-@router.patch("/encounters/{enc_id}/feedback")
-def override_feedback(enc_id: str, overrides: dict, db: Session = Depends(get_session)) -> dict:
-    """Faculty overrides (score changes, review notes). Kept beside the generated feedback, never merged into it."""
-    return services.override_feedback(db, enc_id, overrides)
+@router.patch("/encounters/{enc_id}/feedback", response_model=FeedbackResponse)
+def override_feedback(enc_id: str, body: FeedbackOverrideRequest, db: Session = Depends(get_session)) -> dict:
+    """Save a faculty score or comment beside the generated debrief. The generated scores stay as they were."""
+    return services.override_feedback(db, enc_id, body)
 
 
 def _client_supplied_speech(raw: bytes) -> bool:

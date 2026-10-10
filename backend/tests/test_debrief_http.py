@@ -51,7 +51,7 @@ def _ids(client: TestClient) -> list[str]:
     """Encounter ids that exist. Recovery must not add to this list."""
     listed = client.get("/api/encounters")
     assert listed.status_code == 200
-    return [row["encounter_id"] for row in listed.json()]
+    return [row["encounter_id"] for row in listed.json()["encounters"]]
 
 
 def test_end_returns_the_case_template_and_does_not_start_another_encounter(tmp_path, load_golden):

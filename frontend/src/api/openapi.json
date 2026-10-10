@@ -1032,6 +1032,46 @@
         "title": "CaseVocabItem",
         "type": "object"
       },
+      "ChartItem": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "provenance": {
+            "const": "authored_synthetic_finding",
+            "title": "Provenance",
+            "type": "string"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "urgent": {
+            "title": "Urgent",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "text",
+          "source",
+          "provenance",
+          "urgent"
+        ],
+        "title": "ChartItem",
+        "type": "object"
+      },
       "CitedNote": {
         "description": "A strength or improvement. The quote is omitted when it was not in the transcript.",
         "properties": {
@@ -1433,6 +1473,268 @@
         "title": "DecisionPoint",
         "type": "object"
       },
+      "DemoDebrief": {
+        "additionalProperties": false,
+        "properties": {
+          "assessment_status": {
+            "const": "not_scored",
+            "default": "not_scored",
+            "title": "Assessment Status",
+            "type": "string"
+          },
+          "completed_steps": {
+            "title": "Completed Steps",
+            "type": "integer"
+          },
+          "follows_rehearsal_script": {
+            "title": "Follows Rehearsal Script",
+            "type": "boolean"
+          },
+          "interpretation": {
+            "title": "Interpretation",
+            "type": "string"
+          },
+          "method": {
+            "const": "scripted_guided_reflection",
+            "default": "scripted_guided_reflection",
+            "title": "Method",
+            "type": "string"
+          },
+          "reflections": {
+            "items": {
+              "$ref": "#/components/schemas/Reflection"
+            },
+            "title": "Reflections",
+            "type": "array"
+          },
+          "safety_notice": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Safety Notice"
+          },
+          "session_id": {
+            "title": "Session Id",
+            "type": "string"
+          },
+          "total_steps": {
+            "title": "Total Steps",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "session_id",
+          "reflections",
+          "completed_steps",
+          "total_steps",
+          "follows_rehearsal_script",
+          "interpretation",
+          "safety_notice"
+        ],
+        "title": "DemoDebrief",
+        "type": "object"
+      },
+      "DemoSession": {
+        "additionalProperties": false,
+        "properties": {
+          "actual_model_calls": {
+            "default": 0,
+            "title": "Actual Model Calls",
+            "type": "integer"
+          },
+          "age_years": {
+            "title": "Age Years",
+            "type": "integer"
+          },
+          "chart": {
+            "items": {
+              "$ref": "#/components/schemas/ChartItem"
+            },
+            "title": "Chart",
+            "type": "array"
+          },
+          "execution_mode": {
+            "const": "scripted_playback",
+            "default": "scripted_playback",
+            "title": "Execution Mode",
+            "type": "string"
+          },
+          "fixture_sha256": {
+            "title": "Fixture Sha256",
+            "type": "string"
+          },
+          "input_handling": {
+            "const": "sequence_position_only",
+            "default": "sequence_position_only",
+            "title": "Input Handling",
+            "type": "string"
+          },
+          "next_step": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Step"
+          },
+          "patient_name": {
+            "title": "Patient Name",
+            "type": "string"
+          },
+          "presenting_concern": {
+            "title": "Presenting Concern",
+            "type": "string"
+          },
+          "scenario_id": {
+            "title": "Scenario Id",
+            "type": "integer"
+          },
+          "session_id": {
+            "title": "Session Id",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "student",
+              "ready_to_end",
+              "ended"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "total_steps": {
+            "title": "Total Steps",
+            "type": "integer"
+          },
+          "transcript": {
+            "items": {
+              "$ref": "#/components/schemas/TranscriptTurn"
+            },
+            "title": "Transcript",
+            "type": "array"
+          }
+        },
+        "required": [
+          "session_id",
+          "scenario_id",
+          "fixture_sha256",
+          "status",
+          "patient_name",
+          "age_years",
+          "presenting_concern",
+          "next_step",
+          "total_steps",
+          "transcript",
+          "chart"
+        ],
+        "title": "DemoSession",
+        "type": "object"
+      },
+      "DemoTurnRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "expected_step": {
+            "maximum": 100.0,
+            "minimum": 1.0,
+            "title": "Expected Step",
+            "type": "integer"
+          },
+          "request_id": {
+            "maxLength": 80,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "title": "Request Id",
+            "type": "string"
+          },
+          "text": {
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "expected_step",
+          "request_id",
+          "text"
+        ],
+        "title": "DemoTurnRequest",
+        "type": "object"
+      },
+      "DemoTurnResult": {
+        "additionalProperties": false,
+        "properties": {
+          "actual_model_calls": {
+            "default": 0,
+            "title": "Actual Model Calls",
+            "type": "integer"
+          },
+          "chart_added": {
+            "items": {
+              "$ref": "#/components/schemas/ChartItem"
+            },
+            "title": "Chart Added",
+            "type": "array"
+          },
+          "complete": {
+            "title": "Complete",
+            "type": "boolean"
+          },
+          "execution_mode": {
+            "const": "scripted_playback",
+            "default": "scripted_playback",
+            "title": "Execution Mode",
+            "type": "string"
+          },
+          "next_step": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Step"
+          },
+          "safety_notice": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Safety Notice"
+          },
+          "session_id": {
+            "title": "Session Id",
+            "type": "string"
+          },
+          "turn": {
+            "$ref": "#/components/schemas/TranscriptTurn"
+          }
+        },
+        "required": [
+          "session_id",
+          "turn",
+          "chart_added",
+          "safety_notice",
+          "next_step",
+          "complete"
+        ],
+        "title": "DemoTurnResult",
+        "type": "object"
+      },
       "Diagnosis": {
         "properties": {
           "codes": {
@@ -1677,6 +1979,69 @@
           "rule_based_score"
         ],
         "title": "DomainScore",
+        "type": "object"
+      },
+      "EducatorScenario": {
+        "additionalProperties": false,
+        "properties": {
+          "clinical_review_status": {
+            "const": "pending",
+            "default": "pending",
+            "title": "Clinical Review Status",
+            "type": "string"
+          },
+          "example_description": {
+            "title": "Example Description",
+            "type": "string"
+          },
+          "fixture_version": {
+            "title": "Fixture Version",
+            "type": "integer"
+          },
+          "goal": {
+            "title": "Goal",
+            "type": "string"
+          },
+          "patient": {
+            "$ref": "#/components/schemas/PatientMetadata"
+          },
+          "scenario_id": {
+            "title": "Scenario Id",
+            "type": "integer"
+          },
+          "sources": {
+            "items": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            "title": "Sources",
+            "type": "array"
+          },
+          "suggested_student_sequence": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Suggested Student Sequence",
+            "type": "array"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "scenario_id",
+          "fixture_version",
+          "title",
+          "patient",
+          "goal",
+          "example_description",
+          "suggested_student_sequence",
+          "sources"
+        ],
+        "title": "EducatorScenario",
         "type": "object"
       },
       "EncounterList": {
@@ -2670,6 +3035,88 @@
         "title": "Medication",
         "type": "object"
       },
+      "MetadataExtraction": {
+        "additionalProperties": false,
+        "properties": {
+          "age_years": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Age Years"
+          },
+          "categorized_spans": {
+            "items": {
+              "$ref": "#/components/schemas/SourceSpan"
+            },
+            "title": "Categorized Spans",
+            "type": "array"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "method": {
+            "const": "deterministic_explicit_text_rules",
+            "default": "deterministic_explicit_text_rules",
+            "title": "Method",
+            "type": "string"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "schema_version": {
+            "const": "demo_metadata_v1",
+            "default": "demo_metadata_v1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "sex": {
+            "anyOf": [
+              {
+                "enum": [
+                  "male",
+                  "female"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sex"
+          },
+          "unmatched_spans": {
+            "items": {
+              "$ref": "#/components/schemas/SourceSpan"
+            },
+            "title": "Unmatched Spans",
+            "type": "array"
+          }
+        },
+        "required": [
+          "description",
+          "name",
+          "age_years",
+          "sex",
+          "categorized_spans",
+          "unmatched_spans"
+        ],
+        "title": "MetadataExtraction",
+        "type": "object"
+      },
       "MissedFact": {
         "description": "An expected discovery that stayed undisclosed, with a question the student could ask.",
         "properties": {
@@ -2846,6 +3293,49 @@
         "title": "ObjectiveProgress",
         "type": "object"
       },
+      "PatientMetadata": {
+        "additionalProperties": false,
+        "properties": {
+          "age_years": {
+            "maximum": 120.0,
+            "minimum": 0.0,
+            "title": "Age Years",
+            "type": "integer"
+          },
+          "history": {
+            "items": {
+              "type": "string"
+            },
+            "title": "History",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "presenting_concern": {
+            "title": "Presenting Concern",
+            "type": "string"
+          },
+          "sex": {
+            "enum": [
+              "male",
+              "female"
+            ],
+            "title": "Sex",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "age_years",
+          "sex",
+          "presenting_concern",
+          "history"
+        ],
+        "title": "PatientMetadata",
+        "type": "object"
+      },
       "Personality": {
         "properties": {
           "communication_style": {
@@ -3020,6 +3510,96 @@
           }
         },
         "title": "Predicate",
+        "type": "object"
+      },
+      "Preparation": {
+        "additionalProperties": false,
+        "properties": {
+          "actual_model_calls": {
+            "default": 0,
+            "title": "Actual Model Calls",
+            "type": "integer"
+          },
+          "clinical_review_status": {
+            "const": "pending",
+            "default": "pending",
+            "title": "Clinical Review Status",
+            "type": "string"
+          },
+          "execution_mode": {
+            "const": "scripted_playback",
+            "default": "scripted_playback",
+            "title": "Execution Mode",
+            "type": "string"
+          },
+          "extracted_metadata": {
+            "$ref": "#/components/schemas/MetadataExtraction"
+          },
+          "fixture_sha256": {
+            "title": "Fixture Sha256",
+            "type": "string"
+          },
+          "fixture_version": {
+            "title": "Fixture Version",
+            "type": "integer"
+          },
+          "patient": {
+            "$ref": "#/components/schemas/PatientMetadata"
+          },
+          "preparation_id": {
+            "title": "Preparation Id",
+            "type": "string"
+          },
+          "scenario_id": {
+            "title": "Scenario Id",
+            "type": "integer"
+          },
+          "simulated_delay_ms": {
+            "default": 1600,
+            "title": "Simulated Delay Ms",
+            "type": "integer"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "preparation_id",
+          "scenario_id",
+          "fixture_version",
+          "fixture_sha256",
+          "patient",
+          "extracted_metadata",
+          "warnings"
+        ],
+        "title": "Preparation",
+        "type": "object"
+      },
+      "PrepareRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "description": {
+            "maxLength": 12000,
+            "minLength": 1,
+            "title": "Description",
+            "type": "string"
+          },
+          "scenario_id": {
+            "maximum": 3.0,
+            "minimum": 1.0,
+            "title": "Scenario Id",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "scenario_id",
+          "description"
+        ],
+        "title": "PrepareRequest",
         "type": "object"
       },
       "Preview": {
@@ -4044,6 +4624,50 @@
         "title": "PublicVisitSummary",
         "type": "object"
       },
+      "Reflection": {
+        "additionalProperties": false,
+        "properties": {
+          "anchor_step": {
+            "title": "Anchor Step",
+            "type": "integer"
+          },
+          "domain_id": {
+            "title": "Domain Id",
+            "type": "integer"
+          },
+          "domain_name": {
+            "title": "Domain Name",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "patient_quote": {
+            "title": "Patient Quote",
+            "type": "string"
+          },
+          "question": {
+            "title": "Question",
+            "type": "string"
+          },
+          "student_quote": {
+            "title": "Student Quote",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "domain_id",
+          "domain_name",
+          "question",
+          "anchor_step",
+          "student_quote",
+          "patient_quote"
+        ],
+        "title": "Reflection",
+        "type": "object"
+      },
       "Release": {
         "properties": {
           "fact_id": {
@@ -4281,6 +4905,35 @@
         "title": "Source",
         "type": "object"
       },
+      "SourceSpan": {
+        "additionalProperties": false,
+        "properties": {
+          "category": {
+            "title": "Category",
+            "type": "string"
+          },
+          "end": {
+            "title": "End",
+            "type": "integer"
+          },
+          "start": {
+            "title": "Start",
+            "type": "integer"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "category",
+          "text",
+          "start",
+          "end"
+        ],
+        "title": "SourceSpan",
+        "type": "object"
+      },
       "StartEncounter": {
         "properties": {
           "case_id": {
@@ -4330,6 +4983,26 @@
           "case_id"
         ],
         "title": "StartEncounter",
+        "type": "object"
+      },
+      "StartRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "accept_fixed_script": {
+            "const": true,
+            "title": "Accept Fixed Script",
+            "type": "boolean"
+          },
+          "preparation_id": {
+            "title": "Preparation Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "preparation_id",
+          "accept_fixed_script"
+        ],
+        "title": "StartRequest",
         "type": "object"
       },
       "StudioAutofillResult": {
@@ -4740,6 +5413,43 @@
           "reply_text"
         ],
         "title": "TranscriptEntry",
+        "type": "object"
+      },
+      "TranscriptTurn": {
+        "additionalProperties": false,
+        "properties": {
+          "fact_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Fact Ids",
+            "type": "array"
+          },
+          "patient_text": {
+            "title": "Patient Text",
+            "type": "string"
+          },
+          "simulated_delay_ms": {
+            "title": "Simulated Delay Ms",
+            "type": "integer"
+          },
+          "step": {
+            "title": "Step",
+            "type": "integer"
+          },
+          "student_text": {
+            "title": "Student Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "step",
+          "student_text",
+          "patient_text",
+          "fact_ids",
+          "simulated_delay_ms"
+        ],
+        "title": "TranscriptTurn",
         "type": "object"
       },
       "TrustConfig": {
@@ -5593,6 +6303,431 @@
           }
         },
         "summary": "Config"
+      }
+    },
+    "/api/demo/educator/preparations": {
+      "post": {
+        "operationId": "prepare_api_demo_educator_preparations_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PrepareRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Preparation"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Prepare",
+        "tags": [
+          "scripted-demo"
+        ]
+      }
+    },
+    "/api/demo/educator/scenarios": {
+      "get": {
+        "operationId": "scenarios_api_demo_educator_scenarios_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/EducatorScenario"
+                  },
+                  "title": "Response Scenarios Api Demo Educator Scenarios Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          }
+        },
+        "summary": "Scenarios",
+        "tags": [
+          "scripted-demo"
+        ]
+      }
+    },
+    "/api/demo/sessions": {
+      "post": {
+        "operationId": "start_api_demo_sessions_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DemoSession"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Start",
+        "tags": [
+          "scripted-demo"
+        ]
+      }
+    },
+    "/api/demo/sessions/{sid}": {
+      "get": {
+        "operationId": "read_api_demo_sessions__sid__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sid",
+            "required": true,
+            "schema": {
+              "title": "Sid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DemoSession"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Read",
+        "tags": [
+          "scripted-demo"
+        ]
+      }
+    },
+    "/api/demo/sessions/{sid}/debrief": {
+      "get": {
+        "operationId": "debrief_api_demo_sessions__sid__debrief_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sid",
+            "required": true,
+            "schema": {
+              "title": "Sid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DemoDebrief"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Debrief",
+        "tags": [
+          "scripted-demo"
+        ]
+      }
+    },
+    "/api/demo/sessions/{sid}/end": {
+      "post": {
+        "operationId": "end_api_demo_sessions__sid__end_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sid",
+            "required": true,
+            "schema": {
+              "title": "Sid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DemoSession"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "End",
+        "tags": [
+          "scripted-demo"
+        ]
+      }
+    },
+    "/api/demo/sessions/{sid}/turns": {
+      "post": {
+        "operationId": "turn_api_demo_sessions__sid__turns_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sid",
+            "required": true,
+            "schema": {
+              "title": "Sid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DemoTurnRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DemoTurnResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Turn",
+        "tags": [
+          "scripted-demo"
+        ]
       }
     },
     "/api/encounters": {

@@ -1,0 +1,97 @@
+{
+  "source_main_commit": "1a190e0",
+  "new_api_tests": {
+    "passed": 14
+  },
+  "new_http_rehearsal": {
+    "cases": 3,
+    "fixed_replies": 26,
+    "actual_http_requests": 39,
+    "model_calls": 0
+  },
+  "existing_golden_case_audits": {
+    "passed": 234,
+    "total": 234,
+    "mode": "offline"
+  },
+  "frontend": "TypeScript checks and Vite build passed; generated schema matches backend export",
+  "migration": "Fresh SQLite upgrade and demo-table downgrade/re-upgrade passed; PostgreSQL not executed",
+  "notebook": {
+    "execution": "IPython cells in sequence; native kernel transport blocked by runtime",
+    "code_cells_passed": 6,
+    "figures": 1,
+    "all_case_rehearsals": 3,
+    "manual_controls": "educator prepare, start, suggested question, send, early end verified",
+    "model_calls": 0,
+    "delay_mode": "disabled for validation; enabled by default in notebook"
+  },
+  "full_suite_on_branch": {
+    "passed": 243,
+    "failed": 22,
+    "errors": 18,
+    "skipped": 1
+  },
+  "full_suite_on_unchanged_main": {
+    "passed": 229,
+    "failed": 22,
+    "errors": 18,
+    "skipped": 1
+  },
+  "baseline_failure_comparison": "Exactly the same failing/error test IDs; no newly failing tests",
+  "baseline_problem_groups": [
+    "Historical dataset expectations assume three golden cases; current main includes more.",
+    "Existing debrief-probe evaluation expects a status field removed from the shared branch contract.",
+    "Historic Notebook 06 source locks do not match current main sources."
+  ],
+  "unchanged_failures": [
+    "backend/test_dataset_audit.py::test_all_local_inputs_match_the_audited_schema_and_expected_counts",
+    "backend/test_dataset_audit.py::test_rubric_and_outcome_limitations_remain_visible",
+    "backend/test_debrief_probe.py::test_absent_evidence_is_not_an_action_and_safety_flags_are_review_only",
+    "backend/test_debrief_probe.py::test_all_case_claims_have_exact_sources_and_replay",
+    "backend/test_debrief_probe.py::test_documentation_numeric_discrepancy_is_exact_note_span",
+    "backend/test_debrief_probe.py::test_low_confidence_and_conflicting_actions_do_not_become_suggestions",
+    "backend/test_debrief_probe.py::test_review_import_requires_independent_complete_source_locked_reviews",
+    "backend/test_debrief_probe.py::test_tampered_transcript_offset_and_fact_source_rejected",
+    "backend/test_development_completion.py::test_mechanical_report_preserves_all_human_gates",
+    "backend/test_integration_quality.py::test_blindness_probe_rejects_leaked_release",
+    "backend/test_integration_quality.py::test_imported_audit_requires_source_and_exact_head",
+    "backend/test_integration_quality.py::test_no_approval_means_no_performance_or_learner_import",
+    "backend/test_integration_quality.py::test_partial_private_review_audit_round_trip_and_tamper",
+    "backend/test_next_review.py::test_adjudicator_gets_only_disagreements_and_exact_original_evidence",
+    "backend/test_next_review.py::test_changed_current_sources_require_new_batch",
+    "backend/test_next_review.py::test_new_predictions_cannot_be_substituted_after_review",
+    "backend/test_next_review.py::test_pending_is_preserved_and_adjudication_waits_for_pairs",
+    "backend/test_next_review.py::test_prepare_blinds_answers_and_deduplicates_action_units",
+    "backend/test_next_review.py::test_prepare_refuses_overwrite",
+    "backend/test_next_review.py::test_roundtrip_reports_development_comparison_not_learning[action]",
+    "backend/test_next_review.py::test_roundtrip_reports_development_comparison_not_learning[claim]",
+    "backend/test_next_review.py::test_roundtrip_reports_development_comparison_not_learning[domain]",
+    "backend/test_next_review.py::test_unsupported_human_claim_is_retained_as_diagnostic",
+    "backend/test_next_review.py::test_wrong_stage_kind_rejected",
+    "backend/test_review_kit.py::test_invalid_evidence_duplicate_reviewers_and_early_adjudication",
+    "backend/test_review_kit.py::test_partial_disagreement_adjudication_and_receipt",
+    "backend/test_review_kit.py::test_sample_coverage_and_separate_blinded_supplement",
+    "backend/test_review_kit.py::test_stale_source_private_path_and_toy_rejection",
+    "backend/test_review_workflow.py::test_adjudication_without_two_independent_answers_rejected",
+    "backend/test_review_workflow.py::test_duplicate_identity_and_tampered_spans_rejected",
+    "backend/test_review_workflow.py::test_export_and_supplemental_evidence_integrity",
+    "backend/test_review_workflow.py::test_stale_view_and_source_rejected",
+    "backend/test_review_workflow.py::test_toy_independence_adjudication_and_na",
+    "backend/test_simulation_demo.py::test_actual_http_flow_and_all_simulated_components",
+    "backend/test_simulation_demo.py::test_grouped_action_training_and_frozen_prediction_denominators",
+    "backend/test_simulation_demo.py::test_inputs_reproduce_statistics_and_checks",
+    "backend/test_simulation_demo.py::test_missingness_and_na_remain_visible",
+    "backend/test_simulation_demo.py::test_scenario_signs_null_ties_and_one_learner_weight",
+    "backend/test_simulation_demo.py::test_simulated_review_metadata_never_human_or_faculty",
+    "backend/test_simulation_demo.py::test_tampered_input_manifest_rejected"
+  ],
+  "limits": [
+    "Clinician review pending",
+    "No live LLM, voice, real network server, or human learner assessment exercised"
+  ],
+  "backend_suite": {
+    "passed": 123,
+    "skipped": 1
+  },
+  "existing_api_contracts": "All prior API operations and schemas match unchanged-main export"
+}

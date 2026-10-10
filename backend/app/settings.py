@@ -39,6 +39,9 @@ class Settings(BaseSettings):
     stt_vad_silence_secs: float = 1.2
     stt_vad_threshold: float = 0.4
 
+    # Opt-in scripted presenter routes; never invoke Bedrock, even when llm_enabled is true.
+    scripted_demo_enabled: bool = False
+
     nlm_lookup_enabled: bool = True
     cors_origins: str = "http://localhost:5173"
 

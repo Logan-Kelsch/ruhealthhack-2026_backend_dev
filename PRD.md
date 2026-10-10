@@ -861,3 +861,8 @@ See `context.md` §15 for the full list with owners. The ones that block the bui
 - MakeHuman (CC0 output), if the 3D figure is built.
 - ElevenLabs, Tavus, AWS Bedrock (Anthropic Claude and Amazon Nova Micro models): commercial APIs used under their terms.
 - Open-source libraries: listed from `pyproject.toml` and `package.json`.
+
+
+### Presenter rehearsal extension (2026-10-10; P-02, S-01, F-05)
+
+An explicitly opt-in `/api/demo` workflow rehearses educator text categorization, three fixed clinical dialogue paths, progressive chart releases, and transcript-linked reflection prompts. It uses pinned synthetic fixtures and a separate demo-session table; it does not invoke live LLMs, grade learners, alter the production Case schema, or supply MCPT outcomes. The notebook offers presenter-only text input. Production student encounters remain voice-first. See `backend_kelsch/docs/scripted_clinical_demo.md` for endpoints, provenance, JSON replacement boundaries, and acceptance checks.

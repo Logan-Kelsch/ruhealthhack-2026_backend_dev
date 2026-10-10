@@ -5,7 +5,7 @@ from fastapi.openapi.utils import get_openapi
 from fastapi.staticfiles import StaticFiles
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from app.api import encounters, studio
+from app.api import demo, encounters, studio
 from app.api.errors import (
     handle_conflict,
     handle_http_exception,
@@ -63,6 +63,7 @@ def create_app() -> FastAPI:
 
     app.include_router(encounters.router)
     app.include_router(studio.router)
+    app.include_router(demo.router)
     PORTRAITS_DIR.mkdir(parents=True, exist_ok=True)
     app.mount("/portraits", StaticFiles(directory=PORTRAITS_DIR), name="portraits")
 

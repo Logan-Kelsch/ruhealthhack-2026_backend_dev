@@ -1,0 +1,66 @@
+{
+  "version": "private_reviewer_workflow_v1",
+  "date": "2026-10-10",
+  "protocol_lock": "8cc3e591b02dd241bbc3c26359e7596b4f38c10658a8c149d3816456293927f5",
+  "locked_packet_counts": {
+    "release": 189,
+    "semantic": 15,
+    "claim": 41,
+    "domain": 42,
+    "action": 0
+  },
+  "new_live_candidates_included": 0,
+  "genuine_review_rows": 0,
+  "toy_demonstration": {
+    "label": "TOY TRANSPORT ONLY \u2014 NOT FACULTY REVIEWS",
+    "packets": 4,
+    "independent_rows": 8,
+    "agreements": 2,
+    "initial_disagreements": 2,
+    "adjudication_rows": 2,
+    "technical_audit_events": 10,
+    "genuine_review_rows": 0
+  },
+  "execution": {
+    "combined_offline_tests": {
+      "passed": 90,
+      "failed": 0,
+      "uncompleted": 0,
+      "seconds": 21.97
+    },
+    "workflow_tests": {
+      "passed": 8,
+      "failed": 0,
+      "uncompleted": 0
+    },
+    "http_api_tests": {
+      "passed": 7,
+      "failed": 0,
+      "uncompleted": 0
+    },
+    "notebook": {
+      "code_cells_passed_as_source": 2,
+      "code_cells_total": 2,
+      "jupyter_kernel": "FAILED TO START: runtime socket restriction"
+    },
+    "javascript": "Node mock-DOM smoke passed: render, Unicode spans, memory save, download. Browser acceptance not run."
+  },
+  "gates": {
+    "review_workflow_engineering": "PASS",
+    "trained_action_extraction": "NOT EVALUABLE",
+    "clinical_disclosure_accuracy": "NOT EVALUABLE",
+    "semantic_grounding": "NOT EVALUABLE",
+    "faculty_feedback_accuracy": "NOT EVALUABLE",
+    "faculty_rubric_agreement": "NOT EVALUABLE",
+    "difficulty_calibration": "NOT EVALUABLE",
+    "student_learning": "NOT EVALUABLE"
+  },
+  "limitations": [
+    "No genuine reviews imported; toy labels never enter performance estimates.",
+    "Separate access, faculty identity/independence, consent, encryption and retention require coordinator controls.",
+    "Release packets contain exact student history; engine patient outputs are withheld.",
+    "Approved case status does not authenticate independent faculty approval.",
+    "Audit/receipts detect changes relative to retained originals; they are not signatures.",
+    "Learner intake remains blocked; new live candidates require separate versioned packets."
+  ]
+}

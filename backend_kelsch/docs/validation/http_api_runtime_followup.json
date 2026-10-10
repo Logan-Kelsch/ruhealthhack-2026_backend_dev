@@ -1,0 +1,36 @@
+{
+  "date_utc": "2026-10-10",
+  "scope": "Existing offline FastAPI tests and AnyIO runtime controls",
+  "prior_notebook_reports_modified": false,
+  "restricted_environment": {
+    "http_test_command": "timeout 25s env LLM_ENABLED=false PYTHONPATH=backend python -m pytest -q backend/tests/test_api.py",
+    "http_collected": 7,
+    "http_passed": 0,
+    "http_failed": 0,
+    "http_uncompleted": 7,
+    "exit_code": 124,
+    "first_blocked_call": "test_student_case_list_hides_facts: client.get('/api/cases')",
+    "thread_dump": "Caller waits in Starlette TestClient / AnyIO blocking portal; portal event loop waits in selectors.select",
+    "controls": [
+      "Minimal FastAPI synchronous GET / with TestClient timed out after 8 seconds",
+      "Bare anyio.to_thread.run_sync(lambda: 'ok') timed out after 8 seconds",
+      "With a concurrent event-loop timer, the bare AnyIO handoff completed",
+      "AF_INET socket creation returned PermissionError (not proven causal)"
+    ]
+  },
+  "working_environment": {
+    "control": "Bare anyio.to_thread.run_sync(lambda: 'ok') completed",
+    "http_command": "LLM_ENABLED=false PYTHONPATH=backend python -m pytest -q backend/tests/test_api.py",
+    "http_passed": 7,
+    "http_failed": 0,
+    "http_uncompleted": 0,
+    "http_duration_seconds": 1.05,
+    "all_command": "LLM_ENABLED=false PYTHONPATH=backend python -m pytest -q backend/tests backend_kelsch/tests",
+    "all_passed": 76,
+    "all_failed": 0,
+    "all_uncompleted": 0,
+    "all_duration_seconds": 6.82
+  },
+  "finding": "Runtime-specific AnyIO/TestClient handoff stall; no demonstrated backend defect",
+  "application_changes": 0
+}

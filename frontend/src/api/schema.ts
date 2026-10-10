@@ -166,6 +166,26 @@ export interface paths {
         patch: operations["override_feedback_api_encounters__enc_id__feedback_patch"];
         trace?: never;
     };
+    "/api/encounters/{enc_id}/turns/{turn}/speech": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Speak Turn
+         * @description Stream the saved verified reply for one turn. Client text is not spoken.
+         */
+        post: operations["speak_turn_api_encounters__enc_id__turns__turn__speech_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/encounters/{enc_id}/utterances": {
         parameters: {
             query?: never;
@@ -2056,6 +2076,72 @@ export interface operations {
             };
         };
     };
+    speak_turn_api_encounters__enc_id__turns__turn__speech_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                enc_id: string;
+                turn: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description MPEG audio of the saved verified reply, streamed as chunks. This body is not JSON. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "audio/mpeg": string;
+                };
+            };
+            /** @description No voice service is configured, so there is no audio. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No saved encounter or turn with that id. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description This reply was not verified and will not be spoken. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Speech is taken from the saved verified reply. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description The speech service failed or returned no audio. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     add_utterance_api_encounters__enc_id__utterances_post: {
         parameters: {
             query?: never;
@@ -2666,7 +2752,6 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
                     "audio/mpeg": unknown;
                 };
             };

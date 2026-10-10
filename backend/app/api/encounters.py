@@ -2,7 +2,11 @@
 trust thresholds or decision points; the full case document is only served by Studio."""
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, Response
+import asyncio
+import json
+
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
@@ -11,6 +15,7 @@ from app.db import get_session
 from app.integrations import elevenlabs
 from app.schemas.http import ScribeToken
 from app.schemas.student import EncounterSummary, PublicCase, PublicEncounter, TurnResult, WordTimestamp
+from app.settings import get_settings
 from app.student_view import public_case
 
 router = APIRouter(prefix="/api", tags=["encounters"])
@@ -129,6 +134,69 @@ def get_feedback(enc_id: str, db: Session = Depends(get_session)) -> dict:
 def override_feedback(enc_id: str, overrides: dict, db: Session = Depends(get_session)) -> dict:
     """Faculty overrides (score changes, review notes). Kept beside the generated feedback, never merged into it."""
     return services.override_feedback(db, enc_id, overrides)
+
+
+def _client_supplied_speech(raw: bytes) -> bool:
+    """True when the body tries to choose the words. Only an empty body is accepted."""
+    if not raw:
+        return False
+    try:
+        payload = json.loads(raw)
+    except json.JSONDecodeError:
+        return True
+    return payload not in ({}, None)
+
+
+@router.post(
+    "/encounters/{enc_id}/turns/{turn}/speech",
+    response_model=None,
+    responses={
+        200: {
+            "description": "MPEG audio of the saved verified reply, streamed as chunks. This body is not JSON.",
+            "content": {"audio/mpeg": {"schema": {"type": "string", "format": "binary"}}},
+        },
+        204: {"description": "No voice service is configured, so there is no audio."},
+    },
+)
+async def speak_turn(enc_id: str, turn: int, request: Request, db: Session = Depends(get_session)) -> Response:
+    """Stream the saved verified reply for one turn. Client text is not spoken."""
+    if "text" in request.query_params or _client_supplied_speech(await request.body()):
+        raise HTTPException(status_code=422, detail="Speech is taken from the saved verified reply.")
+    reply, tags, case_voice = services.verified_speech(db, enc_id, turn)
+    settings = get_settings()
+    # The case voice wins. The default voice is only the backup when the case has none.
+    voice = case_voice or settings.elevenlabs_default_voice_id
+    if not settings.elevenlabs_api_key or not voice:
+        return Response(status_code=204)
+    try:
+        opened = await elevenlabs.open_speech(reply, voice, tags)
+    except elevenlabs.SpeechProviderError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+    async def release_when_the_client_leaves() -> None:
+        """Close the vendor stream if the student cancels while a later chunk is still pending."""
+        while True:
+            message = await request.receive()
+            if message["type"] == "http.disconnect":
+                await opened.aclose()
+                return
+
+    async def chunks():
+        """Send audio as it arrives, and close the vendor stream when the client stops."""
+        watcher = asyncio.create_task(release_when_the_client_leaves())
+        try:
+            yield opened.first
+            async for piece in opened.remaining():
+                yield piece
+        finally:
+            await opened.aclose()
+            watcher.cancel()
+            try:
+                await watcher
+            except asyncio.CancelledError:
+                pass
+
+    return StreamingResponse(chunks(), media_type="audio/mpeg")
 
 
 class TTSRequest(BaseModel):

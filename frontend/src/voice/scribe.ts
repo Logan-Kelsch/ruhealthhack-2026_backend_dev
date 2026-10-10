@@ -35,7 +35,7 @@ export type ScribeConnectOptions = {
 
 export type ScribeConnector = (options: ScribeConnectOptions) => Promise<ScribeSession>;
 
-// Stops audio elements this page already started. Streamed speech is a later ticket.
+// Pauses audio elements this page already started. The speech player also stops itself.
 export function stopOwnedAudio(): void {
   document.querySelectorAll("audio").forEach((element) => {
     if (element instanceof HTMLAudioElement) element.pause();

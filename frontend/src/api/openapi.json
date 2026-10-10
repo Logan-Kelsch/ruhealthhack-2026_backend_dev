@@ -3498,6 +3498,92 @@
         ]
       }
     },
+    "/api/encounters/{enc_id}/turns/{turn}/speech": {
+      "post": {
+        "description": "Stream the saved verified reply for one turn. Client text is not spoken.",
+        "operationId": "speak_turn_api_encounters__enc_id__turns__turn__speech_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "enc_id",
+            "required": true,
+            "schema": {
+              "title": "Enc Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "turn",
+            "required": true,
+            "schema": {
+              "title": "Turn",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "audio/mpeg": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "MPEG audio of the saved verified reply, streamed as chunks. This body is not JSON."
+          },
+          "204": {
+            "description": "No voice service is configured, so there is no audio."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No saved encounter or turn with that id."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "This reply was not verified and will not be spoken."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Speech is taken from the saved verified reply."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "The speech service failed or returned no audio."
+          }
+        },
+        "summary": "Speak Turn",
+        "tags": [
+          "encounters"
+        ]
+      }
+    },
     "/api/encounters/{enc_id}/utterances": {
       "post": {
         "description": "Runs one committed utterance. The response is the reply and released rows, not the engine log.",
@@ -4322,9 +4408,6 @@
         "responses": {
           "200": {
             "content": {
-              "application/json": {
-                "schema": {}
-              },
               "audio/mpeg": {}
             },
             "description": "Successful Response"

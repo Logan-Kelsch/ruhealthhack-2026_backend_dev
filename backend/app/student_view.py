@@ -6,10 +6,13 @@ outcomes. These functions copy only the released briefing, chart, and transcript
 
 from typing import Literal
 
+from app import catalogs
 from app.encounter.visit import resolve_visit
 from app.models.tables import EncounterRow, TurnRow
 from app.schemas.case import Case
 from app.schemas.student import (
+    DocumentationField,
+    DocumentationTemplate,
     PublicBriefing,
     PublicCase,
     PublicChartEntry,
@@ -158,6 +161,26 @@ def _briefing(case: Case) -> PublicBriefing:
     )
 
 
+def documentation_template_for(case: Case) -> DocumentationTemplate:
+    """Copy the case's saved template so the student can dictate without opening Studio."""
+    raw = catalogs.documentation_templates()[case.documentation_template]
+    return DocumentationTemplate(
+        id=case.documentation_template,
+        label=str(raw["label"]),
+        fields=[
+            DocumentationField(id=str(field["id"]), label=str(field["label"]), hint=str(field["hint"]))
+            for field in raw["fields"]
+        ],
+    )
+
+
+def _saved_note(raw: dict | None) -> dict[str, str] | None:
+    """The submitted note, as text. No note yet stays null rather than an empty form."""
+    if not raw:
+        return None
+    return {str(key): str(value) for key, value in raw.items()}
+
+
 def public_encounter(enc: EncounterRow, turns: list[TurnRow]) -> PublicEncounter:
     """Build the recovery view from the saved encounter. This does not create another one."""
     case = Case.model_validate(enc.visit_doc)
@@ -179,6 +202,8 @@ def public_encounter(enc: EncounterRow, turns: list[TurnRow]) -> PublicEncounter
         ended_at=enc.ended_at,
         last_turn=lines[-1].turn if lines else None,
         status=_encounter_status(enc.status),
+        documentation_template=documentation_template_for(case),
+        saved_documentation=_saved_note(enc.documentation),
     )
 
 

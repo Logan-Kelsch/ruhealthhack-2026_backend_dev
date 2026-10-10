@@ -39,6 +39,11 @@ SHARED_ERROR_RESPONSES = {
     ("/api/encounters/{enc_id}", "get"): {404: "No saved encounter with that id."},
     ("/api/encounters/{enc_id}/utterances", "post"): {404: "No saved encounter with that id.", 409: "The encounter is not accepting a turn."},
     ("/api/encounters/{enc_id}/end", "post"): {404: "No saved encounter with that id."},
+    ("/api/encounters/{enc_id}/documentation", "post"): {404: "No saved encounter with that id."},
+    ("/api/encounters/{enc_id}/feedback", "get"): {
+        404: "No saved encounter with that id.",
+        409: "End the encounter before requesting feedback.",
+    },
     ("/api/stt/token", "post"): {
         409: "Speech transcription is not configured.",
         503: "The transcription service did not provide a token.",

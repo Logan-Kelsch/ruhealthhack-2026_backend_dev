@@ -1,0 +1,100 @@
+{
+  "format": "clinical_script_review_v1",
+  "scenario_id": 2,
+  "title": "Tobacco use and readiness to change",
+  "patient": {
+    "name": "Marcus Hale",
+    "age_years": 42,
+    "sex": "male",
+    "presenting_concern": "Discussion of tobacco use during a routine visit",
+    "history": [
+      "Tobacco use",
+      "Previous unsuccessful quit attempt"
+    ]
+  },
+  "learning_goal": "Assess readiness, explore sustain talk and support autonomy; the patient remains unwilling to quit. Do not score success by agreement to cessation.",
+  "educator_description": "Marcus Hale is a 42-year-old man who smokes one pack a day. He is not willing to quit smoking. He works rotating shifts, uses cigarettes for stress relief, and had a difficult previous quit attempt. The goal is to explore his willingness to change without pressuring him.",
+  "learner_role": "medical student under supervision",
+  "teaching_notes": [
+    "Use the fixed suggested sequence for a coherent rehearsal.",
+    "This is an authored demonstration, not a diagnosis or grading engine."
+  ],
+  "sources": [
+    {
+      "title": "NCDHHS: motivational interviewing and OARS",
+      "url": "https://www.dph.ncdhhs.gov/programs/chronic-disease-and-injury/tobacco-prevention-and-control/quitlinenc/providers/treatment/motivational-interviewing"
+    }
+  ],
+  "dialogue": [
+    {
+      "student": "Hello, I am the medical student working with your clinician. Would it be okay to talk about smoking for a few minutes?",
+      "patient": "We can talk, but I am telling you now: I am not quitting.",
+      "chart": []
+    },
+    {
+      "student": "What does smoking do for you during a usual day?",
+      "patient": "I smoke about a pack a day. With rotating shifts, those breaks are how I settle down.",
+      "chart": []
+    },
+    {
+      "student": "How do you feel about making a change right now?",
+      "patient": "I do not want to change. I know people say it is bad, but quitting is not on my list right now.",
+      "chart": [
+        {
+          "id": "tobacco.readiness",
+          "label": "Patient-stated readiness",
+          "text": "The patient explicitly declines cessation at this visit. Readiness is not inferred from agreement to receive information.",
+          "source": "https://www.dph.ncdhhs.gov/programs/chronic-disease-and-injury/tobacco-prevention-and-control/quitlinenc/providers/treatment/motivational-interviewing",
+          "urgent": false
+        }
+      ]
+    },
+    {
+      "student": "You really need to stop; could you set a quit date this week?",
+      "patient": "No. That is what everyone says. If this is going to be another lecture, I would rather leave.",
+      "chart": []
+    },
+    {
+      "student": "I pushed ahead of where you are. You get to decide. What was difficult the last time you tried?",
+      "patient": "I barely slept, I was irritable at work, and I went back to smoking. I do not want to go through that again.",
+      "chart": []
+    },
+    {
+      "student": "It sounds like smoking helps you manage stress, and the last attempt was miserable. What matters most to you at the moment?",
+      "patient": "Keeping my job and getting through my shifts. My daughter hates the smell, but that does not mean I am ready to quit.",
+      "chart": []
+    },
+    {
+      "student": "Would you like information about support available if you ever choose to revisit this?",
+      "patient": "You can give me something to look at, but I am not promising to call anyone or take medicine.",
+      "chart": []
+    },
+    {
+      "student": "I hear that you are not ready. We can revisit it when you want. Is there anything you want us to understand before we finish?",
+      "patient": "Just do not make every visit about cigarettes. I want help with my health without being judged.",
+      "chart": []
+    }
+  ],
+  "debrief": [
+    {
+      "after_turn": 4,
+      "rubric_domain": "Rapport, respect, and empathy",
+      "question": "Compare the patient response before and after the quit-date question. What changed in the conversation?"
+    },
+    {
+      "after_turn": 6,
+      "rubric_domain": "Listening and response to cues",
+      "question": "Which of the patient priorities could you reflect back without treating them as a commitment to change?"
+    },
+    {
+      "after_turn": 7,
+      "rubric_domain": "Explanation and shared decisions",
+      "question": "How would you distinguish permission to receive information from willingness to start treatment?"
+    },
+    {
+      "after_turn": 8,
+      "rubric_domain": "Professionalism, safety, and closure",
+      "question": "What would a useful closing plan look like if the patient still declines change?"
+    }
+  ]
+}

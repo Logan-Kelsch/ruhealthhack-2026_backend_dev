@@ -98,11 +98,19 @@ For the actual production encounter, spoken transcripts still go to `/api/encoun
 
 ## JSON replacement boundaries
 
+For clinician review, use the three condensed files in
+[`scripted_scenarios/`](scripted_scenarios/README.md). They contain each dialogue
+only once and place chart findings at their release turn. After edits, run
+`PYTHONPATH=backend python -m scripts.update_scripted_clinical_demo <file1.json> <file2.json> <file3.json>`
+from the repository root. Add `--check` for a validation preview. The importer
+generates internal citations, release references, timing, and changed case versions;
+new preparations use the result. The folder README covers partial imports and exports.
+
 `backend/app/data/scripted_clinical_demo_v1.json` contains the three complete authored snapshots. `ScriptFixture` in `backend/app/schemas/demo.py` validates contiguous steps, exact authored dialogue sources, chart release references, and debrief anchors. `PatientMetadata` and `MetadataExtraction` are the interchangeable metadata contracts.
 
 The deterministic structurer categorizes explicit text into exact source spans. It extracts a digit-based age and explicit sex term, and recognizes the selected fixture's name if present. It does not perform general name recognition, infer clinical facts, interpret negation into diagnoses, or reconcile the pasted description with the dialogue. Negated text remains verbatim. Unmatched text remains visible; demographics disagreements produce warnings. The canonical fixed fixture is returned alongside the extracted description, never silently replaced by it.
 
-Change dialogue, findings, goals, example descriptions, references, and reflection questions together, increment `fixture_version`, and create a new preparation. Each preparation saves a complete snapshot plus a SHA-256 hash. Older sessions use their pinned version even if the fixture changes on disk. These demo sessions live in their own table; none enters production grades, reviewer evidence, learner outcomes, or MCPT.
+Change dialogue, findings, goals, example descriptions, references, and reflection questions together. The review-file importer increments `fixture_version` automatically; when editing the runtime fixture directly, increment it yourself. Create a new preparation. Each preparation saves a complete snapshot plus a SHA-256 hash. Older sessions use their pinned version even if the fixture changes on disk. These demo sessions live in their own table; none enters production grades, reviewer evidence, learner outcomes, or MCPT.
 
 To use an actual model later, add a structuring adapter returning `MetadataExtraction` and preserve explicit provenance. To author a production case, use the existing `Case` schema and Studio review workflow; this demo format is not a direct `Case` import. A future retrieval-supported debrief needs approved hint material and reveal rules. Neither a live model nor RAG is required for this rehearsal.
 

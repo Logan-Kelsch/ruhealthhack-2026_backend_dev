@@ -1,0 +1,124 @@
+{
+  "format": "clinical_script_review_v1",
+  "scenario_id": 1,
+  "title": "Fever and respiratory symptoms",
+  "patient": {
+    "name": "Daniel Mercer",
+    "age_years": 58,
+    "sex": "male",
+    "presenting_concern": "Fever, cough, and shortness of breath",
+    "history": [
+      "Hypertension"
+    ]
+  },
+  "learning_goal": "Recognize a pneumonia syndrome, elicit recent travel exposure, consider Legionella testing and appropriate antibiotic coverage under supervision.",
+  "educator_description": "Daniel Mercer is a 58-year-old man with hypertension. He has four days of fever, dry cough, shortness of breath, and diarrhea. He attended a convention in Philadelphia and stayed in a hotel nine days ago. He takes lisinopril and has no known drug allergies. The goal is to assess the illness course and investigate pneumonia.",
+  "learner_role": "medical student under supervision",
+  "teaching_notes": [
+    "Use the fixed suggested sequence for a coherent rehearsal.",
+    "This is an authored demonstration, not a diagnosis or grading engine."
+  ],
+  "sources": [
+    {
+      "title": "CDC: clinical guidance",
+      "url": "https://www.cdc.gov/legionella/hcp/clinical-guidance/index.html"
+    },
+    {
+      "title": "CDC: clinical features",
+      "url": "https://www.cdc.gov/legionella/hcp/clinical-signs/index.html"
+    }
+  ],
+  "dialogue": [
+    {
+      "student": "Hello, I am the medical student working with your clinician. What has been bothering you most?",
+      "patient": "I am Daniel. I have had a fever and this cough, and now I get winded just walking across the room.",
+      "chart": []
+    },
+    {
+      "student": "When did this start, and how has it changed?",
+      "patient": "It started four days ago with aches and a fever. The cough came next. My breathing has gotten worse since yesterday.",
+      "chart": []
+    },
+    {
+      "student": "Have you had any other symptoms, like stomach problems or confusion?",
+      "patient": "I have had watery diarrhea and a headache. I have not felt confused, but I am worn out.",
+      "chart": []
+    },
+    {
+      "student": "Have you traveled or stayed away from home in the last two weeks?",
+      "patient": "Yes. I went to a convention in Philly nine days ago and stayed at a downtown hotel for three nights.",
+      "chart": []
+    },
+    {
+      "student": "Tell me about your health conditions, medicines, and allergies.",
+      "patient": "I have high blood pressure and take lisinopril. I do not know of any medicine allergies. I used to smoke but stopped five years ago.",
+      "chart": []
+    },
+    {
+      "student": "I would like to check your oxygen level and examine your chest. Is that okay?",
+      "patient": "Yes, please. I feel like I cannot get a full breath.",
+      "chart": [
+        {
+          "id": "pneumonia.vitals",
+          "label": "Vital signs",
+          "text": "Temperature 39.1 C; heart rate 108/min; respiratory rate 26/min; blood pressure 116/72 mmHg; oxygen saturation 91% on room air. Right-sided crackles.",
+          "source": "Authored example values; CDC symptom context: https://www.cdc.gov/legionella/hcp/clinical-signs/index.html",
+          "urgent": true
+        }
+      ]
+    },
+    {
+      "student": "The examination suggests pneumonia. I will ask my supervising clinician to review you now and arrange chest imaging and tests related to your recent travel.",
+      "patient": "Could something at the hotel have made me sick? I thought this was just the flu.",
+      "chart": [
+        {
+          "id": "pneumonia.imaging",
+          "label": "Chest radiograph",
+          "text": "Right lower-lobe air-space opacity, consistent with pneumonia; imaging does not identify the pathogen.",
+          "source": "https://www.cdc.gov/legionella/hcp/clinical-guidance/index.html",
+          "urgent": false
+        }
+      ]
+    },
+    {
+      "student": "Hotel travel is a clue, but it does not prove the cause. We will collect urine and a respiratory sample if possible, without delaying needed treatment.",
+      "patient": "Okay. I can try to cough up a sample. Will I need an antibiotic?",
+      "chart": [
+        {
+          "id": "pneumonia.testing",
+          "label": "Specimens",
+          "text": "Urine antigen and lower respiratory specimen requested; results pending. No positive result is assumed.",
+          "source": "https://www.cdc.gov/legionella/hcp/clinical-guidance/index.html",
+          "urgent": false
+        }
+      ]
+    },
+    {
+      "student": "I will discuss prompt pneumonia treatment with my supervising clinician, including coverage for Legionella, such as a macrolide or a respiratory fluoroquinolone, if appropriate for you.",
+      "patient": "Please explain the plan as we go. I am worried about how breathless I am.",
+      "chart": []
+    },
+    {
+      "student": "We are arranging monitored care and treatment. What questions do you have, and can you tell me what you understand so far?",
+      "patient": "You think I have pneumonia, and the hotel stay helps decide which tests to do. You are getting the clinician because my breathing needs attention.",
+      "chart": []
+    }
+  ],
+  "debrief": [
+    {
+      "after_turn": 4,
+      "rubric_domain": "Information gathering",
+      "question": "What information from the travel history would you carry into your assessment, and what still needs confirmation?"
+    },
+    {
+      "after_turn": 6,
+      "rubric_domain": "Clinical reasoning and synthesis",
+      "question": "Which findings affect the urgency of your plan, independent of the eventual cause?"
+    },
+    {
+      "after_turn": 9,
+      "rubric_domain": "Explanation and shared decisions",
+      "question": "How would you explain why a treatment is being considered without presenting an unconfirmed cause as certain?"
+    }
+  ]
+}

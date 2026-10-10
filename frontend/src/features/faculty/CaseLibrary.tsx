@@ -52,7 +52,7 @@ export function CaseLibrary({ go, client = api }: { go: Go; client?: ApiClient }
         <div className="flex gap-2">
           <GhostButton onClick={() => go("f-import")}>
             <DownloadIcon />
-            Import sample patients
+            Import sample set
           </GhostButton>
           <PrimaryButton onClick={() => go("f-studio", { studioTab: "patient" })}>
             <PlusIcon />

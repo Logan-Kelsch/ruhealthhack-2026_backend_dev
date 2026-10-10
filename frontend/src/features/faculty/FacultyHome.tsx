@@ -12,7 +12,7 @@ export function FacultyHome({ go }: { go: Go }) {
     <Page>
       <PageHeader kicker="Friday, October 10" title="Good morning, Amara">
         <div className="flex gap-2">
-          <GhostButton onClick={() => go("f-import")}>Import patients</GhostButton>
+          <GhostButton onClick={() => go("f-import")}>Import sample set</GhostButton>
           <PrimaryButton onClick={openStudio}>
             <PlusIcon />
             New case

@@ -4,6 +4,7 @@ import type { components, paths } from "./schema";
 export type ErrorResponse = components["schemas"]["ErrorResponse"];
 export type ErrorItem = components["schemas"]["ErrorItem"];
 export type StudioCaseSummary = components["schemas"]["StudioCaseSummary"];
+export type VhsImportResponse = components["schemas"]["VhsImportResponse"];
 
 // One error for every failed response, so screens do not each invent a fallback.
 export class ApiError extends Error {

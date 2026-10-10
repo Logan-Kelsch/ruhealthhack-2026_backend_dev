@@ -52,12 +52,14 @@ export function PrimaryButton({
   onClick,
   size = "md",
   block = false,
+  disabled = false,
   className = "",
 }: {
   children: ReactNode;
   onClick?: () => void;
   size?: "sm" | "md" | "lg";
   block?: boolean;
+  disabled?: boolean;
   className?: string;
 }) {
   const shape =
@@ -70,7 +72,8 @@ export function PrimaryButton({
     <button
       type="button"
       onClick={onClick}
-      className={`inline-flex items-center bg-panel text-white hover:bg-panel-hover ${shape} ${block ? "w-full justify-center" : ""} ${className}`}
+      disabled={disabled}
+      className={`inline-flex items-center bg-panel text-white hover:bg-panel-hover disabled:opacity-60 ${shape} ${block ? "w-full justify-center" : ""} ${className}`}
     >
       {children}
     </button>

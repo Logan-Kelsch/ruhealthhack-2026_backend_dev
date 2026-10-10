@@ -18,6 +18,7 @@ from app.services import Conflict, NotFound
 SHARED_ERROR_RESPONSES = {
     ("/api/studio/cases/{case_id}", "get"): {404: "No saved case with that id."},
     ("/api/studio/cases/{case_id}/publish", "post"): {409: "The case is not ready to publish."},
+    ("/api/studio/import/vhs", "post"): {500: "The sponsor sample set could not be imported."},
 }
 
 

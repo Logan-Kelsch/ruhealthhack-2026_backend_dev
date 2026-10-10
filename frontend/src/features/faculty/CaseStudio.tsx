@@ -22,12 +22,13 @@ import {
   type StudioVocab,
 } from "../../api/client";
 import { factReferenceNotes, saveProblem } from "./caseDraft";
+import { CaseBuilder, type CreatePhase } from "./CaseBuilder";
 import { CaseReview } from "./CaseReview";
 import { DecisionTree } from "./DecisionTree";
 import { CaseEditor, ObjectiveEditor, type SavePhase } from "./caseForm";
 import type { Go, StudioTab } from "../../app/types";
 import { Avatar, type Portrait } from "../../components/Avatar";
-import { BackLink, Badge, Card, CardHead, PrimaryButton, TabNav } from "../../components/ui";
+import { BackLink, Badge, Card, PrimaryButton, TabNav } from "../../components/ui";
 
 const TABS: { id: StudioTab; label: string }[] = [
   { id: "patient", label: "Patient" },
@@ -36,8 +37,6 @@ const TABS: { id: StudioTab; label: string }[] = [
   { id: "tree", label: "Decision tree" },
   { id: "review", label: "Review" },
 ];
-
-type CreatePhase = { kind: "editing" } | { kind: "saving" } | { kind: "error"; message: string };
 
 type LoadPhase =
   | { kind: "loading" }
@@ -144,8 +143,7 @@ export function CaseStudio({
   const heading = detail?.case.profile.name ?? "New case";
 
   // Save the description, then open the case id and version the server returned.
-  async function submitDescription(event: FormEvent) {
-    event.preventDefault();
+  async function submitDescription() {
     setCreatePhase({ kind: "saving" });
     try {
       const result = await createDraft(client, description);
@@ -434,12 +432,14 @@ export function CaseStudio({
             }}
           />
         ) : (
-          <DescriptionForm
+          <CaseBuilder
+            go={go}
+            client={client}
             description={description}
-            phase={createPhase}
-            onChange={setDescription}
-            onSubmit={(event) => {
-              void submitDescription(event);
+            onDescriptionChange={setDescription}
+            createPhase={createPhase}
+            onCreateDraft={() => {
+              void submitDescription();
             }}
           />
         )
@@ -484,48 +484,6 @@ export function CaseStudio({
         </Card>
       )}
     </div>
-  );
-}
-
-// The plain-language description. Nothing here is shown as a saved patient until the request succeeds.
-function DescriptionForm({
-  description,
-  phase,
-  onChange,
-  onSubmit,
-}: {
-  description: string;
-  phase: CreatePhase;
-  onChange: (value: string) => void;
-  onSubmit: (event: FormEvent) => void;
-}) {
-  const saving = phase.kind === "saving";
-  return (
-    <Card>
-      <CardHead title="New draft" />
-      <form onSubmit={onSubmit} className="flex flex-col gap-3 px-5 py-5">
-        <label htmlFor="patient-description" className="text-sm font-medium">
-          Describe the patient
-        </label>
-        <textarea
-          id="patient-description"
-          value={description}
-          onChange={(event) => onChange(event.target.value)}
-          disabled={saving}
-          className="min-h-28 w-full rounded-xl border border-line-2 bg-card px-3 py-2 text-sm text-ink outline-none"
-        />
-        {phase.kind === "error" ? (
-          <p role="alert" className="text-sm text-ink">
-            {phase.message}
-          </p>
-        ) : null}
-        <div>
-          <PrimaryButton type="submit" disabled={saving}>
-            {saving ? "Saving draft" : phase.kind === "error" ? "Try again" : "Create draft"}
-          </PrimaryButton>
-        </div>
-      </form>
-    </Card>
   );
 }
 

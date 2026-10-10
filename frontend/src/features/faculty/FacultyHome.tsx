@@ -30,6 +30,11 @@ export function FacultyHome({ go, client = api }: { go: Go; client?: ApiClient }
           setLoad({ kind: "error", message: asApiError(status, result.error).message });
           return;
         }
+        // A 200 that is not an encounter list is a failure, not an empty class.
+        if (!Array.isArray(result.data.encounters)) {
+          setLoad({ kind: "error", message: "Encounters could not be loaded." });
+          return;
+        }
         setLoad({ kind: "ready", list: result.data });
       })
       .catch(() => {
@@ -41,20 +46,63 @@ export function FacultyHome({ go, client = api }: { go: Go; client?: ApiClient }
   }, [client, attempt]);
 
   return (
-    <Page>
-      <PageHeader kicker={kicker(load)} title="Saved encounters">
-        <div className="flex gap-2">
-          <GhostButton onClick={() => go("f-import")}>Import sample set</GhostButton>
-          <PrimaryButton onClick={() => go("f-studio", { studioTab: "patient" })}>
-            <PlusIcon />
-            New case
-          </PrimaryButton>
-        </div>
-      </PageHeader>
-      <EncounterListView load={load} onRetry={() => setAttempt((value) => value + 1)} onReview={(encounterId) => go("f-review", { encounterId })} />
+    <Page width="max-w-[1180px]">
+      <StartPanel
+        onNew={() => go("f-studio", { studioTab: "patient" })}
+        onImport={() => go("f-import")}
+        onLibrary={() => go("f-cases")}
+      />
+      <section className="flex flex-col gap-4">
+        <PageHeader kicker={kicker(load)} title="Saved encounters" />
+        <EncounterListView load={load} onRetry={() => setAttempt((value) => value + 1)} onReview={(encounterId) => go("f-review", { encounterId })} />
+      </section>
     </Page>
   );
 }
+
+// Building a case is the first thing faculty do, so it leads the page and says what happens next.
+function StartPanel({ onNew, onImport, onLibrary }: { onNew: () => void; onImport: () => void; onLibrary: () => void }) {
+  return (
+    <section className="overflow-hidden rounded-[22px] border border-white/80 bg-card/95 shadow-[0_24px_60px_-36px_rgba(25,31,92,.55)]">
+      <div className="bg-banner h-2" aria-hidden />
+      <div className="flex flex-col gap-7 px-[clamp(22px,3vw,44px)] pt-8 pb-9">
+        <div>
+          <h1 className="m-0 font-serif text-[clamp(34px,3.2vw,48px)] leading-[1.05] font-normal tracking-[-1px]">Build a case</h1>
+          <p className="mt-2 max-w-[640px] font-sans text-[16.5px] leading-snug text-ink-soft">
+            Describe a patient in your own words. Rounds suggests the details, you check every one, and learners only hear what you approved.
+          </p>
+        </div>
+        <ol className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr))]">
+          {START_STEPS.map((step, index) => (
+            <li key={step.title} className="flex gap-3.5 rounded-[16px] bg-wash px-4 py-4">
+              <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-card font-sans text-[14px] font-semibold text-ink shadow-[0_4px_10px_-6px_rgba(25,31,92,.5)]">
+                {index + 1}
+              </span>
+              <span>
+                <span className="block font-serif text-[19px] leading-tight">{step.title}</span>
+                <span className="mt-1 block font-sans text-[13.5px] leading-snug text-ink-soft">{step.detail}</span>
+              </span>
+            </li>
+          ))}
+        </ol>
+        <div className="flex flex-wrap items-center gap-3">
+          <PrimaryButton size="lg" onClick={onNew}>
+            <PlusIcon />
+            New case
+          </PrimaryButton>
+          <GhostButton onClick={onLibrary}>Open case library</GhostButton>
+          <GhostButton onClick={onImport}>Import sample set</GhostButton>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const START_STEPS = [
+  { title: "Describe the patient", detail: "A few sentences, plus any notes on what learners should catch." },
+  { title: "Check the details", detail: "Suggested history, vitals with their sources, and learning goals. Change anything." },
+  { title: "Publish", detail: "Approve each item, then learners can start the visit by voice." },
+];
 
 // The kicker is the real count. A capped list says so instead of pretending the page is complete.
 function kicker(load: LoadState): string | undefined {
@@ -110,15 +158,19 @@ function EncounterRow({ row, onReview }: { row: EncounterSummary; onReview: (enc
   const patient = row.patient_name.trim() || row.case_id;
   const visit = row.visit_label.trim() || row.visit_id;
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-line bg-card px-5 py-4">
+    <div
+      className={`flex flex-wrap items-center justify-between gap-3 rounded-[14px] border px-6 py-4 shadow-[0_10px_30px_-24px_rgba(25,31,92,.35)] ${
+        row.review_flag ? "border-warn-line bg-warn-wash" : "border-line bg-card"
+      }`}
+    >
       <div className="min-w-0">
-        <div className="text-[15px] font-semibold">
-          {who} <span className="font-normal text-muted">· {patient}</span>
+        <div className="font-serif text-[21px]">
+          {who} <span className="text-muted">· {patient}</span>
         </div>
-        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ink-soft">
+        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 font-sans text-[14px] text-ink-soft">
           <span>{visit}</span>
           <span>{statusLabel(row.status)}</span>
-          {row.review_flag ? <span className="font-semibold text-ink">Needs review</span> : null}
+          {row.review_flag ? <span className="font-semibold text-warn-deep">Needs review</span> : null}
           {typeof row.rubric_total === "number" ? <span>{row.rubric_total} / 28</span> : null}
         </div>
       </div>

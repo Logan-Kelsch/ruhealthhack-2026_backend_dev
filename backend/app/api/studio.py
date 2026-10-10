@@ -31,7 +31,7 @@ from app.schemas.http import (
     StudioVocabManeuver,
     VhsImportResponse,
 )
-from app.studio import consistency, drafting, intake, preview, publish, vhs_import
+from app.studio import builder, consistency, drafting, intake, preview, publish, vhs_import
 from app.studio.autofill import autofill_labs, autofill_vitals
 from app.studio.fact_refs import dropped_fact_errors
 from app.studio.visit_authoring import apply_review_status, authored_visit_errors
@@ -106,6 +106,48 @@ def new_draft(body: NewDraft, db: Session = Depends(get_session)) -> StudioDraft
     case, calls = drafting.draft_case(body.description, body.faculty, llm_available())
     row = services.create_case(db, case)
     return _result(row, calls)
+
+
+class BuilderSuggestRequest(BaseModel):
+    description: str = Field(min_length=10, max_length=8000)
+    notes: str = Field(default="", max_length=8000)
+
+
+class BuilderVitalsRequest(BaseModel):
+    description: str = ""
+    age: int = Field(ge=0, le=120)
+    sex: Literal["male", "female", "other"] = "other"
+    conditions: list[builder.BuilderCondition] = Field(default_factory=list)
+
+
+class BuilderVitalsResult(BaseModel):
+    vitals: list[builder.BuilderVital]
+    notes: list[str]
+
+
+class BuilderSuggestResult(builder.BuilderSuggestion):
+    llm_calls: list[LlmCallRecord]
+
+
+@router.post("/builder/suggest", response_model=BuilderSuggestResult)
+def builder_suggest(body: BuilderSuggestRequest) -> BuilderSuggestResult:
+    """Proposed words for the builder form. Nothing is saved; faculty edit the fields first."""
+    suggestion, calls = builder.suggest(body.description, body.notes, llm_available())
+    return BuilderSuggestResult(**suggestion.model_dump(), llm_calls=[LlmCallRecord.model_validate(call) for call in calls])
+
+
+@router.post("/builder/vitals", response_model=BuilderVitalsResult)
+def builder_vitals(body: BuilderVitalsRequest) -> BuilderVitalsResult:
+    """Typical resting vitals from the reference bands and condition rules. Each one names its source."""
+    vitals, notes = builder.typical_vitals(body.age, body.sex, body.conditions, body.description)
+    return BuilderVitalsResult(vitals=vitals, notes=notes)
+
+
+@router.post("/builder", status_code=201, response_model=StudioDraftResult)
+def builder_create(body: builder.BuilderForm, db: Session = Depends(get_session)) -> StudioDraftResult:
+    """Save the finished builder form as one draft case. It opens in Studio for approval and publish."""
+    row = services.create_case(db, builder.build(body, None))
+    return _result(row, [])
 
 
 @router.get("/cases/{case_id}", response_model=StudioCaseDetail, response_model_exclude_none=True)

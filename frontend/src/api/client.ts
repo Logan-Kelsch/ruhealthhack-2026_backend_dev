@@ -15,6 +15,10 @@ export type Icd10Match = components["schemas"]["Icd10Match"];
 export type IntakeGap = components["schemas"]["IntakeGap"];
 export type VhsImportResponse = components["schemas"]["VhsImportResponse"];
 export type CaseDocument = components["schemas"]["Case"];
+export type BuilderForm = components["schemas"]["BuilderForm"];
+export type BuilderVital = components["schemas"]["BuilderVital"];
+export type BuilderSuggestResult = components["schemas"]["BuilderSuggestResult"];
+export type BuilderVitalsResult = components["schemas"]["BuilderVitalsResult"];
 export type ApprovalGroup = components["schemas"]["Approve"]["group"];
 export type ItemStatus = "draft" | "approved";
 export type PublicCase = components["schemas"]["PublicCase"];
@@ -79,6 +83,27 @@ function unwrap<T>(status: number, data: T | undefined, error: unknown): T {
 // Faculty description in, one saved draft out. The case id and version come from the response.
 export async function createDraft(client: ApiClient, description: string): Promise<StudioDraftResult> {
   const result = await client.POST("/api/studio/drafts", { body: { description } });
+  return unwrap(result.response.status, result.data, result.error);
+}
+
+// Proposed words for the builder form from the description. Nothing is saved.
+export async function suggestCase(client: ApiClient, description: string, notes: string): Promise<BuilderSuggestResult> {
+  const result = await client.POST("/api/studio/builder/suggest", { body: { description, notes } });
+  return unwrap(result.response.status, result.data, result.error);
+}
+
+// Typical resting vitals for this age and sex, shifted by condition rules. Each value names its source.
+export async function typicalVitals(
+  client: ApiClient,
+  body: { description: string; age: number; sex: BuilderForm["sex"]; conditions: BuilderForm["conditions"] },
+): Promise<BuilderVitalsResult> {
+  const result = await client.POST("/api/studio/builder/vitals", { body });
+  return unwrap(result.response.status, result.data, result.error);
+}
+
+// The finished builder form as one saved draft case.
+export async function buildCase(client: ApiClient, form: BuilderForm): Promise<StudioDraftResult> {
+  const result = await client.POST("/api/studio/builder", { body: form });
   return unwrap(result.response.status, result.data, result.error);
 }
 

@@ -276,6 +276,66 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/studio/builder": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Builder Create
+         * @description Save the finished builder form as one draft case. It opens in Studio for approval and publish.
+         */
+        post: operations["builder_create_api_studio_builder_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/studio/builder/suggest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Builder Suggest
+         * @description Proposed words for the builder form. Nothing is saved; faculty edit the fields first.
+         */
+        post: operations["builder_suggest_api_studio_builder_suggest_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/studio/builder/vitals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Builder Vitals
+         * @description Typical resting vitals from the reference bands and condition rules. Each one names its source.
+         */
+        post: operations["builder_vitals_api_studio_builder_vitals_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/studio/cases": {
         parameters: {
             query?: never;
@@ -728,6 +788,233 @@ export interface components {
              * @default
              */
             student_role: string;
+        };
+        /** BuilderAllergy */
+        BuilderAllergy: {
+            /** Reaction */
+            reaction?: string | null;
+            /** Substance */
+            substance: string;
+        };
+        /** BuilderCondition */
+        BuilderCondition: {
+            /** Code */
+            code?: string | null;
+            /** Name */
+            name: string;
+        };
+        /**
+         * BuilderForm
+         * @description Everything the builder asks. Empty strings mean the faculty member left it blank.
+         */
+        BuilderForm: {
+            /** Age */
+            age?: number | null;
+            /** Allergies */
+            allergies?: components["schemas"]["BuilderAllergy"][];
+            /**
+             * Chief Complaint
+             * @default
+             */
+            chief_complaint: string;
+            /**
+             * Communication Style
+             * @default
+             */
+            communication_style: string;
+            /** Conditions */
+            conditions?: components["schemas"]["BuilderCondition"][];
+            /** Description */
+            description: string;
+            /**
+             * Difficulty
+             * @default typical
+             * @enum {string}
+             */
+            difficulty: "straightforward" | "typical" | "difficult";
+            /**
+             * Documentation Template
+             * @default SOAP
+             * @enum {string}
+             */
+            documentation_template: "PES" | "ADIME" | "SBAR" | "SOAP";
+            /**
+             * Goal
+             * @default
+             */
+            goal: string;
+            /**
+             * Goals Fears
+             * @default
+             */
+            goals_fears: string;
+            /**
+             * Health Literacy
+             * @default medium
+             * @enum {string}
+             */
+            health_literacy: "low" | "medium" | "high";
+            /**
+             * Hidden
+             * @default
+             */
+            hidden: string;
+            /** Medications */
+            medications?: components["schemas"]["BuilderMedication"][];
+            /**
+             * Mood
+             * @default
+             */
+            mood: string;
+            /**
+             * Name
+             * @default
+             */
+            name: string;
+            /**
+             * No Known Allergies
+             * @default false
+             */
+            no_known_allergies: boolean;
+            /**
+             * Notes
+             * @default
+             */
+            notes: string;
+            /**
+             * Objectives
+             * @default
+             */
+            objectives: string;
+            /**
+             * Occupation
+             * @default
+             */
+            occupation: string;
+            /**
+             * Personal Cue
+             * @default
+             */
+            personal_cue: string;
+            /**
+             * Personality
+             * @default
+             */
+            personality: string;
+            /**
+             * Pronouns
+             * @default
+             */
+            pronouns: string;
+            /**
+             * Reason For Visit
+             * @default
+             */
+            reason_for_visit: string;
+            /**
+             * Setting
+             * @default
+             */
+            setting: string;
+            /**
+             * Sex
+             * @default other
+             * @enum {string}
+             */
+            sex: "male" | "female" | "other";
+            /**
+             * Show Doorway Vitals
+             * @default true
+             */
+            show_doorway_vitals: boolean;
+            /**
+             * Social
+             * @default
+             */
+            social: string;
+            /**
+             * Speaker
+             * @default
+             */
+            speaker: string;
+            /**
+             * Student Role
+             * @default
+             */
+            student_role: string;
+            /** Vitals */
+            vitals?: components["schemas"]["BuilderVital"][];
+        };
+        /** BuilderMedication */
+        BuilderMedication: {
+            /** Dose */
+            dose?: string | null;
+            /** Frequency */
+            frequency?: string | null;
+            /** Name */
+            name: string;
+            /** Purpose */
+            purpose?: string | null;
+        };
+        /** BuilderSuggestRequest */
+        BuilderSuggestRequest: {
+            /** Description */
+            description: string;
+            /**
+             * Notes
+             * @default
+             */
+            notes: string;
+        };
+        /** BuilderSuggestResult */
+        BuilderSuggestResult: {
+            form: components["schemas"]["BuilderForm"];
+            /** Llm Calls */
+            llm_calls: components["schemas"]["LlmCallRecord"][];
+            /** Note */
+            note?: string | null;
+            /** Used Model */
+            used_model: boolean;
+        };
+        /** BuilderVital */
+        BuilderVital: {
+            /** Key */
+            key: string;
+            /** Label */
+            label: string;
+            source?: components["schemas"]["Source"];
+            /**
+             * Unit
+             * @default
+             */
+            unit: string;
+            /** Value */
+            value: string;
+        };
+        /** BuilderVitalsRequest */
+        BuilderVitalsRequest: {
+            /** Age */
+            age: number;
+            /** Conditions */
+            conditions?: components["schemas"]["BuilderCondition"][];
+            /**
+             * Description
+             * @default
+             */
+            description: string;
+            /**
+             * Sex
+             * @default other
+             * @enum {string}
+             */
+            sex: "male" | "female" | "other";
+        };
+        /** BuilderVitalsResult */
+        BuilderVitalsResult: {
+            /** Notes */
+            notes: string[];
+            /** Vitals */
+            vitals: components["schemas"]["BuilderVital"][];
         };
         /** Case */
         Case: {
@@ -3226,6 +3513,105 @@ export interface operations {
             };
             /** @description The transcription service did not provide a token. */
             503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    builder_create_api_studio_builder_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BuilderForm"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudioDraftResult"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    builder_suggest_api_studio_builder_suggest_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BuilderSuggestRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BuilderSuggestResult"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    builder_vitals_api_studio_builder_vitals_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BuilderVitalsRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BuilderVitalsResult"];
+                };
+            };
+            /** @description Validation error */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };

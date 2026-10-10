@@ -378,6 +378,448 @@
         "title": "Briefing",
         "type": "object"
       },
+      "BuilderAllergy": {
+        "properties": {
+          "reaction": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reaction"
+          },
+          "substance": {
+            "title": "Substance",
+            "type": "string"
+          }
+        },
+        "required": [
+          "substance"
+        ],
+        "title": "BuilderAllergy",
+        "type": "object"
+      },
+      "BuilderCondition": {
+        "properties": {
+          "code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Code"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "BuilderCondition",
+        "type": "object"
+      },
+      "BuilderForm": {
+        "description": "Everything the builder asks. Empty strings mean the faculty member left it blank.",
+        "properties": {
+          "age": {
+            "anyOf": [
+              {
+                "maximum": 120.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Age"
+          },
+          "allergies": {
+            "items": {
+              "$ref": "#/components/schemas/BuilderAllergy"
+            },
+            "title": "Allergies",
+            "type": "array"
+          },
+          "chief_complaint": {
+            "default": "",
+            "title": "Chief Complaint",
+            "type": "string"
+          },
+          "communication_style": {
+            "default": "",
+            "title": "Communication Style",
+            "type": "string"
+          },
+          "conditions": {
+            "items": {
+              "$ref": "#/components/schemas/BuilderCondition"
+            },
+            "title": "Conditions",
+            "type": "array"
+          },
+          "description": {
+            "maxLength": 8000,
+            "minLength": 10,
+            "title": "Description",
+            "type": "string"
+          },
+          "difficulty": {
+            "default": "typical",
+            "enum": [
+              "straightforward",
+              "typical",
+              "difficult"
+            ],
+            "title": "Difficulty",
+            "type": "string"
+          },
+          "documentation_template": {
+            "default": "SOAP",
+            "enum": [
+              "PES",
+              "ADIME",
+              "SBAR",
+              "SOAP"
+            ],
+            "title": "Documentation Template",
+            "type": "string"
+          },
+          "goal": {
+            "default": "",
+            "title": "Goal",
+            "type": "string"
+          },
+          "goals_fears": {
+            "default": "",
+            "title": "Goals Fears",
+            "type": "string"
+          },
+          "health_literacy": {
+            "default": "medium",
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ],
+            "title": "Health Literacy",
+            "type": "string"
+          },
+          "hidden": {
+            "default": "",
+            "title": "Hidden",
+            "type": "string"
+          },
+          "medications": {
+            "items": {
+              "$ref": "#/components/schemas/BuilderMedication"
+            },
+            "title": "Medications",
+            "type": "array"
+          },
+          "mood": {
+            "default": "",
+            "title": "Mood",
+            "type": "string"
+          },
+          "name": {
+            "default": "",
+            "title": "Name",
+            "type": "string"
+          },
+          "no_known_allergies": {
+            "default": false,
+            "title": "No Known Allergies",
+            "type": "boolean"
+          },
+          "notes": {
+            "default": "",
+            "maxLength": 8000,
+            "title": "Notes",
+            "type": "string"
+          },
+          "objectives": {
+            "default": "",
+            "title": "Objectives",
+            "type": "string"
+          },
+          "occupation": {
+            "default": "",
+            "title": "Occupation",
+            "type": "string"
+          },
+          "personal_cue": {
+            "default": "",
+            "title": "Personal Cue",
+            "type": "string"
+          },
+          "personality": {
+            "default": "",
+            "title": "Personality",
+            "type": "string"
+          },
+          "pronouns": {
+            "default": "",
+            "title": "Pronouns",
+            "type": "string"
+          },
+          "reason_for_visit": {
+            "default": "",
+            "title": "Reason For Visit",
+            "type": "string"
+          },
+          "setting": {
+            "default": "",
+            "title": "Setting",
+            "type": "string"
+          },
+          "sex": {
+            "default": "other",
+            "enum": [
+              "male",
+              "female",
+              "other"
+            ],
+            "title": "Sex",
+            "type": "string"
+          },
+          "show_doorway_vitals": {
+            "default": true,
+            "title": "Show Doorway Vitals",
+            "type": "boolean"
+          },
+          "social": {
+            "default": "",
+            "title": "Social",
+            "type": "string"
+          },
+          "speaker": {
+            "default": "",
+            "title": "Speaker",
+            "type": "string"
+          },
+          "student_role": {
+            "default": "",
+            "title": "Student Role",
+            "type": "string"
+          },
+          "vitals": {
+            "items": {
+              "$ref": "#/components/schemas/BuilderVital"
+            },
+            "title": "Vitals",
+            "type": "array"
+          }
+        },
+        "required": [
+          "description"
+        ],
+        "title": "BuilderForm",
+        "type": "object"
+      },
+      "BuilderMedication": {
+        "properties": {
+          "dose": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dose"
+          },
+          "frequency": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Frequency"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "purpose": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Purpose"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "BuilderMedication",
+        "type": "object"
+      },
+      "BuilderSuggestRequest": {
+        "properties": {
+          "description": {
+            "maxLength": 8000,
+            "minLength": 10,
+            "title": "Description",
+            "type": "string"
+          },
+          "notes": {
+            "default": "",
+            "maxLength": 8000,
+            "title": "Notes",
+            "type": "string"
+          }
+        },
+        "required": [
+          "description"
+        ],
+        "title": "BuilderSuggestRequest",
+        "type": "object"
+      },
+      "BuilderSuggestResult": {
+        "properties": {
+          "form": {
+            "$ref": "#/components/schemas/BuilderForm"
+          },
+          "llm_calls": {
+            "items": {
+              "$ref": "#/components/schemas/LlmCallRecord"
+            },
+            "title": "Llm Calls",
+            "type": "array"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "used_model": {
+            "title": "Used Model",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "form",
+          "used_model",
+          "llm_calls"
+        ],
+        "title": "BuilderSuggestResult",
+        "type": "object"
+      },
+      "BuilderVital": {
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "source": {
+            "$ref": "#/components/schemas/Source"
+          },
+          "unit": {
+            "default": "",
+            "title": "Unit",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "value"
+        ],
+        "title": "BuilderVital",
+        "type": "object"
+      },
+      "BuilderVitalsRequest": {
+        "properties": {
+          "age": {
+            "maximum": 120.0,
+            "minimum": 0.0,
+            "title": "Age",
+            "type": "integer"
+          },
+          "conditions": {
+            "items": {
+              "$ref": "#/components/schemas/BuilderCondition"
+            },
+            "title": "Conditions",
+            "type": "array"
+          },
+          "description": {
+            "default": "",
+            "title": "Description",
+            "type": "string"
+          },
+          "sex": {
+            "default": "other",
+            "enum": [
+              "male",
+              "female",
+              "other"
+            ],
+            "title": "Sex",
+            "type": "string"
+          }
+        },
+        "required": [
+          "age"
+        ],
+        "title": "BuilderVitalsRequest",
+        "type": "object"
+      },
+      "BuilderVitalsResult": {
+        "properties": {
+          "notes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Notes",
+            "type": "array"
+          },
+          "vitals": {
+            "items": {
+              "$ref": "#/components/schemas/BuilderVital"
+            },
+            "title": "Vitals",
+            "type": "array"
+          }
+        },
+        "required": [
+          "vitals",
+          "notes"
+        ],
+        "title": "BuilderVitalsResult",
+        "type": "object"
+      },
       "Case": {
         "properties": {
           "actions": {
@@ -5943,6 +6385,132 @@
         "summary": "Scribe Token",
         "tags": [
           "encounters"
+        ]
+      }
+    },
+    "/api/studio/builder": {
+      "post": {
+        "description": "Save the finished builder form as one draft case. It opens in Studio for approval and publish.",
+        "operationId": "builder_create_api_studio_builder_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BuilderForm"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudioDraftResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Builder Create",
+        "tags": [
+          "studio"
+        ]
+      }
+    },
+    "/api/studio/builder/suggest": {
+      "post": {
+        "description": "Proposed words for the builder form. Nothing is saved; faculty edit the fields first.",
+        "operationId": "builder_suggest_api_studio_builder_suggest_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BuilderSuggestRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BuilderSuggestResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Builder Suggest",
+        "tags": [
+          "studio"
+        ]
+      }
+    },
+    "/api/studio/builder/vitals": {
+      "post": {
+        "description": "Typical resting vitals from the reference bands and condition rules. Each one names its source.",
+        "operationId": "builder_vitals_api_studio_builder_vitals_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BuilderVitalsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BuilderVitalsResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Builder Vitals",
+        "tags": [
+          "studio"
         ]
       }
     },

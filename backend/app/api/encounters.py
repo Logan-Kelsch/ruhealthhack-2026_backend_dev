@@ -15,6 +15,7 @@ from app.db import get_session
 from app.integrations import elevenlabs
 from app.schemas.feedback import FeedbackResponse
 from app.schemas.http import ScribeToken
+from app.schemas.latency import TurnTimingCapture, TurnTimingSample
 from app.schemas.student import EncounterSummary, PublicCase, PublicEncounter, TurnResult, WordTimestamp
 from app.settings import get_settings
 from app.student_view import public_case
@@ -109,6 +110,18 @@ def add_utterance(enc_id: str, body: Utterance, db: Session = Depends(get_sessio
         body.barge_in_remaining_ms,
         [word.model_dump() for word in body.words],
     )
+
+
+@router.post("/encounters/{enc_id}/turns/{turn}/timings", response_model=TurnTimingSample)
+def record_turn_timing(enc_id: str, turn: int, body: TurnTimingCapture, db: Session = Depends(get_session)) -> TurnTimingSample:
+    """Save client timings for one saved turn. This does not run the pipeline again."""
+    return services.record_timing(db, enc_id, turn, body)
+
+
+@router.get("/encounters/{enc_id}/turns/{turn}/timings", response_model=TurnTimingSample)
+def get_turn_timing(enc_id: str, turn: int, db: Session = Depends(get_session)) -> TurnTimingSample:
+    """The timing sample stored for this turn. A turn with no sample is not filled with zeros."""
+    return services.read_timing(db, enc_id, turn)
 
 
 @router.post("/encounters/{enc_id}/end", response_model=PublicEncounter)

@@ -13,8 +13,10 @@ from app.encounter.pipeline import run_turn
 from app.encounter.visit import resolve_visit
 from app.feedback.debrief import build_debrief
 from app.integrations.bedrock import llm_available
+from app.latency import assemble_sample
 from app.models import CaseRow, EncounterRow, TurnRow
 from app.schemas.case import Case
+from app.schemas.latency import TurnTimingCapture, TurnTimingSample
 from app.schemas.student import EncounterSummary, TurnResult
 from app.student_view import _encounter_status, public_encounter, public_turn
 from app.studio import publish as publish_rules
@@ -225,6 +227,39 @@ def add_utterance(
         mode=out.verifier["mode"],
         latency_ms=out.latency_ms,
     )
+
+
+def _turn_row(db: Session, enc_id: str, turn: int) -> TurnRow:
+    """The saved turn for this encounter. A missing turn is not a new turn."""
+    enc = get_encounter(db, enc_id)
+    row = db.scalars(select(TurnRow).where(TurnRow.encounter_id == enc.id, TurnRow.idx == turn)).first()
+    if row is None:
+        raise NotFound(f"turn {turn} not found")
+    return row
+
+
+def record_timing(db: Session, enc_id: str, turn: int, capture: TurnTimingCapture) -> TurnTimingSample:
+    """Save one timing sample on the turn it describes. Pipeline durations stay as they were."""
+    row = _turn_row(db, enc_id, turn)
+    sample = assemble_sample(
+        encounter_id=row.encounter_id,
+        turn_id=row.idx,
+        capture=capture,
+        latency_ms=row.latency_ms or {},
+        verifier=row.verifier or {},
+    )
+    # Store the public sample. A later read returns this, not a recomputed clock.
+    row.timing_sample = sample.model_dump()
+    db.commit()
+    return sample
+
+
+def read_timing(db: Session, enc_id: str, turn: int) -> TurnTimingSample:
+    """Return the sample saved for this turn. No sample is not a row of zeros."""
+    row = _turn_row(db, enc_id, turn)
+    if not row.timing_sample:
+        raise NotFound(f"no timing sample for turn {turn}")
+    return TurnTimingSample.model_validate(row.timing_sample)
 
 
 def verified_speech(db: Session, enc_id: str, turn: int) -> tuple[str, list[str], str | None]:

@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { createMpegPlayback, verifiedAudioSource, type SpeechSource } from "./speech";
+import { createMpegPlayback, observeFirstAudioByte, verifiedAudioSource, type SpeechSource } from "./speech";
 
 // A browser stand-in. It records play() and accepts the chunks a real buffer would.
 function installMediaSource() {
@@ -179,5 +179,37 @@ test("playback starts on the first chunk and cancellation releases the stream", 
   expect(delayed.cancelled).toBe(true);
   expect(delayed.sentSecond).toBe(false);
   expect(audio.paused).toBe(true);
+  media.restore();
+});
+
+test("first playback is reported when audio starts, after the first bytes were read", async () => {
+  const media = installMediaSource();
+  const audio = fakeAudio();
+  const playback = createMpegPlayback(audio as unknown as HTMLAudioElement);
+  const delayed = delayedStream();
+  let bytes = 0;
+  let playbacksAtPlay = 0;
+
+  const playing = playback.play(
+    observeFirstAudioByte(delayed.source, () => {
+      bytes += 1;
+    }),
+    {
+      onFirstPlayback() {
+        // The player has started. A byte callback alone is not this event.
+        playbacksAtPlay = audio.plays;
+      },
+    },
+  );
+  const started = Date.now();
+  while (audio.plays === 0) {
+    if (Date.now() - started > 500) throw new Error("playback waited for the full response");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  }
+
+  expect(bytes).toBe(1);
+  expect(playbacksAtPlay).toBe(1);
+  playback.stop();
+  await playing;
   media.restore();
 });

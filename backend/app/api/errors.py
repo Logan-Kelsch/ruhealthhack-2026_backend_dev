@@ -38,6 +38,8 @@ SHARED_ERROR_RESPONSES = {
     ("/api/encounters", "post"): {404: "The case or visit was not found.", 409: "The encounter cannot be started."},
     ("/api/encounters/{enc_id}", "get"): {404: "No saved encounter with that id."},
     ("/api/encounters/{enc_id}/utterances", "post"): {404: "No saved encounter with that id.", 409: "The encounter is not accepting a turn."},
+    ("/api/encounters/{enc_id}/turns/{turn}/timings", "post"): {404: "No saved encounter or turn with that id."},
+    ("/api/encounters/{enc_id}/turns/{turn}/timings", "get"): {404: "No saved encounter, turn, or timing sample with that id."},
     ("/api/encounters/{enc_id}/turns/{turn}/speech", "post"): {
         404: "No saved encounter or turn with that id.",
         409: "This reply was not verified and will not be spoken.",

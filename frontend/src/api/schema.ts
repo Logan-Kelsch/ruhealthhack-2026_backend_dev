@@ -192,6 +192,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/encounters/{enc_id}/turns/{turn}/timings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Turn Timing
+         * @description The timing sample stored for this turn. A turn with no sample is not filled with zeros.
+         */
+        get: operations["get_turn_timing_api_encounters__enc_id__turns__turn__timings_get"];
+        put?: never;
+        /**
+         * Record Turn Timing
+         * @description Save client timings for one saved turn. This does not run the pipeline again.
+         */
+        post: operations["record_turn_timing_api_encounters__enc_id__turns__turn__timings_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/encounters/{enc_id}/utterances": {
         parameters: {
             query?: never;
@@ -2203,6 +2227,74 @@ export interface components {
             /** Turn */
             turn: number;
         };
+        /**
+         * TurnTimingCapture
+         * @description Offsets in milliseconds from the committed utterance. Omit a mark that was not observed.
+         */
+        TurnTimingCapture: {
+            /** Error */
+            error?: string | null;
+            /** First Audio Bytes Ms */
+            first_audio_bytes_ms?: number | null;
+            /** First Playback Ms */
+            first_playback_ms?: number | null;
+            /**
+             * Origin
+             * @enum {string}
+             */
+            origin: "live" | "fixture";
+            /** Speech Path */
+            speech_path?: ("vendor" | "browser" | "none") | null;
+            /** Speech Request Ms */
+            speech_request_ms?: number | null;
+            /** Verified Reply Arrival Ms */
+            verified_reply_arrival_ms?: number | null;
+        };
+        /**
+         * TurnTimingSample
+         * @description The saved sample. pipeline_ms is the existing per-step breakdown, unchanged.
+         */
+        TurnTimingSample: {
+            /** Encounter Id */
+            encounter_id: string;
+            /** Error */
+            error?: string | null;
+            /**
+             * Fallback
+             * @default false
+             */
+            fallback: boolean;
+            /** Fallback Kinds */
+            fallback_kinds?: ("template" | "browser_voice")[];
+            /** First Audio Bytes Ms */
+            first_audio_bytes_ms?: number | null;
+            /** First Playback Ms */
+            first_playback_ms?: number | null;
+            /**
+             * Origin
+             * @enum {string}
+             */
+            origin: "live" | "fixture";
+            /** Pipeline Ms */
+            pipeline_ms?: {
+                [key: string]: number;
+            };
+            /**
+             * Retries
+             * @default 0
+             */
+            retries: number;
+            /** Speech Path */
+            speech_path?: ("vendor" | "browser" | "none") | null;
+            /** Speech Request Ms */
+            speech_request_ms?: number | null;
+            /** Turn Id */
+            turn_id: number;
+            /** Unavailable */
+            unavailable?: string[];
+            /** Verified Reply Arrival Ms */
+            verified_reply_arrival_ms?: number | null;
+        };
         /** Unlock */
         Unlock: {
             /** Min Trust */
@@ -2771,6 +2863,92 @@ export interface operations {
             };
             /** @description The speech service failed or returned no audio. */
             503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_turn_timing_api_encounters__enc_id__turns__turn__timings_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                enc_id: string;
+                turn: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TurnTimingSample"];
+                };
+            };
+            /** @description No saved encounter, turn, or timing sample with that id. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    record_turn_timing_api_encounters__enc_id__turns__turn__timings_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                enc_id: string;
+                turn: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TurnTimingCapture"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TurnTimingSample"];
+                };
+            };
+            /** @description No saved encounter or turn with that id. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation error */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };

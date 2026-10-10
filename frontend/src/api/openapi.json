@@ -4001,6 +4001,229 @@
         "title": "TurnResult",
         "type": "object"
       },
+      "TurnTimingCapture": {
+        "description": "Offsets in milliseconds from the committed utterance. Omit a mark that was not observed.",
+        "properties": {
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "first_audio_bytes_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Audio Bytes Ms"
+          },
+          "first_playback_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Playback Ms"
+          },
+          "origin": {
+            "enum": [
+              "live",
+              "fixture"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "speech_path": {
+            "anyOf": [
+              {
+                "enum": [
+                  "vendor",
+                  "browser",
+                  "none"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speech Path"
+          },
+          "speech_request_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speech Request Ms"
+          },
+          "verified_reply_arrival_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verified Reply Arrival Ms"
+          }
+        },
+        "required": [
+          "origin"
+        ],
+        "title": "TurnTimingCapture",
+        "type": "object"
+      },
+      "TurnTimingSample": {
+        "description": "The saved sample. pipeline_ms is the existing per-step breakdown, unchanged.",
+        "properties": {
+          "encounter_id": {
+            "title": "Encounter Id",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "fallback": {
+            "default": false,
+            "title": "Fallback",
+            "type": "boolean"
+          },
+          "fallback_kinds": {
+            "items": {
+              "enum": [
+                "template",
+                "browser_voice"
+              ],
+              "type": "string"
+            },
+            "title": "Fallback Kinds",
+            "type": "array"
+          },
+          "first_audio_bytes_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Audio Bytes Ms"
+          },
+          "first_playback_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Playback Ms"
+          },
+          "origin": {
+            "enum": [
+              "live",
+              "fixture"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "pipeline_ms": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Pipeline Ms",
+            "type": "object"
+          },
+          "retries": {
+            "default": 0,
+            "title": "Retries",
+            "type": "integer"
+          },
+          "speech_path": {
+            "anyOf": [
+              {
+                "enum": [
+                  "vendor",
+                  "browser",
+                  "none"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speech Path"
+          },
+          "speech_request_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speech Request Ms"
+          },
+          "turn_id": {
+            "title": "Turn Id",
+            "type": "integer"
+          },
+          "unavailable": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Unavailable",
+            "type": "array"
+          },
+          "verified_reply_arrival_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verified Reply Arrival Ms"
+          }
+        },
+        "required": [
+          "encounter_id",
+          "turn_id",
+          "origin"
+        ],
+        "title": "TurnTimingSample",
+        "type": "object"
+      },
       "Unlock": {
         "properties": {
           "min_trust": {
@@ -4961,6 +5184,138 @@
           }
         },
         "summary": "Speak Turn",
+        "tags": [
+          "encounters"
+        ]
+      }
+    },
+    "/api/encounters/{enc_id}/turns/{turn}/timings": {
+      "get": {
+        "description": "The timing sample stored for this turn. A turn with no sample is not filled with zeros.",
+        "operationId": "get_turn_timing_api_encounters__enc_id__turns__turn__timings_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "enc_id",
+            "required": true,
+            "schema": {
+              "title": "Enc Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "turn",
+            "required": true,
+            "schema": {
+              "title": "Turn",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TurnTimingSample"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No saved encounter, turn, or timing sample with that id."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Get Turn Timing",
+        "tags": [
+          "encounters"
+        ]
+      },
+      "post": {
+        "description": "Save client timings for one saved turn. This does not run the pipeline again.",
+        "operationId": "record_turn_timing_api_encounters__enc_id__turns__turn__timings_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "enc_id",
+            "required": true,
+            "schema": {
+              "title": "Enc Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "turn",
+            "required": true,
+            "schema": {
+              "title": "Turn",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TurnTimingCapture"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TurnTimingSample"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No saved encounter or turn with that id."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Record Turn Timing",
         "tags": [
           "encounters"
         ]

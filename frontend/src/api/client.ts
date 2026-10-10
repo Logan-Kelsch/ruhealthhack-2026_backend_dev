@@ -7,6 +7,7 @@ export type StudioCaseSummary = components["schemas"]["StudioCaseSummary"];
 export type StudioCaseDetail = components["schemas"]["StudioCaseDetail"];
 export type StudioDraftResult = components["schemas"]["StudioDraftResult"];
 export type IntakeGap = components["schemas"]["IntakeGap"];
+export type VhsImportResponse = components["schemas"]["VhsImportResponse"];
 
 // One error for every failed response, so screens do not each invent a fallback.
 export class ApiError extends Error {

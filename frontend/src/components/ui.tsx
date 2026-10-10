@@ -52,16 +52,16 @@ export function PrimaryButton({
   onClick,
   size = "md",
   block = false,
-  className = "",
   disabled = false,
+  className = "",
   type = "button",
 }: {
   children: ReactNode;
   onClick?: () => void;
   size?: "sm" | "md" | "lg";
   block?: boolean;
-  className?: string;
   disabled?: boolean;
+  className?: string;
   type?: "button" | "submit";
 }) {
   const shape =

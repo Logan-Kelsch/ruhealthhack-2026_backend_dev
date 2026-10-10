@@ -388,7 +388,7 @@ export interface paths {
         put?: never;
         /**
          * Import Vhs
-         * @description Imports the eight sponsor VHS profiles as drafts. Each needs review before publishing.
+         * @description Imports the full sponsor sample set as drafts. Each saved case stays in review until faculty approve it.
          */
         post: operations["import_vhs_api_studio_import_vhs_post"];
         delete?: never;
@@ -1259,6 +1259,16 @@ export interface components {
             /** Low */
             low: number;
         };
+        /**
+         * VhsImportResponse
+         * @description Drafts saved from the bundled sponsor sample set. count is how many drafts were saved.
+         */
+        VhsImportResponse: {
+            /** Cases */
+            cases: components["schemas"]["StudioCaseSummary"][];
+            /** Count */
+            count: number;
+        };
         /** Visit */
         Visit: {
             /** Branches */
@@ -2118,9 +2128,16 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    }[];
+                    "application/json": components["schemas"]["VhsImportResponse"];
+                };
+            };
+            /** @description The sponsor sample set could not be imported. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
         };

@@ -1,90 +1,150 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { asApiError, api, type ApiClient, type StudioCaseSummary } from "../../api/client";
 import type { Go } from "../../app/types";
-import { Avatar } from "../../components/Avatar";
-import { Badge, BackLink, Page, PrimaryButton, Title } from "../../components/ui";
-import { SAMPLE_PATIENTS } from "../../mock/faculty";
+import { Badge, BackLink, GhostButton, Page, PrimaryButton, Title } from "../../components/ui";
 
-// Sample-patient importer. Selecting a name shows the consistency notes for that profile.
-export function ImportPatients({ go }: { go: Go }) {
-  const [selected, setSelected] = useState("Walter Greene");
-  const patient = SAMPLE_PATIENTS.find((item) => item.name === selected) ?? SAMPLE_PATIENTS[0];
-  const flagCount = patient.flags.length;
+type ImportState =
+  | { kind: "ready" }
+  | { kind: "importing" }
+  | { kind: "done"; count: number; cases: StudioCaseSummary[] }
+  | { kind: "error"; message: string };
+
+// Faculty import the bundled sponsor sample set. One request creates every draft.
+export function ImportPatients({ go, client = api }: { go: Go; client?: ApiClient }) {
+  const [state, setState] = useState<ImportState>({ kind: "ready" });
+  // Blocks a second click while the first request is still out. A retry of an uncertain import would duplicate drafts.
+  const inFlight = useRef(false);
 
   return (
     <Page>
       <header>
         <BackLink label="Cases" onClick={() => go("f-cases")} />
         <div className="mt-2.5">
-          <Title>Import sample patients</Title>
+          <Title>Import sample set</Title>
         </div>
         <p className="mt-2 max-w-[620px] text-[15px] text-ink-soft">
-          Ready-made profiles you can open in Studio. We check each one for inconsistencies before you publish.
+          This imports the full sponsor sample set as drafts. Each case needs faculty review before it can be published.
         </p>
       </header>
 
-      <div className="flex flex-wrap items-start gap-4">
-        <section className="max-w-[380px] min-w-[280px] flex-1 overflow-hidden rounded-2xl border border-line bg-card">
-          <div className="border-b border-hair-2 px-5 py-3.5 text-[13px] text-muted">8 patients</div>
-          {SAMPLE_PATIENTS.map((item) => {
-            const on = item.name === selected;
-            const count = item.flags.length;
-            return (
-              <button
-                key={item.name}
-                type="button"
-                onClick={() => setSelected(item.name)}
-                className={`grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-t border-hair px-5 py-3 text-left first:border-t-0 hover:bg-raised ${on ? "bg-indigo-soft shadow-[inset_3px_0_0_var(--color-indigo)]" : "bg-card"}`}
-              >
-                <span className={`text-[14.5px] ${on ? "font-semibold" : "font-medium"}`}>
-                  {item.name} <span className="font-normal text-muted">{item.age}</span>
-                </span>
-                <Badge tone={count ? "warn" : "neutral"}>{count ? `${count} to review` : "Ready"}</Badge>
-              </button>
-            );
-          })}
-        </section>
-
-        <section className="min-w-0 flex-[2] overflow-hidden rounded-2xl border border-line bg-card">
-          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-hair-2 px-6 py-5">
-            <div className="flex items-center gap-3.5">
-              <Avatar who={patient.name === "Walter Greene" ? "walter" : "generic"} size={48} />
-              <div>
-                <div className="font-serif text-[26px] leading-tight font-medium tracking-[-0.4px]">
-                  {patient.name}, {patient.age}
-                </div>
-                <div className="mt-0.5 text-[13.5px] text-ink-soft">{patient.summary}</div>
-              </div>
-            </div>
-            <PrimaryButton onClick={() => go("f-studio", { studioTab: "patient" })}>Open in Studio</PrimaryButton>
+      <section className="overflow-hidden rounded-2xl border border-line bg-card" aria-live="polite">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-hair-2 px-6 py-5">
+          <div>
+            <div className="text-[15px] font-semibold">Sponsor sample set</div>
+            <p className="mt-1 max-w-[520px] text-[13.5px] text-ink-soft">{statusLine(state)}</p>
           </div>
-          <div className="flex flex-col gap-3 px-6 py-5">
-            <div className="flex items-center justify-between">
-              <span className="text-[15px] font-semibold">Worth reviewing</span>
-              <span className="text-[13px] text-muted">
-                {flagCount ? `${flagCount} ${flagCount === 1 ? "issue" : "issues"}` : "All clear"}
-              </span>
-            </div>
-            {flagCount > 0 ? (
-              <div className="flex flex-col overflow-hidden rounded-xl border border-warn-line">
-                {patient.flags.map((flag) => (
-                  <div key={flag} className="grid grid-cols-[28px_minmax(0,1fr)_auto] items-center gap-3 border-t border-warn-line-soft bg-warn-wash px-4 py-3 first:border-t-0">
-                    <span className="flex size-7 items-center justify-center rounded-full bg-warn-pill text-sm font-bold text-warn">!</span>
-                    <span className="text-[14.5px]">{flag}</span>
-                    <span className="text-[12.5px] font-medium text-warn">Fix in Studio</span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="flex items-center gap-3 rounded-xl bg-ok-wash px-4 py-3.5 text-[14.5px] text-ok">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                  <path d="M5 12.5l4.5 4.5L19 7.5" />
-                </svg>
-                No inconsistencies found.
-              </div>
-            )}
-          </div>
-        </section>
-      </div>
+          <ImportAction state={state} onImport={() => void importSampleSet(client, inFlight, setState)} />
+        </div>
+        <ImportResult state={state} onViewCases={() => go("f-cases")} />
+      </section>
     </Page>
   );
+}
+
+// Sends the bulk import once. A failure stays on screen and does not start another request.
+async function importSampleSet(
+  client: ApiClient,
+  inFlight: { current: boolean },
+  setState: (state: ImportState) => void,
+) {
+  if (inFlight.current) return;
+  inFlight.current = true;
+  setState({ kind: "importing" });
+  try {
+    const result = await client.POST("/api/studio/import/vhs");
+    if (!result.response?.ok || result.data == null) {
+      const status = result.response?.status ?? 0;
+      setState({ kind: "error", message: asApiError(status, result.error).message });
+      return;
+    }
+    setState({ kind: "done", count: result.data.count, cases: result.data.cases });
+  } catch {
+    // The request may have reached the server. Do not send it again from here.
+    setState({ kind: "error", message: "The sample set could not be imported." });
+  } finally {
+    inFlight.current = false;
+  }
+}
+
+// The button for the current step. Import stays disabled while the request is running.
+function ImportAction({ state, onImport }: { state: ImportState; onImport: () => void }) {
+  switch (state.kind) {
+    case "done":
+      return null;
+    case "error":
+      return <GhostButton onClick={onImport}>Try again</GhostButton>;
+    case "ready":
+    case "importing":
+      return (
+        <PrimaryButton onClick={onImport} disabled={state.kind === "importing"}>
+          Import sample set
+        </PrimaryButton>
+      );
+    default: {
+      const unreachable: never = state;
+      return unreachable;
+    }
+  }
+}
+
+// The short line under the heading. It names the step without inventing a result count.
+function statusLine(state: ImportState): string {
+  switch (state.kind) {
+    case "ready":
+      return "Every profile in the sample set is saved together.";
+    case "importing":
+      return "Importing the sample set.";
+    case "done":
+      return "These drafts came back from the import. Open Cases to see the saved records.";
+    case "error":
+      return "The import did not finish.";
+    default: {
+      const unreachable: never = state;
+      return unreachable;
+    }
+  }
+}
+
+// Returned drafts, or the error. Nothing here is filled in from sample fixtures.
+function ImportResult({ state, onViewCases }: { state: ImportState; onViewCases: () => void }) {
+  switch (state.kind) {
+    case "done": {
+      const noun = state.count === 1 ? "case" : "cases";
+      return (
+        <div className="flex flex-col gap-3 px-6 py-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <div className="text-[15px] font-semibold">
+                Imported {state.count} {noun}
+              </div>
+              <div className="mt-0.5 text-[13px] text-muted">Needs faculty review</div>
+            </div>
+            <GhostButton onClick={onViewCases}>View cases</GhostButton>
+          </div>
+          <div className="overflow-hidden rounded-xl border border-line">
+            {state.cases.map((row) => (
+              <div
+                key={row.case_id}
+                className="flex items-center justify-between gap-3 border-t border-hair px-4 py-3 first:border-t-0"
+              >
+                <span className="text-[14.5px] font-medium">{row.patient}</span>
+                <Badge tone="warn" dot>
+                  Draft
+                </Badge>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+    case "error":
+      return <p className="px-6 py-5 text-[14.5px] text-ink">{state.message}</p>;
+    case "ready":
+    case "importing":
+      return null;
+    default: {
+      const unreachable: never = state;
+      return unreachable;
+    }
+  }
 }

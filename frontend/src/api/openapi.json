@@ -2019,6 +2019,28 @@
         "title": "ValueRange",
         "type": "object"
       },
+      "VhsImportResponse": {
+        "description": "Drafts saved from the bundled sponsor sample set. count is how many drafts were saved.",
+        "properties": {
+          "cases": {
+            "items": {
+              "$ref": "#/components/schemas/StudioCaseSummary"
+            },
+            "title": "Cases",
+            "type": "array"
+          },
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "count",
+          "cases"
+        ],
+        "title": "VhsImportResponse",
+        "type": "object"
+      },
       "Visit": {
         "properties": {
           "branches": {
@@ -3269,23 +3291,28 @@
     },
     "/api/studio/import/vhs": {
       "post": {
-        "description": "Imports the eight sponsor VHS profiles as drafts. Each needs review before publishing.",
+        "description": "Imports the full sponsor sample set as drafts. Each saved case stays in review until faculty approve it.",
         "operationId": "import_vhs_api_studio_import_vhs_post",
         "responses": {
           "201": {
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {
-                    "additionalProperties": true,
-                    "type": "object"
-                  },
-                  "title": "Response Import Vhs Api Studio Import Vhs Post",
-                  "type": "array"
+                  "$ref": "#/components/schemas/VhsImportResponse"
                 }
               }
             },
             "description": "Successful Response"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "The sponsor sample set could not be imported."
           }
         },
         "summary": "Import Vhs",

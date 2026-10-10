@@ -80,6 +80,13 @@ class StudioDraftResult(BaseModel):
     llm_calls: list[LlmCallRecord]
 
 
+class VhsImportResponse(BaseModel):
+    """Drafts saved from the bundled sponsor sample set. count is how many drafts were saved."""
+
+    count: int
+    cases: list[StudioCaseSummary]
+
+
 class ErrorItem(BaseModel):
     """One validation problem. loc is the same path FastAPI already reported, such as ["body", "description"]."""
 

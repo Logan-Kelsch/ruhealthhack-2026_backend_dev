@@ -1,5 +1,5 @@
 // Prototype fixtures for faculty screens that are not on the API yet.
-// The Case Library does not use these. It loads saved cases.
+// The Case Library and the sample-set import do not use these.
 
 export const FACULTY_STATS: { label: string; value: string; note: string; accent: "none" | "danger" }[] = [
   { label: "Needs your review", value: "3", note: "visits flagged", accent: "danger" },
@@ -27,32 +27,4 @@ export const REVIEW_QUEUE: { initials: string; who: string; caseName: string; wh
 export const ASSIGNMENTS: { name: string; done: string; pct: string; due: string }[] = [
   { name: "Walter Greene · Dietetics cohort A", done: "18/24", pct: "75%", due: "Oct 17" },
   { name: "Alina Reyes · Medicine year 3", done: "10/24", pct: "42%", due: "Oct 24" },
-];
-
-export type SamplePatient = {
-  name: string;
-  age: number;
-  summary: string;
-  flags: string[];
-};
-
-export const SAMPLE_PATIENTS: SamplePatient[] = [
-  { name: "Dominic Rivera", age: 22, summary: "College athlete with low energy during training season.", flags: [] },
-  { name: "Yvette Armstrong", age: 64, summary: "Newly diagnosed celiac disease, lives with her daughter.", flags: ["Gluten-free diet started before biopsy date"] },
-  { name: "Nisha Patel", age: 29, summary: "Gestational diabetes at 28 weeks, vegetarian.", flags: [] },
-  { name: "Omar Sinclair", age: 45, summary: "Six months after bariatric surgery. Protein and supplements.", flags: ["B12 listed twice with different doses"] },
-  { name: "Marcus Ramirez", age: 59, summary: "COPD with unintended weight loss.", flags: [] },
-  {
-    name: "Walter Greene",
-    age: 72,
-    summary: "Heart failure, kidney disease and type 2 diabetes.",
-    flags: [
-      "Notes say high sodium, but the lab shows Na 136",
-      "Widowed, but one line mentions his kids",
-      "Unknown drug name: Epirocil",
-      "Weight change described two different ways",
-    ],
-  },
-  { name: "Wyatt Nelson", age: 18, summary: "Type 1 diabetes, moving out for college.", flags: [] },
-  { name: "Vladko Bareche", age: 31, summary: "Crohn’s disease flare, low-residue diet questions.", flags: [] },
 ];

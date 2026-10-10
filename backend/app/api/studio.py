@@ -6,6 +6,7 @@ from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app import catalogs, services
@@ -20,6 +21,7 @@ from app.schemas.http import (
     StudioCaseDetail,
     StudioCaseSummary,
     StudioDraftResult,
+    VhsImportResponse,
 )
 from app.studio import consistency, drafting, intake, preview, publish, vhs_import
 from app.studio.autofill import autofill_labs, autofill_vitals
@@ -221,10 +223,24 @@ def publish_case(case_id: str, db: Session = Depends(get_session)) -> dict:
     return _full(row)
 
 
-@router.post("/import/vhs", status_code=201)
-def import_vhs(db: Session = Depends(get_session)) -> list[dict]:
-    """Imports the eight sponsor VHS profiles as drafts. Each needs review before publishing."""
-    return [_summary(services.create_case(db, c)) for c in vhs_import.import_all()]
+@router.post("/import/vhs", status_code=201, response_model=VhsImportResponse)
+def import_vhs(db: Session = Depends(get_session)) -> VhsImportResponse:
+    """Imports the full sponsor sample set as drafts. Each saved case stays in review until faculty approve it."""
+    # The sample file is the whole set. This route does not take a profile id or an upload.
+    try:
+        drafted = vhs_import.import_all()
+    except vhs_import.VhsImportError as exc:
+        # A failed read is not a completed import. Nothing has been saved yet.
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+    try:
+        # One commit for the set. A failure here rolls back, so a partial import is not saved.
+        rows = [services.create_case(db, case, commit=False) for case in drafted]
+        db.commit()
+    except SQLAlchemyError as exc:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="The sponsor sample set could not be imported.") from exc
+    saved = [_summary(row) for row in rows]
+    return VhsImportResponse(count=len(saved), cases=saved)
 
 
 @router.get("/lookup/icd10")

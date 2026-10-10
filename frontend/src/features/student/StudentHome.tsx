@@ -1,67 +1,82 @@
+import type { ReactNode } from "react";
 import type { Go } from "../../app/types";
 import { Avatar } from "../../components/Avatar";
-import { ArrowRight, Chevron } from "../../components/Icons";
-import { Badge, Card, CardHead, Page, PrimaryButton, Title } from "../../components/ui";
+import { Chevron } from "../../components/Icons";
+import { BuildTag, Card, CardHead, Page, Title } from "../../components/ui";
 import { RECENT_FEEDBACK, STUDENT_VISITS, UP_NEXT } from "../../mock/student";
 
 // Student landing. The next assigned visit is Walter Greene.
 export function StudentHome({ go }: { go: Go }) {
   return (
-    <Page width="max-w-[1100px]">
-      <Title kicker="Friday, October 10">Good afternoon, Jordan</Title>
-      <section className="overflow-hidden rounded-[20px] border border-line bg-card">
-        <div className="flex items-center gap-2 bg-panel px-6 py-3 text-[12.5px] font-semibold tracking-[0.3px] text-white">
-          <span className="size-1.5 rounded-full bg-[#8fb0ff]" />
-          {UP_NEXT.banner}
+    <Page>
+      <Title>Good afternoon, Jordan</Title>
+
+      <section className="overflow-hidden rounded-[14px] border border-line bg-card shadow-[0_10px_30px_-24px_rgba(25,31,92,.35)]">
+        <div className="bg-banner flex items-center justify-between gap-4 px-8 py-4">
+          <span className="rounded-full bg-white/80 px-4 py-1.5 font-serif text-[17px] text-[#141a55] backdrop-blur-sm">{UP_NEXT.banner}</span>
+          <BuildTag kind="planned" feature="D-01 assignments" className="bg-white/85" />
         </div>
-        <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-6 p-6">
-          <Avatar who={UP_NEXT.who} size={96} />
+        <div className="grid items-center gap-x-8 gap-y-5 px-8 py-7 [grid-template-columns:auto_minmax(0,1fr)_auto] max-md:grid-cols-1">
+          <Avatar who={UP_NEXT.who} size={128} />
           <div className="min-w-0">
-            <div className="font-serif text-[32px] leading-tight font-medium tracking-[-0.6px]">{UP_NEXT.name}</div>
-            <div className="mt-1.5 text-[15px] text-ink-soft">{UP_NEXT.summary}</div>
-            <div className="mt-3 flex flex-wrap gap-1.5">
+            <div className="font-serif text-[clamp(32px,3vw,46px)] leading-none tracking-[-1px]">{UP_NEXT.name}</div>
+            <div className="mt-3 font-serif text-[21px] text-ink-soft">{UP_NEXT.summary}</div>
+            <div className="mt-4 flex flex-wrap gap-2">
               {UP_NEXT.chips.map((chip) => (
-                <Badge key={chip}>{chip}</Badge>
+                <span key={chip} className="inline-flex h-10 items-center rounded-full bg-indigo-soft px-4 font-serif text-[17px]">
+                  {chip}
+                </span>
               ))}
             </div>
           </div>
-          <PrimaryButton size="lg" onClick={() => go("s-brief", { visit: 1 })}>
-            Begin visit
-            <ArrowRight />
-          </PrimaryButton>
+          <button
+            type="button"
+            onClick={() => go("s-brief", { visit: 1 })}
+            className="h-[60px] rounded-xl bg-bright px-10 font-serif text-[24px] text-white shadow-[0_14px_30px_-16px_rgba(74,95,217,.9)] hover:bg-indigo"
+          >
+            Begin visit →
+          </button>
         </div>
       </section>
 
-      <div className="grid items-start gap-4 [grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr))]">
+      <div className="grid items-start gap-5 [grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr))]">
         <Card>
-          <CardHead title="Assigned" />
-          {STUDENT_VISITS.map((item) => (
-            <div key={item.name} className="grid grid-cols-[36px_minmax(0,1fr)_auto] items-center gap-3 border-t border-hair px-5 py-3 first:border-t-0">
-              <Avatar who={item.who} size={36} />
-              <div>
-                <div className="text-[14.5px] font-semibold">{item.name}</div>
-                <div className="mt-0.5 text-[12.5px] text-muted">{item.meta}</div>
+          <CardHead title="Assigned" underline={false} aside={<Count>{STUDENT_VISITS.length} visits</Count>} />
+          <div className="px-6 pb-3">
+            {STUDENT_VISITS.map((item) => (
+              <div key={item.name} className="grid grid-cols-[56px_minmax(0,1fr)_auto] items-center gap-4 border-t border-hair-2 py-3.5">
+                <Avatar who={item.who} size={56} />
+                <div>
+                  <div className="font-serif text-[22px] leading-tight">{item.name}</div>
+                  <div className="mt-0.5 font-serif text-[16px] text-ink-soft">{item.meta}</div>
+                </div>
+                <span className="font-serif text-[17px] text-ink-soft">Due {item.due}</span>
               </div>
-              <span className="text-[12.5px] text-ink-soft">{item.due}</span>
-            </div>
-          ))}
+            ))}
+          </div>
         </Card>
         <Card>
-          <CardHead title="Recent feedback" />
-          <button
-            type="button"
-            onClick={() => go("s-debrief", { visit: 1 })}
-            className="grid w-full grid-cols-[minmax(0,1fr)_auto_16px] items-center gap-3 border-t border-hair px-5 py-3.5 text-left first:border-t-0 hover:bg-raised"
-          >
-            <div>
-              <div className="text-[14.5px] font-semibold">{RECENT_FEEDBACK.who}</div>
-              <div className="mt-0.5 text-[13px] text-ink-soft">{RECENT_FEEDBACK.next}</div>
-            </div>
-            <span className="text-[13px] font-semibold tabular-nums">{RECENT_FEEDBACK.score}</span>
-            <Chevron />
-          </button>
+          <CardHead title="Recent feedback" underline={false} aside={<BuildTag kind="sample" feature="F-05" />} />
+          <div className="px-6 pb-3">
+            <button
+              type="button"
+              onClick={() => go("s-debrief", { visit: 1 })}
+              className="grid w-full grid-cols-[minmax(0,1fr)_auto_20px] items-center gap-4 border-t border-hair-2 py-4 text-left hover:bg-raised"
+            >
+              <div>
+                <div className="font-serif text-[22px] leading-tight">{RECENT_FEEDBACK.who}</div>
+                <div className="mt-1 font-serif text-[17px] text-indigo">{RECENT_FEEDBACK.next}</div>
+              </div>
+              <span className="font-serif text-[18px] tabular-nums">{RECENT_FEEDBACK.score.replace("/", " of ")}</span>
+              <Chevron className="text-ink-soft" />
+            </button>
+          </div>
         </Card>
       </div>
     </Page>
   );
+}
+
+function Count({ children }: { children: ReactNode }) {
+  return <span className="font-serif text-[18px] whitespace-nowrap">{children}</span>;
 }

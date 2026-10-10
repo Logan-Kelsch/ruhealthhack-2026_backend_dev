@@ -10,6 +10,8 @@ export const DEBRIEF_TRANSCRIPT: [string, string, string][] = [
   ["00:20", "Walter", "You look like a kid."],
   ["01:02", "You", "What do you enjoy about dinner club?"],
   ["01:09", "Walter", "Seeing the guys. We do the diner Tuesdays and Fridays."],
+  ["02:15", "You", "Your sodium load is driving fluid retention."],
+  ["02:21", "Walter", "I don't know what that means."],
   ["03:40", "You", "Are you taking anything for pain right now?"],
   ["03:44", "Walter", "Advil for my back, a couple times a week."],
 ];
@@ -28,9 +30,17 @@ export const DEBRIEF_IMPROVEMENTS = [
   "Ask about money for groceries",
 ];
 
-export const DEBRIEF_SAFETY_CHECK = "Ibuprofen risk found and explained";
+export const DEBRIEF_SAFETY_CHECK = "Ibuprofen with heart failure and kidney disease: found and explained";
 
 export const DEBRIEF_NOTE_CHECK = {
-  title: "1 claim never said in the visit",
-  quote: "“Eats breakfast daily”",
+  title: "1 claim in your note was never said in the visit:",
+  quote: "eats breakfast daily",
 };
+
+// Trust events for the timeline tab (PRD F-04). Each change quotes the span that caused it.
+export const DEBRIEF_TRUST: { time: string; seconds: number; change: number; label: string; quote: string }[] = [
+  { time: "00:11", seconds: 11, change: 1, label: "Open question about his goals", quote: "What would you like to get out of today?" },
+  { time: "01:02", seconds: 62, change: 1, label: "Personal cue followed up", quote: "What do you enjoy about dinner club?" },
+  { time: "02:15", seconds: 135, change: -1, label: "Jargon without explanation", quote: "Your sodium load is driving fluid retention." },
+  { time: "03:40", seconds: 220, change: 1, label: "Asked about over-the-counter medicine", quote: "Are you taking anything for pain right now?" },
+];

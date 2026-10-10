@@ -1,113 +1,67 @@
-import { useState } from "react";
 import type { Go } from "../../app/types";
 import { Avatar } from "../../components/Avatar";
-import { Chevron, PlusIcon } from "../../components/Icons";
-import { Badge, Card, GhostButton, Page, PageHeader, PrimaryButton } from "../../components/ui";
+import { PlusIcon } from "../../components/Icons";
+import { BuildTag, GhostButton, Page, PageHeader, SoftButton } from "../../components/ui";
 import { CASE_ROWS } from "../../mock/faculty";
 
-const FILTERS = ["All", "Published", "Draft"] as const;
-type Filter = (typeof FILTERS)[number];
-
-// Faculty case list with a status filter. A draft opens the decision-tree tab in Studio.
+// Faculty case library as cards. A draft opens the decision-tree tab in Studio.
 export function CaseLibrary({ go }: { go: Go }) {
-  const [filter, setFilter] = useState<Filter>("All");
-  const rows = CASE_ROWS.filter((row) => filter === "All" || row.status === filter);
-
   return (
     <Page>
-      <PageHeader kicker="4 cases · 3 published" title="Cases">
-        <div className="flex gap-2">
-          <GhostButton onClick={() => go("f-import")}>
-            <DownloadIcon />
+      <PageHeader title="Cases">
+        <div className="flex flex-wrap items-center gap-4">
+          <BuildTag kind="sample" feature="S-15" />
+          <SoftButton size="lg" onClick={() => go("f-studio", { studioTab: "patient" })} className="shadow-[0_10px_24px_-16px_rgba(74,95,217,.7)]">
+            <PlusIcon size={20} />
+            New case
+          </SoftButton>
+          <GhostButton onClick={() => go("f-import")} className="h-14 rounded-xl px-7 text-[20px]">
+            <UploadIcon />
             Import sample patients
           </GhostButton>
-          <PrimaryButton onClick={() => go("f-studio", { studioTab: "patient" })}>
-            <PlusIcon />
-            New case
-          </PrimaryButton>
         </div>
       </PageHeader>
 
-      <Card>
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-hair-2 px-3.5 py-3">
-          <label className="flex h-9 max-w-[340px] min-w-[240px] flex-1 items-center gap-2 rounded-[9px] bg-wash px-3 text-muted">
-            <SearchIcon />
-            <input placeholder="Search cases" className="min-w-0 flex-1 bg-transparent text-sm text-ink outline-none" />
-          </label>
-          <div className="flex rounded-[9px] bg-segment p-[3px]">
-            {FILTERS.map((label) => {
-              const on = filter === label;
-              return (
-                <button
-                  key={label}
-                  type="button"
-                  onClick={() => setFilter(label)}
-                  className={`flex h-[30px] items-center rounded-[7px] px-3.5 text-[13px] font-medium ${on ? "bg-card text-ink shadow-[0_1px_2px_rgba(20,27,77,.12)]" : "text-muted"}`}
-                >
-                  {label}
+      <div className="grid gap-5 [grid-template-columns:repeat(auto-fill,minmax(min(100%,400px),1fr))]">
+        {CASE_ROWS.map((row) => {
+          const draft = row.status === "Draft";
+          const open = () => go("f-studio", { studioTab: draft ? "tree" : "patient" });
+          return (
+            <article
+              key={row.name}
+              className="flex flex-col rounded-[14px] border border-line bg-card px-6 pt-6 pb-5 shadow-[0_10px_30px_-24px_rgba(25,31,92,.35)] transition-shadow hover:shadow-[0_18px_40px_-24px_rgba(25,31,92,.45)]"
+            >
+              <div className="flex items-center gap-6 pb-6">
+                <Avatar who={row.who} size={128} />
+                <div className="min-w-0">
+                  <div className="font-serif text-[clamp(24px,2vw,32px)] leading-tight tracking-[-0.5px]">{row.name}</div>
+                  <div className="mt-1.5 font-serif text-[19px] text-ink-soft">{row.learner}</div>
+                  <div className="mt-2 font-serif text-[18px] text-ink-soft">
+                    {row.visits} {row.visits === 1 ? "visit" : "visits"} <span className="px-1.5 text-faint">·</span>
+                    <span className={draft ? "text-warn" : ""}>{row.status}</span>
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center justify-between border-t border-hair-2 pt-4">
+                <span className={`inline-flex h-10 items-center rounded-full px-5 font-serif text-[18px] ${draft ? "bg-warn-soft text-warn-deep" : "bg-indigo-soft text-ink"}`}>
+                  {draft ? "Branching" : row.tag}
+                </span>
+                <button type="button" onClick={open} className="font-serif text-[19px] text-indigo underline underline-offset-4 hover:text-ink">
+                  Edit
                 </button>
-              );
-            })}
-          </div>
-        </div>
-        <div className="overflow-x-auto">
-          <div className="min-w-[760px]">
-            <div className="grid grid-cols-[minmax(220px,2fr)_minmax(160px,1.4fr)_80px_110px_110px_20px] gap-4 bg-raised px-5 py-2.5 text-xs font-semibold tracking-[0.4px] text-muted uppercase">
-              <span>Patient</span>
-              <span>Learner</span>
-              <span>Visits</span>
-              <span>Status</span>
-              <span>Updated</span>
-              <span />
-            </div>
-            {rows.map((row) => {
-              const draft = row.status === "Draft";
-              return (
-                <button
-                  key={row.name}
-                  type="button"
-                  onClick={() => go("f-studio", { studioTab: draft ? "tree" : "patient" })}
-                  className="grid w-full grid-cols-[minmax(220px,2fr)_minmax(160px,1.4fr)_80px_110px_110px_20px] items-center gap-4 border-t border-hair px-5 py-3.5 text-left text-sm hover:bg-raised"
-                >
-                  <span className="flex min-w-0 items-center gap-3">
-                    <Avatar who={row.who} size={40} />
-                    <span className="min-w-0">
-                      <span className="block text-[15px] font-semibold">{row.name}</span>
-                      <span className="mt-0.5 block text-[12.5px] text-muted">{row.tag}</span>
-                    </span>
-                  </span>
-                  <span className="text-ink-soft">{row.learner}</span>
-                  <span className="tabular-nums">{row.visits}</span>
-                  <span>
-                    <Badge tone={draft ? "warn" : "ok"} dot>
-                      {row.status}
-                    </Badge>
-                  </span>
-                  <span className="text-[13px] text-muted">{row.updated}</span>
-                  <Chevron />
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </Card>
+              </div>
+            </article>
+          );
+        })}
+      </div>
     </Page>
   );
 }
 
-function SearchIcon() {
+function UploadIcon() {
   return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-      <circle cx="11" cy="11" r="7" />
-      <path d="M20 20l-4-4" />
-    </svg>
-  );
-}
-
-function DownloadIcon() {
-  return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <path d="M12 15V3M7 8l5-5 5 5M5 13v7h14v-7" />
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M12 15V3.5M7.5 8L12 3.5 16.5 8M5 12.5V20h14v-7.5" />
     </svg>
   );
 }

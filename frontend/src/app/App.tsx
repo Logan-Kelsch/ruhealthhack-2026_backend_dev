@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Go, GoOpts, ScreenId, StudioTab, VisitNumber } from "./types";
 import { screenFromHash } from "./types";
+import { ModeTransitionProvider } from "../components/ModeTransition";
 import { Shell } from "../components/Shell";
 import { Welcome } from "../features/welcome/Welcome";
 import { FacultyHome } from "../features/faculty/FacultyHome";
@@ -41,11 +42,18 @@ export function App() {
   }, []);
 
   const body = renderScreen(screen, go, visit, studioTab);
-  if (screen === "welcome") return body;
+  // The welcome screen and the encounter paint their own full-window watercolor.
+  const bare = screen === "welcome" || screen === "s-encounter";
   return (
-    <Shell screen={screen} go={go}>
-      {body}
-    </Shell>
+    <ModeTransitionProvider>
+      {bare ? (
+        body
+      ) : (
+        <Shell screen={screen} go={go}>
+          {body}
+        </Shell>
+      )}
+    </ModeTransitionProvider>
   );
 }
 

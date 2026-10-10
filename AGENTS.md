@@ -51,7 +51,8 @@ Working product name is **Rounds** (may change); keep writing `[Product name]` i
 
 ### Secrets and accounts
 13. **No secrets, account IDs, emails or keys in the repo, in commits or in chat.** Keys go in `.env` (git-ignored), with names listed in `.env.example`.
-14. **Never log in to accounts or enter credentials on someone's behalf.** Each person uses their own IAM user; root is never shared.
+    - The team shares one `.env` directly (not through the repo). The same file is stored as the GitHub secret `APP_ENV`, which CI copies to the server (see `infra/README.md`).
+14. **Never log in to accounts or enter credentials on someone's behalf.** Root is never shared. For local development the team shares one IAM key, limited to the app's own permissions (`AppPermissions` in `infra/cloudformation/app.yaml`), so a new teammate only needs the shared `.env`. Account admin work (deploying stacks, creating keys) uses each person's own IAM user.
 15. **AWS region and resource names come from config** (one settings module plus `.env`). Model IDs come from config, never hard-coded.
 16. Keep costs low: small instances, no always-on extras, and tear down after the event. A budget alert exists on the account.
 
@@ -67,7 +68,7 @@ Working product name is **Rounds** (may change); keep writing `[Product name]` i
 
 ### Style
 - **Modular, not over-engineered.** One module per responsibility (see the PRD §13 layout).
-  - No microservices, Redis, Cognito, vector databases or Kubernetes.
+  - No microservices, Redis, vector databases or Kubernetes. Cognito is used for sign-in only (see `infra/README.md`).
   - Add a dependency only when it removes real work, and say why in the pull request.
 - **The case is one JSON document** validated by Pydantic (`backend/app/schemas/case.py`) and stored in a JSONB column. Change the schema there first, then migrations, then generated types.
 - **Generated API types:** the frontend uses types generated from FastAPI's OpenAPI schema (`openapi-typescript`). Don't hand-write API types; regenerate after backend changes.

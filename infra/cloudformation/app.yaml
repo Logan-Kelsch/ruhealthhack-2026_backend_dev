@@ -1,0 +1,189 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >-
+  [Product name] backend compute (PRD P-04), stack 5 of 5. One small EC2 instance for FastAPI,
+  the application permissions (Bedrock, media bucket, Cognito users) shared by the instance role
+  and a laptop IAM user, and the Elastic IP association. Needs the network, data and auth stacks.
+
+Metadata:
+  AWSToolsMetrics:
+    AWSAgentToolkit: aws-cloudformation@3
+  com.aws.cloudformation.Context:
+    why: >-
+      Last in the chain so it can be replaced freely; the Elastic IP lives in the network stack,
+      so a new instance keeps the same CloudFront origin.
+    must:
+      - No secrets in the template; runtime keys come from the shared .env (GitHub secret APP_ENV).
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label: { default: Compute }
+        Parameters: [InstanceType, AmiId, KeyName]
+
+Parameters:
+  Prefix:
+    Type: String
+    Default: rounds-dev
+    AllowedPattern: '^[a-z][a-z0-9-]{1,30}$'
+    Description: Shared name prefix; must match the network stack.
+  InstanceType:
+    Type: String
+    Default: t3.small
+    AllowedValues: [t3.micro, t3.small, t3.medium]
+    Description: Backend instance size. The heavy work runs in Bedrock and ElevenLabs, so small is enough.
+  AmiId:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64
+    Description: Amazon Linux 2023 x86_64 (matches t3).
+  KeyName:
+    Type: String
+    Default: ""
+    Description: Optional EC2 key pair name for SSH. Leave blank to use SSM Session Manager only.
+
+Conditions:
+  HasKeyName: !Not [!Equals [!Ref KeyName, ""]]
+
+Resources:
+  AppPermissions:
+    Type: AWS::IAM::ManagedPolicy
+    Metadata:
+      com.aws.cloudformation.Context:
+        why: >-
+          Everything the application calls in AWS, in one place. Attached to both the instance
+          role and the shared laptop user, so laptops can do exactly what the deployed app can.
+        must:
+          - Application services only. Never add IAM, EC2, or wildcard actions; the laptop key sits in a shared .env.
+    Properties:
+      Description: !Sub "${Prefix} application access (Bedrock, media bucket, Cognito users)"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: Bedrock
+            Effect: Allow
+            Action: [bedrock:InvokeModel, bedrock:InvokeModelWithResponseStream]
+            Resource:
+              # Cross-region inference profiles route to foundation models in other regions.
+              - !Sub "arn:${AWS::Partition}:bedrock:*::foundation-model/anthropic.*"
+              - !Sub "arn:${AWS::Partition}:bedrock:*:${AWS::AccountId}:inference-profile/*"
+          - Sid: MediaObjects
+            Effect: Allow
+            Action: [s3:GetObject, s3:PutObject, s3:DeleteObject]
+            Resource: !Sub
+              - "${Arn}/*"
+              - Arn: { "Fn::ImportValue": !Sub "${Prefix}-MediaBucketArn" }
+          - Sid: MediaList
+            Effect: Allow
+            Action: s3:ListBucket
+            Resource: { "Fn::ImportValue": !Sub "${Prefix}-MediaBucketArn" }
+          - Sid: CognitoAdmin
+            Effect: Allow
+            Action: [cognito-idp:AdminAddUserToGroup, cognito-idp:AdminGetUser, cognito-idp:ListUsers]
+            Resource: { "Fn::ImportValue": !Sub "${Prefix}-UserPoolArn" }
+
+  AppRole:
+    Type: AWS::IAM::Role
+    Metadata:
+      com.aws.cloudformation.Context:
+        why: Backend identity on the instance; boto3 picks it up from instance metadata.
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: { Service: ec2.amazonaws.com }
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - !Ref AppPermissions
+        - !Sub "arn:${AWS::Partition}:iam::aws:policy/AmazonSSMManagedInstanceCore"
+      Policies:
+        - PolicyName: server-only
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: SharedEnv
+                Effect: Allow
+                Action: ssm:GetParameter
+                # SecureString with the AWS managed aws/ssm key, which needs no extra KMS grant.
+                Resource: !Sub "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Prefix}/app-env"
+
+  LaptopUser:
+    Type: AWS::IAM::User
+    Metadata:
+      com.aws.cloudformation.Context:
+        why: >-
+          One AWS identity for every teammate's laptop, so the shared .env is the only setup
+          step. The server strips its key from .env and uses AppRole instead.
+        must:
+          - Only AppPermissions attached; nothing else.
+          - Access keys are created outside CloudFormation (infra/README.md) so the secret never appears in stack outputs; delete them before deleting this stack.
+    Properties:
+      ManagedPolicyArns: [!Ref AppPermissions]
+
+  AppInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles: [!Ref AppRole]
+
+  AppInstance:
+    Type: AWS::EC2::Instance
+    Metadata:
+      com.aws.cloudformation.Context:
+        why: Runs the FastAPI backend under systemd (rounds-api). User data installs git, uv and the unit; code arrives through infra/scripts/deploy-backend.sh.
+        must:
+          - IMDSv2 only.
+          - Changing UserData or AmiId replaces the instance (the Elastic IP keeps the origin stable).
+    Properties:
+      InstanceType: !Ref InstanceType
+      ImageId: !Ref AmiId
+      IamInstanceProfile: !Ref AppInstanceProfile
+      KeyName: !If [HasKeyName, !Ref KeyName, !Ref AWS::NoValue]
+      SubnetId: { "Fn::ImportValue": !Sub "${Prefix}-PublicSubnetId" }
+      SecurityGroupIds: [{ "Fn::ImportValue": !Sub "${Prefix}-AppSecurityGroupId" }]
+      MetadataOptions:
+        HttpTokens: required
+        HttpEndpoint: enabled
+        HttpPutResponseHopLimit: 2  # lets containers reach IMDS for role credentials
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs: { VolumeSize: 20, VolumeType: gp3, Encrypted: true, DeleteOnTermination: true }
+      Tags: [{ Key: Name, Value: !Sub "${Prefix}-api" }]
+      UserData:
+        Fn::Base64: !Sub
+          - |
+            #!/bin/bash
+            set -euxo pipefail
+            dnf install -y git python3-pip postgresql16 jq
+            pip3 install --quiet uv==0.8.0
+            mkdir -p /opt/app && chown ec2-user:ec2-user /opt/app
+            # Installed but not enabled; infra/scripts/server-deploy.sh enables it on first deploy.
+            cat > /etc/systemd/system/rounds-api.service <<'UNIT'
+            [Unit]
+            Description=[Product name] API
+            After=network-online.target
+            Wants=network-online.target
+
+            [Service]
+            User=ec2-user
+            WorkingDirectory=/opt/app/backend
+            Environment=PORT=${Port}
+            ExecStart=/usr/local/bin/uv run --no-sync uvicorn app.main:app --host 0.0.0.0 --port ${Port} --proxy-headers --forwarded-allow-ips=*
+            Restart=always
+            RestartSec=5
+
+            [Install]
+            WantedBy=multi-user.target
+            UNIT
+            systemctl daemon-reload
+          - Port: { "Fn::ImportValue": !Sub "${Prefix}-AppPort" }
+
+  AppEipAssociation:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      AllocationId: { "Fn::ImportValue": !Sub "${Prefix}-AppEipAllocationId" }
+      InstanceId: !Ref AppInstance
+
+Outputs:
+  LaptopUserName:
+    Description: Create its access key with `aws iam create-access-key --user-name <name>` and put it in the shared .env
+    Value: !Ref LaptopUser
+  InstanceId:
+    Description: Connect with `aws ssm start-session --target <id>`
+    Value: !Ref AppInstance

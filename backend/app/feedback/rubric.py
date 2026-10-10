@@ -178,7 +178,8 @@ def validate_llm_domains(data: dict, turns: list[dict]) -> tuple[dict[str, dict]
             problems.append(f"{k}: invalid score {score!r}")
             continue
         evidence = [e for e in d.get("evidence", []) if isinstance(e, dict) and quote_valid(str(e.get("quote", "")), int(e.get("turn", -1) or -1), turns)]
-        if score not in ("N/A", 1) and not evidence:
+        # A 1 needs a span too. N/A is the only score that can stand without one.
+        if score != "N/A" and not evidence:
             problems.append(f"{k}: no quote found verbatim in the transcript")
             continue
         good[k] = {
@@ -188,6 +189,35 @@ def validate_llm_domains(data: dict, turns: list[dict]) -> tuple[dict[str, dict]
             "method": "llm",
         }
     return good, problems
+
+
+def _first_student_quote(turns: list[dict]) -> dict | None:
+    """The first thing the student actually said, used only when a narrower span is missing."""
+    for turn in turns:
+        text = str(turn.get("student_text") or "").strip()
+        if text and quote_valid(text, int(turn["idx"]), turns):
+            return {"turn": int(turn["idx"]), "quote": text}
+    return None
+
+
+def _with_citation(chosen: dict, turns: list[dict]) -> dict:
+    """Keep a numeric score only when its quote is in the transcript. Otherwise the score is N/A."""
+    evidence: list[dict] = []
+    for item in chosen.get("evidence") or []:
+        if not isinstance(item, dict):
+            continue
+        turn = item.get("turn")
+        quote = str(item.get("quote") or "")
+        if isinstance(turn, int) and quote_valid(quote, turn, turns):
+            evidence.append({"turn": turn, "quote": quote})
+    if chosen.get("score") != "N/A" and not evidence:
+        # The rule found no shorter span. The student's own words are still a real span.
+        spoken = _first_student_quote(turns)
+        if spoken is not None:
+            evidence = [spoken]
+    if chosen.get("score") != "N/A" and not evidence:
+        return {**chosen, "score": "N/A", "evidence": []}
+    return {**chosen, "evidence": evidence[:3]}
 
 
 def score_rubric(case: Case, turns: list[dict], signals: dict, use_llm: bool) -> tuple[dict, list[dict]]:
@@ -212,7 +242,7 @@ def score_rubric(case: Case, turns: list[dict], signals: dict, use_llm: bool) ->
                 break
     domains = []
     for d in rub["domains"]:
-        chosen = llm_domains.get(d["key"]) or rules[d["key"]]
+        chosen = _with_citation(llm_domains.get(d["key"]) or rules[d["key"]], turns)
         domains.append({"key": d["key"], "name": d["name"], "id": d["id"], **chosen, "rule_based_score": rules[d["key"]]["score"]})
     numeric = [x["score"] for x in domains if isinstance(x["score"], int)]
     review = [x["name"] for x in domains if x["id"] in rub["scoring"]["review_trigger_domain_ids"] and x["score"] == 1]

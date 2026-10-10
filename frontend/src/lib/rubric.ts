@@ -1,6 +1,5 @@
-// The official SHP 7-domain rubric, in order. The backend ships the same labels
-// in backend/app/data/rubric_shp_v1.json; this list becomes the API version when
-// Studio and the debrief read real data.
+// The official SHP 7-domain rubric, in order. The debrief reads names and scores
+// from the feedback response. This list is the same order for screens that only need the labels.
 export const RUBRIC_DOMAINS = [
   "Opening and purpose",
   "Rapport, respect, and empathy",

@@ -244,6 +244,7 @@ def verified_speech(db: Session, enc_id: str, turn: int) -> tuple[str, list[str]
 
 
 def end_encounter(db: Session, enc_id: str) -> EncounterRow:
+    """Mark the visit ended. A second end leaves the saved row as it is."""
     enc = get_encounter(db, enc_id)
     if enc.status == "active":
         enc.status, enc.ended_at = "ended", _now()
@@ -251,12 +252,24 @@ def end_encounter(db: Session, enc_id: str) -> EncounterRow:
     return enc
 
 
+def _reply_mode(verifier: dict) -> str:
+    """The debrief only reports template or llm. Anything else was the template path."""
+    mode = verifier.get("mode")
+    if mode == "llm":
+        return "llm"
+    return "template"
+
+
 def build_feedback(db: Session, enc: EncounterRow) -> dict:
+    """Score the saved encounter and store the debrief. This does not start a new encounter."""
     case = Case.model_validate(enc.visit_doc)
     visit = case.visit(enc.visit_id)
     turns = _turn_dicts(db, enc.id)
     debrief, calls = build_debrief(case, visit, turns, enc.state, enc.documentation, llm_available(), enc.state.get("prior_branch_id"))
-    debrief["transcript"] = [{"turn": t["idx"], "student": t["student_text"], "patient": t["reply_text"], "mode": t["verifier"].get("mode")} for t in turns]
+    debrief["transcript"] = [
+        {"turn": t["idx"], "student": t["student_text"], "patient": t["reply_text"], "mode": _reply_mode(t["verifier"])}
+        for t in turns
+    ]
     debrief["llm_calls"] = calls
     debrief["fallback_used"] = enc.fallback_used
     debrief["generated_at"] = _now().isoformat()
@@ -267,6 +280,7 @@ def build_feedback(db: Session, enc: EncounterRow) -> dict:
 
 
 def submit_documentation(db: Session, enc_id: str, fields: dict[str, str]) -> dict:
+    """Save the dictated note, then build the debrief from that note and the disclosure log."""
     enc = get_encounter(db, enc_id)
     if enc.status == "active":
         end_encounter(db, enc_id)
@@ -276,6 +290,7 @@ def submit_documentation(db: Session, enc_id: str, fields: dict[str, str]) -> di
 
 
 def get_feedback(db: Session, enc_id: str) -> dict:
+    """Return the saved debrief. An active visit has none yet, and this does not create an encounter."""
     enc = get_encounter(db, enc_id)
     if enc.status == "active":
         raise Conflict("end the encounter first")

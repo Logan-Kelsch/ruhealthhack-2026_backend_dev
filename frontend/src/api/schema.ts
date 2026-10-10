@@ -117,7 +117,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Submit Documentation */
+        /**
+         * Submit Documentation
+         * @description Save the dictated note and return the debrief, including the fabrication check.
+         */
         post: operations["submit_documentation_api_encounters__enc_id__documentation_post"];
         delete?: never;
         options?: never;
@@ -152,7 +155,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get Feedback */
+        /**
+         * Get Feedback
+         * @description The saved debrief. A missing encounter is 404. An active visit is 409.
+         */
         get: operations["get_feedback_api_encounters__enc_id__feedback_get"];
         put?: never;
         post?: never;
@@ -278,7 +284,10 @@ export interface paths {
          * @description Return one saved version. Reading the case does not create another one.
          */
         get: operations["get_case_api_studio_cases__case_id__get"];
-        /** Save Case */
+        /**
+         * Save Case
+         * @description Store faculty edits on the draft. The body is the same case a refresh loads.
+         */
         put: operations["save_case_api_studio_cases__case_id__put"];
         post?: never;
         delete?: never;
@@ -296,7 +305,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Approve */
+        /**
+         * Approve
+         * @description Set review state on saved items. The returned case is what a refresh loads.
+         */
         post: operations["approve_api_studio_cases__case_id__approve_post"];
         delete?: never;
         options?: never;
@@ -315,7 +327,7 @@ export interface paths {
         put?: never;
         /**
          * Autofill
-         * @description Adds proposed values as drafts. Each value records where it came from.
+         * @description Add proposed values as drafts. Faculty-set labs and vitals are left as they were.
          */
         post: operations["autofill_api_studio_cases__case_id__autofill_post"];
         delete?: never;
@@ -465,7 +477,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Lookup Icd10 */
+        /**
+         * Lookup Icd10
+         * @description Diagnosis matches from the existing lookup. A one-character query is too broad to search.
+         */
         get: operations["lookup_icd10_api_studio_lookup_icd10_get"];
         put?: never;
         post?: never;
@@ -484,7 +499,7 @@ export interface paths {
         };
         /**
          * Vocab
-         * @description Closed label sets the editor offers (topics, actions, exam maneuvers, lab panels).
+         * @description Closed label sets the editor offers. Maneuver normals come from the exam catalog.
          */
         get: operations["vocab_api_studio_vocab_get"];
         put?: never;
@@ -531,10 +546,16 @@ export interface components {
             /** Substance */
             substance: string;
         };
-        /** Approve */
+        /**
+         * Approve
+         * @description Which saved items change review state. keys limits the change to those ids.
+         */
         Approve: {
-            /** Group */
-            group: string;
+            /**
+             * Group
+             * @enum {string}
+             */
+            group: "facts" | "vitals" | "labs" | "exam" | "artifacts" | "diagnoses" | "medications" | "allergies" | "objectives" | "branches";
             /** Keys */
             keys?: string[] | null;
             /**
@@ -584,6 +605,16 @@ export interface components {
             vitals: boolean;
         };
         /**
+         * AutofillAdded
+         * @description Lab ids and vital keys this auto-fill run proposed. Faculty entries are not listed.
+         */
+        AutofillAdded: {
+            /** Labs */
+            labs: string[];
+            /** Vitals */
+            vitals: string[];
+        };
+        /**
          * Belief
          * @description What the patient believes when it differs from the chart (unreliable narrator).
          */
@@ -622,6 +653,21 @@ export interface components {
             when?: {
                 [key: string]: boolean;
             };
+        };
+        /**
+         * BranchSummary
+         * @description Which authored outcome was taken. Later-visit fact changes are not part of this view.
+         */
+        BranchSummary: {
+            /** Id */
+            id: string;
+            /** Label */
+            label: string;
+            /**
+             * Summary
+             * @default
+             */
+            summary: string;
         };
         /** Briefing */
         Briefing: {
@@ -741,6 +787,18 @@ export interface components {
             /** Keywords */
             keywords?: string[];
         };
+        /**
+         * CitedNote
+         * @description A strength or improvement. The quote is omitted when it was not in the transcript.
+         */
+        CitedNote: {
+            /** Quote */
+            quote?: string | null;
+            /** Text */
+            text: string;
+            /** Turn */
+            turn?: number | null;
+        };
         /** Code */
         Code: {
             /** Code */
@@ -752,6 +810,32 @@ export interface components {
              * @enum {string}
              */
             system: "ICD-10-CM" | "LOINC" | "RxNorm" | "SNOMED-CT";
+        };
+        /**
+         * CommunicationMetrics
+         * @description Counts from the tagged turns. A ratio stays null when there were no questions to count.
+         */
+        CommunicationMetrics: {
+            /** Closed Questions */
+            closed_questions: number;
+            /** Interruptions */
+            interruptions: number;
+            /** Open Questions */
+            open_questions: number;
+            /** Percent Open */
+            percent_open?: number | null;
+            /** Reflection To Question Ratio */
+            reflection_to_question_ratio?: number | null;
+            /** Reflections */
+            reflections: number;
+            /** Student Talk Share */
+            student_talk_share?: number | null;
+            /** Turns */
+            turns: number;
+            /** Unexplained Jargon */
+            unexplained_jargon?: components["schemas"]["JargonMetric"][];
+            /** Validations */
+            validations: number;
         };
         /** ConsistencyFinding */
         ConsistencyFinding: {
@@ -783,6 +867,37 @@ export interface components {
             source: string;
             /** What */
             what: string;
+        };
+        /**
+         * DebriefTurn
+         * @description One exchange the debrief can point at. mode says whether the reply used the template.
+         */
+        DebriefTurn: {
+            /**
+             * Mode
+             * @default template
+             * @enum {string}
+             */
+            mode: "template" | "llm";
+            /** Patient */
+            patient: string;
+            /** Student */
+            student: string;
+            /** Turn */
+            turn: number;
+        };
+        /**
+         * DecisionPathView
+         * @description The outcome id for this visit. Follow-up selection is a separate screen.
+         */
+        DecisionPathView: {
+            /** Ghosts */
+            ghosts?: components["schemas"]["BranchSummary"][];
+            /** Needs Faculty Review */
+            needs_faculty_review?: string[];
+            taken?: components["schemas"]["BranchSummary"] | null;
+            /** Visit Id */
+            visit_id: string;
         };
         /**
          * DecisionPoint
@@ -851,6 +966,94 @@ export interface components {
             };
         };
         /**
+         * DocumentationCheck
+         * @description The fabrication check. unsupported and missing keep the evidence they were judged against.
+         */
+        DocumentationCheck: {
+            /**
+             * Method
+             * @enum {string}
+             */
+            method: "rule-based" | "llm";
+            /** Missing */
+            missing?: components["schemas"]["MissingFinding"][];
+            /** Supported */
+            supported?: components["schemas"]["SupportedStatement"][];
+            /** Unsupported */
+            unsupported?: components["schemas"]["UnsupportedClaim"][];
+        };
+        /**
+         * DocumentationField
+         * @description One blank in the note the student dictates after the visit.
+         */
+        DocumentationField: {
+            /** Hint */
+            hint: string;
+            /** Id */
+            id: string;
+            /** Label */
+            label: string;
+        };
+        /**
+         * DocumentationTemplate
+         * @description The template stored on the case. The student does not fetch the Studio case to learn it.
+         */
+        DocumentationTemplate: {
+            /** Fields */
+            fields: components["schemas"]["DocumentationField"][];
+            /**
+             * Id
+             * @enum {string}
+             */
+            id: "PES" | "ADIME" | "SBAR" | "SOAP";
+            /** Label */
+            label: string;
+        };
+        /**
+         * DomainScore
+         * @description One official domain. A number is only valid when evidence quotes the transcript.
+         */
+        DomainScore: {
+            /** Evidence */
+            evidence?: components["schemas"]["EvidenceQuote"][];
+            /** Id */
+            id: number;
+            /**
+             * Important Gap Or Missed Opportunity
+             * @default
+             */
+            important_gap_or_missed_opportunity: string;
+            /** Key */
+            key: string;
+            /**
+             * Method
+             * @enum {string}
+             */
+            method: "rule-based" | "llm";
+            /** Name */
+            name: string;
+            /**
+             * Rule Based Score
+             * @enum {unknown}
+             */
+            rule_based_score: 1 | 2 | 3 | 4 | "N/A";
+            /**
+             * Safety Or Accuracy Concern
+             * @default
+             */
+            safety_or_accuracy_concern: string;
+            /**
+             * Score
+             * @enum {unknown}
+             */
+            score: 1 | 2 | 3 | 4 | "N/A";
+            /**
+             * Strength Demonstrated
+             * @default
+             */
+            strength_demonstrated: string;
+        };
+        /**
          * EncounterSummary
          * @description One saved encounter in a list. The transcript stays on the encounter view.
          */
@@ -906,6 +1109,16 @@ export interface components {
             errors?: components["schemas"]["ErrorItem"][];
             /** Message */
             message: string;
+        };
+        /**
+         * EvidenceQuote
+         * @description A transcript span a score or trust event is allowed to cite.
+         */
+        EvidenceQuote: {
+            /** Quote */
+            quote: string;
+            /** Turn */
+            turn: number;
         };
         /** ExamFinding */
         ExamFinding: {
@@ -974,12 +1187,63 @@ export interface components {
             value?: number | string | null;
         };
         /**
+         * FeedbackResponse
+         * @description The saved debrief: rubric, evidence, trust, the note check, and the counts behind them.
+         */
+        FeedbackResponse: {
+            /** Communication Notes */
+            communication_notes?: string[];
+            decision_path: components["schemas"]["DecisionPathView"];
+            documentation?: components["schemas"]["DocumentationCheck"] | null;
+            /** Elicited */
+            elicited: components["schemas"]["ObjectiveProgress"][];
+            /**
+             * Fallback Used
+             * @default false
+             */
+            fallback_used: boolean;
+            /** Generated At */
+            generated_at: string;
+            /** Llm Calls */
+            llm_calls?: components["schemas"]["LlmCallRecord"][];
+            metrics: components["schemas"]["CommunicationMetrics"];
+            rubric: components["schemas"]["RubricResult"];
+            /** Safety */
+            safety?: components["schemas"]["SafetyItem"][];
+            /** Transcript */
+            transcript: components["schemas"]["DebriefTurn"][];
+            /** Trust Timeline */
+            trust_timeline: components["schemas"]["TrustPoint"][];
+        };
+        /**
+         * FoundFact
+         * @description An expected discovery the student actually elicited, with the turn that released it.
+         */
+        FoundFact: {
+            /** Fact Id */
+            fact_id: string;
+            /** Text */
+            text: string;
+            /** Turn */
+            turn: number;
+        };
+        /**
          * HealthResponse
          * @description Liveness. True means this process can answer; it does not check the database.
          */
         HealthResponse: {
             /** Ok */
             ok: boolean;
+        };
+        /**
+         * Icd10Match
+         * @description One diagnosis from the existing lookup. code and display are what faculty store.
+         */
+        Icd10Match: {
+            /** Code */
+            code: string;
+            /** Display */
+            display: string;
         };
         /** IntakeAnswer */
         IntakeAnswer: {
@@ -1006,6 +1270,16 @@ export interface components {
             kind: "field" | "facts" | "objectives" | "autofill";
             /** Question */
             question: string;
+        };
+        /**
+         * JargonMetric
+         * @description A term the student used without a plain-language explanation, with the words they said.
+         */
+        JargonMetric: {
+            /** Quote */
+            quote: string;
+            /** Term */
+            term: string;
         };
         /** LabResult */
         LabResult: {
@@ -1085,6 +1359,31 @@ export interface components {
              */
             status: "draft" | "approved";
         };
+        /**
+         * MissedFact
+         * @description An expected discovery that stayed undisclosed, with a question the student could ask.
+         */
+        MissedFact: {
+            /** Fact Id */
+            fact_id: string;
+            /**
+             * Suggestion
+             * @default
+             */
+            suggestion: string;
+            /** Text */
+            text: string;
+        };
+        /**
+         * MissingFinding
+         * @description A key finding the student learned and left out of the note. id is the fact or chart reference.
+         */
+        MissingFinding: {
+            /** Id */
+            id: string;
+            /** Text */
+            text: string;
+        };
         /** NewDraft */
         NewDraft: {
             /** Description */
@@ -1110,6 +1409,32 @@ export interface components {
             status: "draft" | "approved";
             /** Text */
             text: string;
+        };
+        /**
+         * ObjectiveAction
+         * @description Whether the student performed one expected action.
+         */
+        ObjectiveAction: {
+            /** Action */
+            action: string;
+            /** Done */
+            done: boolean;
+        };
+        /**
+         * ObjectiveProgress
+         * @description Elicited and missed items for one learning objective.
+         */
+        ObjectiveProgress: {
+            /** Actions */
+            actions?: components["schemas"]["ObjectiveAction"][];
+            /** Found */
+            found?: components["schemas"]["FoundFact"][];
+            /** Missed */
+            missed?: components["schemas"]["MissedFact"][];
+            /** Objective */
+            objective: string;
+            /** Objective Id */
+            objective_id: string;
         };
         /** Personality */
         Personality: {
@@ -1326,6 +1651,7 @@ export interface components {
             case_version: number;
             /** Chart */
             chart?: components["schemas"]["PublicChartEntry"][];
+            documentation_template: components["schemas"]["DocumentationTemplate"];
             /** Encounter Id */
             encounter_id: string;
             /** Ended At */
@@ -1337,6 +1663,10 @@ export interface components {
             patient: components["schemas"]["PublicPatient"];
             /** Previous Encounter Id */
             previous_encounter_id?: string | null;
+            /** Saved Documentation */
+            saved_documentation?: {
+                [key: string]: string;
+            } | null;
             /** Started At */
             started_at?: string | null;
             /**
@@ -1424,6 +1754,51 @@ export interface components {
             topics?: string[];
         };
         /**
+         * RubricResult
+         * @description The seven-domain result. The interpretation is the official discussion-aid wording.
+         */
+        RubricResult: {
+            /** Domains */
+            domains: components["schemas"]["DomainScore"][];
+            /** Improvements */
+            improvements?: components["schemas"]["CitedNote"][];
+            /** Interpretation */
+            interpretation: string;
+            /** Max Total */
+            max_total: number;
+            /** Next Attempt */
+            next_attempt?: string[];
+            /** Review Flag */
+            review_flag: boolean;
+            /** Review Reasons */
+            review_reasons?: string[];
+            /** Rubric Title */
+            rubric_title: string;
+            /** Strengths */
+            strengths?: components["schemas"]["CitedNote"][];
+            /** Total */
+            total: number;
+        };
+        /**
+         * SafetyItem
+         * @description A case safety fact and whether the student found it and addressed it.
+         */
+        SafetyItem: {
+            /** Addressed */
+            addressed?: boolean | null;
+            /** Discovered */
+            discovered: boolean;
+            /** Fact Id */
+            fact_id: string;
+            /**
+             * Patient Words
+             * @default
+             */
+            patient_words: string;
+            /** Text */
+            text: string;
+        };
+        /**
          * ScribeToken
          * @description One single-use Scribe token. It expires at the provider and is not the API key.
          */
@@ -1459,6 +1834,25 @@ export interface components {
             version?: number | null;
             /** Visit Id */
             visit_id?: string | null;
+        };
+        /**
+         * StudioAutofillResult
+         * @description The saved case after auto-fill, plus the notes and which values were proposed.
+         */
+        StudioAutofillResult: {
+            added: components["schemas"]["AutofillAdded"];
+            /** Blockers */
+            blockers: string[];
+            case: components["schemas"]["Case"];
+            /** Gaps */
+            gaps: components["schemas"]["IntakeGap"][];
+            /** Notes */
+            notes: string[];
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "draft" | "published" | "archived";
         };
         /**
          * StudioCaseDetail
@@ -1519,6 +1913,57 @@ export interface components {
              */
             status: "draft" | "published" | "archived";
         };
+        /**
+         * StudioVocab
+         * @description Closed lists for the studio. The values come from the vocab files and the lab catalog.
+         */
+        StudioVocab: {
+            /** Actions */
+            actions: components["schemas"]["StudioVocabLabel"][];
+            /** Lab Panels */
+            lab_panels: string[];
+            /** Maneuvers */
+            maneuvers: components["schemas"]["StudioVocabManeuver"][];
+            /** Topics */
+            topics: components["schemas"]["StudioVocabLabel"][];
+        };
+        /**
+         * StudioVocabLabel
+         * @description A topic or action the editor can offer. The id is what a fact or objective stores.
+         */
+        StudioVocabLabel: {
+            /** Description */
+            description: string;
+            /** Id */
+            id: string;
+        };
+        /**
+         * StudioVocabManeuver
+         * @description An exam maneuver. normal is the catalog sentence, not a finding invented for this patient.
+         */
+        StudioVocabManeuver: {
+            /** Id */
+            id: string;
+            /** Label */
+            label: string;
+            /** Normal */
+            normal: string;
+        };
+        /**
+         * SupportedStatement
+         * @description A sentence tied to fact ids from the disclosure log, or marked as the student's own plan.
+         */
+        SupportedStatement: {
+            /**
+             * Assessment Or Plan
+             * @default false
+             */
+            assessment_or_plan: boolean;
+            /** Statement */
+            statement: string;
+            /** Supported By */
+            supported_by?: string[];
+        };
         /** TTSRequest */
         TTSRequest: {
             /** Audio Tags */
@@ -1570,6 +2015,34 @@ export interface components {
             };
         };
         /**
+         * TrustPoint
+         * @description Trust after one turn. Shown in the debrief, not while the visit is going on.
+         */
+        TrustPoint: {
+            /** Events */
+            events?: components["schemas"]["TrustTimelineEvent"][];
+            /** Trust */
+            trust: number;
+            /** Turn */
+            turn: number;
+        };
+        /**
+         * TrustTimelineEvent
+         * @description One trust change. The span is the words that caused it.
+         */
+        TrustTimelineEvent: {
+            /** Delta */
+            delta: number;
+            /** Event */
+            event: string;
+            /** Note */
+            note?: string | null;
+            /** Span */
+            span: string;
+            /** Turn */
+            turn: number;
+        };
+        /**
          * TurnResult
          * @description The verified reply and the chart rows that turn released. The engine log stays stored.
          */
@@ -1606,6 +2079,16 @@ export interface components {
             requires_facts?: string[];
             /** Topics */
             topics?: string[];
+        };
+        /**
+         * UnsupportedClaim
+         * @description A sentence in the note that the disclosure log and chart do not back.
+         */
+        UnsupportedClaim: {
+            /** Reason */
+            reason: string;
+            /** Statement */
+            statement: string;
         };
         /** Utterance */
         Utterance: {
@@ -1948,9 +2431,16 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["FeedbackResponse"];
+                };
+            };
+            /** @description No saved encounter with that id. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description Validation error */
@@ -2021,9 +2511,25 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["FeedbackResponse"];
+                };
+            };
+            /** @description No saved encounter with that id. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description End the encounter before requesting feedback. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description Validation error */
@@ -2336,9 +2842,25 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["StudioCaseDetail"];
+                };
+            };
+            /** @description No saved case with that id. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description A fact is still referenced. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description Validation error */
@@ -2373,9 +2895,16 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["StudioCaseDetail"];
+                };
+            };
+            /** @description No saved case with that id. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description Validation error */
@@ -2410,9 +2939,16 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["StudioAutofillResult"];
+                };
+            };
+            /** @description No saved case with that id. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description Validation error */
@@ -2695,9 +3231,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    }[];
+                    "application/json": components["schemas"]["Icd10Match"][];
                 };
             };
             /** @description Validation error */
@@ -2726,9 +3260,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["StudioVocab"];
                 };
             };
         };

@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { asApiError, api, type ApiClient, type PublicChartEntry, type PublicEncounter } from "../../api/client";
 import type { components } from "../../api/schema";
-import type { StudentRoute } from "../../app/types";
+import type { Go, StudentRoute } from "../../app/types";
+import { Documentation } from "./Documentation";
 import { Avatar } from "../../components/Avatar";
 import { CardHead, GhostButton, Wordmark } from "../../components/ui";
 import { portraitFor } from "../student/portrait";
@@ -36,6 +37,7 @@ export function Encounter({
   stopOwnedAudio = stopPageAudio,
   playSpeech,
   browserVoice,
+  go,
 }: {
   route: StudentRoute;
   client?: ApiClient;
@@ -43,6 +45,7 @@ export function Encounter({
   stopOwnedAudio?: () => void;
   playSpeech?: SpeechPlayback;
   browserVoice?: BrowserVoice;
+  go?: Go;
 }) {
   const [attempt, setAttempt] = useState(0);
   const [load, setLoad] = useState<LoadState>(route.encounterId ? { kind: "loading" } : { kind: "missing" });
@@ -100,6 +103,7 @@ export function Encounter({
       stopOwnedAudio={stopOwnedAudio}
       playback={playback}
       browserVoice={spoken}
+      go={go}
     />
   );
 }
@@ -112,6 +116,7 @@ function EncounterLive({
   stopOwnedAudio,
   playback,
   browserVoice,
+  go,
 }: {
   initial: PublicEncounter;
   client: ApiClient;
@@ -119,6 +124,7 @@ function EncounterLive({
   stopOwnedAudio: () => void;
   playback: SpeechPlayback;
   browserVoice: BrowserVoice;
+  go?: Go;
 }) {
   const [view, setView] = useState(initial);
   const [voice, setVoice] = useState<VoiceState>("off");
@@ -412,6 +418,9 @@ function EncounterLive({
   const patient = view.patient;
   const simplified = (view.transcript ?? []).some((line) => line.mode === "template");
   const active = view.status === "active";
+  // The note opens only after the visit has ended, and only with the template the case saved.
+  const template = view.documentation_template;
+  const showDocumentation = !active && template !== undefined && template.fields.length > 0;
 
   return (
     <div className="flex min-h-full flex-col">
@@ -516,6 +525,17 @@ function EncounterLive({
             ))}
             {partial ? <p className="text-sm text-ink-soft">{partial}</p> : null}
           </section>
+          {showDocumentation && view.status !== "active" ? (
+            <Documentation
+              template={template}
+              saved={view.saved_documentation ?? null}
+              status={view.status}
+              encounterId={view.encounter_id}
+              client={client}
+              connectScribe={connectScribe}
+              go={go}
+            />
+          ) : null}
         </div>
 
         <aside aria-label="Chart" className="flex flex-col gap-3">

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, type ApiClient } from "../api/client";
-import type { Go, GoOpts, ScreenId, StudentRoute, StudioTab, VisitNumber } from "./types";
+import type { Go, GoOpts, ScreenId, StudentRoute, StudioTab } from "./types";
 import { caseRouteFromSearch, hrefFor, parseHash, routeForScreen, writeHash } from "./types";
 import { Shell } from "../components/Shell";
 import { Welcome } from "../features/welcome/Welcome";
@@ -21,7 +21,6 @@ export function App({ client = api }: { client?: ApiClient }) {
   const initial = parseHash(window.location.hash);
   const initialCase = caseRouteFromSearch(window.location.search);
   const [screen, setScreen] = useState<ScreenId>(initial.screen ?? "welcome");
-  const [visit, setVisit] = useState<VisitNumber>(1);
   const [studioTab, setStudioTab] = useState<StudioTab>("patient");
   // Student visit ids live in the hash. Faculty case ids live in the page search.
   const [route, setRoute] = useState<StudentRoute>(initial.route);
@@ -32,7 +31,6 @@ export function App({ client = api }: { client?: ApiClient }) {
     const updated = routeForScreen(next, route, opts);
     setScreen(next);
     setRoute(updated);
-    if (opts?.visit) setVisit(opts.visit);
     if (opts?.studioTab) setStudioTab(opts.studioTab);
     const studentUrl = updated.caseId !== null || updated.encounterId !== null;
     if (studentUrl) {
@@ -65,7 +63,7 @@ export function App({ client = api }: { client?: ApiClient }) {
     return () => window.removeEventListener("hashchange", onHash);
   }, []);
 
-  const body = renderScreen(screen, go, visit, studioTab, route, caseId, version, client);
+  const body = renderScreen(screen, go, studioTab, route, caseId, version, client);
   if (screen === "welcome") return body;
   return (
     <Shell screen={screen} go={go}>
@@ -78,7 +76,6 @@ export function App({ client = api }: { client?: ApiClient }) {
 function renderScreen(
   screen: ScreenId,
   go: Go,
-  visit: VisitNumber,
   studioTab: StudioTab,
   route: StudentRoute,
   caseId: string | undefined,
@@ -103,9 +100,9 @@ function renderScreen(
     case "s-mic":
       return <MicCheck go={go} />;
     case "s-encounter":
-      return <Encounter route={route} client={client} />;
+      return <Encounter route={route} client={client} go={go} />;
     case "s-debrief":
-      return <Debrief go={go} visit={visit} />;
+      return <Debrief go={go} route={route} client={client} />;
     case "s-between":
       return <BetweenVisits go={go} />;
     default: {

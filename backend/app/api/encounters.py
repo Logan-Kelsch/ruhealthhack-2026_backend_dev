@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 from app import services
 from app.db import get_session
 from app.integrations import elevenlabs
+from app.schemas.feedback import FeedbackResponse
 from app.schemas.http import ScribeToken
 from app.schemas.student import EncounterSummary, PublicCase, PublicEncounter, TurnResult, WordTimestamp
 from app.settings import get_settings
@@ -120,13 +121,15 @@ class Documentation(BaseModel):
     fields: dict[str, str]
 
 
-@router.post("/encounters/{enc_id}/documentation")
+@router.post("/encounters/{enc_id}/documentation", response_model=FeedbackResponse)
 def submit_documentation(enc_id: str, body: Documentation, db: Session = Depends(get_session)) -> dict:
+    """Save the dictated note and return the debrief, including the fabrication check."""
     return services.submit_documentation(db, enc_id, body.fields)
 
 
-@router.get("/encounters/{enc_id}/feedback")
+@router.get("/encounters/{enc_id}/feedback", response_model=FeedbackResponse)
 def get_feedback(enc_id: str, db: Session = Depends(get_session)) -> dict:
+    """The saved debrief. A missing encounter is 404. An active visit is 409."""
     return services.get_feedback(db, enc_id)
 
 

@@ -7,6 +7,8 @@ list those uses so the save can refuse.
 
 from __future__ import annotations
 
+from pydantic import BaseModel
+
 from app.schemas.case import Case, VisitChanges
 from app.schemas.http import ErrorItem
 
@@ -93,6 +95,9 @@ def _change_errors(where: str, changes: VisitChanges, fact_id: str) -> list[Erro
 
 def _predicate_mentions(predicate: object, fact_id: str) -> bool:
     """True when a decision predicate names this fact, including any/all/not/before groups."""
+    if isinstance(predicate, BaseModel):
+        # The case stores a model. The walk below is the same one used when the predicate was a dict.
+        predicate = predicate.model_dump(by_alias=True, exclude_none=True)
     if not isinstance(predicate, dict):
         return False
     if predicate.get("fact_disclosed") == fact_id:

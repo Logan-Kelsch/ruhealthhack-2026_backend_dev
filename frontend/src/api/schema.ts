@@ -561,7 +561,7 @@ export interface components {
              * Group
              * @enum {string}
              */
-            group: "facts" | "vitals" | "labs" | "exam" | "artifacts" | "diagnoses" | "medications" | "allergies" | "objectives" | "branches";
+            group: "facts" | "vitals" | "labs" | "exam" | "artifacts" | "diagnoses" | "medications" | "allergies" | "objectives" | "branches" | "visit_changes";
             /** Keys */
             keys?: string[] | null;
             /**
@@ -931,10 +931,7 @@ export interface components {
          * DecisionPoint
          * @description A yes/no condition checked at the end of a visit (PRD L-03).
          *
-         *     predicate grammar (JSON):
-         *       {"topic": id} | {"action": id} | {"maneuver": id} | {"order": panel}
-         *       {"fact_disclosed": fact_id} | {"any": [p, ...]} | {"all": [p, ...]} | {"not": p}
-         *       {"before": [p_first, p_second]}  # p_first happened in an earlier turn than p_second
+         *     The predicate is one supported operator, not a free-text rule.
          */
         DecisionPoint: {
             /**
@@ -951,10 +948,7 @@ export interface components {
             id: string;
             /** Label */
             label: string;
-            /** Predicate */
-            predicate: {
-                [key: string]: unknown;
-            };
+            predicate: components["schemas"]["Predicate"];
             /** Rubric Domain */
             rubric_domain?: string | null;
         };
@@ -1238,6 +1232,26 @@ export interface components {
             /** Unit */
             unit?: string | null;
             unlock?: components["schemas"]["Unlock"];
+            /** Value */
+            value?: number | string | null;
+        };
+        /**
+         * FactPatch
+         * @description Fields a later visit may replace on a fact that already exists.
+         *
+         *     Any other key is not a change. This does not add a new clinical fact.
+         */
+        FactPatch: {
+            /** Say */
+            say?: string | null;
+            /** Status */
+            status?: ("draft" | "approved") | null;
+            /** Text */
+            text?: string | null;
+            /** Tier */
+            tier?: ("initial" | "discoverable" | "reluctant" | "hidden") | null;
+            /** Unit */
+            unit?: string | null;
             /** Value */
             value?: number | string | null;
         };
@@ -1543,6 +1557,34 @@ export interface components {
             traits?: {
                 [key: string]: number;
             };
+        };
+        /**
+         * Predicate
+         * @description One supported yes/no check. Exactly one operator is set.
+         *
+         *     A sentence, or a second key beside an operator, is not a predicate. The
+         *     evaluator reads these same keys and does not infer a rule from other text.
+         */
+        Predicate: {
+            /** Action */
+            action?: string | null;
+            /** All */
+            all?: components["schemas"]["Predicate"][] | null;
+            /** Any */
+            any?: components["schemas"]["Predicate"][] | null;
+            /** Before */
+            before?: components["schemas"]["Predicate"][] | null;
+            /** Fact Disclosed */
+            fact_disclosed?: string | null;
+            /** Maneuver */
+            maneuver?: string | null;
+            not?: components["schemas"]["Predicate"] | null;
+            /** Open Question */
+            open_question?: true | null;
+            /** Order */
+            order?: string | null;
+            /** Topic */
+            topic?: string | null;
         };
         /** Preview */
         Preview: {
@@ -2398,9 +2440,7 @@ export interface components {
             remove_facts?: string[];
             /** Update Facts */
             update_facts?: {
-                [key: string]: {
-                    [key: string]: unknown;
-                };
+                [key: string]: components["schemas"]["FactPatch"];
             };
             /** Vitals */
             vitals?: components["schemas"]["Vital"][];

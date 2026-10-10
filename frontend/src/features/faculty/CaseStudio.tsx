@@ -23,6 +23,7 @@ import {
 } from "../../api/client";
 import { factReferenceNotes, saveProblem } from "./caseDraft";
 import { CaseReview } from "./CaseReview";
+import { DecisionTree } from "./DecisionTree";
 import { CaseEditor, ObjectiveEditor, type SavePhase } from "./caseForm";
 import type { Go, StudioTab } from "../../app/types";
 import { Avatar, type Portrait } from "../../components/Avatar";
@@ -54,7 +55,7 @@ type PublishPhase =
   | { kind: "rejected"; message: string; blockers: string[] }
   | { kind: "error"; message: string };
 
-// Patient Studio. Supported case content can be edited and approved. Files and the decision tree cannot.
+// Patient Studio. Supported case content, including the decision tree, can be edited and approved. Files cannot.
 export function CaseStudio({
   go,
   tab,
@@ -447,6 +448,21 @@ export function CaseStudio({
           <ObjectiveEditor
             caseDocument={editorProps.caseDocument}
             vocab={editorProps.vocab}
+            savePhase={editorProps.savePhase}
+            reviewMessage={editorProps.reviewMessage}
+            onChange={editorProps.onChange}
+            onSave={editorProps.onSave}
+            onApprove={editorProps.onApprove}
+          />
+        ) : (
+          <LoadStatus load={load} onRetry={() => setAttempt((value) => value + 1)} />
+        )
+      ) : current === "tree" ? (
+        editorProps ? (
+          <DecisionTree
+            caseDocument={editorProps.caseDocument}
+            vocab={editorProps.vocab}
+            vocabError={editorProps.vocabError}
             savePhase={editorProps.savePhase}
             reviewMessage={editorProps.reviewMessage}
             onChange={editorProps.onChange}

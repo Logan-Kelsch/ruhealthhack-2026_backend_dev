@@ -1,5 +1,7 @@
 # Kelsch notebook work
 
+The [next review stage](docs/next_review_stage.md) freezes current action, feedback-claim and seven-domain rubric work items with private baseline predictions, separate offline A/B pages, disagreement adjudication, and a clinical/difficulty decision worksheet. Run `LLM_ENABLED=false PYTHONPATH=backend python -m backend_kelsch.scripts.eval_next_review prepare --workspace ~/rounds-private/next-review-v1`. It advances development to independent human review without treating authored encounters as learner evidence.
+
 The [development completion workflow](docs/development_completion.md) and Notebook 09 accept a replaceable private review reference, compare saved live outputs, check action/difficulty/feedback mechanics, and exercise learner-unit MCPT with synthetic fixtures. `reference_v1.json` is the input switch point; create a new config version when replacing AI responses with human submissions. Human, clinical, and learner gates stay separate from development checks. Run `LLM_ENABLED=false PYTHONPATH=backend python -m backend_kelsch.scripts.eval_development demo` for offline checks.
 
 Notebooks 01–07, their Python modules, scripts, tests, source fixtures, and reports live here. This folder is separate from the shared `backend/` application. It imports the existing case schema, disclosure engine, Studio importer, verifier, feedback, and visit contracts; those shared contracts and the three cases remain in their original locations.

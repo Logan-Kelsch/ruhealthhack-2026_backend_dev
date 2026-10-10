@@ -64,7 +64,7 @@ export function StudentHome({ go, client = api }: { go: Go; client?: ApiClient }
 
   return (
     <Page>
-      <Title kicker={kicker(load)}>Your cases</Title>
+      <Title>Your cases</Title>
       <CaseList
         load={load}
         onRetry={() => setAttempt((value) => value + 1)}
@@ -90,12 +90,6 @@ function historyNote(history: HistoryState): string | undefined {
   }
   if (history.list.total === 1) return "1 saved encounter";
   return `${history.list.total} saved encounters`;
-}
-
-// The count is the number of published cases. It is not a date or an assignment.
-function kicker(load: LoadState): string | undefined {
-  if (load.kind === "ready") return `${load.cases.length} published`;
-  return undefined;
 }
 
 // Lists each published visit. Opening one goes to its briefing and does not start an encounter.
@@ -138,7 +132,6 @@ function CaseList({
               <div className="font-serif text-[clamp(28px,2.4vw,38px)] leading-none tracking-[-0.8px]">
                 {row.patient.name}
               </div>
-              <div className="mt-2 font-serif text-[19px] text-ink-soft">{caseHook(row.title, row.patient.name)}</div>
             </div>
           </div>
           <div className="flex flex-wrap gap-3 px-7 pt-5 pb-6">
@@ -217,8 +210,3 @@ function statusLabel(status: EncounterSummary["status"]): string {
   return unreachable;
 }
 
-// Case titles are written as "Name: hook". The card already shows the name, so only the hook is kept.
-function caseHook(title: string, name: string): string {
-  const hook = title.startsWith(`${name}:`) ? title.slice(name.length + 1).trim() : title;
-  return hook.charAt(0).toUpperCase() + hook.slice(1);
-}

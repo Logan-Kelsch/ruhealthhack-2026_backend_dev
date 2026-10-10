@@ -84,6 +84,6 @@ def test_editing_published_case_starts_new_version(client):
 
 def test_config_and_vocab(client):
     cfg = client.get("/api/config").json()
-    assert cfg["llm"] is False and cfg["stt_provider"] == "browser"
+    assert cfg["llm"] is False and cfg["stt_provider"] == "elevenlabs"
     v = client.get("/api/studio/vocab").json()
     assert v["topics"] and v["maneuvers"]

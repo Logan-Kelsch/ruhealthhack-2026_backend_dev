@@ -217,7 +217,8 @@ test("a student opens a published case, starts once, and recovers that encounter
   expect(view.host.textContent).toContain("Fine crackles at both lung bases.");
   expect(view.host.textContent).toContain("f_ibuprofen");
   expect(view.host.textContent).toContain("Do you take anything over the counter for pain?");
-  expect(view.host.textContent).toContain("Microphone unavailable");
+  expect(view.host.textContent).toContain("Connect microphone");
+  expect(calls.some((call) => call.url.endsWith("/api/stt/token"))).toBe(false);
   expect(view.host.querySelector("input, textarea")).toBeNull();
   expect(view.host.textContent).not.toContain("Push to talk");
 
@@ -225,6 +226,7 @@ test("a student opens a published case, starts once, and recovers that encounter
   window.location.hash = "#s-encounter?case=walter_greene&version=1&visit=v1&encounter=enc-walter";
   const refreshed = await renderApp(client);
   expect(refreshed.host.textContent).toContain("Do you take anything over the counter for pain?");
+  expect(refreshed.host.textContent).toContain("Connect microphone");
   expect(refreshed.host.textContent).toContain("f_ibuprofen");
   expect(starts()).toBe(1);
   expect(encounterReads()).toBeGreaterThan(readsBeforeRefresh);

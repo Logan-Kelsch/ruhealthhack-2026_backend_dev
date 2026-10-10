@@ -21,6 +21,7 @@ from app.schemas.student import (
     PublicVisitSummary,
     TranscriptEntry,
     TurnResult,
+    WordTimestamp,
 )
 
 
@@ -124,6 +125,8 @@ def transcript_entries(turns: list[TurnRow]) -> list[TranscriptEntry]:
             reply_text=turn.reply_text,
             student_start_ms=turn.student_start_ms,
             student_end_ms=turn.student_end_ms,
+            words=[WordTimestamp.model_validate(word) for word in (turn.student_words or [])],
+            mode=_reply_mode(str((turn.verifier or {}).get("mode") or "template")),
             is_last=turn.idx == last,
         )
         for turn in turns
@@ -192,6 +195,11 @@ def public_turn(
     latency_ms: dict,
 ) -> TurnResult:
     """The reply the student hears, plus the rows that turn released. Engine internals stay out."""
+    reply_mode = _reply_mode(mode)
+    visible = [PublicNotice.model_validate(notice) for notice in notices]
+    # Offline and failed checks use the template. The student sees that notice instead of a silent change.
+    if reply_mode == "template" and not any(notice.kind == "fallback" for notice in visible):
+        visible.append(PublicNotice(kind="fallback", text="Simplified responses"))
     return TurnResult(
         turn=turn,
         reply_text=reply_text,
@@ -199,8 +207,8 @@ def public_turn(
         audio_tags=list(audio_tags),
         chart_releases=chart_entries(case, chart_releases),
         exam_results=chart_entries(case, exam_results),
-        notices=[PublicNotice.model_validate(notice) for notice in notices],
-        mode=_reply_mode(mode),
+        notices=visible,
+        mode=reply_mode,
         # The stored step name "engine" is the disclosure pass. Students see the duration, not that name.
         latency_ms={("disclosure" if key == "engine" else key): int(value) for key, value in latency_ms.items()},
     )

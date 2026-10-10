@@ -182,7 +182,15 @@ def encounter_view(db: Session, enc: EncounterRow):
     return public_encounter(enc, turns)
 
 
-def add_utterance(db: Session, enc_id: str, text: str, start_ms: int | None, end_ms: int | None, barge_in_remaining_ms: int | None) -> TurnResult:
+def add_utterance(
+    db: Session,
+    enc_id: str,
+    text: str,
+    start_ms: int | None,
+    end_ms: int | None,
+    barge_in_remaining_ms: int | None,
+    words: list[dict] | None = None,
+) -> TurnResult:
     """Save one turn and return the reply a student may see. The engine log stays on the turn row."""
     enc = get_encounter(db, enc_id)
     if enc.status != "active":
@@ -197,6 +205,7 @@ def add_utterance(db: Session, enc_id: str, text: str, start_ms: int | None, end
     idx = out.state["turn"]
     db.add(TurnRow(
         encounter_id=enc.id, idx=idx, student_text=text, student_start_ms=start_ms, student_end_ms=end_ms,
+        student_words=list(words or []),
         intent=out.intent.model_dump(), engine=out.engine.model_dump(), reply_text=out.reply_text,
         cited_fact_ids=out.cited_fact_ids, verifier=out.verifier, audio_tags=out.audio_tags,
         latency_ms=out.latency_ms, llm_calls=out.llm_calls,

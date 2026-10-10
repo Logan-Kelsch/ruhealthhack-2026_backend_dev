@@ -253,3 +253,64 @@ def test_recovery_returns_the_same_encounter(client):
     encounter_schema = app.openapi()["components"]["schemas"]["PublicEncounter"]
     assert {"transcript", "last_turn", "started_at", "ended_at", "previous_encounter_id"} <= set(encounter_schema["properties"])
     assert encounter_schema.get("additionalProperties") is not True
+
+
+def test_committed_words_and_turn_times_are_saved(client):
+    """A committed utterance keeps its word times and turn times, and the released fact stays cited."""
+    started = client.post(
+        "/api/encounters",
+        json={"case_id": "walter_greene", "version": 1, "visit_id": "v1", "student_name": "Sam"},
+    )
+    encounter_id = started.json()["encounter_id"]
+    words = [
+        {"text": "Do", "start_ms": 1200, "end_ms": 1400},
+        {"text": "you", "start_ms": 1500, "end_ms": 1700},
+    ]
+    sent = client.post(
+        f"/api/encounters/{encounter_id}/utterances",
+        json={
+            "text": "Do you take anything over the counter for pain?",
+            "start_ms": 1200,
+            "end_ms": 4600,
+            "words": words,
+        },
+    )
+    assert sent.status_code == 200
+    released = next(item for item in sent.json()["chart_releases"] if item["source_fact"] == "f_ibuprofen")
+    assert "ibuprofen" in released["label"].lower()
+    assert released["source"]["kind"] == "faculty"
+    _assert_student_safe(sent.json())
+
+    recovered = client.get(f"/api/encounters/{encounter_id}").json()
+    line = recovered["transcript"][0]
+    assert line["student_text"] == "Do you take anything over the counter for pain?"
+    assert line["student_start_ms"] == 1200
+    assert line["student_end_ms"] == 4600
+    assert line["words"] == words
+    _assert_student_safe(recovered)
+
+    utterance = app.openapi()["components"]["schemas"]["Utterance"]
+    assert "words" in utterance["properties"]
+    transcript = app.openapi()["components"]["schemas"]["TranscriptEntry"]
+    assert "words" in transcript["properties"]
+
+
+def test_unavailable_order_does_not_invent_a_finding(client):
+    """An order this case cannot release stays unavailable, and the offline reply is the template."""
+    started = client.post(
+        "/api/encounters",
+        json={"case_id": "walter_greene", "version": 1, "visit_id": "v1", "student_name": "Sam"},
+    )
+    encounter_id = started.json()["encounter_id"]
+    sent = client.post(
+        f"/api/encounters/{encounter_id}/utterances",
+        json={"text": "Can we order a troponin?"},
+    )
+    assert sent.status_code == 200
+    body = sent.json()
+    assert body["mode"] == "template"
+    assert body["exam_results"] == []
+    assert any(notice["kind"] == "order_unavailable" and "Troponin" in notice["text"] for notice in body["notices"])
+    assert any(notice["kind"] == "fallback" and notice["text"] == "Simplified responses" for notice in body["notices"])
+    assert not any(item.get("ref") == "troponin" or "troponin" in (item.get("label") or "").lower() for item in body["chart_releases"])
+    _assert_student_safe(body)

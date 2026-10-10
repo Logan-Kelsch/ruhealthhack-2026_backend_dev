@@ -2,17 +2,30 @@
 trust thresholds or decision points; the full case document is only served by Studio."""
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends, HTTPException, Response
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from app import services
 from app.db import get_session
 from app.integrations import elevenlabs
-from app.schemas.student import EncounterSummary, PublicCase, PublicEncounter, TurnResult
+from app.schemas.http import ScribeToken
+from app.schemas.student import EncounterSummary, PublicCase, PublicEncounter, TurnResult, WordTimestamp
 from app.student_view import public_case
 
 router = APIRouter(prefix="/api", tags=["encounters"])
+
+
+@router.post("/stt/token", response_model=ScribeToken)
+def scribe_token() -> ScribeToken:
+    """Issue one single-use Scribe token. Building the OpenAPI schema does not call this."""
+    try:
+        token = elevenlabs.create_scribe_token()
+    except elevenlabs.MissingScribeConfig as exc:
+        raise services.Conflict(str(exc)) from exc
+    except elevenlabs.ScribeTokenError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    return ScribeToken(token=token)
 
 
 @router.get("/cases", response_model=list[PublicCase])
@@ -72,6 +85,8 @@ class Utterance(BaseModel):
     text: str = Field(min_length=1, max_length=2000)
     start_ms: int | None = None
     end_ms: int | None = None
+    # Word times when Scribe sent them. Omitted words stay an empty list.
+    words: list[WordTimestamp] = Field(default_factory=list)
     # How much patient audio was left when the student spoke over it, if any.
     barge_in_remaining_ms: int | None = None
 
@@ -79,7 +94,15 @@ class Utterance(BaseModel):
 @router.post("/encounters/{enc_id}/utterances", response_model=TurnResult)
 def add_utterance(enc_id: str, body: Utterance, db: Session = Depends(get_session)) -> TurnResult:
     """Runs one committed utterance. The response is the reply and released rows, not the engine log."""
-    return services.add_utterance(db, enc_id, body.text, body.start_ms, body.end_ms, body.barge_in_remaining_ms)
+    return services.add_utterance(
+        db,
+        enc_id,
+        body.text,
+        body.start_ms,
+        body.end_ms,
+        body.barge_in_remaining_ms,
+        [word.model_dump() for word in body.words],
+    )
 
 
 @router.post("/encounters/{enc_id}/end", response_model=PublicEncounter)

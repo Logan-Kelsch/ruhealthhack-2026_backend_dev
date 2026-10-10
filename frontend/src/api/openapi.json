@@ -1826,30 +1826,68 @@
         "type": "object"
       },
       "PublicConfig": {
-        "description": "Voice settings the browser may see. Model ids, keys, and account values stay off this object.",
+        "description": "Voice settings the browser may see. The long-lived key is not a field on this object.",
         "properties": {
+          "commit_strategy": {
+            "const": "vad",
+            "title": "Commit Strategy",
+            "type": "string"
+          },
+          "include_timestamps": {
+            "title": "Include Timestamps",
+            "type": "boolean"
+          },
           "llm": {
             "title": "Llm",
             "type": "boolean"
           },
-          "stt_commit_silence_ms": {
-            "title": "Stt Commit Silence Ms",
-            "type": "integer"
+          "stt_model_id": {
+            "title": "Stt Model Id",
+            "type": "string"
           },
           "stt_provider": {
+            "const": "elevenlabs",
             "title": "Stt Provider",
             "type": "string"
           },
           "tts": {
             "title": "Tts",
             "type": "boolean"
+          },
+          "tts_model_id": {
+            "title": "Tts Model Id",
+            "type": "string"
+          },
+          "vad_silence_secs": {
+            "title": "Vad Silence Secs",
+            "type": "number"
+          },
+          "vad_threshold": {
+            "title": "Vad Threshold",
+            "type": "number"
+          },
+          "voice_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Voice Id"
           }
         },
         "required": [
           "llm",
           "tts",
           "stt_provider",
-          "stt_commit_silence_ms"
+          "stt_model_id",
+          "tts_model_id",
+          "vad_silence_secs",
+          "vad_threshold",
+          "commit_strategy",
+          "include_timestamps"
         ],
         "title": "PublicConfig",
         "type": "object"
@@ -2185,6 +2223,20 @@
         "title": "Release",
         "type": "object"
       },
+      "ScribeToken": {
+        "description": "One single-use Scribe token. It expires at the provider and is not the API key.",
+        "properties": {
+          "token": {
+            "title": "Token",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
+        ],
+        "title": "ScribeToken",
+        "type": "object"
+      },
       "Source": {
         "properties": {
           "by": {
@@ -2469,6 +2521,15 @@
             "title": "Is Last",
             "type": "boolean"
           },
+          "mode": {
+            "default": "template",
+            "enum": [
+              "template",
+              "llm"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
           "reply_text": {
             "title": "Reply Text",
             "type": "string"
@@ -2502,6 +2563,13 @@
           "turn": {
             "title": "Turn",
             "type": "integer"
+          },
+          "words": {
+            "items": {
+              "$ref": "#/components/schemas/WordTimestamp"
+            },
+            "title": "Words",
+            "type": "array"
           }
         },
         "required": [
@@ -2669,6 +2737,13 @@
             "minLength": 1,
             "title": "Text",
             "type": "string"
+          },
+          "words": {
+            "items": {
+              "$ref": "#/components/schemas/WordTimestamp"
+            },
+            "title": "Words",
+            "type": "array"
           }
         },
         "required": [
@@ -2887,6 +2962,30 @@
         ],
         "title": "Vital",
         "type": "object"
+      },
+      "WordTimestamp": {
+        "description": "One recognized word and when it was spoken. Times are milliseconds from the start of capture.",
+        "properties": {
+          "end_ms": {
+            "title": "End Ms",
+            "type": "integer"
+          },
+          "start_ms": {
+            "title": "Start Ms",
+            "type": "integer"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text",
+          "start_ms",
+          "end_ms"
+        ],
+        "title": "WordTimestamp",
+        "type": "object"
       }
     }
   },
@@ -3009,7 +3108,7 @@
     },
     "/api/config": {
       "get": {
-        "description": "What the frontend needs to pick its voice path. No secrets.",
+        "description": "What the browser needs to open Scribe. The long-lived key is not included.",
         "operationId": "config_api_config_get",
         "responses": {
           "200": {
@@ -3489,6 +3588,48 @@
           }
         },
         "summary": "Health"
+      }
+    },
+    "/api/stt/token": {
+      "post": {
+        "description": "Issue one single-use Scribe token. Building the OpenAPI schema does not call this.",
+        "operationId": "scribe_token_api_stt_token_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScribeToken"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Speech transcription is not configured."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "The transcription service did not provide a token."
+          }
+        },
+        "summary": "Scribe Token",
+        "tags": [
+          "encounters"
+        ]
       }
     },
     "/api/studio/cases": {

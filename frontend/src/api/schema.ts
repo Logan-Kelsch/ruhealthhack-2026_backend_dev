@@ -53,7 +53,7 @@ export interface paths {
         };
         /**
          * Config
-         * @description What the frontend needs to pick its voice path. No secrets.
+         * @description What the browser needs to open Scribe. The long-lived key is not included.
          */
         get: operations["config_api_config_get"];
         put?: never;
@@ -200,6 +200,26 @@ export interface paths {
         get: operations["health_api_health_get"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/stt/token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Scribe Token
+         * @description Issue one single-use Scribe token. Building the OpenAPI schema does not call this.
+         */
+        post: operations["scribe_token_api_stt_token_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1226,17 +1246,35 @@ export interface components {
         };
         /**
          * PublicConfig
-         * @description Voice settings the browser may see. Model ids, keys, and account values stay off this object.
+         * @description Voice settings the browser may see. The long-lived key is not a field on this object.
          */
         PublicConfig: {
+            /**
+             * Commit Strategy
+             * @constant
+             */
+            commit_strategy: "vad";
+            /** Include Timestamps */
+            include_timestamps: boolean;
             /** Llm */
             llm: boolean;
-            /** Stt Commit Silence Ms */
-            stt_commit_silence_ms: number;
-            /** Stt Provider */
-            stt_provider: string;
+            /** Stt Model Id */
+            stt_model_id: string;
+            /**
+             * Stt Provider
+             * @constant
+             */
+            stt_provider: "elevenlabs";
             /** Tts */
             tts: boolean;
+            /** Tts Model Id */
+            tts_model_id: string;
+            /** Vad Silence Secs */
+            vad_silence_secs: number;
+            /** Vad Threshold */
+            vad_threshold: number;
+            /** Voice Id */
+            voice_id?: string | null;
         };
         /**
          * PublicDoorwayVital
@@ -1365,6 +1403,14 @@ export interface components {
             /** Topics */
             topics?: string[];
         };
+        /**
+         * ScribeToken
+         * @description One single-use Scribe token. It expires at the provider and is not the API key.
+         */
+        ScribeToken: {
+            /** Token */
+            token: string;
+        };
         /** Source */
         Source: {
             /** By */
@@ -1472,6 +1518,12 @@ export interface components {
              * @default false
              */
             is_last: boolean;
+            /**
+             * Mode
+             * @default template
+             * @enum {string}
+             */
+            mode: "template" | "llm";
             /** Reply Text */
             reply_text: string;
             /** Student End Ms */
@@ -1482,6 +1534,8 @@ export interface components {
             student_text: string;
             /** Turn */
             turn: number;
+            /** Words */
+            words?: components["schemas"]["WordTimestamp"][];
         };
         /** TrustConfig */
         TrustConfig: {
@@ -1543,6 +1597,8 @@ export interface components {
             start_ms?: number | null;
             /** Text */
             text: string;
+            /** Words */
+            words?: components["schemas"]["WordTimestamp"][];
         };
         /** ValueRange */
         ValueRange: {
@@ -1624,6 +1680,18 @@ export interface components {
             unit: string;
             /** Value */
             value: string;
+        };
+        /**
+         * WordTimestamp
+         * @description One recognized word and when it was spoken. Times are milliseconds from the start of capture.
+         */
+        WordTimestamp: {
+            /** End Ms */
+            end_ms: number;
+            /** Start Ms */
+            start_ms: number;
+            /** Text */
+            text: string;
         };
     };
     responses: never;
@@ -2057,6 +2125,44 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HealthResponse"];
+                };
+            };
+        };
+    };
+    scribe_token_api_stt_token_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScribeToken"];
+                };
+            };
+            /** @description Speech transcription is not configured. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description The transcription service did not provide a token. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
         };

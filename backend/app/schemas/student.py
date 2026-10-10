@@ -87,6 +87,14 @@ class PublicChartEntry(BaseModel):
     body: str | None = None
 
 
+class WordTimestamp(BaseModel):
+    """One recognized word and when it was spoken. Times are milliseconds from the start of capture."""
+
+    text: str
+    start_ms: int
+    end_ms: int
+
+
 class TranscriptEntry(BaseModel):
     """One saved exchange. is_last marks the newest turn so refresh can show where the visit stopped."""
 
@@ -95,6 +103,9 @@ class TranscriptEntry(BaseModel):
     reply_text: str
     student_start_ms: int | None = None
     student_end_ms: int | None = None
+    words: list[WordTimestamp] = Field(default_factory=list)
+    # template means the reply used the approved phrasing because the model path did not pass.
+    mode: Literal["template", "llm"] = "template"
     is_last: bool = False
 
 

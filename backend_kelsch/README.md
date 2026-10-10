@@ -1,6 +1,6 @@
 # Kelsch notebook work
 
-Notebooks 01–03, their Python modules, scripts, tests, source fixtures, and reports live here. This folder is separate from the shared `backend/` application. It imports the existing case schema, disclosure engine, Studio importer, and verifier; those shared contracts and the three cases remain in their original locations.
+Notebooks 01–05, their Python modules, scripts, tests, source fixtures, and reports live here. This folder is separate from the shared `backend/` application. It imports the existing case schema, disclosure engine, Studio importer, verifier, feedback, and visit contracts; those shared contracts and the three cases remain in their original locations.
 
 From the repository root in the backend's Python environment:
 

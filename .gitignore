@@ -11,4 +11,6 @@ design/*
 *.db
 *.egg-info/
 **.cursor/
+.cursor/
 .design-import/
+frontend/.vite/

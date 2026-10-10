@@ -1,0 +1,84 @@
+@import "tailwindcss";
+
+/* Palette taken from the Rounds design file. Names match how the screens use them. */
+@theme {
+  --font-sans: "Hanken Grotesk", system-ui, sans-serif;
+  --font-serif: "Newsreader", Georgia, serif;
+  --color-ink: #141b4d;
+  --color-indigo: #2b3ab8;
+  --color-ink-soft: #4b5285;
+  --color-muted: #6a7099;
+  --color-faint: #8a8fb3;
+  --color-soon: #9a9fc0;
+  --color-line: #e7e8f0;
+  --color-line-2: #dcdfea;
+  --color-hair: #f0f1f6;
+  --color-paper: #f7f6f3;
+  --color-wash: #f6f6fa;
+  --color-danger: #b42b24;
+  --color-danger-strong: #c63a31;
+  --color-warn: #9a5212;
+  --color-warn-deep: #7a4210;
+  --color-ok: #1f7a50;
+  --color-chip: #f4f5f9;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background: #d9defa;
+}
+
+/* Washed pastel trees behind signed-in screens. Matches the design's Muted setting. */
+.bg-wash {
+  background: #f7f6f3 url("/assets/app-wash.png") center / cover no-repeat;
+  filter: saturate(0.55);
+  opacity: 0.45;
+}
+
+/* Full watercolor on the welcome screen, a little more saturated than the file. */
+.bg-painting {
+  background: #fbf8f4 url("/assets/painting.png") center / cover no-repeat;
+  filter: saturate(1.15);
+}
+
+@keyframes rnd-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.15;
+  }
+}
+
+@keyframes rnd-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.rnd-pulse {
+  animation: rnd-pulse 2s ease-in-out infinite;
+}
+
+.rnd-blink {
+  animation: rnd-blink 1.4s ease-in-out infinite;
+}

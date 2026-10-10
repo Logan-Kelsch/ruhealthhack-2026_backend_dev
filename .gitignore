@@ -10,3 +10,5 @@ design/*
 !design/ui-refs/
 *.db
 *.egg-info/
+**.cursor/
+.design-import/

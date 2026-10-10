@@ -61,6 +61,7 @@
 /* Dark theme: the same token names get dark values, so every utility and the
    inline `var(--color-*)` uses follow along without edits to the screens.
    Values are drafts until the design pass. */
+/* @deprecated Dark mode is retired (no toggle; lib/theme.ts always picks light). Kept until the team decides to delete it. */
 .dark {
   --color-ink: #eeeff4;
   --color-ink-soft: #b9bacb;

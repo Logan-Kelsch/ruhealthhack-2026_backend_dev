@@ -1,9 +1,7 @@
 import { useEffect, useState, type MouseEvent, type ReactNode } from "react";
 import type { Go, ScreenId } from "../app/types";
-import { useTheme } from "../lib/theme";
 import { FACULTY_USER, STUDENT_USER } from "../mock/session";
 import { useModeSwitch, type Role } from "./ModeTransition";
-import { MoonIcon, SunIcon } from "./Icons";
 import { DawnDisc, Wordmark } from "./ui";
 
 type RailKey = "home" | "insights" | "cases" | "people" | "settings";
@@ -59,7 +57,6 @@ type ShellProps = {
 // wordmark top left, a slim white icon rail, and one large white sheet.
 // The briefing drops the sheet so its card can stand on the street painting.
 export function Shell({ screen, go, children }: ShellProps) {
-  const { theme, toggle } = useTheme();
   const switchMode = useModeSwitch();
   const role: Role = screen.startsWith("f-") ? "faculty" : "student";
   const scene = screen === "s-brief";
@@ -121,15 +118,6 @@ export function Shell({ screen, go, children }: ShellProps) {
           );
         })}
         <div className="flex-1" />
-        <button
-          type="button"
-          onClick={toggle}
-          title={theme === "dark" ? "Light mode" : "Dark mode"}
-          aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-          className="flex size-11 items-center justify-center rounded-full text-ink-soft hover:bg-indigo-soft/60"
-        >
-          {theme === "dark" ? <SunIcon /> : <MoonIcon />}
-        </button>
         <button
           type="button"
           onClick={swap}

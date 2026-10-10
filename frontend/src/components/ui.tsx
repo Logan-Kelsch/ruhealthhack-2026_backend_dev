@@ -164,7 +164,7 @@ export function GhostButton({
   );
 }
 
-// Light/dark switch. Lives on the welcome screen.
+/** @deprecated Dark mode is retired and no screen renders this switch. */
 export function ThemeToggle({ theme, onToggle, className = "" }: { theme: Theme; onToggle: () => void; className?: string }) {
   const dark = theme === "dark";
   return (

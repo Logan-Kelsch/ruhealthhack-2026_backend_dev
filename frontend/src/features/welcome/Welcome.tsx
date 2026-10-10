@@ -1,12 +1,10 @@
 import type { MouseEvent, ReactNode } from "react";
 import type { Go } from "../../app/types";
 import { useModeSwitch, type Role } from "../../components/ModeTransition";
-import { useTheme } from "../../lib/theme";
-import { ThemeToggle, Wordmark } from "../../components/ui";
+import { Wordmark } from "../../components/ui";
 
 // Role picker. Teaching opens the faculty home; learning opens the student home.
 export function Welcome({ go }: { go: Go }) {
-  const { theme, toggle } = useTheme();
   const switchMode = useModeSwitch();
 
   function pick(role: Role) {
@@ -25,9 +23,6 @@ export function Welcome({ go }: { go: Go }) {
         className="absolute inset-0"
         style={{ background: "radial-gradient(ellipse 60% 55% at 50% 50%, rgba(255,253,250,.92), rgba(255,253,250,.55) 60%, transparent 85%)" }}
       />
-      <div className="absolute top-6 right-6 z-10">
-        <ThemeToggle theme={theme} onToggle={toggle} />
-      </div>
       <div className="relative flex min-h-full flex-col items-center justify-center gap-12 px-8 py-12 text-center text-ink">
         <div className="flex flex-col items-center gap-4">
           <Wordmark size={Math.round(Math.min(148, Math.max(80, window.innerWidth * 0.085)))} />

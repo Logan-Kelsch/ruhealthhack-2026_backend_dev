@@ -197,8 +197,8 @@ topics:
     description: Past antibiotic use and how infections were treated before
     keywords: ['antibiotic', 'amoxicillin', 'previous infections', 'treated before']
   - id: testing_done
-    description: Tests or results the patient already had elsewhere
-    keywords: ['test(s|ed)?\b', 'swab', 'results', 'lab work', 'blood work']
+    description: Tests the patient already had, or asks the patient for their own test results or lab numbers (for example potassium, A1C, cholesterol)
+    keywords: ['test(s|ed)?\b', 'swab', 'results', 'lab work', 'blood work', '\b(potassium|sodium|a1c|cholesterol|creatinine|glucose|sugar) (level|number|reading)', 'your (potassium|a1c|labs?)\b']
   - id: vaccination
     description: Vaccination history
     keywords: ['vaccin', 'shots', 'immuniz', 'flu shot']

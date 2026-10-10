@@ -18,16 +18,49 @@ WORD_NUMBERS = {
     "zero": 0, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8, "nine": 9,
     "ten": 10, "eleven": 11, "twelve": 12, "thirteen": 13, "fourteen": 14, "fifteen": 15, "sixteen": 16,
     "seventeen": 17, "eighteen": 18, "nineteen": 19, "twenty": 20, "thirty": 30, "forty": 40, "fifty": 50,
-    "sixty": 60, "seventy": 70, "eighty": 80, "ninety": 90, "hundred": 100, "twice": 2,
+    "sixty": 60, "seventy": 70, "eighty": 80, "ninety": 90, "twice": 2,
 }  # "one" is left out on purpose: "no one", "the one I take"
-NUM_RE = re.compile(r"\d+(?:\.\d+)?")
-WORD_RE = re.compile(r"\b(" + "|".join(WORD_NUMBERS) + r")\b", re.IGNORECASE)
+SCALES = {"hundred": 100, "thousand": 1000}
+NUM_RE = re.compile(r"\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?")
+TOKEN_RE = re.compile(r"[a-z]+|[^\sa-z]")
+
+
+def _word_numbers(text: str) -> set[float]:
+    """Spoken numbers as values: "two thousand" is 2000, "twenty five" is 25, "two, three" is 2 and 3."""
+    out: set[float] = set()
+    total, cur = 0, None
+
+    def flush():
+        nonlocal total, cur
+        if cur is not None:
+            out.add(float(total + cur))
+        total, cur = 0, None
+
+    for tok in TOKEN_RE.findall(text.lower()):
+        if tok in WORD_NUMBERS and tok != "twice":
+            v = WORD_NUMBERS[tok]
+            joins = cur is not None and (cur % 100 == 0 or (v < 10 and cur % 10 == 0 and cur % 100 >= 20))
+            if not joins:
+                flush()
+                cur = 0
+            cur += v
+        elif tok in SCALES:
+            if tok == "hundred":
+                cur = (cur or 1) * 100
+            else:
+                total, cur = total + (cur or 1) * 1000, 0
+        elif tok == "and" and cur is not None and total + cur >= 100:
+            continue
+        else:
+            flush()
+            if tok == "twice":
+                out.add(2.0)
+    flush()
+    return out
 
 
 def numbers_in(text: str) -> set[float]:
-    out = {float(n) for n in NUM_RE.findall(text)}
-    out |= {float(WORD_NUMBERS[w.lower()]) for w in WORD_RE.findall(text)}
-    return out
+    return {float(n.replace(",", "")) for n in NUM_RE.findall(text)} | _word_numbers(text)
 
 
 def _fact_texts(f: Fact) -> str:
@@ -64,13 +97,14 @@ def deterministic_checks(
     return problems
 
 
-def judge(case: Case, reply: str, allowed: list[str], previously_disclosed: list[str]) -> tuple[list[str], LLMCall]:
+def judge(case: Case, reply: str, allowed: list[str], previously_disclosed: list[str], student_said: str = "") -> tuple[list[str], LLMCall]:
     facts = [case.fact(i) for i in list(dict.fromkeys(allowed + previously_disclosed))]
     facts_payload = [{"id": f.id, "say": fact_line(f), "chart_truth": f.text} for f in facts if f is not None]
     pers = case.profile.personality
     user = (
         f"APPROVED FACTS:\n{json.dumps(facts_payload, ensure_ascii=False)}\n\n"
         f"PATIENT BASICS (allowed): name {case.profile.name}, age {case.profile.age}. Personality (style only): {pers.summary}\n\n"
+        f"WHAT THE STUDENT SAID (the patient may repeat or react to this):\n{json.dumps(student_said, ensure_ascii=False)}\n\n"
         f"REPLY TO CHECK:\n{json.dumps(reply)}"
     )
     try:
@@ -78,6 +112,12 @@ def judge(case: Case, reply: str, allowed: list[str], previously_disclosed: list
     except LLMUnavailable:
         failed = last_failed_call("verify")
         raise LLMUnavailable(failed.error if failed else "verifier failed") from None
-    unsupported = data.get("unsupported", []) if isinstance(data, dict) else ["unreadable judge output"]
-    problems = [f"unsupported: {u.get('sentence', u) if isinstance(u, dict) else u}" for u in unsupported]
+    if not isinstance(data, dict) or not isinstance(data.get("unsupported", []), list):
+        return ["unreadable judge output"], call
+    problems = []
+    for u in data.get("unsupported", []):
+        if not isinstance(u, dict):
+            problems.append(f"unsupported: {u}")
+        elif str(u.get("new_claim", "")).strip():  # a flag must name the invented claim
+            problems.append(f"unsupported: {u.get('sentence', '')} (new claim: {u['new_claim']})")
     return problems, call

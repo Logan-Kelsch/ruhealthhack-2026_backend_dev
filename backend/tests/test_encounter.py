@@ -78,8 +78,19 @@ def test_numbers_must_be_backed(load_golden):
 
 
 def test_word_numbers():
-    assert numbers_in("nine hundred dollars and 3 cans") == {9.0, 100.0, 3.0}
+    assert numbers_in("nine hundred dollars and 3 cans") == {900.0, 3.0}
     assert numbers_in("no one asked") == set()
+    assert numbers_in("under two thousand a day") == {2000.0}
+    assert numbers_in("two, three times a week") == {2.0, 3.0}
+    assert numbers_in("twenty five pounds, twice") == {25.0, 2.0}
+    assert numbers_in("2,000 mg") == {2000.0}
+    assert numbers_in("two thousand five hundred") == {2500.0}
+
+
+def test_patient_may_repeat_student_numbers(load_golden):
+    case = load_golden("walter_greene")
+    said = "Let's aim for under 2000 milligrams of sodium a day."
+    assert not deterministic_checks(case, "So under two thousand a day.", [], [], [], said)
 
 
 def test_cited_fact_must_be_allowed(load_golden):

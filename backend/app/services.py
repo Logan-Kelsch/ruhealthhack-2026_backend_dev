@@ -154,6 +154,8 @@ def start_encounter(db: Session, *, case_id: str, version: int | None, visit_id:
         case_row = get_case_row(db, case_id, version, status="published")
         case = load_case(case_row)
         visit_id = visit_id or case.visits[0].id
+        if case.visit(visit_id) is None:
+            raise NotFound(f"visit {visit_id} not found in {case.case_id}")
     resolved = resolve_visit(case, visit_id, prior_branch)
     state = engine.new_state(resolved)
     state["prior_branch_id"] = prior_branch.id if prior_branch else None

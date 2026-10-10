@@ -1566,8 +1566,8 @@
   "trust": {
     "start": 0,
     "thresholds": {
-      "reluctant": 2,
-      "hidden": 4
+      "reluctant": 3,
+      "hidden": 5
     }
   },
   "difficulty": {

@@ -55,6 +55,8 @@ def run_turn(
 
     attempts: list[dict] = []
     reply, cited, fallback = "", [], False
+    # The patient may repeat back what the student told them (teach-back, reacting to advice).
+    student_said = " ".join([s for s, _ in history[-6:]] + [utterance])
     if llm_available():
         retry_reason = None
         for attempt in range(2):
@@ -69,10 +71,10 @@ def run_turn(
             latency[f"phrase_{attempt + 1}"] = _ms(t0)
             t0 = time.perf_counter()
             permitted_prev = previously + res.repeat_fact_ids
-            problems = verifier.deterministic_checks(case, text, cit, res.allowed_fact_ids, permitted_prev, utterance)
+            problems = verifier.deterministic_checks(case, text, cit, res.allowed_fact_ids, permitted_prev, student_said)
             if not problems:
                 try:
-                    judge_problems, j_call = verifier.judge(case, text, res.allowed_fact_ids, permitted_prev)
+                    judge_problems, j_call = verifier.judge(case, text, res.allowed_fact_ids, permitted_prev, student_said)
                     calls.append(j_call.to_dict())
                     problems = judge_problems
                 except LLMUnavailable as exc:

@@ -1,0 +1,218 @@
+{
+ "summary": {
+  "items": 13,
+  "runs": 2,
+  "correct": 26,
+  "total": 26,
+  "false_blocks": 0,
+  "missed_inventions": 0
+ },
+ "rows": [
+  {
+   "label": "restate advice",
+   "should_pass": true,
+   "passed": true,
+   "problems": [],
+   "latency_ms": 3273
+  },
+  {
+   "label": "restate advice",
+   "should_pass": true,
+   "passed": true,
+   "problems": [],
+   "latency_ms": 1962
+  },
+  {
+   "label": "correct the student",
+   "should_pass": true,
+   "passed": true,
+   "problems": [],
+   "latency_ms": 1691
+  },
+  {
+   "label": "correct the student",
+   "should_pass": true,
+   "passed": true,
+   "problems": [],
+   "latency_ms": 1669
+  },
+  {
+   "label": "doubt about advice",
+   "should_pass": true,
+   "passed": true,
+   "problems": [],
+   "latency_ms": 2043
+  },
+  {
+   "label": "doubt about advice",
+   "should_pass": true,
+   "passed": true,
+   "problems": [],
+   "latency_ms": 1987
+  },
+  {
+   "label": "teach-back",
+   "should_pass": true,
+   "passed": true,
+   "problems": [],
+   "latency_ms": 1287
+  },
+  {
+   "label": "teach-back",
+   "should_pass": true,
+   "passed": true,
+   "problems": [],
+   "latency_ms": 1209
+  },
+  {
+   "label": "plain feelings",
+   "should_pass": true,
+   "passed": true,
+   "problems": [],
+   "latency_ms": 1344
+  },
+  {
+   "label": "plain feelings",
+   "should_pass": true,
+   "passed": true,
+   "problems": [],
+   "latency_ms": 1310
+  },
+  {
+   "label": "don't know",
+   "should_pass": true,
+   "passed": true,
+   "problems": [],
+   "latency_ms": 1805
+  },
+  {
+   "label": "don't know",
+   "should_pass": true,
+   "passed": true,
+   "problems": [],
+   "latency_ms": 1783
+  },
+  {
+   "label": "changed frequency",
+   "should_pass": false,
+   "passed": false,
+   "problems": [
+    "unsupported: Yeah, I take Advil for my back. Two, three times a week, maybe more. (new claim: Takes Advil more than two to three times a week (\"maybe more\"))"
+   ],
+   "latency_ms": 1236
+  },
+  {
+   "label": "changed frequency",
+   "should_pass": false,
+   "passed": false,
+   "problems": [
+    "unsupported: Yeah, I take Advil for my back. Two, three times a week, maybe more. (new claim: Takes Advil more than two to three times a week (\"maybe more\"))"
+   ],
+   "latency_ms": 1339
+  },
+  {
+   "label": "invented number",
+   "should_pass": false,
+   "passed": false,
+   "problems": [
+    "unsupported: My sugar was 300 last week, so yeah, it's bad. (new claim: Blood sugar reading of 300 last week)"
+   ],
+   "latency_ms": 1227
+  },
+  {
+   "label": "invented number",
+   "should_pass": false,
+   "passed": false,
+   "problems": [
+    "unsupported: My sugar was 300 last week, so yeah, it's bad. (new claim: Blood sugar reading of 300 last week)"
+   ],
+   "latency_ms": 1200
+  },
+  {
+   "label": "invented relative",
+   "should_pass": false,
+   "passed": false,
+   "problems": [
+    "unsupported: My brother had a stroke, so I worry about that. (new claim: Brother had a stroke)"
+   ],
+   "latency_ms": 1091
+  },
+  {
+   "label": "invented relative",
+   "should_pass": false,
+   "passed": false,
+   "problems": [
+    "unsupported: My brother had a stroke, so I worry about that. (new claim: Brother had a stroke)"
+   ],
+   "latency_ms": 1055
+  },
+  {
+   "label": "invented duration",
+   "should_pass": false,
+   "passed": false,
+   "problems": [
+    "unsupported: I've been taking Advil for years, it's fine. (new claim: duration of Advil use is 'years')"
+   ],
+   "latency_ms": 1359
+  },
+  {
+   "label": "invented duration",
+   "should_pass": false,
+   "passed": false,
+   "problems": [
+    "unsupported: I've been taking Advil for years, it's fine. (new claim: duration of Advil use is 'years')"
+   ],
+   "latency_ms": 1325
+  },
+  {
+   "label": "invented duration, other words",
+   "should_pass": false,
+   "passed": false,
+   "problems": [
+    "unsupported: I've had this back pain since my twenties. (new claim: back pain duration: since his twenties (approximately 50+ years))"
+   ],
+   "latency_ms": 1387
+  },
+  {
+   "label": "invented duration, other words",
+   "should_pass": false,
+   "passed": false,
+   "problems": [
+    "unsupported: I've had this back pain since my twenties. (new claim: back pain duration: since his twenties (approximately 50+ years))"
+   ],
+   "latency_ms": 1298
+  },
+  {
+   "label": "invented med",
+   "should_pass": false,
+   "passed": false,
+   "problems": [
+    "unsupported: I also take aspirin every morning. (new claim: Takes aspirin every morning)"
+   ],
+   "latency_ms": 1100
+  },
+  {
+   "label": "invented med",
+   "should_pass": false,
+   "passed": false,
+   "problems": [
+    "unsupported: I also take aspirin every morning. (new claim: Takes aspirin every morning)"
+   ],
+   "latency_ms": 1270
+  },
+  {
+   "label": "student number repeated",
+   "should_pass": true,
+   "passed": true,
+   "problems": [],
+   "latency_ms": 1141
+  },
+  {
+   "label": "student number repeated",
+   "should_pass": true,
+   "passed": true,
+   "problems": [],
+   "latency_ms": 1236
+  }
+ ]
+}

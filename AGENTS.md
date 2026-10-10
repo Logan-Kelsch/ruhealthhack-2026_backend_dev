@@ -112,11 +112,11 @@ Docs never refer to "the coder" as a particular person and never take sides betw
   - type check and build for the frontend;
   - for pipeline changes, run `backend/scripts/run_test_students.py` on the golden cases (once it exists).
 - **Golden-case gate:** before recording any video, run the test students on all golden cases and check that grounding is 100% and nothing regressed.
-- **Commit messages:** imperative mood, plain language, reference feature IDs. AI-generated commits keep the tool's co-author trailer.
+- **Commit messages:** imperative mood, plain language, reference feature IDs. No AI co-author trailers or "generated with" lines; commits are authored by the person who pushes them.
 
-## Setup (to be filled in as code lands)
+## Setup
 
-Planned commands (update when real):
+Backend (Python 3.12+). `pip` shown; `uv sync` / `uv run` also work from `backend/`.
 ```bash
 cp .env.example .env
 ```
@@ -124,8 +124,22 @@ cp .env.example .env
 docker compose up -d db
 ```
 ```bash
-cd backend && uv sync && uv run alembic upgrade head && uv run uvicorn app.main:app --reload
+cd backend && python -m venv .venv && .venv/Scripts/pip install -e . pytest
 ```
+```bash
+cd backend && .venv/Scripts/python -m alembic upgrade head && .venv/Scripts/python -m scripts.seed_golden_cases
+```
+```bash
+cd backend && .venv/Scripts/python -m uvicorn app.main:app --reload
+```
+(On macOS/Linux use `.venv/bin/` instead of `.venv/Scripts/`.) API docs are at http://localhost:8000/docs.
+
+Checks:
+- Tests (offline, SQLite): `cd backend && LLM_ENABLED=false .venv/Scripts/python -m pytest -q`
+- Verifier on labeled lines (needs Bedrock): `.venv/Scripts/python -m scripts.eval_verifier --runs 2`
+- Set `LLM_ENABLED=false` to run everything without AWS (keyword classifier and template replies).
+
+Frontend (not built yet):
 ```bash
 cd frontend && npm install && npm run dev
 ```

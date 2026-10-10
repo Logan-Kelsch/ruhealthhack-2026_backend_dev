@@ -255,7 +255,7 @@ class Visit(BaseModel):
 
 class TrustConfig(BaseModel):
     start: int = 0
-    thresholds: dict[str, int] = Field(default_factory=lambda: {"reluctant": 2, "hidden": 4})
+    thresholds: dict[str, int] = Field(default_factory=lambda: {"reluctant": 3, "hidden": 5})
 
 
 class Difficulty(BaseModel):

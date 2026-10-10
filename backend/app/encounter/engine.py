@@ -32,6 +32,7 @@ def new_state(case: Case) -> dict:
         "open_before_si": None,
         "trust_log": [],
         "events": [],
+        "last_topics": [],
     }
 
 
@@ -107,8 +108,9 @@ def _releases_for_fact(case: Case, fact: Fact) -> list[ChartRelease]:
 
 
 def _max_new_facts(case: Case) -> int:
+    # Spoken answers stay short: two new things per reply is already a full turn out loud.
     verbosity = case.profile.personality.traits.get("verbosity", 0.5)
-    return 4 if verbosity >= 0.7 else 3
+    return 3 if verbosity >= 0.7 else 1 if verbosity <= 0.3 else 2
 
 
 def process_turn(
@@ -125,7 +127,12 @@ def process_turn(
     st["turn"] = turn
     res = EngineResult()
 
-    topic_ids = intent.topic_ids()
+    topic_ids = set(intent.topic_ids())
+    # "Tell me more" continues the topic the student just asked about.
+    if "anything_else" in topic_ids:
+        topic_ids |= set(st.get("last_topics", []))
+    if topic_ids - OPENER_TOPICS:
+        st["last_topics"] = sorted(topic_ids - OPENER_TOPICS)
     case_sensitive = sensitive_topic_ids()
 
     # 1. Trust events first, so empathy in this turn counts toward this turn's disclosure.
@@ -180,6 +187,10 @@ def process_turn(
     tier_order = {"initial": 0, "discoverable": 1, "reluctant": 2, "hidden": 3}
     new_allowed.sort(key=lambda f: tier_order[f.tier])
     new_allowed = new_allowed[:limit]
+    # A guarded disclosure is its own moment: at most one per turn, and not buried in a list.
+    guarded = [f for f in new_allowed if f.tier in ("reluctant", "hidden")]
+    if guarded:
+        new_allowed = [f for f in new_allowed if f.tier not in ("reluctant", "hidden")][: limit - 1] + guarded[:1]
 
     asked_before = any(st["asked"].get(t) for t in topic_ids)
     for t in topic_ids:

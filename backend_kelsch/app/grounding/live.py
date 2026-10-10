@@ -9,7 +9,7 @@ from time import perf_counter
 
 from app.encounter import engine, pipeline, verifier
 from app.integrations.bedrock import load_prompt, llm_available
-from app.settings import get_settings
+from app.settings import get_settings, aws_session
 from backend_kelsch.app.grounding.evaluation import (
     CASE_IDS, LEVELS, ROOT, _case, challenges, check_challenges, scripts,
 )
@@ -95,11 +95,8 @@ def credentials_ready() -> bool:
     """No inference or identity request; check only whether the SDK finds credentials."""
     if not llm_available():
         return False
-    import boto3
-    settings = get_settings()
     try:
-        session = boto3.Session(profile_name=settings.aws_profile, region_name=settings.aws_region)
-        return session.get_credentials() is not None
+        return aws_session().get_credentials() is not None
     except Exception:
         return False
 

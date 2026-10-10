@@ -176,7 +176,9 @@ def check_challenges(rows: list[dict], *, use_llm: bool = False) -> dict:
                                               row["previously_disclosed"], row["student_utterance"])
                 row["llm_judge"] = {"status": "EVALUATED", "call": call.to_dict(), "problems": issues}
             except LLMUnavailable as exc:
-                row["llm_judge"] = {"status": "UNAVAILABLE", "call": None, "problems": [str(exc)]}
+                row["llm_judge"] = {"status": "UNAVAILABLE",
+                    "call": exc.call.to_dict() if exc.call is not None else None,
+                    "problems": [str(exc)]}
     return {"counts": dict(counts), "examples": examples}
 
 

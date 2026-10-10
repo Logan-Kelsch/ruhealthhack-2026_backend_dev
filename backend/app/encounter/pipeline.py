@@ -65,6 +65,8 @@ def run_turn(
                 text, cit, p_calls = phraser.phrase(case, res, utterance, history, previously, retry_reason)
                 calls += [c.to_dict() for c in p_calls]
             except LLMUnavailable as exc:
+                if exc.call is not None:
+                    calls.append(exc.call.to_dict())
                 attempts.append({"attempt": attempt + 1, "error": str(exc)})
                 latency[f"phrase_{attempt + 1}"] = _ms(t0)
                 break
@@ -78,6 +80,8 @@ def run_turn(
                     calls.append(j_call.to_dict())
                     problems = judge_problems
                 except LLMUnavailable as exc:
+                    if exc.call is not None:
+                        calls.append(exc.call.to_dict())
                     problems = [f"judge unavailable: {exc}"]  # fail closed
             latency[f"verify_{attempt + 1}"] = _ms(t0)
             attempts.append({"attempt": attempt + 1, "reply": text, "cited": cit, "problems": problems})
@@ -86,7 +90,9 @@ def run_turn(
                 break
             retry_reason = "; ".join(problems)
     if not reply:
+        t0 = time.perf_counter()
         reply, cited = phraser.template_reply(case, res, intent.topic_ids(), intent.action_ids(), bool(intent.empathy))
+        latency["template"] = _ms(t0)
         fallback = True
 
     blocked = sum(1 for a in attempts if a.get("problems"))

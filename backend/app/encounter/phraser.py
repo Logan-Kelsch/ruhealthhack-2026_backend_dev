@@ -133,10 +133,12 @@ def phrase(
         user += f"\n\nYOUR PREVIOUS REPLY WAS REJECTED: {retry_reason}. Fix it."
     try:
         data, call = complete_json(purpose="phrase", prompt_name="phraser", user=user, max_tokens=400, temperature=0.6)
-    except LLMUnavailable:
+    except LLMUnavailable as exc:
         failed = last_failed_call("phrase")
-        raise LLMUnavailable(failed.error if failed else "phraser failed") from None
+        raise LLMUnavailable(failed.error if failed else "phraser failed", call=failed or exc.call) from None
     if not isinstance(data, dict) or not isinstance(data.get("reply_text"), str):
-        raise LLMUnavailable("phraser returned an unexpected shape")
+        call.ok = False
+        call.error = "phraser returned an unexpected shape"
+        raise LLMUnavailable(call.error, call=call)
     cited = [str(c) for c in data.get("cited_fact_ids") or []]
     return data["reply_text"].strip(), cited, [call]

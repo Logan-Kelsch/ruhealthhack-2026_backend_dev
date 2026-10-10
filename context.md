@@ -886,5 +886,5 @@ A user-requested notebook rehearses three fixed examples: pneumonia after Philad
 
 The debrief is a separate review after the encounter has ended. Reflection questions
 and teaching guidance do not interject into the conversation. The notebook separates
-ending the encounter from viewing its debrief; turn numbers in review files cite
-completed transcript evidence, not a schedule for in-conversation prompts.
+ending the encounter from viewing its debrief. Each review file ends with one
+debrief block for the entire completed dialogue, without per-turn references.

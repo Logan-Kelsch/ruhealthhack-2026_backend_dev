@@ -1,5 +1,5 @@
 {
-  "format": "clinical_script_review_v1",
+  "format": "clinical_script_review_v3",
   "scenario_id": 2,
   "title": "Tobacco use and readiness to change",
   "patient": {
@@ -17,7 +17,8 @@
   "learner_role": "medical student under supervision",
   "teaching_notes": [
     "Use the fixed suggested sequence for a coherent rehearsal.",
-    "This is an authored demonstration, not a diagnosis or grading engine."
+    "This is an authored demonstration, not a diagnosis or grading engine.",
+    "Show the single debrief only after the entire student-patient dialogue is complete and the encounter has ended."
   ],
   "sources": [
     {
@@ -43,7 +44,7 @@
         {
           "id": "tobacco.readiness",
           "label": "Patient-stated readiness",
-          "text": "The patient explicitly declines cessation at this visit. Readiness is not inferred from agreement to receive information.",
+          "text": "Patient states: \"I do not want to change.\"",
           "source": "https://www.dph.ncdhhs.gov/programs/chronic-disease-and-injury/tobacco-prevention-and-control/quitlinenc/providers/treatment/motivational-interviewing",
           "urgent": false
         }
@@ -75,26 +76,25 @@
       "chart": []
     }
   ],
-  "debrief": [
-    {
-      "after_turn": 4,
-      "rubric_domain": "Rapport, respect, and empathy",
-      "question": "Compare the patient response before and after the quit-date question. What changed in the conversation?"
-    },
-    {
-      "after_turn": 6,
-      "rubric_domain": "Listening and response to cues",
-      "question": "Which of the patient priorities could you reflect back without treating them as a commitment to change?"
-    },
-    {
-      "after_turn": 7,
-      "rubric_domain": "Explanation and shared decisions",
-      "question": "How would you distinguish permission to receive information from willingness to start treatment?"
-    },
-    {
-      "after_turn": 8,
-      "rubric_domain": "Professionalism, safety, and closure",
-      "question": "What would a useful closing plan look like if the patient still declines change?"
-    }
-  ]
+  "debrief": {
+    "delivery": "after_dialogue",
+    "questions": [
+      {
+        "rubric_domain": "Rapport, respect, and empathy",
+        "question": "Looking back at the patient's response to the quit-date question, how did your wording affect the conversation, and what would you adjust in a future encounter?"
+      },
+      {
+        "rubric_domain": "Listening and response to cues",
+        "question": "Review the priorities the patient described. How well did your response reflect what mattered to him without assuming a decision to change?"
+      },
+      {
+        "rubric_domain": "Explanation and shared decisions",
+        "question": "Looking back at the permission discussion, what did the patient actually agree to, and how would you check that understanding in a future visit?"
+      },
+      {
+        "rubric_domain": "Professionalism, safety, and closure",
+        "question": "At the end of the encounter, how well did your closing plan fit the willingness the patient expressed throughout the conversation?"
+      }
+    ]
+  }
 }

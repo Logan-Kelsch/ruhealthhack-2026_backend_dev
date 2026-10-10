@@ -8141,7 +8141,7 @@ a.anchor-link {
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="4.-Enter-a-student-question;-receive-the-next-static-patient-reply">4. Enter a student question; receive the next static patient reply<a class="anchor-link" href="#4.-Enter-a-student-question;-receive-the-next-static-patient-reply">¶</a></h2><p>Use the text box for this presenter notebook, or call <code>next_turn("your question")</code> in another cell. Click <strong>Use suggested question</strong>, then <strong>Send question</strong>, for the intended sequence. If educator text was changed, click <strong>Start prepared case</strong> first.</p>
 <p>The response carries an assumed thinking delay of about 1–2.4 seconds. The notebook waits before displaying the patient bubble. The HTTP server does <strong>not</strong> sleep; the frontend controls presentation. Released chart findings appear immediately. The conversation contains no teaching prompts or coaching notices.</p>
-<p><strong>When finished:</strong> click <strong>End encounter</strong>, then <strong>View debrief</strong>. Ending stops the conversation; it does not display feedback. The debrief opens in its own output area and cannot be requested while the encounter is active. An early ending reviews only exchanges that actually occurred.</p>
+<p><strong>When finished:</strong> click <strong>End encounter</strong>, then <strong>View debrief</strong>. Ending stops the conversation; it does not display feedback. The debrief opens in its own output area and cannot be requested while the encounter is active. Ending early does not release the debrief. Complete the entire dialogue first.</p>
 <p><strong>Presenter:</strong> “The wait is a presentation estimate, not measured Bedrock or voice latency.”</p>
 </div>
 </div>
@@ -8428,67 +8428,122 @@ a.anchor-link {
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p>The encounter has ended. Review the completed transcript using these authored reflection questions; turn numbers identify evidence, not feedback scheduled during conversation. These questions are not a judgment that you made an error. Replies depend on sequence position, not interpretation of your input. No rubric score or learning outcome is assigned.</p>
+<p>Review the entire completed dialogue using these authored reflection questions. They are not a judgment that you made an error. Replies depend on sequence position, not interpretation of your input. No rubric score or learning outcome is assigned.</p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p><strong>Information gathering · evidence from turn 4</strong></p>
+<p><strong>Completed dialogue</strong></p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<blockquote><b>Your words:</b> Have you traveled or stayed away from home in the last two weeks?</blockquote>
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>student_text</th>
+<th>patient_text</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>Hello, I am the medical student working with y...</td>
+<td>I am Daniel. I have had a fever and this cough...</td>
+</tr>
+<tr>
+<th>1</th>
+<td>When did this start, and how has it changed?</td>
+<td>It started four days ago with aches and a feve...</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Have you had any other symptoms, like stomach ...</td>
+<td>I have had watery diarrhea and a headache. I h...</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Have you traveled or stayed away from home in ...</td>
+<td>Yes. I went to a convention in Philly nine day...</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Tell me about your health conditions, medicine...</td>
+<td>I have high blood pressure and take lisinopril...</td>
+</tr>
+<tr>
+<th>5</th>
+<td>I would like to check your oxygen level and ex...</td>
+<td>Yes, please. I feel like I cannot get a full b...</td>
+</tr>
+<tr>
+<th>6</th>
+<td>The examination suggests pneumonia. I will ask...</td>
+<td>Could something at the hotel have made me sick...</td>
+</tr>
+<tr>
+<th>7</th>
+<td>Hotel travel is a clue, but it does not prove ...</td>
+<td>Okay. I can try to cough up a sample. Will I n...</td>
+</tr>
+<tr>
+<th>8</th>
+<td>I will discuss prompt pneumonia treatment with...</td>
+<td>Please explain the plan as we go. I am worried...</td>
+</tr>
+<tr>
+<th>9</th>
+<td>We are arranging monitored care and treatment....</td>
+<td>You think I have pneumonia, and the hotel stay...</td>
+</tr>
+</tbody>
+</table>
 </div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<blockquote><b>Patient response:</b> Yes. I went to a convention in Philly nine days ago and stayed at a downtown hotel for three nights.</blockquote>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p>What information from the travel history would you carry into your assessment, and what still needs confirmation?</p>
+<p><strong>Information gathering</strong></p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p><strong>Clinical reasoning and synthesis · evidence from turn 6</strong></p>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<blockquote><b>Your words:</b> I would like to check your oxygen level and examine your chest. Is that okay?</blockquote>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<blockquote><b>Patient response:</b> Yes, please. I feel like I cannot get a full breath.</blockquote>
+<p>Looking back at the completed encounter, which details influenced your assessment, and which parts of your explanation remained uncertain?</p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p>Which findings affect the urgency of your plan, independent of the eventual cause?</p>
+<p><strong>Clinical reasoning and synthesis</strong></p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p><strong>Explanation and shared decisions · evidence from turn 9</strong></p>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<blockquote><b>Your words:</b> I will discuss prompt pneumonia treatment with my supervising clinician, including coverage for Legionella, such as a macrolide or a respiratory fluoroquinolone, if appropriate for you.</blockquote>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<blockquote><b>Patient response:</b> Please explain the plan as we go. I am worried about how breathless I am.</blockquote>
+<p>When reviewing the examination findings, what influenced how quickly you sought help, and what would you prioritize in a similar encounter?</p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p>How would you explain why a treatment is being considered without presenting an unconfirmed cause as certain?</p>
+<p><strong>Explanation and shared decisions</strong></p>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
+<p>Review your treatment discussion. How clearly did you separate known findings from working explanations, and what wording would you improve next time?</p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
@@ -8550,7 +8605,7 @@ a.anchor-link {
 <tr>
 <th>0</th>
 <td>Patient-stated readiness</td>
-<td>The patient explicitly declines cessation at t...</td>
+<td>Patient states: "I do not want to change."</td>
 <td>authored_synthetic_finding</td>
 </tr>
 </tbody>
@@ -8630,87 +8685,122 @@ a.anchor-link {
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p>The encounter has ended. Review the completed transcript using these authored reflection questions; turn numbers identify evidence, not feedback scheduled during conversation. These questions are not a judgment that you made an error. Replies depend on sequence position, not interpretation of your input. No rubric score or learning outcome is assigned.</p>
+<p>Review the entire completed dialogue using these authored reflection questions. They are not a judgment that you made an error. Replies depend on sequence position, not interpretation of your input. No rubric score or learning outcome is assigned.</p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p><strong>Rapport, respect, and empathy · evidence from turn 4</strong></p>
+<p><strong>Completed dialogue</strong></p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<blockquote><b>Your words:</b> You really need to stop; could you set a quit date this week?</blockquote>
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>student_text</th>
+<th>patient_text</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>Hello, I am the medical student working with y...</td>
+<td>We can talk, but I am telling you now: I am no...</td>
+</tr>
+<tr>
+<th>1</th>
+<td>What does smoking do for you during a usual day?</td>
+<td>I smoke about a pack a day. With rotating shif...</td>
+</tr>
+<tr>
+<th>2</th>
+<td>How do you feel about making a change right now?</td>
+<td>I do not want to change. I know people say it ...</td>
+</tr>
+<tr>
+<th>3</th>
+<td>You really need to stop; could you set a quit ...</td>
+<td>No. That is what everyone says. If this is goi...</td>
+</tr>
+<tr>
+<th>4</th>
+<td>I pushed ahead of where you are. You get to de...</td>
+<td>I barely slept, I was irritable at work, and I...</td>
+</tr>
+<tr>
+<th>5</th>
+<td>It sounds like smoking helps you manage stress...</td>
+<td>Keeping my job and getting through my shifts. ...</td>
+</tr>
+<tr>
+<th>6</th>
+<td>Would you like information about support avail...</td>
+<td>You can give me something to look at, but I am...</td>
+</tr>
+<tr>
+<th>7</th>
+<td>I hear that you are not ready. We can revisit ...</td>
+<td>Just do not make every visit about cigarettes....</td>
+</tr>
+</tbody>
+</table>
 </div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<blockquote><b>Patient response:</b> No. That is what everyone says. If this is going to be another lecture, I would rather leave.</blockquote>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p>Compare the patient response before and after the quit-date question. What changed in the conversation?</p>
+<p><strong>Rapport, respect, and empathy</strong></p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p><strong>Listening and response to cues · evidence from turn 6</strong></p>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<blockquote><b>Your words:</b> It sounds like smoking helps you manage stress, and the last attempt was miserable. What matters most to you at the moment?</blockquote>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<blockquote><b>Patient response:</b> Keeping my job and getting through my shifts. My daughter hates the smell, but that does not mean I am ready to quit.</blockquote>
+<p>Looking back at the patient's response to the quit-date question, how did your wording affect the conversation, and what would you adjust in a future encounter?</p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p>Which of the patient priorities could you reflect back without treating them as a commitment to change?</p>
+<p><strong>Listening and response to cues</strong></p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p><strong>Explanation and shared decisions · evidence from turn 7</strong></p>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<blockquote><b>Your words:</b> Would you like information about support available if you ever choose to revisit this?</blockquote>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<blockquote><b>Patient response:</b> You can give me something to look at, but I am not promising to call anyone or take medicine.</blockquote>
+<p>Review the priorities the patient described. How well did your response reflect what mattered to him without assuming a decision to change?</p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p>How would you distinguish permission to receive information from willingness to start treatment?</p>
+<p><strong>Explanation and shared decisions</strong></p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p><strong>Professionalism, safety, and closure · evidence from turn 8</strong></p>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<blockquote><b>Your words:</b> I hear that you are not ready. We can revisit it when you want. Is there anything you want us to understand before we finish?</blockquote>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<blockquote><b>Patient response:</b> Just do not make every visit about cigarettes. I want help with my health without being judged.</blockquote>
+<p>Looking back at the permission discussion, what did the patient actually agree to, and how would you check that understanding in a future visit?</p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p>What would a useful closing plan look like if the patient still declines change?</p>
+<p><strong>Professionalism, safety, and closure</strong></p>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
+<p>At the end of the encounter, how well did your closing plan fit the willingness the patient expressed throughout the conversation?</p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
@@ -8853,87 +8943,122 @@ a.anchor-link {
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p>The encounter has ended. Review the completed transcript using these authored reflection questions; turn numbers identify evidence, not feedback scheduled during conversation. These questions are not a judgment that you made an error. Replies depend on sequence position, not interpretation of your input. No rubric score or learning outcome is assigned.</p>
+<p>Review the entire completed dialogue using these authored reflection questions. They are not a judgment that you made an error. Replies depend on sequence position, not interpretation of your input. No rubric score or learning outcome is assigned.</p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p><strong>Clinical reasoning and synthesis · evidence from turn 1</strong></p>
+<p><strong>Completed dialogue</strong></p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<blockquote><b>Your words:</b> Hello, I am the medical student with the emergency team. Tell me what feels different today.</blockquote>
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>student_text</th>
+<th>patient_text</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>Hello, I am the medical student with the emerg...</td>
+<td>I feel sick to my stomach and sweaty. There is...</td>
+</tr>
+<tr>
+<th>1</th>
+<td>When did it begin, and what were you doing?</td>
+<td>About forty minutes ago, carrying groceries. I...</td>
+</tr>
+<tr>
+<th>2</th>
+<td>I do not want to assume this is anxiety. I wil...</td>
+<td>All right. I have had panic attacks before, bu...</td>
+</tr>
+<tr>
+<th>3</th>
+<td>While the team reviews the ECG, how does this ...</td>
+<td>Usually I get frightened first, my heart races...</td>
+</tr>
+<tr>
+<th>4</th>
+<td>The ECG has changes that need immediate review...</td>
+<td>Is something wrong with my heart? I thought I ...</td>
+</tr>
+<tr>
+<th>5</th>
+<td>The tracing raises concern for a serious heart...</td>
+<td>Please stay with me until they get here. I am ...</td>
+</tr>
+<tr>
+<th>6</th>
+<td>I will stay with you while we hand over. Do yo...</td>
+<td>No known medicine allergies. I take sertraline...</td>
+</tr>
+<tr>
+<th>7</th>
+<td>I am handing over your symptoms, their timing,...</td>
+<td>Thank you for taking me seriously. Please tell...</td>
+</tr>
+</tbody>
+</table>
 </div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<blockquote><b>Patient response:</b> I feel sick to my stomach and sweaty. There is a strange heaviness here, but it is not sharp pain. Maybe it is my anxiety.</blockquote>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p>What alternative explanations deserve attention before accepting the patient initial explanation?</p>
+<p><strong>Clinical reasoning and synthesis</strong></p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p><strong>Information gathering · evidence from turn 3</strong></p>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<blockquote><b>Your words:</b> I do not want to assume this is anxiety. I will alert my supervisor and arrange an ECG and vital signs now while we continue.</blockquote>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<blockquote><b>Patient response:</b> All right. I have had panic attacks before, but this feels different.</blockquote>
+<p>After reviewing the completed encounter, how did the patient's initial explanation influence your thinking, and what other possibilities would you keep open next time?</p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p>Which parts of the history justified early testing rather than a longer interview first?</p>
+<p><strong>Information gathering</strong></p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p><strong>Clinical reasoning and synthesis · evidence from turn 5</strong></p>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<blockquote><b>Your words:</b> The ECG has changes that need immediate review. I am escalating now to the emergency clinician and cardiac team rather than waiting for more questions or blood-test results.</blockquote>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<blockquote><b>Patient response:</b> Is something wrong with my heart? I thought I was having another panic attack.</blockquote>
+<p>Reflect on the timing of your initial assessment. Which information made prompt testing worth prioritizing over a longer interview?</p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p>What evidence changed the urgency of your plan, and how would you communicate it in a handover?</p>
+<p><strong>Clinical reasoning and synthesis</strong></p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p><strong>Rapport, respect, and empathy · evidence from turn 6</strong></p>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<blockquote><b>Your words:</b> The tracing raises concern for a serious heart problem. The team is acting urgently and will explain the next steps. You have done the right thing by coming in.</blockquote>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<blockquote><b>Patient response:</b> Please stay with me until they get here. I am scared.</blockquote>
+<p>Looking back, which findings changed your plan, and how clearly did your handover communicate the urgency?</p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p>How can you acknowledge fear while avoiding premature reassurance?</p>
+<p><strong>Rapport, respect, and empathy</strong></p>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
+<p>Review your response to the patient's fear. How did your words acknowledge it without promising an outcome, and what would you refine next time?</p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
@@ -9070,12 +9195,12 @@ a.anchor-link {
 <tr>
 <td>Finish</td>
 <td><code>POST /api/demo/sessions/{sid}/end</code></td>
-<td>Public ended session; conversation stops, no feedback displayed</td>
+<td>Public ended session; no feedback displayed; incomplete dialogue has no debrief</td>
 </tr>
 <tr>
 <td>Reflect</td>
 <td><code>GET /api/demo/sessions/{sid}/debrief</code></td>
-<td>Separate post-encounter review of transcript evidence; 409 until ended, no score</td>
+<td>One review of the entire completed dialogue; 409 until all exchanges are complete and ended</td>
 </tr>
 </tbody>
 </table>
@@ -9087,7 +9212,7 @@ a.anchor-link {
 <li><strong>Categorization / sequence behavior:</strong> <code>backend/app/demo/service.py</code>.</li>
 <li><strong>HTTP boundary:</strong> <code>backend/app/api/demo.py</code>.</li>
 </ul>
-<p>For nontechnical review, use the three JSON files in <code>backend_kelsch/docs/scripted_scenarios/</code> and the <code>scripts.update_scripted_clinical_demo</code> importer. Its debrief <code>after_turn</code> values cite completed transcript turns; they do not schedule feedback. The importer increments <code>fixture_version</code> after an authored change. New preparations pin the new content and hash; existing sessions retain their saved snapshot. The fixture is a demo format, not the production <code>Case</code> schema. A live educator adapter can return <code>MetadataExtraction</code>, but must go through clinical authoring/review before changing real case facts. A RAG-guided debrief can later replace static prompts using approved hint material and explicit reveal rules; RAG is not used here.</p>
+<p>For nontechnical review, use the three JSON files in <code>backend_kelsch/docs/scripted_scenarios/</code> and the <code>scripts.update_scripted_clinical_demo</code> importer. Each file ends with one <code>debrief</code> block whose <code>delivery</code> is <code>after_dialogue</code>. Questions review the entire conversation and have no per-turn references. The importer increments <code>fixture_version</code> after an authored change. New preparations pin the new content and hash; existing sessions retain their saved snapshot. The fixture is a demo format, not the production <code>Case</code> schema. A live educator adapter can return <code>MetadataExtraction</code>, but must go through clinical authoring/review before changing real case facts. A RAG-guided debrief can later replace static prompts using approved hint material and explicit reveal rules; RAG is not used here.</p>
 <p>References supporting the authored patterns: <a href="https://www.cdc.gov/legionella/hcp/clinical-guidance/index.html">CDC Legionella clinical guidance</a>, <a href="https://www.cdc.gov/legionella/hcp/clinical-signs/index.html">CDC symptoms</a>, <a href="https://www.dph.ncdhhs.gov/programs/chronic-disease-and-injury/tobacco-prevention-and-control/quitlinenc/providers/treatment/motivational-interviewing">NCDHHS motivational interviewing</a>, <a href="https://www.jacc.org/doi/10.1016/j.jacc.2024.11.009">2025 ACS guideline</a>, and <a href="https://www.heart.org/en/health-topics/heart-attack/warning-signs-of-a-heart-attack/heart-attack-symptoms-in-women">AHA symptoms in women</a>. These support the teaching context, not approval of these particular cases.</p>
 <p><strong>Presenter closing:</strong> “We can now rehearse the full interface consistently. Clinical approval, actual model/voice timing, and evidence that learners improve remain separate work.”</p>
 </div>

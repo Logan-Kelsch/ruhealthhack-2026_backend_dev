@@ -157,20 +157,22 @@ def debrief(db: Session, sid: str) -> dict:
     row = load(db,sid)
     if row.status!="ended": raise Conflict("End the demo session before requesting debrief")
     p, case = row.payload, row.payload["case"]
+    if len(p["turns"]) != len(case["turns"]):
+        raise Conflict("Complete the entire dialogue before requesting debrief")
     domains = {d["id"]:d["name"] for d in catalogs.rubric()["domains"]}
-    reflections = []
-    for q in case["debrief"]:
-        if q["anchor_step"]>len(p["turns"]): continue
-        t = p["turns"][q["anchor_step"]-1]
-        question = q["question"]
-        if t["student_text"].strip() != case["turns"][q["anchor_step"]-1]["suggested_student_text"]:
-            question = "Review this completed exchange. How would you approach this domain in a future encounter, and what would you ask or explain differently?"
-        reflections.append({**q,"question":question,"domain_name":domains[q["domain_id"]],
-                           "student_quote":t["student_text"],"patient_quote":t["patient_text"]})
-    match = len(p["turns"])==len(case["turns"]) and all(
-        t["student_text"].strip()==s["suggested_student_text"] for t,s in zip(p["turns"],case["turns"]))
-    return {"session_id":sid,"reflections":reflections,"completed_steps":len(p["turns"]),
+    match = all(t["student_text"].strip()==s["suggested_student_text"]
+                for t,s in zip(p["turns"],case["turns"]))
+    # Stored sessions from earlier versions keep their questions, without per-turn delivery.
+    authored = case["debrief"]
+    questions = authored["questions"] if isinstance(authored, dict) else authored
+    reflections = [{"id":q["id"], "domain_id":q["domain_id"],
+                    "domain_name":domains[q["domain_id"]],
+                    "question":q["question"] if match else
+                    "Review the completed dialogue. How would you approach this domain differently in a future encounter?"}
+                   for q in questions]
+    return {"session_id":sid, "delivery":"after_dialogue", "reflections":reflections,
+            "transcript":p["turns"], "completed_steps":len(p["turns"]),
             "total_steps":len(case["turns"]),"follows_rehearsal_script":match,
             "method":"scripted_guided_reflection","assessment_status":"not_scored",
-            "interpretation":"The encounter has ended. Review the completed transcript using these authored reflection questions; turn numbers identify evidence, not feedback scheduled during conversation. These questions are not a judgment that you made an error. Replies depend on sequence position, not interpretation of your input. No rubric score or learning outcome is assigned.",
-            "safety_notice":SAFETY_NOTICE if any(c["urgent"] and c["release_step"]<=len(p["turns"]) for c in case["chart"]) else None}
+            "interpretation":"Review the entire completed dialogue using these authored reflection questions. They are not a judgment that you made an error. Replies depend on sequence position, not interpretation of your input. No rubric score or learning outcome is assigned.",
+            "safety_notice":SAFETY_NOTICE if any(c["urgent"] for c in case["chart"]) else None}

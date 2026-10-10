@@ -1,5 +1,5 @@
 {
-  "format": "clinical_script_review_v1",
+  "format": "clinical_script_review_v3",
   "scenario_id": 3,
   "title": "Nausea, fatigue, and chest unease",
   "patient": {
@@ -17,7 +17,8 @@
   "learner_role": "medical student under supervision",
   "teaching_notes": [
     "Use the fixed suggested sequence for a coherent rehearsal.",
-    "This is an authored demonstration, not a diagnosis or grading engine."
+    "This is an authored demonstration, not a diagnosis or grading engine.",
+    "Show the single debrief only after the entire student-patient dialogue is complete and the encounter has ended."
   ],
   "sources": [
     {
@@ -47,7 +48,7 @@
         {
           "id": "cardiac.vitals",
           "label": "Vital signs",
-          "text": "Blood pressure 132/84 mmHg; heart rate 96/min; respiratory rate 22/min; oxygen saturation 97% on room air. Authored snapshot, not a reassurance of cardiac safety.",
+          "text": "Blood pressure 132/84 mmHg; heart rate 96/min; respiratory rate 22/min; oxygen saturation 97% on room air.",
           "source": "Authored example values",
           "urgent": false
         },
@@ -86,26 +87,25 @@
       "chart": []
     }
   ],
-  "debrief": [
-    {
-      "after_turn": 1,
-      "rubric_domain": "Clinical reasoning and synthesis",
-      "question": "What alternative explanations deserve attention before accepting the patient initial explanation?"
-    },
-    {
-      "after_turn": 3,
-      "rubric_domain": "Information gathering",
-      "question": "Which parts of the history justified early testing rather than a longer interview first?"
-    },
-    {
-      "after_turn": 5,
-      "rubric_domain": "Clinical reasoning and synthesis",
-      "question": "What evidence changed the urgency of your plan, and how would you communicate it in a handover?"
-    },
-    {
-      "after_turn": 6,
-      "rubric_domain": "Rapport, respect, and empathy",
-      "question": "How can you acknowledge fear while avoiding premature reassurance?"
-    }
-  ]
+  "debrief": {
+    "delivery": "after_dialogue",
+    "questions": [
+      {
+        "rubric_domain": "Clinical reasoning and synthesis",
+        "question": "After reviewing the completed encounter, how did the patient's initial explanation influence your thinking, and what other possibilities would you keep open next time?"
+      },
+      {
+        "rubric_domain": "Information gathering",
+        "question": "Reflect on the timing of your initial assessment. Which information made prompt testing worth prioritizing over a longer interview?"
+      },
+      {
+        "rubric_domain": "Clinical reasoning and synthesis",
+        "question": "Looking back, which findings changed your plan, and how clearly did your handover communicate the urgency?"
+      },
+      {
+        "rubric_domain": "Rapport, respect, and empathy",
+        "question": "Review your response to the patient's fear. How did your words acknowledge it without promising an outcome, and what would you refine next time?"
+      }
+    ]
+  }
 }

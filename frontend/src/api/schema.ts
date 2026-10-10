@@ -1410,6 +1410,12 @@ export interface components {
             assessment_status: "not_scored";
             /** Completed Steps */
             completed_steps: number;
+            /**
+             * Delivery
+             * @default after_dialogue
+             * @constant
+             */
+            delivery: "after_dialogue";
             /** Follows Rehearsal Script */
             follows_rehearsal_script: boolean;
             /** Interpretation */
@@ -1428,6 +1434,8 @@ export interface components {
             session_id: string;
             /** Total Steps */
             total_steps: number;
+            /** Transcript */
+            transcript: components["schemas"]["TranscriptTurn"][];
         };
         /** DemoSession */
         DemoSession: {
@@ -2679,20 +2687,14 @@ export interface components {
         };
         /** Reflection */
         Reflection: {
-            /** Anchor Step */
-            anchor_step: number;
             /** Domain Id */
             domain_id: number;
             /** Domain Name */
             domain_name: string;
             /** Id */
             id: string;
-            /** Patient Quote */
-            patient_quote: string;
             /** Question */
             question: string;
-            /** Student Quote */
-            student_quote: string;
         };
         /** Release */
         Release: {

@@ -21,7 +21,9 @@ PROMPT_DIR = Path(__file__).resolve().parent.parent / "prompts"
 
 
 class LLMUnavailable(Exception):
-    pass
+    def __init__(self, message: str, *, call: LLMCall | None = None):
+        super().__init__(message)
+        self.call = call
 
 
 @dataclass
@@ -33,6 +35,11 @@ class LLMCall:
     latency_ms: int
     ok: bool
     error: str | None = None
+    input_tokens: int | None = None
+    output_tokens: int | None = None
+    total_tokens: int | None = None
+    cache_read_input_tokens: int | None = None
+    cache_write_input_tokens: int | None = None
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -98,6 +105,12 @@ def complete_json(
             messages=[{"role": "user", "content": [{"text": user}]}],
             inferenceConfig={"maxTokens": max_tokens, "temperature": temperature},
         )
+        usage = resp.get("usage") or {}
+        call.input_tokens = usage.get("inputTokens")
+        call.output_tokens = usage.get("outputTokens")
+        call.total_tokens = usage.get("totalTokens")
+        call.cache_read_input_tokens = usage.get("cacheReadInputTokens")
+        call.cache_write_input_tokens = usage.get("cacheWriteInputTokens")
         text = "".join(block.get("text", "") for block in resp["output"]["message"]["content"])
         data = _extract_json(text)
         call.ok = True
@@ -105,7 +118,7 @@ def complete_json(
     except Exception as exc:  # network, auth, throttling, bad JSON: all mean "use the fallback"
         call.error = f"{type(exc).__name__}: {str(exc)[:200]}"
         log.warning("bedrock %s failed: %s", purpose, call.error)
-        raise LLMUnavailable(call.error) from exc
+        raise LLMUnavailable(call.error, call=call) from exc
     finally:
         call.latency_ms = int((time.perf_counter() - t0) * 1000)
         if not call.ok:

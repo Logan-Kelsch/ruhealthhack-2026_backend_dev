@@ -109,15 +109,17 @@ def judge(case: Case, reply: str, allowed: list[str], previously_disclosed: list
     )
     try:
         data, call = complete_json(purpose="verify", prompt_name="verifier", user=user, max_tokens=500)
-    except LLMUnavailable:
+    except LLMUnavailable as exc:
         failed = last_failed_call("verify")
-        raise LLMUnavailable(failed.error if failed else "verifier failed") from None
-    if not isinstance(data, dict) or not isinstance(data.get("unsupported", []), list):
+        raise LLMUnavailable(failed.error if failed else "verifier failed", call=failed or exc.call) from None
+    if not isinstance(data, dict) or not isinstance(data.get("unsupported"), list):
         return ["unreadable judge output"], call
     problems = []
     for u in data.get("unsupported", []):
         if not isinstance(u, dict):
             problems.append(f"unsupported: {u}")
-        elif str(u.get("new_claim", "")).strip():  # a flag must name the invented claim
+        elif isinstance(u.get("new_claim"), str) and u["new_claim"].strip():
             problems.append(f"unsupported: {u.get('sentence', '')} (new claim: {u['new_claim']})")
+        else:
+            problems.append("judge flagged unsupported content without a named claim")
     return problems, call

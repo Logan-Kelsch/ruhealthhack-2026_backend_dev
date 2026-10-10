@@ -1,0 +1,31 @@
+{
+  "scope": "Executed offline clinical-facing presentation; no Bedrock call or clinical approval",
+  "notebook_sha256": "dec98a5621560a6fd7e09bcd1abef3b2391611cf3e51e46ea5ea2926c27b91ba",
+  "exporter_sha256": "2208442a9296c83f791c7ec01f88f7f6c6798f69b0b4240771576c4f4b499a7e",
+  "presenter_module_sha256": "6a77e3de5eab6c4f43dff5ee414b7643c33492a1a762bf3763aeb35bcdc01655",
+  "method": "Sequential in-process IPython execution with captured rich displays",
+  "code_cells_passed": 11,
+  "embedded_pngs": 7,
+  "output_error_cells": 0,
+  "preview": "presenter_demo.html",
+  "executed_notebook": "executed_presenter.ipynb",
+  "native_kernel": {
+    "status": "BLOCKED",
+    "reason": "Work runtime denies ZMQ IP resolution / kernel died before kernel_info"
+  },
+  "live_bedrock": "NOT EXECUTED in this work environment; default live off; .env-aware session path and failed-call accounting tested with mocks",
+  "visual_qa": "All seven generated figures visually inspected; no clipped content or overlapping titles",
+  "html_qa": {
+    "embedded_chart_tags": 7,
+    "code_input_elements": 0
+  },
+  "preview_sha256": "8a5c6d2403b527f0e45ba2f1703244675baf3916fa249a81125d7cac48f6938b",
+  "base_main": "c7f6d5331d7f4738d7a332ebc15d38bec9b8098c",
+  "tests": {
+    "command": "LLM_ENABLED=false PYTHONPATH=backend MPLBACKEND=Agg python -m pytest -q backend/tests backend_kelsch/tests --durations=5",
+    "passed": 193,
+    "elapsed_seconds": 391.57,
+    "exit_code": 0,
+    "focused_tests_passed": 34
+  }
+}

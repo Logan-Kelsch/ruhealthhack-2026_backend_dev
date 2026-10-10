@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { Go } from "../../app/types";
 import { Avatar } from "../../components/Avatar";
-import { BackLink, Page, PrimaryButton, Title } from "../../components/ui";
+import { Badge, BackLink, Page, PrimaryButton, Title } from "../../components/ui";
 
 type Patient = {
   name: string;
@@ -50,8 +50,8 @@ export function ImportPatients({ go }: { go: Go }) {
       </header>
 
       <div className="flex flex-wrap items-start gap-4">
-        <section className="max-w-[380px] min-w-[280px] flex-1 overflow-hidden rounded-2xl border border-line bg-white">
-          <div className="border-b border-[#eeeff5] px-5 py-3.5 text-[13px] text-muted">8 patients</div>
+        <section className="max-w-[380px] min-w-[280px] flex-1 overflow-hidden rounded-2xl border border-line bg-card">
+          <div className="border-b border-hair-2 px-5 py-3.5 text-[13px] text-muted">8 patients</div>
           {PATIENTS.map((item) => {
             const on = item.name === selected;
             const count = item.flags.length;
@@ -60,21 +60,19 @@ export function ImportPatients({ go }: { go: Go }) {
                 key={item.name}
                 type="button"
                 onClick={() => setSelected(item.name)}
-                className={`grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-t border-hair px-5 py-3 text-left hover:bg-[#fafafd] ${on ? "bg-[#f6f7fe] shadow-[inset_3px_0_0_#2b3ab8]" : "bg-white"}`}
+                className={`grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-t border-hair px-5 py-3 text-left first:border-t-0 hover:bg-raised ${on ? "bg-indigo-soft shadow-[inset_3px_0_0_var(--color-indigo)]" : "bg-card"}`}
               >
                 <span className={`text-[14.5px] ${on ? "font-semibold" : "font-medium"}`}>
                   {item.name} <span className="font-normal text-muted">{item.age}</span>
                 </span>
-                <span className={`inline-flex h-[22px] items-center rounded-md px-2 text-xs font-semibold ${count ? "bg-[#fdf1e3] text-warn" : "bg-[#f1f2f7] text-muted"}`}>
-                  {count ? `${count} to review` : "Ready"}
-                </span>
+                <Badge tone={count ? "warn" : "neutral"}>{count ? `${count} to review` : "Ready"}</Badge>
               </button>
             );
           })}
         </section>
 
-        <section className="min-w-0 flex-[2] overflow-hidden rounded-2xl border border-line bg-white">
-          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#eeeff5] px-6 py-5">
+        <section className="min-w-0 flex-[2] overflow-hidden rounded-2xl border border-line bg-card">
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-hair-2 px-6 py-5">
             <div className="flex items-center gap-3.5">
               <Avatar who={patient.name === "Walter Greene" ? "walter" : "generic"} size={48} />
               <div>
@@ -94,17 +92,17 @@ export function ImportPatients({ go }: { go: Go }) {
               </span>
             </div>
             {flagCount > 0 ? (
-              <div className="flex flex-col overflow-hidden rounded-xl border border-[#f3dcc2]">
+              <div className="flex flex-col overflow-hidden rounded-xl border border-warn-line">
                 {patient.flags.map((flag) => (
-                  <div key={flag} className="grid grid-cols-[28px_minmax(0,1fr)_auto] items-center gap-3 border-t border-[#f6e6d3] bg-[#fffaf4] px-4 py-3 first:border-t-0">
-                    <span className="flex size-7 items-center justify-center rounded-full bg-[#fde6cc] text-sm font-bold text-warn">!</span>
+                  <div key={flag} className="grid grid-cols-[28px_minmax(0,1fr)_auto] items-center gap-3 border-t border-warn-line-soft bg-warn-wash px-4 py-3 first:border-t-0">
+                    <span className="flex size-7 items-center justify-center rounded-full bg-warn-pill text-sm font-bold text-warn">!</span>
                     <span className="text-[14.5px]">{flag}</span>
                     <span className="text-[12.5px] font-medium text-warn">Fix in Studio</span>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="flex items-center gap-3 rounded-xl bg-[#f1f9f4] px-4 py-3.5 text-[14.5px] text-ok">
+              <div className="flex items-center gap-3 rounded-xl bg-ok-wash px-4 py-3.5 text-[14.5px] text-ok">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                   <path d="M5 12.5l4.5 4.5L19 7.5" />
                 </svg>

@@ -47,7 +47,7 @@ function RoleCard({
     <button
       type="button"
       onClick={onClick}
-      className="flex flex-col items-start gap-2.5 rounded-[20px] border border-white/90 bg-white/90 p-6 text-left shadow-[0_20px_50px_-24px_rgba(20,27,77,.35)] transition-transform hover:-translate-y-0.5"
+      className="flex flex-col items-start gap-2.5 rounded-[20px] border border-card/90 bg-card/90 p-6 text-left shadow-[0_20px_50px_-24px_rgba(20,27,77,.35)] transition-transform hover:-translate-y-0.5"
     >
       <span className="flex size-11 items-center justify-center rounded-xl bg-ink text-white">{icon}</span>
       <span className="mt-1.5 font-serif text-[28px] font-medium tracking-[-0.4px]">{title}</span>

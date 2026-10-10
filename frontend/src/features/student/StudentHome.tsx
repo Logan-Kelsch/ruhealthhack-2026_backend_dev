@@ -1,7 +1,7 @@
 import type { Go } from "../../app/types";
 import { Avatar } from "../../components/Avatar";
 import { ArrowRight, Chevron } from "../../components/Icons";
-import { Card, Page, Title } from "../../components/ui";
+import { Badge, Card, CardHead, Page, PrimaryButton, Title } from "../../components/ui";
 
 // Student landing. The next assigned visit is Walter Greene.
 export function StudentHome({ go }: { go: Go }) {
@@ -12,10 +12,8 @@ export function StudentHome({ go }: { go: Go }) {
 
   return (
     <Page width="max-w-[1100px]">
-      <header>
-        <Title kicker="Friday, October 10">Good afternoon, Jordan</Title>
-      </header>
-      <section className="overflow-hidden rounded-[20px] border border-line bg-white">
+      <Title kicker="Friday, October 10">Good afternoon, Jordan</Title>
+      <section className="overflow-hidden rounded-[20px] border border-line bg-card">
         <div className="flex items-center gap-2 bg-ink px-6 py-3 text-[12.5px] font-semibold tracking-[0.3px] text-white">
           <span className="size-1.5 rounded-full bg-[#8fb0ff]" />
           Up next · due in 7 days
@@ -27,28 +25,22 @@ export function StudentHome({ go }: { go: Go }) {
             <div className="mt-1.5 text-[15px] text-ink-soft">Assess diet and medicines; agree on one change.</div>
             <div className="mt-3 flex flex-wrap gap-1.5">
               {["Visit 1 of 2", "Nutrition clinic", "About 15 min"].map((chip) => (
-                <span key={chip} className="inline-flex h-6 items-center rounded-md bg-chip px-2 text-[12.5px] text-ink-soft">
-                  {chip}
-                </span>
+                <Badge key={chip}>{chip}</Badge>
               ))}
             </div>
           </div>
-          <button
-            type="button"
-            onClick={() => go("s-brief", { visit: 1 })}
-            className="inline-flex h-12 items-center gap-2.5 rounded-xl bg-ink px-[22px] text-[15px] font-semibold text-white hover:bg-indigo"
-          >
+          <PrimaryButton size="lg" onClick={() => go("s-brief", { visit: 1 })}>
             Begin visit
             <ArrowRight />
-          </button>
+          </PrimaryButton>
         </div>
       </section>
 
       <div className="grid items-start gap-4 [grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr))]">
         <Card>
-          <div className="border-b border-[#eeeff5] px-5 py-4 text-[15px] font-semibold">Assigned</div>
+          <CardHead title="Assigned" />
           {assigned.map((item) => (
-            <div key={item.name} className="grid grid-cols-[36px_minmax(0,1fr)_auto] items-center gap-3 border-t border-hair px-5 py-3">
+            <div key={item.name} className="grid grid-cols-[36px_minmax(0,1fr)_auto] items-center gap-3 border-t border-hair px-5 py-3 first:border-t-0">
               <Avatar who={item.who} size={36} />
               <div>
                 <div className="text-[14.5px] font-semibold">{item.name}</div>
@@ -59,11 +51,11 @@ export function StudentHome({ go }: { go: Go }) {
           ))}
         </Card>
         <Card>
-          <div className="border-b border-[#eeeff5] px-5 py-4 text-[15px] font-semibold">Recent feedback</div>
+          <CardHead title="Recent feedback" />
           <button
             type="button"
             onClick={() => go("s-debrief", { visit: 1 })}
-            className="grid w-full grid-cols-[minmax(0,1fr)_auto_16px] items-center gap-3 border-t border-hair px-5 py-3.5 text-left hover:bg-[#fafafd]"
+            className="grid w-full grid-cols-[minmax(0,1fr)_auto_16px] items-center gap-3 border-t border-hair px-5 py-3.5 text-left first:border-t-0 hover:bg-raised"
           >
             <div>
               <div className="text-[14.5px] font-semibold">Practice · Dominic Rivera, 22</div>

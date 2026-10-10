@@ -43,7 +43,3 @@ export function screenFromHash(hash: string): ScreenId | null {
   const id = hash.replace(/^#/, "") as ScreenId;
   return SCREENS.includes(id) ? id : null;
 }
-
-export function isScreenId(value: string): value is ScreenId {
-  return SCREENS.includes(value as ScreenId);
-}

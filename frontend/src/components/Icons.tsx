@@ -37,9 +37,9 @@ export const ICONS = {
 export type IconName = keyof typeof ICONS;
 
 // Small chevron used on rows that open another screen.
-export function Chevron() {
+export function Chevron({ className = "text-faint" }: { className?: string }) {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8a8fb3" strokeWidth="2" strokeLinecap="round" aria-hidden>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className={className} aria-hidden>
       <path d="M9 5l7 7-7 7" />
     </svg>
   );
@@ -61,10 +61,20 @@ export function BackArrow() {
   );
 }
 
-export function PlusIcon() {
+export function PlusIcon({ size = 15 }: { size?: number }) {
   return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden>
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden>
       <path d="M12 5v14M5 12h14" />
+    </svg>
+  );
+}
+
+// Microphone, used on the briefing and the mic check.
+export function MicIcon({ size = 16 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden>
+      <rect x="9" y="3" width="6" height="11" rx="3" />
+      <path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6" />
     </svg>
   );
 }

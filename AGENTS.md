@@ -141,7 +141,7 @@ Checks:
 - Verifier on labeled lines (needs Bedrock): `.venv/Scripts/python -m scripts.eval_verifier --runs 2`
 - Set `LLM_ENABLED=false` to run everything without AWS (keyword classifier and template replies).
 
-Frontend (not built yet):
+Frontend (the Rounds prototype, all screens on mock data; build check: `npm run build`):
 ```bash
 cd frontend && npm install && npm run dev
 ```

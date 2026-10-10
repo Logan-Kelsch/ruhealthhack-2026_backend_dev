@@ -12,15 +12,39 @@
   --color-soon: #9a9fc0;
   --color-line: #e7e8f0;
   --color-line-2: #dcdfea;
+  --color-line-3: #e3e4ee; /* tab underline, thin separators, timeline connectors */
+  --color-line-4: #c9cce0; /* dashed borders, inactive dots */
   --color-hair: #f0f1f6;
+  --color-hair-2: #eeeff5; /* underline under card headers, boxed lists */
+  --color-track: #eceef5; /* progress and meter troughs */
+  --color-segment: #f1f2f7; /* segmented control, quiet chips, patient bubbles */
+  --color-raised: #fafafd; /* row hover, table header band */
   --color-paper: #f7f6f3;
   --color-wash: #f6f6fa;
+  --color-card: #ffffff; /* cards, controls and glass surfaces */
   --color-danger: #b42b24;
   --color-danger-strong: #c63a31;
+  --color-danger-bright: #e2685f; /* one-of-four scores and hot mic levels */
+  --color-danger-soft: #fdecea;
   --color-warn: #9a5212;
   --color-warn-deep: #7a4210;
+  --color-warn-soft: #fdf1e3;
+  --color-warn-wash: #fffaf4; /* rows waiting on a review */
+  --color-warn-pill: #fde6cc;
+  --color-warn-line: #f3dcc2;
+  --color-warn-line-soft: #f6e6d3;
   --color-ok: #1f7a50;
+  --color-ok-soft: #e6f4ec;
+  --color-ok-wash: #f1f9f4;
+  --color-indigo-soft: #eef0fd;
+  --color-indigo-soft-2: #e3e8fd;
+  --color-indigo-line: #dde1fa;
+  --color-indigo-on-ink: #a9b6ff; /* indigo labels on the dark goal panels */
   --color-chip: #f4f5f9;
+  --color-inactive: #a3a7c6; /* muted controls and status dots */
+  --color-select: #d9defa; /* text selection */
+  --color-canvas: #fbfbfd; /* decision tree canvas */
+  --color-canvas-dot: #dfe1ec;
 }
 
 html,
@@ -37,12 +61,12 @@ body {
 }
 
 ::selection {
-  background: #d9defa;
+  background: var(--color-select);
 }
 
 /* Washed pastel trees behind signed-in screens. Matches the design's Muted setting. */
 .bg-wash {
-  background: #f7f6f3 url("/assets/app-wash.png") center / cover no-repeat;
+  background: var(--color-paper) url("/assets/app-wash.png") center / cover no-repeat;
   filter: saturate(0.55);
   opacity: 0.45;
 }

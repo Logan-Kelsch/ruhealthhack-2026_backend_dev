@@ -33,7 +33,11 @@ const EDGES: [NodeId, NodeId, string][] = [
   ["q2", "o3", "No"],
 ];
 
-const KIND_COLOR: Record<Kind, string> = { start: "#2b3ab8", decision: "#9a5212", outcome: "#1f7a50" };
+const KIND_COLOR: Record<Kind, string> = {
+  start: "var(--color-indigo)",
+  decision: "var(--color-warn)",
+  outcome: "var(--color-ok)",
+};
 const KIND_LABEL: Record<Kind, string> = { start: "Start", decision: "Question", outcome: "Outcome" };
 
 // Faculty-authored yes/no tree. Editing a node updates the card on the canvas.
@@ -51,13 +55,13 @@ export function DecisionTree() {
   }
 
   return (
-    <div className="grid min-h-[620px] grid-cols-[minmax(0,1fr)_280px] overflow-hidden rounded-2xl border border-line bg-white">
-      <div className="relative overflow-auto bg-[#fbfbfd] bg-[radial-gradient(#dfe1ec_1px,transparent_1px)] bg-[length:20px_20px]">
+    <div className="grid min-h-[620px] grid-cols-[minmax(0,1fr)_280px] overflow-hidden rounded-2xl border border-line bg-card">
+      <div className="relative overflow-auto bg-canvas bg-[radial-gradient(var(--color-canvas-dot)_1px,transparent_1px)] bg-[length:20px_20px]">
         <div className="relative mx-auto h-[620px] w-[940px]">
           <svg width="940" height="620" className="absolute inset-0 overflow-visible">
             <defs>
               <marker id="dt-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-                <path d="M0 0L10 5L0 10z" fill="#9aa0c4" />
+                <path d="M0 0L10 5L0 10z" fill="var(--color-inactive)" />
               </marker>
             </defs>
             {EDGES.map(([from, to]) => {
@@ -72,7 +76,7 @@ export function DecisionTree() {
             return (
               <span
                 key={`${from}-${to}-label`}
-                className={`absolute inline-flex h-[22px] -translate-x-1/2 -translate-y-1/2 items-center rounded-md px-2 text-xs font-semibold ${yes ? "bg-[#e6f4ec] text-ok" : "bg-[#fdecea] text-danger"}`}
+                className={`absolute inline-flex h-[22px] -translate-x-1/2 -translate-y-1/2 items-center rounded-md px-2 text-xs font-semibold ${yes ? "bg-ok-soft text-ok" : "bg-danger-soft text-danger"}`}
                 style={{ left: path.lx, top: path.ly }}
               >
                 {label}
@@ -87,12 +91,12 @@ export function DecisionTree() {
                 key={id}
                 type="button"
                 onClick={() => setSelected(id)}
-                className="absolute flex flex-col gap-1 rounded-xl border bg-white px-3.5 py-3 text-left hover:border-[#9aa0c4]"
+                className="absolute flex flex-col gap-1 rounded-xl border bg-card px-3.5 py-3 text-left hover:border-inactive"
                 style={{
                   left: node.x,
                   top: node.y,
                   width: node.w,
-                  borderColor: on ? "#2b3ab8" : "#e3e4ee",
+                  borderColor: on ? "var(--color-indigo)" : "var(--color-line-3)",
                   boxShadow: on ? "0 0 0 3px rgba(43,58,184,.14)" : "0 1px 2px rgba(20,27,77,.05)",
                 }}
               >
@@ -107,8 +111,8 @@ export function DecisionTree() {
         </div>
       </div>
 
-      <aside className="flex flex-col border-l border-[#eeeff5]">
-        <div className="border-b border-[#eeeff5] px-[18px] py-4">
+      <aside className="flex flex-col border-l border-hair-2">
+        <div className="border-b border-hair-2 px-[18px] py-4">
           <div className="text-[11px] font-bold tracking-[0.6px] uppercase" style={{ color: KIND_COLOR[current.kind] }}>
             {KIND_LABEL[current.kind]}
           </div>
@@ -135,9 +139,9 @@ export function DecisionTree() {
           {current.kind === "decision" ? (
             <div className="flex flex-col gap-1.5">
               <span className="text-[12.5px] font-semibold text-ink-soft">Branches</span>
-              <BranchRow color="#1f7a50" label="Yes" />
-              <BranchRow color="#b42b24" label="No" />
-              <button type="button" className="h-[34px] rounded-[9px] border border-dashed border-[#c9cce0] text-[13px] text-ink-soft">
+              <BranchRow color="var(--color-ok)" label="Yes" />
+              <BranchRow color="var(--color-danger)" label="No" />
+              <button type="button" className="h-[34px] rounded-[9px] border border-dashed border-line-4 text-[13px] text-ink-soft">
                 Add branch
               </button>
             </div>

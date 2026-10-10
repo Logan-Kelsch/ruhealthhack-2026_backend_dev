@@ -1,0 +1,23 @@
+{
+  "dialogue_act": [
+    "question",
+    "disclosure",
+    "explanation",
+    "acknowledgment",
+    "other"
+  ],
+  "student_skill": [
+    "summarize",
+    "check_understanding",
+    "ask_permission",
+    "give_information",
+    "plan_next_steps",
+    "safety_netting",
+    "closing",
+    "confront_or_lecture",
+    "start_medication",
+    "prescribe_antibiotic",
+    "order_test",
+    "other"
+  ]
+}

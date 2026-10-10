@@ -691,7 +691,7 @@ Postgres (Docker locally → AWS RDS)   S3 (audio, images)   AWS Bedrock (Claude
 - **Types:** frontend types are generated from FastAPI's OpenAPI schema (`openapi-typescript`). Don't hand-write API types.
 - **Local dev:** `docker compose up` for Postgres; backend via `uvicorn`; frontend via `vite`.
 - **Deploy:** five CloudFormation stacks in `infra/cloudformation/` (network, data, edge, auth, app), deployed in that order by `infra/scripts/deploy-stacks.sh` (see `infra/README.md`).
-  - API: a t3.small EC2 instance in a public subnet, reachable only through CloudFront (`/api/*`). No ALB and no NAT gateway, to stay inside the $50/month budget.
+  - API: a t3.small EC2 instance in a public subnet, reachable only through CloudFront (`/api/*`; `/portraits/*` for static patient portraits). No ALB and no NAT gateway, to stay inside the $50/month budget.
   - Database: RDS Postgres (db.t4g.micro, the largest class AWS free plan accounts allow). One database shared by the deployed app and team laptops; reachable only from the backend and single team IPs.
   - Frontend: S3 + CloudFront, on the default `*.cloudfront.net` domain until the team has one (Route 53 and ACM come later).
   - Sign-in: Cognito user pool with email + password, optional Google, and optional email one-time codes (needs a verified SES identity). Added so faculty and students have real accounts at the demo instead of a role switcher.

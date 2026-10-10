@@ -25,13 +25,19 @@ Scripts in `scripts/` read settings from the environment (`PREFIX`, default `rou
 - `teardown.sh`: empty the frontend bucket, delete the stacks in reverse order and remove the SSM parameters (asks first).
 
 ```
-Browser ──HTTPS──▶ CloudFront ─┬─ /*      ──▶ S3 (React build, private, origin access control)
-                               └─ /api/*  ──▶ EC2 :8000 (FastAPI, HTTP + WebSocket)
+Browser ──HTTPS──▶ CloudFront ─┬─ /*           ──▶ S3 (React build, private, origin access control)
+                               ├─ /portraits/* ──▶ EC2 :8000 (FastAPI static files, cached)
+                               └─ /api/*      ──▶ EC2 :8000 (FastAPI, HTTP + WebSocket)
                                                 │
   laptops (team IPs) ─▶ RDS Postgres ◀───┤──▶ Bedrock, S3 media bucket
                                                 └──▶ ElevenLabs / Tavus (internet)
 Cognito user pool (managed login) ── tokens ──▶ browser ──▶ /api/*
 ```
+
+FastAPI serves `/portraits/<filename>` from `backend/app/data/portraits/`. CloudFront routes
+`/portraits/*` to the existing backend origin with the managed `CachingOptimized` policy and
+no frontend rewrite function. Changes to `cloudformation/edge.yaml` deploy through CI; to
+update only the edge stack from a laptop, run `infra/scripts/deploy-stacks.sh edge`.
 
 ## What's in it and why
 

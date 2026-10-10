@@ -2,6 +2,8 @@
 
 **Status:** draft v0.1, 2026-10-10. Written before any code exists, so expect changes. Change this file in the same pull request as the code that changes the plan.
 
+**Working name:** Rounds (may change; docs write [Product name]).
+
 **Event:** Rutgers Health Hack 2026, TwinVerse track, Challenge 1 (Virtual Patient Encounter System), plus selected Challenge 2 ideas.
 
 **Companion docs:**
@@ -38,7 +40,7 @@ The debrief scores the student on the school's own 7-domain rubric. Every score 
 | User | Needs |
 |---|---|
 | **Faculty / case author** (dietetics, speech-language pathology, lab science, medicine, nursing…) | Build a case quickly; trust that the patient stays on-script; reuse and share cases; see class-wide gaps; adjust grades. |
-| **Student** (role set per case) | Realistic practice; hands-free voice; feedback that cites what they actually did; a next step. |
+| **Student** (role set per case: profession or specialty plus training level, such as medical student, resident, attending, dietetics student) | Realistic practice; hands-free voice; feedback that cites what they actually did; a next step. |
 | **Program lead** (secondary) | Anonymized export; alignment with their rubric; evidence the system is reliable. |
 
 ## 4. Goals and non-goals
@@ -278,7 +280,8 @@ Extract candidate objectives from an attached syllabus (for example MLSC 4329). 
 ### 7.2 Encounter (student)
 
 #### E-01 Assignment and briefing card (P0)
-- The instructor assigns a case, role and visit to a student or cohort.
+- The instructor assigns a case, role and visit to a student or cohort, or a set of cases at once.
+- Role = profession or specialty plus training level. Assign roles a learner at that level actually holds (a medical student is not assigned "cardiologist").
 - Before starting, the student sees the briefing card: patient name, age, setting, **their role**, goal and **doorway vitals**.
 - Not gamified.
 
@@ -388,6 +391,7 @@ A visit can include a prior note written "by" an earlier clinician (for example 
 - Each combination of outcomes maps to faculty-written state changes for the next visit (symptoms, values, mood, new facts).
 - The AI may draft outcomes from objectives, but every outcome needs faculty approval.
 - No probabilities; optional "common/rare" tags.
+- This is how follow-ups differ per student without faculty editing each one: rules pick the authored outcome; the LLM never extrapolates the next state.
 
 #### L-05 Tree editor (P1)
 A node editor (React Flow) for decision points and outcomes, with validation (every leaf has an outcome).
@@ -397,6 +401,12 @@ After a visit, show the taken path (solid) and the alternatives (dashed), each w
 
 #### L-07 Consequence timeline (P2)
 An animated timeline between visits showing the authored changes.
+
+#### L-08 Care timeline (P2)
+- Faculty order a patient's care as nodes (role + visit). Each node is a student encounter or a simulated one; follow-ups may loop back to an earlier clinician.
+- Every node before the graded encounter is fixed by faculty.
+- A simulated node outputs the same artifacts as a student node (note, chart state), using only faculty-approved content.
+- No multi-student chains (that drifts into C2).
 
 ### 7.4 Feedback (student)
 
@@ -456,7 +466,7 @@ Assign a case and role to a cohort.
 Percentage of students missing each expected discovery; common wrong turns (decision-point outcomes); rubric distribution.
 
 #### D-03 Student view (P1)
-Per-student strengths and weaknesses over encounters; "recommended next case" chosen by a rule (the case whose objectives target the weakest domain).
+Per-student strengths and weaknesses over encounters; "recommended next case" chosen by a rule (the case whose objectives target the weakest domain), optionally stepping difficulty up or down by score. Framing: "precision medical education" (an existing term: Triola and Burk-Rafel, *Academic Medicine*, 2023).
 
 #### D-04 Anonymized export (P1)
 CSV or JSON export with student identifiers replaced by random IDs.
@@ -772,7 +782,7 @@ Postgres (Docker locally → AWS RDS)   S3 (audio, images)   AWS Bedrock (Claude
 
 ## 14. Design direction
 
-- **Vibrant, flat color; no gradients;** not blank white; professional, not a portfolio showpiece.
+- **Vibrant color; gradients, depth and illustration allowed** (updated 2026-10-10); not blank white, not enterprise; still professional.
 - Use a warm, light, non-white base (or a dark base) with 3–4 saturated accent colors, assigned to meaning:
   - one for the patient and voice;
   - one for chart and data;
@@ -782,7 +792,7 @@ Postgres (Docker locally → AWS RDS)   S3 (audio, images)   AWS Bedrock (Claude
 - Encounter layout as in E-02.
 - Large type for the transcript; captions always visible.
 - No photorealistic generated people in the UI other than the sponsor portraits (cropped) and the Tavus replica.
-- **Mockups are built as real React/Tailwind screens,** not images. Pick one palette with the team before polishing.
+- **Direction is explored with local image mockups** (GPT Image via Codex, never committed); the shipped UI is real React/Tailwind screens. Pick one palette with the team before polishing.
 
 ## 15. Validation and metrics (what the video can honestly claim)
 
@@ -834,7 +844,7 @@ See `context.md` §15 for the full list with owners. The ones that block the bui
 2. **Depression case visit-2 states** (Ahmad).
 3. **Tavus account and v4 model ID test.**
 4. **Hosting choice** (JJ).
-5. **Product name.**
+5. **Product name:** working name Rounds; confirm.
 
 ## 19. Credits and licenses (to maintain in `backend/app/data/credits.md` and the README)
 - VHS sample profiles: `joeljames270/virtual-patient-profiles-sample` (Hugging Face), CC BY 4.0.

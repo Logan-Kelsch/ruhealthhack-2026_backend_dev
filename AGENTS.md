@@ -17,7 +17,7 @@ If something you are asked to do conflicts with these docs, say so before doing 
 - **The debrief** scores the student on the official 7-domain rubric, with every score citing transcript evidence.
 - **Follow-up visits** change based on what the student did.
 
-Product name is undecided; write `[Product name]`.
+Working product name is **Rounds** (may change); keep writing `[Product name]` in docs.
 
 ## Non-negotiable rules
 
@@ -79,7 +79,7 @@ Product name is undecided; write `[Product name]`.
 - **Log everything an encounter needs for replay and feedback** (PRD P-01).
 - **Match the surrounding code:** naming, comment density, idiom. Comments explain *why*, not *what*.
 - **UI:**
-  - Vibrant flat colors, **no gradients**, not blank white, professional.
+  - Vibrant colors; gradients, depth and illustration allowed (updated 2026-10-10); not blank white; professional.
   - Colors are tokens in one file.
   - Expand abbreviations on first use on each screen.
   - No gamified language.

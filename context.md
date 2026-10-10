@@ -6,7 +6,7 @@ This file holds everything decided, researched, and discussed about this project
 - **How to work in this repo:** `AGENTS.md`.
 - **What everything means:** the Shared Dictionary in section 14 of this file.
 
-The product name is not chosen yet. All docs say **[Product name]**.
+Working product name: **Rounds** (chosen 2026-10-10; may still change). Docs keep writing **[Product name]** so a rename is one edit.
 
 ---
 
@@ -139,11 +139,12 @@ These apply to people and AI sessions alike.
 - **No Q&A prep sheet** for judging. The team will know the product.
 - **Don't second-guess the After Effects video pipeline.** It's handled.
 - **Docs and agent output must avoid "AI slop" wording** (see the banned list in section 14).
-- **UI direction:**
-  - Vibrant and colorful, but **no gradients**.
-  - Not blank white, not a mundane enterprise look, but also not an Awwwards/Dribbble showpiece. It must read as a professional tool.
+- **UI direction** (Anuj owns UI/UX and frontend):
+  - Vibrant and colorful. **Updated 2026-10-10: gradients, depth and illustration are allowed;** the earlier "no gradients, not a showpiece" rule is lifted.
+  - Not blank white, not a mundane enterprise look, not brutalist. It must still read as a professional tool.
   - Encounter layout: the **patient in the center** (Tavus video later; a circular profile photo in iteration 1), **live transcript below**, **useful information on the left and right**.
-  - No photorealistic generated people in mockups. Image-generated mockups (ChatGPT) were rejected as "atrocious" (all-white UI, weird hyperrealistic people). Build mockups as real React/Tailwind screens instead.
+  - No photorealistic generated people in mockups. The first ChatGPT image mockups were rejected as "atrocious" (all-white UI, weird hyperrealistic people).
+  - **Updated 2026-10-10:** image mockups are back for exploration only (GPT Image via Codex, short prompts, the patient always an abstract placeholder). They stay local in `design/` and are never committed. Once the direction is settled, the UI is built as real React/Tailwind screens.
   - Small, functional 3D (Blender models) is welcome only where it serves a purpose (see section 9).
 - **Iteration 1 voice:**
   - No live video.
@@ -587,6 +588,18 @@ The team returned the planning summary as a Word document with comments and inli
 - **Rubric:** the doc still mentions AAMC EPAs, but the official SHP rubric is primary.
 - **Two sentences in the doc were cut off:** "ideally we can bang down everything else but also…" and "Also just so we are on the same page." Their endings are unknown.
 
+### Team discussion 3 (2026-10-10): roles, rubrics, care timeline
+Partly mistranscribed audio; these are the conclusions.
+- **Learner role = profession or specialty + training level.** Medicine is hierarchical: medical student → resident → attending (the student presents to the resident, the resident to the attending). A medical student is expected to know general medicine, not to act as a specialist, so cases shouldn't assign "cardiologist" to a medical student. Other professions (dietetics, nursing, SLP) keep their own roles.
+- **Assignments:** faculty assign a set of cases at once (patients A, B and C), all through the same pipeline; the next assignment covers new material.
+- **Score only with the sponsor's rubrics:** the 7-domain encounter rubric (the file's scale is 1–4 or N/A; it was misremembered aloud as 1–5), the case-specific SLP checklist, and C2's SBAR and TeamSTEPPS items. Nothing invented.
+- **Everything before the graded encounter is fixed by faculty.** The student is examined in an exact state the faculty defined; a simulation must never land them somewhere the faculty didn't author.
+- **Care timeline (sketch, `design/reference-timeline-sketch.jpg`, local only):** faculty order the nodes of a patient's care (role + visit). Each node is a student encounter or a simulated one. A simulated node outputs the same artifacts as a student node (note, chart state), but only faculty-approved content. Follow-ups can loop back to an earlier clinician. C1 itself is one encounter; ordered clinicians come from C2, so we borrow the shape lightly and skip multi-student chains.
+- **Faculty-rework worry:** if every student handles visit 1 differently, faculty would have to hand-edit each patient's visit 2. The answer is the factored decision points with faculty-written outcomes (`PRD.md` L-03, L-04): rules select the authored outcome, so no per-student editing and no LLM extrapolation.
+- **Fast faculty input:** the LLM only sorts free text into defined fields (for example "BP 140/90" → systolic and diastolic), which is the Studio's guided intake.
+- **Scale vision:** faculty build many cases (about 50); after each encounter the system explains what went wrong and routes the student to the faculty case that targets their weakest domains, stepping difficulty up or down by score. Difficulty can come from noise or missing information in the history and prior notes. This matches **"precision medical education"**, an existing term (Triola and Burk-Rafel, *Academic Medicine*, 2023): cite it rather than claim it.
+- **Real-world gap noted, out of scope:** real clinicians rarely have every prior clinician's records in one place. That is C2's data problem; our prior notes are faculty-written.
+
 ---
 
 ## 11. Key design decisions and their reasons
@@ -608,7 +621,7 @@ The team returned the planning summary as a Word document with comments and inli
 11. **The avatar is only a face; our backend is the brain.** If the avatar vendor's built-in AI talks, we lose the grounding guarantee and the disclosure log.
 12. **All-ElevenLabs voice stack** (Scribe v2 Realtime in, Eleven v4 / v4 Turbo out). It fits the product naturally and the ElevenLabs prize.
 13. **Iteration 1 has no video** (a circular photo placeholder), but the reply endpoint is designed to be wrapped for Tavus later.
-14. **Image-generation mockups are dropped** in favor of coded React/Tailwind mockups.
+14. **Image-generated mockups are for exploration only** (local, never committed); the shipped UI is coded React/Tailwind.
 15. **Reliable, not fake, demo:** golden cases plus scripted test-student runs before each recording.
 
 ---
@@ -844,7 +857,9 @@ Use these exact meanings in code, UI, docs and conversation.
 12. **Brief conflict:** the C1 brief says "support text interaction". The team decided the student never types. The live transcript and the internal text pipeline (used by test students) are text, but there is no typed input. Decide whether a hidden accessibility or text fallback should exist.
 13. **Tavus:** someone must create the account (keys go in `.env`). Test the custom LLM, Image-to-Replica timing and ElevenLabs v4 model acceptance.
 14. **Kaggle pathology dataset:** someone with a login checks its contents and license.
-15. **Product name.**
+15. **Product name:** working name Rounds. Confirm or replace; the name is crowded (Bedside Rounds podcast, Rounds AI, others).
+16. **Care timeline scope:** v1 is multi-visit cases (L-01) only. Does the faculty-ordered timeline with simulated nodes (PRD L-08) make the video, or stay a sketch?
+17. **Ahmad:** the list of learner roles per profession and training level that cases may assign.
 
 ---
 
@@ -860,6 +875,6 @@ Use these exact meanings in code, UI, docs and conversation.
 - **Not done:**
   - no application code yet;
   - Tavus account not created;
-  - mockups (image-generated) rejected; coded mockups not started;
+  - image mockups in progress locally (Anuj); coded UI not started;
   - golden case content incomplete (waiting on Ahmad).
 - **Next:** the iteration 1 build per `PRD.md`, then the mentor session, then iteration 2 (Tavus, polish, statistics, video).

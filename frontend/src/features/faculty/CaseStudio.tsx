@@ -373,7 +373,7 @@ export function CaseStudio({
     : null;
 
   return (
-    <div className="mx-auto flex max-w-[1320px] flex-col gap-5 px-10 pt-7 pb-12">
+    <div className={`mx-auto flex max-w-[1320px] flex-col gap-5 px-10 pt-7 ${caseId ? "pb-12" : "h-full pb-6"}`}>
       <header className="flex flex-col gap-3.5">
         <BackLink label="Cases" onClick={() => go("f-cases")} />
         <div className="flex flex-wrap items-center justify-between gap-4">
@@ -415,7 +415,7 @@ export function CaseStudio({
             <PublishNotice phase={publishPhase} />
           </div>
         </div>
-        <TabNav items={TABS} active={current} onChange={setCurrent} />
+        {caseId ? <TabNav items={TABS} active={current} onChange={setCurrent} /> : null}
       </header>
 
       {current === "patient" ? (

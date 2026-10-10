@@ -28,13 +28,13 @@ export type CreatePhase = { kind: "editing" } | { kind: "saving" } | { kind: "er
 type Work = { kind: "idle" } | { kind: "working" } | { kind: "error"; message: string };
 
 const STEPS: { id: StepId; title: string; why: string }[] = [
-  { id: "describe", title: "Start with a description", why: "A few sentences is enough. Rounds reads it and suggests the rest of the form. You check every suggestion." },
+  { id: "describe", title: "Description", why: "A few sentences is enough. Rounds suggests the rest of the form, and you check every suggestion." },
   { id: "patient", title: "Who they are", why: "The basics a learner would see on the chart before walking in." },
   { id: "visit", title: "The visit", why: "What the learner is told at the door, and what they are there to do." },
   { id: "history", title: "History", why: "What the patient can tell the learner. The patient never says anything that is not written here." },
   { id: "voice", title: "How they talk", why: "Personality shapes the wording, never the facts." },
   { id: "vitals", title: "Vitals", why: "Taken by the nurse before the visit. Leave a value blank to skip it." },
-  { id: "finish", title: "Learning goals and save", why: "What a learner should come away with. The debrief checks for these." },
+  { id: "finish", title: "Goals and save", why: "What a learner should come away with. The debrief checks for these." },
 ];
 
 const VITALS: { key: VitalKey; label: string; unit: string; example: string }[] = [
@@ -114,16 +114,11 @@ export function CaseBuilder({
   const [vitalsNotes, setVitalsNotes] = useState<string[]>([]);
   const [saveWork, setSaveWork] = useState<Work>({ kind: "idle" });
 
-  const panelRef = useRef<HTMLElement | null>(null);
-  const firstStep = useRef(true);
+  const bodyRef = useRef<HTMLDivElement | null>(null);
 
-  // A new step starts at its heading, not wherever the last step was scrolled to.
+  // A new step starts at its first field, not wherever the last step was scrolled to.
   useEffect(() => {
-    if (firstStep.current) {
-      firstStep.current = false;
-      return;
-    }
-    panelRef.current?.scrollIntoView?.({ block: "start", behavior: "smooth" });
+    if (bodyRef.current) bodyRef.current.scrollTop = 0;
   }, [step]);
 
   const described = description.trim().length >= 10;
@@ -247,8 +242,8 @@ export function CaseBuilder({
   };
 
   return (
-    <div className="grid items-start gap-5 lg:grid-cols-[260px_minmax(0,1fr)]">
-      <nav aria-label="Builder steps" className="rounded-[18px] border border-white/80 bg-card/90 p-3 shadow-[0_18px_40px_-28px_rgba(25,31,92,.5)] backdrop-blur-md lg:sticky lg:top-4">
+    <div className="grid min-h-0 flex-1 items-start gap-5 lg:grid-cols-[250px_minmax(0,1fr)] lg:items-stretch">
+      <nav aria-label="Builder steps" className="self-start rounded-[18px] border border-white/80 bg-card/90 p-3 shadow-[0_18px_40px_-28px_rgba(25,31,92,.5)] backdrop-blur-md">
         <div className="px-3 pt-2 pb-3 font-sans text-[13px] text-ink-soft">
           {Object.values(done).filter(Boolean).length} of {STEPS.length} steps filled
         </div>
@@ -278,17 +273,18 @@ export function CaseBuilder({
         </ol>
       </nav>
 
-      <section ref={panelRef} className="scroll-mt-4 rounded-[18px] border border-white/80 bg-card/95 px-[clamp(20px,2.6vw,40px)] py-7 shadow-[0_24px_60px_-36px_rgba(25,31,92,.55)] backdrop-blur-md">
+      <section className="flex min-h-0 flex-col rounded-[18px] border border-white/80 bg-card/95 shadow-[0_24px_60px_-36px_rgba(25,31,92,.55)] backdrop-blur-md">
+        <div ref={bodyRef} className="min-h-0 flex-1 overflow-y-auto px-[clamp(20px,2.6vw,40px)] pt-5 pb-5">
         <div className="font-sans text-[13px] font-semibold tracking-[0.5px] text-indigo uppercase">
           Step {index + 1} of {STEPS.length}
         </div>
-        <h2 className="m-0 mt-1 font-serif text-[clamp(28px,2.4vw,36px)] leading-tight font-normal tracking-[-0.6px]">{STEPS[index].title}</h2>
+        <h2 className="m-0 mt-1 font-serif text-[clamp(26px,2.2vw,32px)] leading-tight font-normal tracking-[-0.6px]">{STEPS[index].title}</h2>
         <p className="mt-1.5 max-w-[680px] font-sans text-[15.5px] leading-snug text-ink-soft">{STEPS[index].why}</p>
         {suggestNote && step !== "describe" ? (
           <p className="mt-4 rounded-[12px] bg-indigo-soft/70 px-4 py-2.5 font-sans text-[14px] text-ink">{suggestNote}</p>
         ) : null}
 
-        <div className="mt-6">
+        <div className="mt-5">
           {step === "describe" ? (
             <div className="flex flex-col gap-5">
               <Field id="patient-description" label="Describe the patient">
@@ -298,37 +294,34 @@ export function CaseBuilder({
                   onChange={(event) => onDescriptionChange(event.target.value)}
                   disabled={createPhase.kind === "saving" || suggestWork.kind === "working"}
                   placeholder="A 58-year-old truck driver with type 2 diabetes who keeps missing doses of metformin. He is embarrassed about it and only admits it once the learner earns his trust."
-                  className={`${INPUT} min-h-[150px] text-[17px]`}
+                  className={`${INPUT} min-h-[104px] text-[17px]`}
                 />
               </Field>
-              <Field id="builder-notes" label="Notes for this case" hint="Optional. Anything else: what learners should catch, how hard it should be, what to avoid.">
+              <Field id="builder-notes" label="Notes for this case" hint="Optional: what learners should catch, how hard it should be.">
                 <textarea
                   id="builder-notes"
                   value={form.notes ?? ""}
                   onChange={(event) => set("notes", event.target.value)}
                   placeholder="Learners should ask about side effects before assuming he doesn't care."
-                  className={`${INPUT} min-h-[84px]`}
+                  className={`${INPUT} min-h-[56px]`}
                 />
               </Field>
               <div className="flex flex-wrap items-center gap-3">
                 <PrimaryButton size="lg" onClick={() => void suggest()} disabled={!described || suggestWork.kind === "working"}>
                   {suggestWork.kind === "working" ? "Reading your description" : "Suggest the details"}
                 </PrimaryButton>
-                <GhostButton onClick={() => setStep("patient")}>I'll fill it in myself</GhostButton>
-                {!described ? <span className="font-sans text-[13px] text-muted">Write at least a sentence to get suggestions.</span> : null}
+                <GhostButton onClick={() => setStep("patient")}>Fill it in myself</GhostButton>
+                <GhostButton onClick={onCreateDraft}>
+                  {createPhase.kind === "saving" ? "Saving draft" : createPhase.kind === "error" ? "Try again" : "Create draft"}
+                </GhostButton>
               </div>
+              <p className="-mt-2 font-sans text-[13px] leading-snug text-muted">
+                {described
+                  ? "Create draft skips the steps: Rounds drafts the whole case and opens it in Studio for you to edit."
+                  : "Write at least a sentence to get suggestions."}
+              </p>
               {suggestWork.kind === "error" ? <Alert>{suggestWork.message}</Alert> : null}
-              <div className="mt-2 flex flex-wrap items-center justify-between gap-3 border-t border-hair pt-5">
-                <p className="max-w-[560px] font-sans text-[14px] leading-snug text-ink-soft">
-                  Prefer to skip the form? Rounds can draft every part of the case at once, then you edit it in Studio.
-                </p>
-                <div className="flex items-center gap-3">
-                  {createPhase.kind === "error" ? <Alert>{createPhase.message}</Alert> : null}
-                  <GhostButton onClick={onCreateDraft}>
-                    {createPhase.kind === "saving" ? "Saving draft" : createPhase.kind === "error" ? "Try again" : "Create draft"}
-                  </GhostButton>
-                </div>
-              </div>
+              {createPhase.kind === "error" ? <Alert>{createPhase.message}</Alert> : null}
             </div>
           ) : null}
 
@@ -539,8 +532,9 @@ export function CaseBuilder({
           ) : null}
         </div>
 
+        </div>
         {step !== "describe" ? (
-          <div className="mt-8 flex items-center justify-between border-t border-hair pt-5">
+          <div className="flex shrink-0 items-center justify-between border-t border-hair px-[clamp(20px,2.6vw,40px)] py-4">
             <GhostButton onClick={() => setStep(STEPS[index - 1].id)}>Back</GhostButton>
             {index < STEPS.length - 1 ? (
               <PrimaryButton onClick={() => setStep(STEPS[index + 1].id)}>Next: {STEPS[index + 1].title}</PrimaryButton>

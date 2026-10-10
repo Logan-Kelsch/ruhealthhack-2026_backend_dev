@@ -1,6 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
 import type { Go, ScreenId } from "../app/types";
-import { FACULTY_USER, STUDENT_USER } from "../mock/session";
 import { useModeSwitch, type Role } from "./ModeTransition";
 import { DawnDisc, Wordmark } from "./ui";
 
@@ -63,7 +62,6 @@ export function Shell({ screen, go, children }: ShellProps) {
   const scene = screen === "s-brief";
   const section = sectionFor(screen);
   const items = role === "faculty" ? FACULTY_NAV : STUDENT_NAV;
-  const user = role === "faculty" ? FACULTY_USER : STUDENT_USER;
   const [note, setNote] = useState<NavDef | null>(null);
 
   useEffect(() => {
@@ -83,13 +81,6 @@ export function Shell({ screen, go, children }: ShellProps) {
         <button type="button" onClick={() => go(role === "faculty" ? "f-home" : "s-home")} className="leading-none" aria-label="Rounds home">
           <Wordmark size="lg" />
         </button>
-        <div className="flex items-center gap-2.5 rounded-full border border-white/70 bg-white/75 py-1.5 pr-4 pl-1.5 font-sans text-[13px] text-ink-soft shadow-[0_6px_20px_-12px_rgba(25,31,92,.4)] backdrop-blur-md dark:border-line dark:bg-card/80">
-          <span className="flex size-8 items-center justify-center rounded-full bg-indigo-soft text-[12px] font-bold text-indigo">{user.initials}</span>
-          <span className="hidden leading-tight sm:block">
-            <span className="block font-semibold text-ink">{user.name}</span>
-            <span className="block text-[12px]">{role === "faculty" ? `Educator · ${user.role}` : user.role}</span>
-          </span>
-        </div>
       </header>
 
       <nav

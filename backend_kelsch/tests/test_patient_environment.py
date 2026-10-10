@@ -4,10 +4,10 @@ from copy import deepcopy
 import pytest
 
 from app.encounter.engine import new_state
-from app.patient_environment.runner import (
+from backend_kelsch.app.patient_environment.runner import (
     fact_for_role, fingerprint, replay, run_script, tagged_turn, with_probe_preset,
 )
-from scripts.eval_patient_environment import evaluate, scenario
+from backend_kelsch.scripts.eval_patient_environment import evaluate, scenario
 
 
 def test_authored_gates():

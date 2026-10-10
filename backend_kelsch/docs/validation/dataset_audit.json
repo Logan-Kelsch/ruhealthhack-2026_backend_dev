@@ -32,7 +32,7 @@
         "student_performance",
         "learning_gain"
       ],
-      "path": "backend/app/data/source_fixtures/faculty-provided-sample-patient-details.csv",
+      "path": "backend_kelsch/app/data/source_fixtures/faculty-provided-sample-patient-details.csv",
       "sha256": "ea802c9ac4dcd522c10ba2fcbb90fe248cfc0a0879f91876659ab76b209d43c8",
       "local_status": "present",
       "columns": [
@@ -187,7 +187,7 @@
         "learning_gain"
       ],
       "review_note": "No associated case, audiogram, or Speech Banana asset was provided in the local source set.",
-      "path": "backend/app/data/source_fixtures/pediatric_treatment_rubric.docx",
+      "path": "backend_kelsch/app/data/source_fixtures/pediatric_treatment_rubric.docx",
       "sha256": "a53ea4edb249dd365de916b31c0d0ae6953049b81403db63f5772eb0334dc05b",
       "local_status": "present",
       "record_count": 4,
@@ -216,7 +216,7 @@
         "clinical_decisions",
         "learning_gain"
       ],
-      "path": "backend/app/data/source_fixtures",
+      "path": "backend_kelsch/app/data/source_fixtures",
       "sha256": "1d837e8ad093bd708c0a5296793e6a1ebaad95cedbac69892233989692d6b682",
       "local_status": "present",
       "record_count": 5,

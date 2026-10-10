@@ -1,6 +1,6 @@
 """Audit supplied TwinVerse case, rubric, dialogue, and persona sources.
 
-Run from ``backend/`` with ``python -m scripts.audit_datasets``. This is a
+Run from ``backend/`` with ``python -m backend_kelsch.scripts.audit_datasets``. This is a
 provenance and structural audit; it does not validate clinical correctness or
 student learning outcomes.
 """
@@ -18,7 +18,7 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
-MANIFEST = Path("backend/app/data/dataset_manifest.json")
+MANIFEST = Path("backend_kelsch/app/data/dataset_manifest.json")
 
 
 def load_json_objects(path: Path) -> list[dict[str, Any]]:
@@ -323,7 +323,7 @@ def build_report(root: Path = ROOT) -> dict[str, Any]:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repo-root", type=Path, default=ROOT)
-    parser.add_argument("--output", type=Path, default=Path("docs/validation/dataset_audit.json"))
+    parser.add_argument("--output", type=Path, default=Path("backend_kelsch/docs/validation/dataset_audit.json"))
     args = parser.parse_args()
     root = args.repo_root.resolve()
     report = build_report(root)

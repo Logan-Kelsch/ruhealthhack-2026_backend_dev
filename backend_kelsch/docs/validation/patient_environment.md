@@ -4,16 +4,16 @@ Date: 2026-10-10. Feature: E-07 progressive disclosure, E-12 trust, PRD V-01/V-0
 
 ## Sources and method
 
-The offline script `backend/scripts/eval_patient_environment.py` loads only authored synthetic `cases/walter_greene.json` and `cases/alina_reyes.json`. The machine-readable [report](patient_environment.json) records their SHA-256 hashes. Each disclosed or repeated fact in the trace carries its case fact ID and `source` fields. The comparison uses exact authored `Intent` tags and fallback patient text from the existing `engine`, `trust`, `phraser`, and `verifier` contracts. It does not infer student actions with a model, use external dialogue, or score students.
+The offline script `backend_kelsch/scripts/eval_patient_environment.py` loads only authored synthetic `cases/walter_greene.json` and `cases/alina_reyes.json`. The machine-readable [report](patient_environment.json) records their SHA-256 hashes. Each disclosed or repeated fact in the trace carries its case fact ID and `source` fields. The comparison uses exact authored `Intent` tags and fallback patient text from the existing `engine`, `trust`, `phraser`, and `verifier` contracts. It does not infer student actions with a model, use external dialogue, or score students.
 
 Run from the repository root:
 
 ```bash
-LLM_ENABLED=false PYTHONPATH=backend python -m scripts.eval_patient_environment --output docs/validation/patient_environment.json
-LLM_ENABLED=false PYTHONPATH=backend python -m pytest -q backend/tests
+LLM_ENABLED=false PYTHONPATH=backend python -m backend_kelsch.scripts.eval_patient_environment --output backend_kelsch/docs/validation/patient_environment.json
+LLM_ENABLED=false PYTHONPATH=backend python -m pytest -q backend_kelsch/tests backend/tests --ignore=backend/tests/test_api.py
 ```
 
-The notebook `notebooks/03_patient_environment.ipynb` executes eight code cells and renders two figures (trust/disclosure and comparative discovery). A fresh Python process with a shared notebook namespace and the Agg plot backend completed all code cells.
+The notebook `backend_kelsch/notebooks/03_patient_environment.ipynb` executes eight code cells and renders two figures (trust/disclosure and comparative discovery). A fresh Python process with a shared notebook namespace and the Agg plot backend completed all code cells.
 
 ## Measured results
 
@@ -40,3 +40,7 @@ The source fields on the authored facts are `kind: faculty` with no cited extern
 ## Next notebook prompt
 
 Implement Notebook 04: scripted novice, competent and expert test students across the three authored cases. Define independently faculty-reviewed expected fact releases and a semantic verifier challenge set. Measure fact-level disclosure precision/recall, zero premature guarded releases, delivered grounding and fallback use. Report denominators and failure examples. Compare difficulty only after full preset vectors are faculty approved and sample size supports inference. Preserve Notebook 02's NOT EVALUABLE trained-extraction gate until licensed, reviewed conversation-level split labels exist.
+
+## Folder partition
+
+This report and the Notebook 01–03 additions now live under `backend_kelsch/`. The original `backend/` remains the source of shared case, engine, verifier, and Studio contracts. Run the notebook scripts from the repository root with `PYTHONPATH=backend`; notebook-specific modules import those contracts without copying them. Historical validation counts above were produced before relocation; current source paths and hashes are regenerated in the JSON reports.

@@ -1,7 +1,7 @@
 """Synthetic fixtures verify mechanics, never model quality."""
 import pytest
-from app.action_data.preparation import parse_dialogue, grouped_split, validate_annotations, evaluate
-from scripts.prepare_action_data import build_report
+from backend_kelsch.app.action_data.preparation import parse_dialogue, grouped_split, validate_annotations, evaluate
+from backend_kelsch.scripts.prepare_action_data import build_report
 
 VOCAB = {'dialogue_act':['question','other'], 'student_skill':['summarize','other']}
 

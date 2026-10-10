@@ -1,6 +1,6 @@
 Implement Notebook 03: controlled patient environment in Logan-Kelsch/ruhealthhack-2026_backend_dev. Continue from the Notebook 02 PR branch or its merged equivalent.
 
-Read AGENTS.md, context.md, PRD.md, docs/action_data.md, and both Notebook 02 validation reports. Preserve the NOT EVALUABLE supervised extraction gate: no reviewed action labels or licensed Postzeun dialogue contents were available.
+Read AGENTS.md, context.md, PRD.md, backend_kelsch/docs/action_data.md, and both Notebook 02 validation reports. Preserve the NOT EVALUABLE supervised extraction gate: no reviewed action labels or licensed Postzeun dialogue contents were available.
 
 Deliver reusable backend modules and a runnable script, an explanatory notebook with actual sourced patient examples and visual state traces, meaningful tests, a machine-readable validation report, and a draft PR.
 

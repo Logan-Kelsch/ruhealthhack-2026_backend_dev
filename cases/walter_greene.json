@@ -1545,7 +1545,7 @@
       "id": "counsel_sodium",
       "description": "Discusses lowering salt or sodium, for example at the dinner club or with canned soup",
       "keywords": [
-        "(less|lower|cut( back)?( on)?|reduce|watch) (the |your )?(salt|sodium)",
+        "(less|lower(ing)?|cut(ting)?( back)?( on)?|reduc(e|ing)|watch(ing)?|limit(ing)?) (the |your |on )?(salt|sodium)",
         "low.?sodium",
         "(salt|sodium).{0,40}(heart|swell|fluid|blood pressure|water)"
       ]

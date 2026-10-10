@@ -567,6 +567,7 @@
       ],
       "expected_actions": [
         "supportive_care",
+        "counsel_cam",
         "safety_netting"
       ],
       "rubric_domains": [

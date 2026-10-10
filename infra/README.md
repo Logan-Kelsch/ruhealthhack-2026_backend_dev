@@ -162,6 +162,14 @@ sudo journalctl -u rounds-api -f
 
 When anyone changes a key, update the shared copy and the `APP_ENV` secret together, then run the Deploy workflow by hand.
 
+**Nova Micro:** `AppPermissions` permits `amazon.nova-micro-v1:0` alongside Claude,
+including destination foundation models used by cross-region inference. To select it
+for the fast tier, set `BEDROCK_MODEL_FAST=us.amazon.nova-micro-v1:0` in the shared
+`.env` and `APP_ENV`. Model selection stays in config. Merge the `app.yaml` permission
+change into `main` so CI updates the app stack before deploying the backend, or run
+`infra/scripts/deploy-stacks.sh app` from a laptop. Run the golden-case audit with
+the selected models before using them in a demo.
+
 ## The database
 
 There is one database, `rounds`, used by both the deployed app and every laptop, so everyone sees the same cases and encounters. Things to keep in mind:

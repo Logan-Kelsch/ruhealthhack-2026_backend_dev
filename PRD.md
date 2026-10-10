@@ -641,6 +641,7 @@ Latency target: commit → first audio ≤2.0 s median. Measure each step. If to
 
 ### 9.2 Model use (config, verify IDs before use)
 - **Classifier and verifier judge:** a fast Claude model on Bedrock (a Claude Haiku 4.5 inference profile was tested and works in us-east-1).
+- **Optional fast tier:** Nova Micro is permitted by the app policy and selected through `BEDROCK_MODEL_FAST`. Run the golden-case audit with it before using it in a demo; its grounding and latency have not been measured here.
 - **Phraser:** a fast model; upgrade only if quality demands it.
 - **Studio drafting, consistency suggestions, feedback writing:** a stronger Claude model (Sonnet- or Opus-class on Bedrock). Check availability with `aws bedrock list-inference-profiles --region us-east-1`.
 - Record model ID and prompt version on every logged call.
@@ -683,7 +684,7 @@ FastAPI (Python)
   ├─ dashboard/ (cohort aggregates, export)
   ├─ integrations/ (bedrock, elevenlabs, tavus, nlm_tables, s3)
   └─ openai_compat/ (/v1/chat/completions for Tavus)
-Postgres (Docker locally → AWS RDS)   S3 (audio, images)   AWS Bedrock (Claude)
+Postgres (Docker locally → AWS RDS)   S3 (audio, images)   AWS Bedrock (Claude, Nova Micro)
 ```
 
 - **Backend:** Python 3.12, FastAPI, Pydantic v2, SQLAlchemy 2, Alembic, boto3, httpx, pytest.
@@ -855,5 +856,5 @@ See `context.md` §15 for the full list with owners. The ones that block the bui
 - PTB-XL (PhysioNet), CC BY 4.0.
 - Radiopaedia images: per-case license (usually CC BY-NC-SA), attribution per image.
 - MakeHuman (CC0 output), if the 3D figure is built.
-- ElevenLabs, Tavus, AWS Bedrock (Anthropic Claude models): commercial APIs used under their terms.
+- ElevenLabs, Tavus, AWS Bedrock (Anthropic Claude and Amazon Nova Micro models): commercial APIs used under their terms.
 - Open-source libraries: listed from `pyproject.toml` and `package.json`.

@@ -277,6 +277,30 @@
         "title": "Branch",
         "type": "object"
       },
+      "BranchSummary": {
+        "description": "Which authored outcome was taken. Later-visit fact changes are not part of this view.",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "summary": {
+            "default": "",
+            "title": "Summary",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label"
+        ],
+        "title": "BranchSummary",
+        "type": "object"
+      },
       "Briefing": {
         "properties": {
           "goal": {
@@ -520,6 +544,42 @@
         "title": "CaseVocabItem",
         "type": "object"
       },
+      "CitedNote": {
+        "description": "A strength or improvement. The quote is omitted when it was not in the transcript.",
+        "properties": {
+          "quote": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quote"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "turn": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Turn"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "CitedNote",
+        "type": "object"
+      },
       "Code": {
         "properties": {
           "code": {
@@ -547,6 +607,85 @@
           "display"
         ],
         "title": "Code",
+        "type": "object"
+      },
+      "CommunicationMetrics": {
+        "description": "Counts from the tagged turns. A ratio stays null when there were no questions to count.",
+        "properties": {
+          "closed_questions": {
+            "title": "Closed Questions",
+            "type": "integer"
+          },
+          "interruptions": {
+            "title": "Interruptions",
+            "type": "integer"
+          },
+          "open_questions": {
+            "title": "Open Questions",
+            "type": "integer"
+          },
+          "percent_open": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Percent Open"
+          },
+          "reflection_to_question_ratio": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reflection To Question Ratio"
+          },
+          "reflections": {
+            "title": "Reflections",
+            "type": "integer"
+          },
+          "student_talk_share": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Student Talk Share"
+          },
+          "turns": {
+            "title": "Turns",
+            "type": "integer"
+          },
+          "unexplained_jargon": {
+            "items": {
+              "$ref": "#/components/schemas/JargonMetric"
+            },
+            "title": "Unexplained Jargon",
+            "type": "array"
+          },
+          "validations": {
+            "title": "Validations",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "turns",
+          "open_questions",
+          "closed_questions",
+          "reflections",
+          "validations",
+          "interruptions"
+        ],
+        "title": "CommunicationMetrics",
         "type": "object"
       },
       "ConsistencyFinding": {
@@ -620,6 +759,77 @@
           "source"
         ],
         "title": "Credit",
+        "type": "object"
+      },
+      "DebriefTurn": {
+        "description": "One exchange the debrief can point at. mode says whether the reply used the template.",
+        "properties": {
+          "mode": {
+            "default": "template",
+            "enum": [
+              "template",
+              "llm"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "patient": {
+            "title": "Patient",
+            "type": "string"
+          },
+          "student": {
+            "title": "Student",
+            "type": "string"
+          },
+          "turn": {
+            "title": "Turn",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "turn",
+          "student",
+          "patient"
+        ],
+        "title": "DebriefTurn",
+        "type": "object"
+      },
+      "DecisionPathView": {
+        "description": "The outcome id for this visit. Follow-up selection is a separate screen.",
+        "properties": {
+          "ghosts": {
+            "items": {
+              "$ref": "#/components/schemas/BranchSummary"
+            },
+            "title": "Ghosts",
+            "type": "array"
+          },
+          "needs_faculty_review": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Needs Faculty Review",
+            "type": "array"
+          },
+          "taken": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BranchSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "visit_id": {
+            "title": "Visit Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "visit_id"
+        ],
+        "title": "DecisionPathView",
         "type": "object"
       },
       "DecisionPoint": {
@@ -760,6 +970,179 @@
           "fields"
         ],
         "title": "Documentation",
+        "type": "object"
+      },
+      "DocumentationCheck": {
+        "description": "The fabrication check. unsupported and missing keep the evidence they were judged against.",
+        "properties": {
+          "method": {
+            "enum": [
+              "rule-based",
+              "llm"
+            ],
+            "title": "Method",
+            "type": "string"
+          },
+          "missing": {
+            "items": {
+              "$ref": "#/components/schemas/MissingFinding"
+            },
+            "title": "Missing",
+            "type": "array"
+          },
+          "supported": {
+            "items": {
+              "$ref": "#/components/schemas/SupportedStatement"
+            },
+            "title": "Supported",
+            "type": "array"
+          },
+          "unsupported": {
+            "items": {
+              "$ref": "#/components/schemas/UnsupportedClaim"
+            },
+            "title": "Unsupported",
+            "type": "array"
+          }
+        },
+        "required": [
+          "method"
+        ],
+        "title": "DocumentationCheck",
+        "type": "object"
+      },
+      "DocumentationField": {
+        "description": "One blank in the note the student dictates after the visit.",
+        "properties": {
+          "hint": {
+            "title": "Hint",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "hint"
+        ],
+        "title": "DocumentationField",
+        "type": "object"
+      },
+      "DocumentationTemplate": {
+        "description": "The template stored on the case. The student does not fetch the Studio case to learn it.",
+        "properties": {
+          "fields": {
+            "items": {
+              "$ref": "#/components/schemas/DocumentationField"
+            },
+            "title": "Fields",
+            "type": "array"
+          },
+          "id": {
+            "enum": [
+              "PES",
+              "ADIME",
+              "SBAR",
+              "SOAP"
+            ],
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "fields"
+        ],
+        "title": "DocumentationTemplate",
+        "type": "object"
+      },
+      "DomainScore": {
+        "description": "One official domain. A number is only valid when evidence quotes the transcript.",
+        "properties": {
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/EvidenceQuote"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "important_gap_or_missed_opportunity": {
+            "default": "",
+            "title": "Important Gap Or Missed Opportunity",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "method": {
+            "enum": [
+              "rule-based",
+              "llm"
+            ],
+            "title": "Method",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "rule_based_score": {
+            "enum": [
+              1,
+              2,
+              3,
+              4,
+              "N/A"
+            ],
+            "title": "Rule Based Score"
+          },
+          "safety_or_accuracy_concern": {
+            "default": "",
+            "title": "Safety Or Accuracy Concern",
+            "type": "string"
+          },
+          "score": {
+            "enum": [
+              1,
+              2,
+              3,
+              4,
+              "N/A"
+            ],
+            "title": "Score"
+          },
+          "strength_demonstrated": {
+            "default": "",
+            "title": "Strength Demonstrated",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "name",
+          "id",
+          "score",
+          "method",
+          "rule_based_score"
+        ],
+        "title": "DomainScore",
         "type": "object"
       },
       "EncounterSummary": {
@@ -906,6 +1289,26 @@
           "message"
         ],
         "title": "ErrorResponse",
+        "type": "object"
+      },
+      "EvidenceQuote": {
+        "description": "A transcript span a score or trust event is allowed to cite.",
+        "properties": {
+          "quote": {
+            "minLength": 1,
+            "title": "Quote",
+            "type": "string"
+          },
+          "turn": {
+            "title": "Turn",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "turn",
+          "quote"
+        ],
+        "title": "EvidenceQuote",
         "type": "object"
       },
       "ExamFinding": {
@@ -1066,6 +1469,116 @@
         "title": "Fact",
         "type": "object"
       },
+      "FeedbackResponse": {
+        "description": "The saved debrief: rubric, evidence, trust, the note check, and the counts behind them.",
+        "properties": {
+          "communication_notes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Communication Notes",
+            "type": "array"
+          },
+          "decision_path": {
+            "$ref": "#/components/schemas/DecisionPathView"
+          },
+          "documentation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DocumentationCheck"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "elicited": {
+            "items": {
+              "$ref": "#/components/schemas/ObjectiveProgress"
+            },
+            "title": "Elicited",
+            "type": "array"
+          },
+          "fallback_used": {
+            "default": false,
+            "title": "Fallback Used",
+            "type": "boolean"
+          },
+          "generated_at": {
+            "title": "Generated At",
+            "type": "string"
+          },
+          "llm_calls": {
+            "items": {
+              "$ref": "#/components/schemas/LlmCallRecord"
+            },
+            "title": "Llm Calls",
+            "type": "array"
+          },
+          "metrics": {
+            "$ref": "#/components/schemas/CommunicationMetrics"
+          },
+          "rubric": {
+            "$ref": "#/components/schemas/RubricResult"
+          },
+          "safety": {
+            "items": {
+              "$ref": "#/components/schemas/SafetyItem"
+            },
+            "title": "Safety",
+            "type": "array"
+          },
+          "transcript": {
+            "items": {
+              "$ref": "#/components/schemas/DebriefTurn"
+            },
+            "title": "Transcript",
+            "type": "array"
+          },
+          "trust_timeline": {
+            "items": {
+              "$ref": "#/components/schemas/TrustPoint"
+            },
+            "title": "Trust Timeline",
+            "type": "array"
+          }
+        },
+        "required": [
+          "rubric",
+          "metrics",
+          "elicited",
+          "trust_timeline",
+          "decision_path",
+          "transcript",
+          "generated_at"
+        ],
+        "title": "FeedbackResponse",
+        "type": "object"
+      },
+      "FoundFact": {
+        "description": "An expected discovery the student actually elicited, with the turn that released it.",
+        "properties": {
+          "fact_id": {
+            "title": "Fact Id",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "turn": {
+            "title": "Turn",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "fact_id",
+          "text",
+          "turn"
+        ],
+        "title": "FoundFact",
+        "type": "object"
+      },
       "HealthResponse": {
         "description": "Liveness. True means this process can answer; it does not check the database.",
         "properties": {
@@ -1144,6 +1657,25 @@
           "blocking"
         ],
         "title": "IntakeGap",
+        "type": "object"
+      },
+      "JargonMetric": {
+        "description": "A term the student used without a plain-language explanation, with the words they said.",
+        "properties": {
+          "quote": {
+            "title": "Quote",
+            "type": "string"
+          },
+          "term": {
+            "title": "Term",
+            "type": "string"
+          }
+        },
+        "required": [
+          "term",
+          "quote"
+        ],
+        "title": "JargonMetric",
         "type": "object"
       },
       "LabResult": {
@@ -1395,6 +1927,49 @@
         "title": "Medication",
         "type": "object"
       },
+      "MissedFact": {
+        "description": "An expected discovery that stayed undisclosed, with a question the student could ask.",
+        "properties": {
+          "fact_id": {
+            "title": "Fact Id",
+            "type": "string"
+          },
+          "suggestion": {
+            "default": "",
+            "title": "Suggestion",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "fact_id",
+          "text"
+        ],
+        "title": "MissedFact",
+        "type": "object"
+      },
+      "MissingFinding": {
+        "description": "A key finding the student learned and left out of the note. id is the fact or chart reference.",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "text"
+        ],
+        "title": "MissingFinding",
+        "type": "object"
+      },
       "NewDraft": {
         "properties": {
           "description": {
@@ -1467,6 +2042,65 @@
           "text"
         ],
         "title": "Objective",
+        "type": "object"
+      },
+      "ObjectiveAction": {
+        "description": "Whether the student performed one expected action.",
+        "properties": {
+          "action": {
+            "title": "Action",
+            "type": "string"
+          },
+          "done": {
+            "title": "Done",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "action",
+          "done"
+        ],
+        "title": "ObjectiveAction",
+        "type": "object"
+      },
+      "ObjectiveProgress": {
+        "description": "Elicited and missed items for one learning objective.",
+        "properties": {
+          "actions": {
+            "items": {
+              "$ref": "#/components/schemas/ObjectiveAction"
+            },
+            "title": "Actions",
+            "type": "array"
+          },
+          "found": {
+            "items": {
+              "$ref": "#/components/schemas/FoundFact"
+            },
+            "title": "Found",
+            "type": "array"
+          },
+          "missed": {
+            "items": {
+              "$ref": "#/components/schemas/MissedFact"
+            },
+            "title": "Missed",
+            "type": "array"
+          },
+          "objective": {
+            "title": "Objective",
+            "type": "string"
+          },
+          "objective_id": {
+            "title": "Objective Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "objective_id",
+          "objective"
+        ],
+        "title": "ObjectiveProgress",
         "type": "object"
       },
       "Personality": {
@@ -1946,6 +2580,9 @@
             "title": "Chart",
             "type": "array"
           },
+          "documentation_template": {
+            "$ref": "#/components/schemas/DocumentationTemplate"
+          },
           "encounter_id": {
             "title": "Encounter Id",
             "type": "string"
@@ -1990,6 +2627,20 @@
               }
             ],
             "title": "Previous Encounter Id"
+          },
+          "saved_documentation": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Saved Documentation"
           },
           "started_at": {
             "anyOf": [
@@ -2037,7 +2688,8 @@
           "visit_label",
           "has_next_visit",
           "patient",
-          "briefing"
+          "briefing",
+          "documentation_template"
         ],
         "title": "PublicEncounter",
         "type": "object"
@@ -2221,6 +2873,116 @@
           }
         },
         "title": "Release",
+        "type": "object"
+      },
+      "RubricResult": {
+        "description": "The seven-domain result. The interpretation is the official discussion-aid wording.",
+        "properties": {
+          "domains": {
+            "items": {
+              "$ref": "#/components/schemas/DomainScore"
+            },
+            "title": "Domains",
+            "type": "array"
+          },
+          "improvements": {
+            "items": {
+              "$ref": "#/components/schemas/CitedNote"
+            },
+            "title": "Improvements",
+            "type": "array"
+          },
+          "interpretation": {
+            "title": "Interpretation",
+            "type": "string"
+          },
+          "max_total": {
+            "title": "Max Total",
+            "type": "integer"
+          },
+          "next_attempt": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Next Attempt",
+            "type": "array"
+          },
+          "review_flag": {
+            "title": "Review Flag",
+            "type": "boolean"
+          },
+          "review_reasons": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Review Reasons",
+            "type": "array"
+          },
+          "rubric_title": {
+            "title": "Rubric Title",
+            "type": "string"
+          },
+          "strengths": {
+            "items": {
+              "$ref": "#/components/schemas/CitedNote"
+            },
+            "title": "Strengths",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "rubric_title",
+          "domains",
+          "total",
+          "max_total",
+          "review_flag",
+          "interpretation"
+        ],
+        "title": "RubricResult",
+        "type": "object"
+      },
+      "SafetyItem": {
+        "description": "A case safety fact and whether the student found it and addressed it.",
+        "properties": {
+          "addressed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Addressed"
+          },
+          "discovered": {
+            "title": "Discovered",
+            "type": "boolean"
+          },
+          "fact_id": {
+            "title": "Fact Id",
+            "type": "string"
+          },
+          "patient_words": {
+            "default": "",
+            "title": "Patient Words",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "fact_id",
+          "text",
+          "discovered"
+        ],
+        "title": "SafetyItem",
         "type": "object"
       },
       "ScribeToken": {
@@ -2480,6 +3242,32 @@
         "title": "StudioDraftResult",
         "type": "object"
       },
+      "SupportedStatement": {
+        "description": "A sentence tied to fact ids from the disclosure log, or marked as the student's own plan.",
+        "properties": {
+          "assessment_or_plan": {
+            "default": false,
+            "title": "Assessment Or Plan",
+            "type": "boolean"
+          },
+          "statement": {
+            "title": "Statement",
+            "type": "string"
+          },
+          "supported_by": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Supported By",
+            "type": "array"
+          }
+        },
+        "required": [
+          "statement"
+        ],
+        "title": "SupportedStatement",
+        "type": "object"
+      },
       "TTSRequest": {
         "properties": {
           "audio_tags": {
@@ -2598,6 +3386,72 @@
         "title": "TrustConfig",
         "type": "object"
       },
+      "TrustPoint": {
+        "description": "Trust after one turn. Shown in the debrief, not while the visit is going on.",
+        "properties": {
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/TrustTimelineEvent"
+            },
+            "title": "Events",
+            "type": "array"
+          },
+          "trust": {
+            "title": "Trust",
+            "type": "integer"
+          },
+          "turn": {
+            "title": "Turn",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "turn",
+          "trust"
+        ],
+        "title": "TrustPoint",
+        "type": "object"
+      },
+      "TrustTimelineEvent": {
+        "description": "One trust change. The span is the words that caused it.",
+        "properties": {
+          "delta": {
+            "title": "Delta",
+            "type": "integer"
+          },
+          "event": {
+            "title": "Event",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "span": {
+            "title": "Span",
+            "type": "string"
+          },
+          "turn": {
+            "title": "Turn",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "event",
+          "delta",
+          "span",
+          "turn"
+        ],
+        "title": "TrustTimelineEvent",
+        "type": "object"
+      },
       "TurnResult": {
         "description": "The verified reply and the chart rows that turn released. The engine log stays stored.",
         "properties": {
@@ -2695,6 +3549,25 @@
           }
         },
         "title": "Unlock",
+        "type": "object"
+      },
+      "UnsupportedClaim": {
+        "description": "A sentence in the note that the disclosure log and chart do not back.",
+        "properties": {
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "statement": {
+            "title": "Statement",
+            "type": "string"
+          }
+        },
+        "required": [
+          "statement",
+          "reason"
+        ],
+        "title": "UnsupportedClaim",
         "type": "object"
       },
       "Utterance": {
@@ -3294,6 +4167,7 @@
     },
     "/api/encounters/{enc_id}/documentation": {
       "post": {
+        "description": "Save the dictated note and return the debrief, including the fabrication check.",
         "operationId": "submit_documentation_api_encounters__enc_id__documentation_post",
         "parameters": [
           {
@@ -3321,13 +4195,21 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Submit Documentation Api Encounters  Enc Id  Documentation Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/FeedbackResponse"
                 }
               }
             },
             "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No saved encounter with that id."
           },
           "422": {
             "content": {
@@ -3401,6 +4283,7 @@
     },
     "/api/encounters/{enc_id}/feedback": {
       "get": {
+        "description": "The saved debrief. A missing encounter is 404. An active visit is 409.",
         "operationId": "get_feedback_api_encounters__enc_id__feedback_get",
         "parameters": [
           {
@@ -3418,13 +4301,31 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Get Feedback Api Encounters  Enc Id  Feedback Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/FeedbackResponse"
                 }
               }
             },
             "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No saved encounter with that id."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "End the encounter before requesting feedback."
           },
           "422": {
             "content": {

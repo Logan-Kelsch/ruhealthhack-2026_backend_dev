@@ -109,6 +109,22 @@ class TranscriptEntry(BaseModel):
     is_last: bool = False
 
 
+class DocumentationField(BaseModel):
+    """One blank in the note the student dictates after the visit."""
+
+    id: str
+    label: str
+    hint: str
+
+
+class DocumentationTemplate(BaseModel):
+    """The template stored on the case. The student does not fetch the Studio case to learn it."""
+
+    id: Literal["PES", "ADIME", "SBAR", "SOAP"]
+    label: str
+    fields: list[DocumentationField]
+
+
 class PublicEncounter(BaseModel):
     """The encounter a refresh restores. Trust and engine state are not fields on this object."""
 
@@ -127,6 +143,9 @@ class PublicEncounter(BaseModel):
     started_at: datetime | None = None
     ended_at: datetime | None = None
     last_turn: int | None = None
+    documentation_template: DocumentationTemplate
+    # The note the student already submitted. None until that submit succeeds.
+    saved_documentation: dict[str, str] | None = None
 
 
 class EncounterSummary(BaseModel):

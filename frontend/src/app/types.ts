@@ -103,8 +103,9 @@ export function routeForScreen(screen: ScreenId, current: StudentRoute, opts?: G
     caseId: opts?.caseId ?? current.caseId,
     version: opts?.version ?? current.version,
     visitId: opts?.visitId ?? current.visitId,
-    // Only the encounter screen keeps an encounter id. Briefing must not resume one by itself.
-    encounterId: screen === "s-encounter" ? (opts?.encounterId ?? current.encounterId) : null,
+    // The visit and the debrief reopen the same encounter. Briefing must not resume one by itself.
+    encounterId:
+      screen === "s-encounter" || screen === "s-debrief" ? (opts?.encounterId ?? current.encounterId) : null,
   };
 }
 

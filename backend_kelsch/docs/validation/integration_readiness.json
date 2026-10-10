@@ -1,0 +1,117 @@
+{
+  "stage": "Notebook 07",
+  "mode": "quality_control_only",
+  "source_lock": {
+    "protocol_id": "notebook06_prospective_v1",
+    "protocol_status": "proposed_pending_faculty_and_ethics_review",
+    "source_sha256": {
+      "backend_kelsch/app/data/study_protocol_v1.json": "776b2ff41092c849fca0553f0f77a8748c2f48376261eee5b288ead69e1563a3",
+      "backend_kelsch/app/data/action_annotation_vocab.json": "4047d4da17656cfd4838007a4ee51e3c2b388d3e0f783730b605af502b2c3b5e",
+      "backend/app/data/rubric_shp_v1.json": "4c337aab9891b5c8f224e7efeaf4214013847a000b19c7ebec5101e68c58fce7",
+      "backend_kelsch/app/study/protocol.py": "58876f601286d485c68efce295388c76d14251f2bb386a48b59bc3fa02843072",
+      "backend_kelsch/app/study/review.py": "7269c667161b8be1e4d4b3d784856611291a7c98999f08a8db88c712b62bdcaa",
+      "backend_kelsch/app/study/analysis.py": "63cc42e02718f112b67f2c14bf48af87c7851194c6e5fe32f3e835969e70226b",
+      "backend_kelsch/scripts/eval_study.py": "9949fc90181d3ef0eec7d90cf5a982151335eaeb9f6d31d8ca67f9c441ed778c",
+      "backend_kelsch/app/action_data/preparation.py": "29a21404688c8286e49676668391980d87984109790425e35a2c1d05d406a4c7",
+      "backend/app/schemas/case.py": "f5b5e37c72b894dc4a278cf875ccbe5172d2e35179490d857ac02586d4c2c0ba",
+      "backend/app/schemas/encounter.py": "a8ca17b0705b2c477828f7321332c528999bff3ba60d715bcd412244479a8051",
+      "backend/app/feedback/debrief.py": "b68e8ab83c8265c30074dd60e81dd72d86870ed7502a2abed45ebbb50ec73f99",
+      "backend/app/feedback/decisions.py": "e48aaaed4178103d49daf1b7318c90a0ec767d15db74dd29e971d242da820ab1",
+      "backend/app/feedback/documentation.py": "38bc27f112ae25056d444607875060088c9442bb0c043942686fbdac43a94a2e",
+      "backend/app/feedback/rubric.py": "b15a0f227cd0e4d88b0d149d6927ef3b623087eb7c790539b87ce85337e4025c",
+      "backend/app/encounter/visit.py": "21fc48f9c5143b241d6297b97805b739d784d98ca35c3c3669abb0f8c6ae3632",
+      "cases/walter_greene.json": "af9b64eded4aae898af7f47714aa95883d87bc9f2f7fa4c3b73866c73225b7bf",
+      "cases/alina_reyes.json": "624f4713b587550865b5a6a378de6f3c678b13454ee3c0af26a5ffe7d5728c98",
+      "cases/eli_brooks.json": "59c5c783e1baea71271f0fc49d96be907f5bbbbceea490ec0d8136dc18527c0b",
+      "backend_kelsch/docs/validation/dataset_audit.json": "90664087089ac1d04499c79f1036e2121d2dd1265244d76ce9d337176557879d",
+      "backend_kelsch/docs/validation/action_data.json": "c2daa0fbd6cdce11c3503675d38d3c956a9b5f47952e726c30fb3fbae045b89c",
+      "backend_kelsch/docs/validation/patient_environment.json": "e9db69539cd3b19ece0d4d13830addb61e94a627d60e350ed4ac461c994840eb",
+      "backend_kelsch/docs/validation/grounding_eval.json": "7db60b10d4a74806c4449db565a9f0c439db6d46ca36571c5e70d830df2c1e08",
+      "backend_kelsch/docs/validation/debrief_eval.json": "6e87fe456323b57fb597e4b0b6c5c373d1edf6f497397f6495f49382aac420d2",
+      "backend_kelsch/docs/validation/grounding_traces.json.gz": "7000fb2eba5c1b94b26635d646b170d743cd3fb40b73b3a3524b6d0bbfea8256",
+      "backend_kelsch/docs/validation/debrief_traces.json.gz": "94cf0c8b674e25d594156933238436c2a74e38806c8a9f118eeaa2835a376304"
+    },
+    "lock_id": "8cc3e591b02dd241bbc3c26359e7596b4f38c10658a8c149d3816456293927f5"
+  },
+  "packet_manifest_sha256": "90e26d07a315d60ff36e5b93682f1d96aca8810b3d4e3100438d571b1a063b0b",
+  "approval": {
+    "status": "NOT VERIFIED",
+    "metadata_complete": false,
+    "scopes_checked": 0,
+    "required_scopes": 6,
+    "reason": "No faculty or institutional approval bundle supplied"
+  },
+  "review_denominators": {
+    "total_by_kind": {
+      "release": 189,
+      "semantic": 15,
+      "domain": 42,
+      "claim": 41
+    },
+    "resolved_by_kind": {},
+    "missing_by_kind": {
+      "release": 189,
+      "semantic": 15,
+      "domain": 42,
+      "claim": 41
+    },
+    "unresolved_disagreements": 0,
+    "reviewed_na_domain_count": 0
+  },
+  "audit": {
+    "status": "PASS",
+    "events": 0,
+    "head": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "prospective_learners": 0,
+  "test_execution_snapshot": {
+    "date_utc": "2026-10-10",
+    "non_http": {
+      "command": "LLM_ENABLED=false PYTHONPATH=backend python -m pytest -q backend_kelsch/tests backend/tests/test_feedback_and_studio.py backend/tests/test_encounter.py",
+      "passed": 69,
+      "failed": 0,
+      "notebook_07_tests_passed": 7
+    },
+    "notebooks": {
+      "execution": "Code cells of each notebook concatenated and run in an isolated Python process with IPython display helpers and MPLBACKEND=Agg; not a Jupyter kernel execution",
+      "code_cells_passed_by_notebook": {
+        "01": 12,
+        "02": 8,
+        "03": 8,
+        "04": 8,
+        "05": 6,
+        "06": 6,
+        "07": 5
+      }
+    },
+    "http_api": {
+      "collection_command": "LLM_ENABLED=false PYTHONPATH=backend python -m pytest --collect-only -q backend/tests/test_api.py",
+      "collected": 7,
+      "run_command": "timeout 25s env LLM_ENABLED=false PYTHONPATH=backend python -m pytest -q backend/tests/test_api.py",
+      "exit_code": 124,
+      "completed": 0,
+      "status": "TIMEOUT; no HTTP API tests counted as passed"
+    }
+  },
+  "reviewed_class_balance": null,
+  "confidence_intervals": null,
+  "performance_failure_examples": null,
+  "engineering_limitations": [
+    "No verified faculty/ethics authorization or learner cohort.",
+    "Metadata, document digests and reviewer role strings do not authenticate institutional approval.",
+    "Authored Notebook 04/05 probes are reviewer work items, not learner outcomes.",
+    "HTTP API tests require a working TestClient environment; local status is reported separately."
+  ],
+  "gates": {
+    "source_locked_import_quality": "PASS",
+    "approval_and_consent": "NOT EVALUABLE",
+    "trained_action_extraction": "NOT EVALUABLE",
+    "prompted_extraction_comparison": "NOT EVALUABLE",
+    "clinical_disclosure_accuracy": "NOT EVALUABLE",
+    "semantic_grounding": "NOT EVALUABLE",
+    "faculty_feedback_accuracy": "NOT EVALUABLE",
+    "faculty_rubric_agreement": "NOT EVALUABLE",
+    "difficulty_calibration": "NOT EVALUABLE",
+    "student_learning": "NOT EVALUABLE"
+  }
+}

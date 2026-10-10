@@ -24,6 +24,9 @@ Scripts in `scripts/` read settings from the environment (`PREFIX`, default `rou
 - `db-allow-me.sh`: let your current IP reach RDS.
 - `teardown.sh`: empty the frontend bucket, delete the stacks in reverse order and remove the SSM parameters (asks first).
 
+The env upload passes a private temporary JSON file to the AWS CLI and removes it
+on success or failure. The secret value stays out of command arguments and logs.
+
 ```
 Browser ──HTTPS──▶ CloudFront ─┬─ /*           ──▶ S3 (React build, private, origin access control)
                                ├─ /portraits/* ──▶ EC2 :8000 (FastAPI static files, cached)

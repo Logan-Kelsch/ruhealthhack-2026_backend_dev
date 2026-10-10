@@ -1,0 +1,21 @@
+{
+  "environment": "workspace sandbox, 2026-10-10",
+  "non_http": {
+    "command": "LLM_ENABLED=false PYTHONPATH=backend python -m pytest -q backend_kelsch/tests backend/tests --ignore=backend/tests/test_api.py",
+    "passed": 62,
+    "collected": 62,
+    "exit_code": 0
+  },
+  "notebooks": {
+    "method": "Each notebook's code cells executed in a fresh Python process with Agg plotting and IPython display; kernel sockets unavailable",
+    "code_cells": {"01": 12, "02": 8, "03": 8, "04": 8, "05": 6, "06": 6},
+    "failed": 0
+  },
+  "http_api": {
+    "collected": 7,
+    "completed": 0,
+    "command": "timeout 25s env LLM_ENABLED=false PYTHONPATH=backend python -m pytest -q backend/tests/test_api.py",
+    "exit_code": 124,
+    "status": "TIMED OUT after 25 seconds; no tests counted as passing"
+  }
+}

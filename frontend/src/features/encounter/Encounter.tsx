@@ -145,6 +145,14 @@ function EncounterLive({
   const [voiceLabel, setVoiceLabel] = useState<string | null>(null);
   // Mirrors speechActiveRef for the call frame's speaking glow. Display only.
   const [speaking, setSpeaking] = useState(false);
+  const transcriptRef = useRef<HTMLDivElement | null>(null);
+  const turnCount = (view.transcript ?? []).length;
+
+  // The transcript box keeps a fixed size, so it follows the newest line like a chat.
+  useEffect(() => {
+    const box = transcriptRef.current;
+    if (box) box.scrollTop = box.scrollHeight;
+  }, [turnCount, partial]);
   const sessionRef = useRef<Awaited<ReturnType<ScribeConnector>> | null>(null);
   const queueRef = useRef(Promise.resolve());
   const closedRef = useRef(false);
@@ -517,22 +525,25 @@ function EncounterLive({
   const chart = view.chart ?? [];
   const notes = chart.filter((item) => item.kind === "artifact");
   const exams = chart.filter((item) => item.kind === "exam");
-  const released = chart.filter((item) => item.kind !== "artifact" && item.kind !== "exam");
+  const labs = chart.filter((item) => item.kind === "lab");
+  const released = chart.filter((item) => item.kind !== "artifact" && item.kind !== "exam" && item.kind !== "lab");
   const patient = view.patient;
   const simplified = (view.transcript ?? []).some((line) => line.mode === "template");
   const active = view.status === "active";
   // The note opens only after the visit has ended, and only with the template the case saved.
   const template = view.documentation_template;
   const showDocumentation = !active && template !== undefined && template.fields.length > 0;
+  // While the visit runs everything fits one screen on a laptop. The note after the visit scrolls.
+  const fitted = active || !showDocumentation;
 
   return (
-    <div className="relative flex h-full min-h-[700px] flex-col overflow-auto text-ink">
+    <div className={`relative flex h-full min-h-[620px] flex-col overflow-auto text-ink ${fitted ? "lg:overflow-hidden" : ""}`}>
       <div className="bg-world fixed inset-0" aria-hidden />
 
-      <header className="relative flex flex-wrap items-center justify-between gap-4 px-[clamp(24px,3vw,48px)] pt-5 pb-3">
+      <header className="relative flex flex-wrap items-center justify-between gap-4 px-[clamp(24px,3vw,48px)] pt-4 pb-2">
         <div className="flex items-center gap-5">
           <Wordmark size="md" />
-          <span className="rounded-full bg-white/75 px-4 py-1.5 font-serif text-[17px] backdrop-blur-sm">{view.visit_label}</span>
+          <span className="rounded-full bg-white/75 px-4 py-1.5 font-serif text-[17px] whitespace-nowrap backdrop-blur-sm">{view.visit_label}</span>
           <span className="font-sans text-[13px] text-ink-soft">{timingLabel(view.started_at, view.ended_at)}</span>
         </div>
         <div className="flex items-center gap-4">
@@ -544,7 +555,7 @@ function EncounterLive({
                 else void connect();
               }}
               disabled={voice === "connecting"}
-              className="inline-flex h-[54px] items-center gap-3 rounded-full border border-indigo-line/50 bg-white/85 px-6 font-serif text-[20px] backdrop-blur-sm hover:bg-white disabled:opacity-70"
+              className="inline-flex h-[50px] items-center gap-3 rounded-full whitespace-nowrap border border-indigo-line/50 bg-white/85 px-6 font-serif text-[20px] backdrop-blur-sm hover:bg-white disabled:opacity-70"
             >
               <span className={`size-3.5 rounded-full ${voice === "live" ? "rnd-blink bg-bright" : "bg-inactive"}`} />
               {micLabel(voice)}
@@ -556,48 +567,33 @@ function EncounterLive({
             type="button"
             onClick={() => void endVisit()}
             disabled={!active}
-            className="h-[54px] rounded-full bg-danger px-7 font-serif text-[20px] text-white shadow-[0_12px_26px_-14px_rgba(200,50,50,.8)] hover:brightness-95 disabled:bg-inactive disabled:shadow-none"
+            className="h-[50px] rounded-full bg-danger px-7 whitespace-nowrap font-serif text-[20px] text-white shadow-[0_12px_26px_-14px_rgba(200,50,50,.8)] hover:brightness-95 disabled:bg-inactive disabled:shadow-none"
           >
             End visit
           </button>
         </div>
       </header>
 
-      <div className="relative mx-auto grid w-full max-w-[1680px] flex-1 items-start gap-5 px-[clamp(16px,2.4vw,40px)] pt-2 pb-8 lg:grid-cols-[minmax(240px,300px)_minmax(0,1fr)_minmax(260px,320px)]">
-        <aside aria-label="Visit notes" className="flex flex-col gap-4">
-          <section className="rounded-[18px] bg-panel px-5 py-4 text-white shadow-[0_18px_40px_-24px_rgba(25,31,92,.7)]">
+      <div
+        className={`relative mx-auto grid w-full max-w-[1680px] flex-1 items-start gap-4 px-[clamp(16px,2.4vw,40px)] pt-2 pb-5 lg:grid-cols-[minmax(240px,290px)_minmax(0,1fr)_minmax(220px,260px)] ${
+          fitted ? "lg:min-h-0 lg:items-stretch" : ""
+        }`}
+      >
+        <aside aria-label="Visit notes" className="flex min-h-0 flex-col gap-4">
+          <section className="shrink-0 rounded-[18px] bg-panel px-5 py-4 text-white shadow-[0_18px_40px_-24px_rgba(25,31,92,.7)]">
             <div className="font-sans text-[11.5px] font-semibold tracking-[0.6px] text-indigo-on-ink uppercase">Goal</div>
-            <div className="mt-1 font-serif text-[21px] leading-snug">{view.briefing.goal}</div>
+            <div className="mt-1 font-serif text-[20px] leading-snug">{view.briefing.goal}</div>
           </section>
-          <section className="rounded-[18px] border border-white/70 bg-card/85 shadow-[0_18px_40px_-28px_rgba(25,31,92,.5)] backdrop-blur-md px-5 py-4">
-            <div className="font-serif text-[22px]">Referral</div>
-            {notes.length === 0 ? <div className="mt-1 font-serif text-[17px] text-ink-soft">No referral has been released.</div> : null}
-            {notes.map((note) => (
-              <div key={note.ref} className="mt-2">
-                <div className="font-serif text-[18px]">{note.label}</div>
-                {note.body ? <div className="mt-1 font-serif text-[17px] leading-snug text-ink-soft">{note.body}</div> : null}
-                <Provenance item={note} />
-              </div>
-            ))}
-          </section>
-          <section className="rounded-[18px] border border-white/70 bg-card/85 shadow-[0_18px_40px_-28px_rgba(25,31,92,.5)] backdrop-blur-md overflow-hidden">
-            <div className="px-5 pt-4 pb-2 font-serif text-[22px]">Exam log</div>
-            {exams.length === 0 ? <div className="px-5 pb-4 font-serif text-[17px] text-ink-soft">No exam has been released.</div> : null}
-            {exams.map((exam) => (
-              <div key={exam.ref} className="border-t border-hair px-5 py-3 font-serif text-[17px]">
-                <div>{exam.label}</div>
-                {exam.value ? <div className="text-ink-soft">{exam.value}</div> : null}
-                <Provenance item={exam} />
-              </div>
-            ))}
-          </section>
+          <ResultsPanel notes={notes} labs={labs} exams={exams} />
         </aside>
 
-        <div className="flex min-w-0 flex-col gap-4">
-          <section aria-label="Patient" className="rounded-[18px] border border-white/70 bg-card/85 shadow-[0_18px_40px_-28px_rgba(25,31,92,.5)] backdrop-blur-md p-3">
-            <PatientCall name={patient.speaker || patient.name} speaking={speaking} muted={voice === "muted"} listening={voice === "live"} />
-            <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-2 pt-3 pb-1">
-              <div className="font-serif text-[clamp(26px,2.2vw,34px)] leading-none tracking-[-0.6px]">
+        <div className="flex min-h-0 min-w-0 flex-col gap-4">
+          <section aria-label="Patient" className={`${GLASS} shrink-0 p-3`}>
+            <div className="mx-auto" style={{ width: "min(100%, calc(36dvh * 16 / 9))" }}>
+              <PatientCall name={patient.speaker || patient.name} speaking={speaking} muted={voice === "muted"} listening={voice === "live"} />
+            </div>
+            <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-2 pt-2.5">
+              <div className="font-serif text-[clamp(24px,2vw,30px)] leading-none tracking-[-0.6px]">
                 {patient.name}, {patient.age}
               </div>
               <div className="font-sans text-[13px] text-ink-soft">
@@ -605,28 +601,41 @@ function EncounterLive({
               </div>
             </div>
           </section>
-          <section aria-label="Transcript" className="rounded-[18px] border border-white/70 bg-card/85 shadow-[0_18px_40px_-28px_rgba(25,31,92,.5)] backdrop-blur-md flex flex-col gap-3 px-5 py-4">
-            {banner ? <p className="font-serif text-[17px] text-ink">{banner}</p> : null}
-            {voiceLabel ? <p className="font-serif text-[17px] text-ink">{voiceLabel}</p> : null}
-            {simplified || notices.includes("Simplified responses") ? (
-              <p className="font-sans text-[13px] text-ink-soft">Simplified responses</p>
-            ) : null}
-            {notices
-              .filter((notice) => notice !== "Simplified responses")
-              .map((notice) => (
-                <p key={notice} className="font-sans text-[13px] text-ink-soft">
-                  {notice}
-                </p>
+          <section aria-label="Transcript" className={`${GLASS} flex min-h-[220px] flex-1 flex-col overflow-hidden`}>
+            <div className="flex shrink-0 items-center justify-between gap-3 border-b border-hair px-5 py-2.5">
+              <span className="font-serif text-[19px]">Transcript</span>
+              <span className="flex items-center gap-3 font-sans text-[12px] text-ink-soft">
+                <span className="flex items-center gap-1.5">
+                  <span className="size-2.5 rounded-full bg-indigo-soft-2 ring-1 ring-indigo-line/40" /> {patient.speaker || patient.name}
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="size-2.5 rounded-full bg-panel" /> You
+                </span>
+              </span>
+            </div>
+            <div ref={transcriptRef} className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-5 py-4">
+              {banner ? <p className="font-serif text-[17px] text-ink">{banner}</p> : null}
+              {voiceLabel ? <p className="font-serif text-[17px] text-ink">{voiceLabel}</p> : null}
+              {simplified || notices.includes("Simplified responses") ? (
+                <p className="font-sans text-[13px] text-ink-soft">Simplified responses</p>
+              ) : null}
+              {notices
+                .filter((notice) => notice !== "Simplified responses")
+                .map((notice) => (
+                  <p key={notice} className="font-sans text-[13px] text-ink-soft">
+                    {notice}
+                  </p>
+                ))}
+              {(view.transcript ?? []).length === 0 && !partial ? <p className="font-serif text-[17px] text-ink-soft">No transcript yet.</p> : null}
+              {(view.transcript ?? []).map((line) => (
+                <div key={line.turn} className="flex flex-col gap-2">
+                  <TurnLine who="Student" text={line.student_text} align="end" />
+                  <TurnLine who={patient.speaker || patient.name} text={line.reply_text} align="start" />
+                  {line.is_last ? <div className="font-sans text-[11.5px] font-semibold text-muted">Latest turn</div> : null}
+                </div>
               ))}
-            {(view.transcript ?? []).length === 0 && !partial ? <p className="font-serif text-[17px] text-ink-soft">No transcript yet.</p> : null}
-            {(view.transcript ?? []).map((line) => (
-              <div key={line.turn} className="flex flex-col gap-2">
-                <TurnLine who="Student" text={line.student_text} align="end" />
-                <TurnLine who={patient.speaker || patient.name} text={line.reply_text} align="start" />
-                {line.is_last ? <div className="font-sans text-[11.5px] font-semibold text-muted">Latest turn</div> : null}
-              </div>
-            ))}
-            {partial ? <p className="font-serif text-[17px] text-ink-soft italic">{partial}</p> : null}
+              {partial ? <p className="self-end font-serif text-[17px] text-ink-soft italic">{partial}</p> : null}
+            </div>
           </section>
           {showDocumentation && view.status !== "active" ? (
             <Documentation
@@ -641,25 +650,89 @@ function EncounterLive({
           ) : null}
         </div>
 
-        <aside aria-label="Chart" className="flex flex-col gap-4">
+        <aside aria-label="Chart" className="flex min-h-0 flex-col gap-3 overflow-y-auto pb-1">
           {groupChart(released).map((group) => (
-            <section key={group.section} className="rounded-[18px] border border-white/70 bg-card/85 shadow-[0_18px_40px_-28px_rgba(25,31,92,.5)] backdrop-blur-md overflow-hidden">
-              <div className="px-5 pt-4 pb-2 font-serif text-[22px]">{group.section}</div>
+            <section key={group.section} className={`${GLASS} shrink-0 overflow-hidden`}>
+              <div className="px-4 pt-3 pb-1.5 font-serif text-[19px]">{group.section}</div>
               {group.items.map((item) => (
-                <div key={`${item.kind}-${item.ref}`} className="border-t border-hair px-5 py-3">
-                  <div className="font-serif text-[18px]">{item.label}</div>
-                  {item.value ? <div className="font-serif text-[17px] text-ink-soft tabular-nums">{item.value}</div> : null}
+                <div key={`${item.kind}-${item.ref}`} className="border-t border-hair px-4 py-2.5">
+                  <div className="font-serif text-[16.5px] leading-snug">{item.label}</div>
+                  {item.value ? <div className="font-serif text-[16px] text-ink-soft tabular-nums">{chartValue(item)}</div> : null}
                   <Provenance item={item} />
                 </div>
               ))}
             </section>
           ))}
           {released.length === 0 ? (
-            <section className="rounded-[18px] border border-white/70 bg-card/85 shadow-[0_18px_40px_-28px_rgba(25,31,92,.5)] backdrop-blur-md px-5 py-4 font-serif text-[17px] text-ink-soft">No chart entries have been released.</section>
+            <section className={`${GLASS} px-4 py-3 font-serif text-[16.5px] text-ink-soft`}>No chart entries have been released.</section>
           ) : null}
         </aside>
       </div>
     </div>
+  );
+}
+
+const GLASS = "rounded-[18px] border border-white/70 bg-card/85 shadow-[0_18px_40px_-28px_rgba(25,31,92,.5)] backdrop-blur-md";
+
+type ResultsTab = "notes" | "labs" | "exam";
+
+// Referral and prior notes, labs, and exam findings share one tabbed panel so the screen does not scroll.
+// A newly released item opens its tab. Inactive tabs stay in the page, hidden, so nothing released is lost.
+function ResultsPanel({ notes, labs, exams }: { notes: PublicChartEntry[]; labs: PublicChartEntry[]; exams: PublicChartEntry[] }) {
+  const [tab, setTab] = useState<ResultsTab>("notes");
+  const counts = useRef({ notes: notes.length, labs: labs.length, exam: exams.length });
+
+  useEffect(() => {
+    const next = { notes: notes.length, labs: labs.length, exam: exams.length };
+    const grew = (Object.keys(next) as ResultsTab[]).find((key) => next[key] > counts.current[key]);
+    counts.current = next;
+    if (grew) setTab(grew);
+  }, [notes.length, labs.length, exams.length]);
+
+  const tabs: { id: ResultsTab; label: string; items: PublicChartEntry[]; empty: string }[] = [
+    { id: "notes", label: "Referral", items: notes, empty: "No referral has been released." },
+    { id: "labs", label: "Labs", items: labs, empty: "No labs have been released." },
+    { id: "exam", label: "Exam log", items: exams, empty: "No exam has been released." },
+  ];
+
+  return (
+    <section aria-label="Results" className={`${GLASS} flex min-h-[200px] flex-1 flex-col overflow-hidden`}>
+      <div role="tablist" className="flex shrink-0 gap-1 border-b border-hair px-2 pt-2">
+        {tabs.map((t) => (
+          <button
+            key={t.id}
+            type="button"
+            role="tab"
+            aria-selected={tab === t.id}
+            onClick={() => setTab(t.id)}
+            className={`-mb-px flex items-center gap-1.5 border-b-2 px-3 pt-1.5 pb-2 font-serif text-[17px] ${
+              tab === t.id ? "border-panel text-ink" : "border-transparent text-ink-soft hover:text-ink"
+            }`}
+          >
+            {t.label}
+            {t.items.length > 0 ? (
+              <span className="rounded-full bg-indigo-soft px-1.5 font-sans text-[11.5px] font-semibold text-indigo">{t.items.length}</span>
+            ) : null}
+          </button>
+        ))}
+      </div>
+      {tabs.map((t) => (
+        <div key={t.id} role="tabpanel" hidden={tab !== t.id} className="min-h-0 flex-1 overflow-y-auto">
+          {t.items.length === 0 ? <div className="px-5 py-4 font-serif text-[16.5px] text-ink-soft">{t.empty}</div> : null}
+          {t.items.map((item) => (
+            <div key={item.ref} className="border-b border-hair px-5 py-3">
+              <div className="flex items-baseline justify-between gap-3">
+                <span className="font-serif text-[17px] leading-snug">{item.label}</span>
+                {item.value ? <span className={`font-serif text-[16.5px] tabular-nums ${item.flag ? "text-danger" : "text-ink-soft"}`}>{item.value}</span> : null}
+              </div>
+              {item.flag ? <div className="font-sans text-[12px] font-semibold text-danger">{item.flag}</div> : null}
+              {item.body ? <div className="mt-1 font-serif text-[16px] leading-snug text-ink-soft">{item.body}</div> : null}
+              <Provenance item={item} />
+            </div>
+          ))}
+        </div>
+      ))}
+    </section>
   );
 }
 
@@ -727,9 +800,24 @@ function monotonicNow(): number {
 
 // Shows the saved start or end time. The clock is the saved time, not a running timer.
 function timingLabel(startedAt: string | null | undefined, endedAt: string | null | undefined): string {
-  if (endedAt) return `Ended ${endedAt}`;
-  if (startedAt) return `Started ${startedAt}`;
+  if (endedAt) return `Ended ${clockTime(endedAt)}`;
+  if (startedAt) return `Started ${clockTime(startedAt)}`;
   return "Not started";
+}
+
+// Temperature reads in Fahrenheit first, with the stored Celsius beside it, as on the briefing.
+function chartValue(item: PublicChartEntry): string {
+  const value = item.value ?? "";
+  const celsius = item.kind === "vital" && item.ref === "temp_c" ? Number.parseFloat(value) : Number.NaN;
+  if (Number.isNaN(celsius)) return value;
+  return `${((celsius * 9) / 5 + 32).toFixed(1)} °F (${celsius} °C)`;
+}
+
+// The server stores UTC without a zone suffix. Shown as the viewer's local clock time.
+function clockTime(stamp: string): string {
+  const date = new Date(/[zZ]|[+-]\d\d:?\d\d$/.test(stamp) ? stamp : `${stamp}Z`);
+  if (Number.isNaN(date.getTime())) return stamp;
+  return date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
 }
 
 // Keeps the fact id and the source kind on screen so a released value can be traced.

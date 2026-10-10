@@ -1,0 +1,14 @@
+{
+  "url": "https://huggingface.co/datasets/Postzeun/Patient-Doctor",
+  "checked_at": "2026-10-10",
+  "accessible": true,
+  "revision": "9b42fa79e8e30a9e70410feca743e47dcf7f75ff",
+  "file_count": 272,
+  "txt_file_count": 271,
+  "card_data": null,
+  "license_files": [],
+  "readme_files": [],
+  "import_status": "BLOCKED",
+  "reason": "No license or provenance card; synthetic origin not established. No dialogue contents downloaded.",
+  "metadata_endpoint": "https://huggingface.co/api/datasets/Postzeun/Patient-Doctor"
+}

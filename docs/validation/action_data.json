@@ -1,0 +1,133 @@
+{
+  "stage": "Notebook 02",
+  "gate": "NOT EVALUABLE",
+  "implementation_ready": true,
+  "validated_model_ready": false,
+  "gates": {
+    "prior_structural_gate": "PASS",
+    "external_license_and_synthetic_provenance": "NOT EVALUABLE",
+    "macro_f1_ge_085": "NOT EVALUABLE",
+    "critical_recall_ge_095": "NOT EVALUABLE",
+    "llm_comparison": "NOT EVALUABLE"
+  },
+  "advance_to_notebook_03": "Controlled simulator may proceed with existing classifier. Trained extraction is blocked.",
+  "external_source": {
+    "url": "https://huggingface.co/datasets/Postzeun/Patient-Doctor",
+    "checked_at": "2026-10-10",
+    "accessible": true,
+    "revision": "9b42fa79e8e30a9e70410feca743e47dcf7f75ff",
+    "file_count": 272,
+    "txt_file_count": 271,
+    "card_data": null,
+    "license_files": [],
+    "readme_files": [],
+    "import_status": "BLOCKED",
+    "reason": "No license or provenance card; synthetic origin not established. No dialogue contents downloaded.",
+    "metadata_endpoint": "https://huggingface.co/api/datasets/Postzeun/Patient-Doctor"
+  },
+  "conversations": [
+    {
+      "conversation_id": "alina_reyes",
+      "family_id": "alina_reyes",
+      "patient_id": "alina_reyes",
+      "source": "cases/alina_reyes.json",
+      "source_sha256": "624f4713b587550865b5a6a378de6f3c678b13454ee3c0af26a5ffe7d5728c98",
+      "source_kind": "authored_persona_example",
+      "turns": [
+        {
+          "turn_id": "alina_reyes:0",
+          "speaker": "patient",
+          "text": "I don't know. It's probably nothing.",
+          "source_pointer": "/profile/personality/example_lines/0"
+        },
+        {
+          "turn_id": "alina_reyes:1",
+          "speaker": "patient",
+          "text": "Sorry, I'm bad at explaining.",
+          "source_pointer": "/profile/personality/example_lines/1"
+        }
+      ]
+    },
+    {
+      "conversation_id": "eli_brooks",
+      "family_id": "eli_brooks",
+      "patient_id": "eli_brooks",
+      "source": "cases/eli_brooks.json",
+      "source_sha256": "59c5c783e1baea71271f0fc49d96be907f5bbbbceea490ec0d8136dc18527c0b",
+      "source_kind": "authored_persona_example",
+      "turns": [
+        {
+          "turn_id": "eli_brooks:0",
+          "speaker": "patient",
+          "text": "I just want him better.",
+          "source_pointer": "/profile/personality/example_lines/0"
+        },
+        {
+          "turn_id": "eli_brooks:1",
+          "speaker": "patient",
+          "text": "Urgent care didn't give us anything either.",
+          "source_pointer": "/profile/personality/example_lines/1"
+        }
+      ]
+    },
+    {
+      "conversation_id": "walter_greene",
+      "family_id": "walter_greene",
+      "patient_id": "walter_greene",
+      "source": "cases/walter_greene.json",
+      "source_sha256": "af9b64eded4aae898af7f47714aa95883d87bc9f2f7fa4c3b73866c73225b7bf",
+      "source_kind": "authored_persona_example",
+      "turns": [
+        {
+          "turn_id": "walter_greene:0",
+          "speaker": "patient",
+          "text": "You look like a kid.",
+          "source_pointer": "/profile/personality/example_lines/0"
+        },
+        {
+          "turn_id": "walter_greene:1",
+          "speaker": "patient",
+          "text": "Healthy eating's for rich folks.",
+          "source_pointer": "/profile/personality/example_lines/1"
+        },
+        {
+          "turn_id": "walter_greene:2",
+          "speaker": "patient",
+          "text": "Fine. What do you want to know?",
+          "source_pointer": "/profile/personality/example_lines/2"
+        }
+      ]
+    }
+  ],
+  "splits": {
+    "alina_reyes": "validation",
+    "eli_brooks": "test",
+    "walter_greene": "train"
+  },
+  "evaluation": {
+    "dialogue_act": {
+      "status": "NOT EVALUABLE",
+      "reviewed_count": 0,
+      "class_balance": {},
+      "macro_f1": null,
+      "per_class": null,
+      "confusion_matrix": null,
+      "reason": "Need reviewed train/test data and training examples for every declared label"
+    },
+    "student_skill": {
+      "status": "NOT EVALUABLE",
+      "reviewed_count": 0,
+      "class_balance": {},
+      "macro_f1": null,
+      "per_class": null,
+      "confusion_matrix": null,
+      "reason": "Need reviewed train/test data and training examples for every declared label"
+    }
+  },
+  "limitations": [
+    "Persona examples are isolated speech, not encounters or student labels.",
+    "Upstream format unverified: no licensed dialogue contents imported.",
+    "Critical labels and targets need reviewer agreement.",
+    "No student learning or efficiency results exist."
+  ]
+}

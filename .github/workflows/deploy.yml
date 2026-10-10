@@ -1,0 +1,136 @@
+# Check every pull request and push to main; on main, deploy the parts that changed since the
+# last successful deploy.
+# AWS access comes from OIDC (no stored keys); see infra/README.md "Continuous deployment".
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      everything:
+        description: Deploy every part, not just what changed
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+env:
+  PREFIX: ${{ vars.PREFIX || 'rounds-dev' }}
+  AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+      - name: Backend tests
+        working-directory: backend
+        run: |
+          uv sync
+          uv run pytest -q
+
+      - uses: actions/setup-node@v4
+        if: hashFiles('frontend/package-lock.json') != ''
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Frontend type check and build
+        if: hashFiles('frontend/package-lock.json') != ''
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+
+  infra-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+      - name: Lint CloudFormation (valid templates, properties, types)
+        run: uvx cfn-lint infra/cloudformation/*.yaml
+
+      - name: Install CloudFormation Guard
+        env:
+          GUARD_VERSION: "3.2.1"
+        run: |
+          curl -fsSL "https://github.com/aws-cloudformation/cloudformation-guard/releases/download/${GUARD_VERSION}/cfn-guard-v3-x86_64-linux-latest.tar.gz" \
+            | tar xz -C "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/cfn-guard-v3-x86_64-linux-latest" >> "$GITHUB_PATH"
+      - name: CloudFormation Guard policy checks (infra/guard/rules.guard)
+        run: cfn-guard validate --data infra/cloudformation --rules infra/guard --show-summary fail
+
+  deploy:
+    needs: [test, infra-checks]
+    # Pull requests only run the checks. Deploys are off until the stacks and AWS_DEPLOY_ROLE_ARN
+    # exist; then set the repo variable DEPLOY_ENABLED=true.
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && vars.DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write  # lets configure-aws-credentials request the OIDC token
+    # One deploy at a time. A newer run waits; it diffs against the last deployed commit,
+    # so a run skipped in between loses nothing.
+    concurrency:
+      group: deploy-${{ vars.PREFIX || 'rounds-dev' }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+          role-session-name: github-${{ github.run_id }}
+
+      - name: Work out what changed
+        id: changes
+        env:
+          EVERYTHING: ${{ inputs.everything }}
+        run: |
+          base=""
+          if [ "$EVERYTHING" != "true" ]; then
+            base="$(aws ssm get-parameter --name "/$PREFIX/deployed-sha" --query Parameter.Value --output text 2>/dev/null || true)"
+          fi
+          infra/scripts/changed-parts.sh "$base" "$GITHUB_SHA"
+
+      - name: Store the shared .env for the instance
+        id: appenv
+        env:
+          APP_ENV: ${{ secrets.APP_ENV }}
+        run: infra/scripts/push-app-env.sh
+
+      - name: Update CloudFormation stacks
+        if: steps.changes.outputs.stacks != ''
+        run: infra/scripts/deploy-stacks.sh ${{ steps.changes.outputs.stacks }}
+
+      - uses: actions/setup-node@v4
+        if: steps.changes.outputs.frontend == 'true' && hashFiles('frontend/package-lock.json') != ''
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Deploy frontend
+        if: steps.changes.outputs.frontend == 'true' && hashFiles('frontend/package-lock.json') != ''
+        run: infra/scripts/deploy-frontend.sh
+
+      - name: Deploy backend
+        if: steps.changes.outputs.backend == 'true' || steps.appenv.outputs.changed == 'true'
+        run: infra/scripts/deploy-backend.sh "$GITHUB_SHA"
+
+      - name: Record deployed commit
+        run: aws ssm put-parameter --name "/$PREFIX/deployed-sha" --type String --value "$GITHUB_SHA" --overwrite >/dev/null
+
+      - name: Summary
+        run: |
+          url="$(aws cloudformation describe-stacks --stack-name "$PREFIX-edge" --query "Stacks[0].Outputs[?OutputKey=='SiteUrl'].OutputValue" --output text)"
+          echo "Deployed $(git rev-parse --short HEAD) to $url" >> "$GITHUB_STEP_SUMMARY"

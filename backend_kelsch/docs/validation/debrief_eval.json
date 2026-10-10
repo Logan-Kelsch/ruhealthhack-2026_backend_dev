@@ -1,0 +1,56 @@
+{
+  "stage": "Notebook 05",
+  "method": "authored fixture intents and deterministic debrief; no measured learner outcomes",
+  "sources": [
+    "AGENTS.md",
+    "context.md §14",
+    "PRD.md F-01–F-10 and L-03–L-04",
+    "backend/app/feedback/",
+    "backend/app/data/rubric_shp_v1.json",
+    "cases/{walter_greene,alina_reyes,eli_brooks}.json",
+    "backend_kelsch/docs/validation/{action_data,patient_environment,grounding_eval}.json"
+  ],
+  "counts": {
+    "claims": 41,
+    "evidence_refs": 45,
+    "branches_replayed": 4,
+    "branches_with_next_visit": 4,
+    "uncertain_branches": 2,
+    "safety_flags": 5,
+    "document_discrepancies": 11,
+    "cases": 3,
+    "authored_scenarios": 6,
+    "branch_replay_denominator": 4,
+    "evidence_audit_denominator": 45
+  },
+  "na_probe": {
+    "domain_id": 6,
+    "observed": "N/A",
+    "expected": "N/A",
+    "fixture": "empty hypothetical signals",
+    "faculty_score": null
+  },
+  "gates": {
+    "evidence_linkage_and_replay": "PASS",
+    "faculty_feedback_accuracy": "NOT EVALUABLE",
+    "faculty_rubric_scoring": "NOT EVALUABLE",
+    "trained_action_extraction": "NOT EVALUABLE",
+    "clinical_disclosure_accuracy": "NOT EVALUABLE",
+    "semantic_grounding": "NOT EVALUABLE",
+    "difficulty_calibration": "NOT EVALUABLE",
+    "student_learning": "NOT EVALUABLE"
+  },
+  "limitations": [
+    "Authored intents are test inputs, not reviewed student performance labels.",
+    "Shared rubric provisional numeric outputs are intentionally discarded; no faculty scores are produced.",
+    "Shared documentation fallback detects new numbers and uses lexical overlap for omissions; it cannot certify prose semantics.",
+    "Shared decision selection treats unclear as boolean; uncertain branches are flagged and need faculty review.",
+    "No independent faculty reviews or observed learner sample imported; prior blocked gates remain blocked."
+  ],
+  "reviews": {
+    "reviewed_claims": 0,
+    "total_claims": 41,
+    "complete": false,
+    "feedback_accuracy": null
+  }
+}

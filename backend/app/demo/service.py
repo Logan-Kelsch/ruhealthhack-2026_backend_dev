@@ -14,7 +14,7 @@ from app.services import Conflict, NotFound
 from app.settings import BACKEND_DIR
 
 FIXTURE = BACKEND_DIR / "app/data/scripted_clinical_demo_v1.json"
-SAFETY_NOTICE = "Time-critical teaching finding: obtain immediate supervising-clinician review and escalation. Reflection must not delay urgent care."
+SAFETY_NOTICE = "This completed encounter included time-critical findings. Review when supervising-clinician escalation was needed and how you communicated the urgency."
 
 def scenarios() -> list[dict]:
     data = ScriptFixture.model_validate_json(FIXTURE.read_text(encoding="utf-8"))
@@ -127,7 +127,8 @@ def turn(db: Session, sid: str, expected_step: int, request_id: str, text: str) 
     if request_id in p["requests"]:
         saved = p["requests"][request_id]
         if saved["request"] != request: raise Conflict("request_id was already used with a different payload")
-        return saved["response"]
+        # Old sessions may have saved an inline coaching notice before this boundary.
+        return {**saved["response"], "safety_notice": None}
     if row.status != "student": raise Conflict("Demo session is not accepting turns")
     case, step = p["case"], len(p["turns"])+1
     if expected_step != step: raise Conflict(f"Expected step {step}; reload the session")
@@ -138,7 +139,8 @@ def turn(db: Session, sid: str, expected_step: int, request_id: str, text: str) 
     chart = [_chart(c) for c in case["chart"] if c["release_step"]==step]
     complete = step==len(case["turns"])
     output = {"session_id":sid,"turn":t,"chart_added":chart,
-              "safety_notice":SAFETY_NOTICE if any(c["urgent"] for c in chart) else None,
+              # Keep the existing response contract; teaching feedback is post-encounter only.
+              "safety_notice":None,
               "next_step":None if complete else step+1,"complete":complete,
               "execution_mode":"scripted_playback","actual_model_calls":0}
     p["requests"][request_id] = {"request":request,"response":output}
@@ -162,7 +164,7 @@ def debrief(db: Session, sid: str) -> dict:
         t = p["turns"][q["anchor_step"]-1]
         question = q["question"]
         if t["student_text"].strip() != case["turns"][q["anchor_step"]-1]["suggested_student_text"]:
-            question = "Review this scripted exchange. How would you approach this domain, and what would you ask or explain next?"
+            question = "Review this completed exchange. How would you approach this domain in a future encounter, and what would you ask or explain differently?"
         reflections.append({**q,"question":question,"domain_name":domains[q["domain_id"]],
                            "student_quote":t["student_text"],"patient_quote":t["patient_text"]})
     match = len(p["turns"])==len(case["turns"]) and all(
@@ -170,5 +172,5 @@ def debrief(db: Session, sid: str) -> dict:
     return {"session_id":sid,"reflections":reflections,"completed_steps":len(p["turns"]),
             "total_steps":len(case["turns"]),"follows_rehearsal_script":match,
             "method":"scripted_guided_reflection","assessment_status":"not_scored",
-            "interpretation":"These are authored reflection questions, not a judgment that you made an error. Replies depend on sequence position, not interpretation of your input. No rubric score or learning outcome is assigned.",
+            "interpretation":"The encounter has ended. Review the completed transcript using these authored reflection questions; turn numbers identify evidence, not feedback scheduled during conversation. These questions are not a judgment that you made an error. Replies depend on sequence position, not interpretation of your input. No rubric score or learning outcome is assigned.",
             "safety_notice":SAFETY_NOTICE if any(c["urgent"] and c["release_step"]<=len(p["turns"]) for c in case["chart"]) else None}

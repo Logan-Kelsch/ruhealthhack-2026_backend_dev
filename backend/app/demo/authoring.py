@@ -40,7 +40,7 @@ class ReviewTurn(ReviewModel):
 
 
 class ReviewReflection(ReviewModel):
-    after_turn: int = Field(ge=1)
+    after_turn: int = Field(ge=1)  # Citation in the completed transcript; never schedules feedback.
     rubric_domain: Text
     question: Text
 

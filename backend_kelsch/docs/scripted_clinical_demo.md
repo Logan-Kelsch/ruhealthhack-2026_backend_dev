@@ -1,6 +1,6 @@
 # Three-case scripted clinical rehearsal (P-02, S-01, F-05)
 
-This opt-in demo walks from an educator's natural-language description through structured metadata, a fixed student–patient conversation, progressive findings, and indirect reflection prompts. It uses real HTTP handlers and persisted sessions. It does not call an LLM, interpret arbitrary student questions, assign grades, or establish clinical approval.
+This opt-in demo walks from an educator's natural-language description through structured metadata, a fixed student–patient conversation, progressive findings, and a separate post-encounter debrief with indirect reflection prompts. It uses real HTTP handlers and persisted sessions. It does not call an LLM, interpret arbitrary student questions, assign grades, or establish clinical approval.
 
 The dialogue is authored synthetic content representing the intended LLM-assisted experience. It is not a recording of live Bedrock output. `actual_model_calls: 0` and `execution_mode: scripted_playback` are returned explicitly. `LLM_ENABLED=true` in a local `.env` does not change this mode.
 
@@ -8,7 +8,7 @@ The dialogue is authored synthetic content representing the intended LLM-assiste
 
 | Select | Fixed example | Teaching target | Path behavior |
 |---|---|---|---|
-| 1 | Daniel Mercer, 58; fever, cough, breathlessness, diarrhea; Philadelphia convention and hotel stay | Elicit illness course and exposure history; investigate pneumonia and consider Legionella-directed antibiotic coverage under supervision | Ten exchanges. Travel is a clue, not a confirmed source or diagnosis. Hypoxemia triggers a safety notice; testing stays pending. No antibiotic dose or universal regimen is supplied. |
+| 1 | Daniel Mercer, 58; fever, cough, breathlessness, diarrhea; Philadelphia convention and hotel stay | Elicit illness course and exposure history; investigate pneumonia and consider Legionella-directed antibiotic coverage under supervision | Ten exchanges. Travel is a clue, not a confirmed source or diagnosis. Hypoxemia is visible in the chart; safety reasoning is reviewed after the encounter. Testing stays pending. No antibiotic dose or universal regimen is supplied. |
 | 2 | Marcus Hale, 42; tobacco use and difficult past quit attempt | Explore readiness, sustain talk, priorities, and autonomy | Eight exchanges. A premature quit-date question produces resistance; the student repairs the interaction. The patient remains unwilling to quit. Success is not defined by cessation agreement. |
 | 3 | Leah Carter, 45; nausea, sweating, fatigue, vague chest unease; panic/anxiety history | Avoid anchoring; recognize the released ST-elevation pattern and escalate urgently | Eight exchanges. ECG and vitals release at step 3. The ECG is a synthetic text report, not a waveform. Escalation is immediate; the script does not wait for troponin or a complete interview. |
 
@@ -22,7 +22,7 @@ Open `backend_kelsch/notebooks/11_scripted_clinical_demo.ipynb` in VS Code or Ju
 python -m pip install -r backend_kelsch/requirements-notebooks.txt
 ```
 
-Set `CASE = 1`, `2`, or `3`. Leave `API_BASE_URL = None` for real routes against a temporary isolated SQLite database. The notebook does not change the database selected in `.env`. Pasted educator text is editable in a widget or `EDUCATOR_TEXT`. Student controls offer a presenter suggestion, a text input, send, start, and end/debrief.
+Set `CASE = 1`, `2`, or `3`. Leave `API_BASE_URL = None` for real routes against a temporary isolated SQLite database. The notebook does not change the database selected in `.env`. Pasted educator text is editable in a widget or `EDUCATOR_TEXT`. Student controls offer a presenter suggestion, a text input, send, start, **End encounter**, and a separate **View debrief** control. View debrief is disabled until the conversation has ended; its output never appears inside the conversation.
 
 `REPLAY_ALL = True` displays all three completed rehearsals in separate sessions. `SHOW_NATURAL_DELAY = True` enables estimated patient-display waits; set it false for quick review. The preview in `docs/validation/scripted_demo/scripted_clinical_demo.html` is a static presentation; interactive widgets need the notebook kernel.
 
@@ -50,9 +50,9 @@ Alternatively set `SCRIPTED_DEMO_ENABLED=true` in the existing `.env`. The route
 | Prepare | `POST /api/demo/educator/preparations` | `{scenario_id, description}` → preparation ID, canonical patient, extracted spans, mismatch warnings, fixture hash |
 | Start | `POST /api/demo/sessions` | `{preparation_id, accept_fixed_script: true}` → current public session |
 | Resume | `GET /api/demo/sessions/{sid}` | Transcript, released chart, next step; no future replies, goal, or full instructor metadata |
-| Advance | `POST /api/demo/sessions/{sid}/turns` | `{expected_step, request_id, text}` → static patient turn, new chart items, urgent notice, assumed display delay |
-| End | `POST /api/demo/sessions/{sid}/end` | Ended session; early ending allowed |
-| Debrief | `GET /api/demo/sessions/{sid}/debrief` | Anchored reflection prompts for observed steps; no grade |
+| Advance | `POST /api/demo/sessions/{sid}/turns` | `{expected_step, request_id, text}` → static patient turn, new chart items, assumed display delay; no teaching feedback |
+| End | `POST /api/demo/sessions/{sid}/end` | Ended session; conversation stops, no debrief returned; early ending allowed |
+| Debrief | `GET /api/demo/sessions/{sid}/debrief` | Separate post-encounter review citing completed exchanges; 409 until ended, no grade |
 
 Example first request:
 
@@ -85,14 +85,18 @@ const request = {
   text: committedStudentTranscript,
 };
 const result = await demo.turn(session.session_id, request);
-// Apply chart_added and safety_notice immediately.
+// Show released chart findings. Turn responses contain no teaching feedback.
 // Optionally show the patient reply after simulated_delay_ms; this is a presentation wait.
 session = await demo.read(session.session_id);
+// When the user finishes the conversation:
+const ended = await demo.end(session.session_id);
+// Only then, in a separate review area:
+const feedback = await demo.debrief(ended.session_id);
 ```
 
 Disable submission while pending. Retry the exact same body and `request_id` after a network failure; retries return the saved response and do not advance twice. Reusing a key for different text returns 409. `expected_step` and an atomic database revision protect against stale tabs and concurrent workers. On 409 reload the session; do not silently move the input to another step. Start and end are idempotent for the same preparation/session. Create a new preparation to restart.
 
-Estimated delays use `min(2400, 850 + 32 * word_count)` milliseconds per reply, frozen in the fixture; educator presentation delay is 1600 ms. These are estimates, not sampled model/voice latency. The server does not sleep. This lets the UI show urgent information before a cosmetic wait. Completed chart entries and notices retain source/provenance fields.
+Estimated delays use `min(2400, 850 + 32 * word_count)` milliseconds per reply, frozen in the fixture; educator presentation delay is 1600 ms. These are estimates, not sampled model/voice latency. The server does not sleep. This lets the UI show chart findings before a cosmetic wait. Chart entries retain source/provenance fields. Teaching guidance is reserved for the post-encounter debrief; the turn response keeps its existing `safety_notice` field as null for compatibility.
 
 For the actual production encounter, spoken transcripts still go to `/api/encounters/{id}/utterances` and patient speech uses the existing voice integration. A presenter-only text rehearsal is authorized by this demo request; this PR adds no production student typing box.
 
@@ -116,7 +120,11 @@ To use an actual model later, add a structuring adapter returning `MetadataExtra
 
 ## Debrief and rubric boundary
 
-Questions are linked to official seven-domain rubric IDs and the exact submitted student text and delivered patient reply at their anchor turn. The debrief invites reflection rather than printing the final diagnosis or expected antibiotic. It is **scripted guided reflection**, not a validated PEARLS implementation, a conversational tutor, or an automated assessment of mistakes. Urgent clinical notices remain direct. N/A/numeric scoring belongs to the existing production scorer; this rehearsal assigns no score.
+The debrief is a separate phase after the conversation has ended. During the encounter, responses contain patient dialogue and released chart findings only. Neither a chart release nor reaching the last scripted reply opens or returns debrief feedback.
+
+Call `POST /api/demo/sessions/{sid}/end` to close the conversation, then call `GET /api/demo/sessions/{sid}/debrief` and render that response outside the conversation transcript. The debrief read never ends an active encounter; it returns 409 for both active and ready-to-end sessions. Explicit early ending is allowed and reviews only exchanges that occurred. Repeated debrief reads are stable and do not advance dialogue.
+
+Questions are linked to official seven-domain rubric IDs and the exact submitted student text and delivered patient reply at their anchor turn. `anchor_step` (runtime) and `after_turn` (review JSON) identify transcript evidence, not during-conversation feedback triggers. The debrief invites reflection rather than printing the final diagnosis or expected antibiotic. It is **scripted guided reflection**, not a validated PEARLS implementation, a conversational tutor, or an automated assessment of mistakes. Safety reasoning is reviewed retrospectively in the ended-session debrief. The chart retains its authored urgency flags during the encounter. N/A/numeric scoring belongs to the existing production scorer; this rehearsal assigns no score.
 
 ## Reproduce the HTTP rehearsal
 
@@ -129,7 +137,7 @@ LLM_ENABLED=false PYTHONPATH=backend python -m scripts.run_scripted_clinical_dem
 
 Add `--scenario 1`, `2`, or `3` for one example. All cases make 39 requests and deliver 26 fixed replies. The report distinguishes actual handler timings from invented display waits and states zero model calls. It creates and cleans up an isolated SQLite database.
 
-Validation details and known baseline issues are recorded in `docs/validation/scripted_demo/validation.json`. The native Jupyter kernel transport is blocked in the development runtime; notebook cells were executed through IPython instead, including interactive suggestion/send/early-end callbacks. Rehearsal source code and a static HTML preview are supplied.
+Validation details and known baseline issues are recorded in `docs/validation/scripted_demo/validation.json`. The native Jupyter kernel transport is blocked in the development runtime; notebook cells were executed through IPython instead, including interactive suggestion/send/early-end callbacks. The post-encounter update verifies separate end/view controls, a blocked active debrief read, no coaching during turns, and reset of debrief access when preparing a new case. Post-encounter callback results are saved in `docs/validation/scripted_demo/post_encounter_debrief.json`. Rehearsal source code and a refreshed static HTML preview are supplied.
 
 ## Clinical sources
 

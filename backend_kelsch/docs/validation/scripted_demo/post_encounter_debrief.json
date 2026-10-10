@@ -1,0 +1,15 @@
+{
+  "execution": "IPython cells and manual callbacks; no native Jupyter kernel used",
+  "code_cells_passed": 6,
+  "all_case_rehearsals": 3,
+  "all_debriefs_follow_explicit_end": true,
+  "conversation_teaching_notices": 0,
+  "active_debrief_http_status": 409,
+  "end_control_requests_debrief": false,
+  "view_control_ends_conversation": false,
+  "debrief_control_disabled_until_ended": true,
+  "new_preparation_resets_debrief_access": true,
+  "model_calls": 0,
+  "delay_mode": "disabled for validation; enabled by default in notebook",
+  "manual_controls": "suggested question, send, end, separate debrief view, prepare reset, restart verified"
+}

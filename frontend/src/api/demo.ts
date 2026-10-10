@@ -33,7 +33,7 @@ export function scriptedDemo(client: ApiClient) {
         params: { path: { sid: sessionId } },
       }));
     },
-    // Keep the same request_id AND body when retrying after a network failure.
+    // Conversation only: no debrief coaching. Keep the same request_id AND body for retries.
     async turn(sessionId: string, request: DemoTurnRequest): Promise<DemoTurnResult> {
       return body(await client.POST("/api/demo/sessions/{sid}/turns", {
         params: { path: { sid: sessionId } }, body: request,
@@ -44,6 +44,7 @@ export function scriptedDemo(client: ApiClient) {
         params: { path: { sid: sessionId } },
       }));
     },
+    // Call only after end() succeeds; this read never ends an active conversation.
     async debrief(sessionId: string): Promise<DemoDebrief> {
       return body(await client.GET("/api/demo/sessions/{sid}/debrief", {
         params: { path: { sid: sessionId } },

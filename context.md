@@ -883,3 +883,8 @@ Use these exact meanings in code, UI, docs and conversation.
 ### Scripted presenter rehearsal (2026-10-10)
 
 A user-requested notebook rehearses three fixed examples: pneumonia after Philadelphia convention/hotel travel, tobacco use with a patient unwilling to quit, and a 45-year-old woman with panic/anxiety history and an early ST-elevation ECG finding. This is separate from the existing golden cases. `/api/demo` uses authored static playback with estimated display delays and no actual model calls or scores. Educator metadata extraction and fixed dialogue are shown separately; the source snapshot is pinned per session. Text inputs exist only in the presenter notebook/automation boundary; no production student typing UI is introduced. Clinical review remains pending.
+
+The debrief is a separate review after the encounter has ended. Reflection questions
+and teaching guidance do not interject into the conversation. The notebook separates
+ending the encounter from viewing its debrief; turn numbers in review files cite
+completed transcript evidence, not a schedule for in-conversation prompts.

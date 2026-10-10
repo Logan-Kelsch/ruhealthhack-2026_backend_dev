@@ -20,9 +20,11 @@ def apply_changes(case: Case, changes: VisitChanges) -> Case:
     removed = set(changes.remove_facts)
     facts: list[Fact] = [f for f in c.facts if f.id not in removed]
     for fact_id, patch in changes.update_facts.items():
+        # Only fields the faculty member set are copied. Unset fields must not wipe the fact.
+        patch_data = patch.model_dump(exclude_none=True)
         for i, f in enumerate(facts):
             if f.id == fact_id:
-                facts[i] = Fact.model_validate({**f.model_dump(), **patch})
+                facts[i] = Fact.model_validate({**f.model_dump(), **patch_data})
     facts = _replace_by(facts, changes.add_facts, "id")
     c.facts = facts
     c.vitals = _replace_by(c.vitals, changes.vitals, "key")

@@ -8,7 +8,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-from app.schemas.case import Branch, DecisionPoint, Visit
+from app.schemas.case import Branch, DecisionPoint, Predicate, Visit
 
 
 @dataclass
@@ -66,7 +66,11 @@ def _leaf_matches(pred: dict[str, Any], turns: list[TurnView]) -> Match:
     )
 
 
-def evaluate_predicate(pred: dict[str, Any], turns: list[TurnView]) -> tuple[bool, Match]:
+def evaluate_predicate(pred: Predicate | dict[str, Any], turns: list[TurnView]) -> tuple[bool, Match]:
+    """Yes or no for one predicate. A saved model is read as the same operator object as a dict."""
+    if isinstance(pred, Predicate):
+        # Dumping here keeps the match order below unchanged for golden cases and unit tests.
+        pred = pred.model_dump(by_alias=True, exclude_none=True)
     if "any" in pred:
         results = [evaluate_predicate(p, turns) for p in pred["any"]]
         good = [m for ok, m in results if ok]

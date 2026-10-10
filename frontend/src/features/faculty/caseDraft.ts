@@ -1,4 +1,5 @@
 import type { CaseDocument } from "../../api/client";
+import { visitAuthoringProblem } from "./decisionAuthoring";
 
 type Fact = NonNullable<CaseDocument["facts"]>[number];
 type Source = NonNullable<Fact["source"]>;
@@ -153,5 +154,6 @@ export function saveProblem(caseDocument: CaseDocument): string | null {
   for (const objective of caseDocument.objectives ?? []) {
     if (!objective.text.trim()) return "Write each learning objective before saving.";
   }
-  return null;
+  // Visit rules run last so a draft with no decision points can still be saved from the patient tab.
+  return visitAuthoringProblem(caseDocument);
 }

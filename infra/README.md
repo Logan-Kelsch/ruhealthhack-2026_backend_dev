@@ -24,6 +24,9 @@ Scripts in `scripts/` read settings from the environment (`PREFIX`, default `rou
 - `db-allow-me.sh`: let your current IP reach RDS.
 - `teardown.sh`: empty the frontend bucket, delete the stacks in reverse order and remove the SSM parameters (asks first).
 
+The env upload passes a private temporary JSON file to the AWS CLI and removes it
+on success or failure. The secret value stays out of command arguments and logs.
+
 ```
 Browser ──HTTPS──▶ CloudFront ─┬─ /*           ──▶ S3 (React build, private, origin access control)
                                ├─ /portraits/* ──▶ EC2 :8000 (FastAPI static files, cached)
@@ -57,13 +60,16 @@ Not included yet: Route 53 and ACM (no domain). Add them when the team has one.
 
 ## First deploy (once, from a laptop)
 
-Prerequisites: AWS CLI v2 signed in as your own IAM user (`aws login` or `AWS_PROFILE`), `jq`, and Bedrock model access in the region.
+Prerequisites: AWS CLI v2 signed in as your own IAM user (`aws login` or `AWS_PROFILE`), `jq`, GitHub CLI (`gh`) with repository access, and Bedrock model access in the region. If `gh` is unavailable, supply `GITHUB_OIDC_SUBJECT_PREFIX` from the repository's OIDC settings.
 
 ```bash
 export PREFIX=rounds-dev AWS_REGION=us-east-1
 ```
 
 1. Give GitHub access to AWS. This creates the GitHub OIDC provider, a deploy role that only `main` of this repository can assume, and the CloudFormation execution role. It prints the deploy role ARN.
+
+   The script reads the repository's OIDC subject prefix, including immutable owner and
+   repository IDs when enabled. The role matches that exact prefix and branch.
 
    ```bash
    infra/scripts/bootstrap-github.sh
@@ -131,6 +137,13 @@ Only one deploy runs at a time. After changing the `APP_ENV` secret, run the wor
 ```bash
 infra/scripts/deploy-stacks.sh data
 ```
+
+If the credential step fails with `Not authorized to perform sts:AssumeRoleWithWebIdentity`,
+check that `AWS_DEPLOY_ROLE_ARN` contains the github stack's `DeployRoleArn` and that
+the trust policy matches the repository's current OIDC subject. Repositories with
+immutable subject claims include IDs alongside the owner and repository names.
+Run the updated `infra/scripts/bootstrap-github.sh` with your own AWS identity to
+refresh the trust, then rerun the failed workflow. CI cannot repair its own trust.
 
 **How the backend is deployed:** `deploy-backend.sh` sends an SSM Run Command to the instance. The instance checks out the commit from GitHub (the repository is public), then `server-deploy.sh`:
 - writes `/opt/app/.env` from `/$PREFIX/app-env`, dropping any `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_SESSION_TOKEN` or `AWS_PROFILE` lines so the instance always uses its own role;

@@ -18,10 +18,14 @@ if [ "$current" == "$APP_ENV" ]; then
   echo "app-env unchanged"
   exit 0
 fi
-# Sent on stdin so the contents never appear on a command line.
-jq -n --arg name "$path" --arg value "$APP_ENV" \
-  '{Name: $name, Value: $value, Type: "SecureString", Overwrite: true}' \
-  | aws ssm put-parameter --region "$AWS_REGION" --cli-input-json file:///dev/stdin >/dev/null
+# The CLI can read its JSON input more than once; stdin cannot be replayed.
+# Keep the request private and read the value from the environment, not command arguments.
+umask 077
+request="$(mktemp)"
+trap 'rm -f "$request"' EXIT
+jq -n --arg name "$path" \
+  '{Name: $name, Value: env.APP_ENV, Type: "SecureString", Overwrite: true}' >"$request"
+aws ssm put-parameter --region "$AWS_REGION" --cli-input-json "file://$request" >/dev/null
 echo "app-env updated"
 # Tells the workflow to redeploy the backend so the instance picks up the new .env.
 echo "changed=true" >>"${GITHUB_OUTPUT:-/dev/null}"

@@ -35,6 +35,9 @@ jobs:
           uv sync
           uv run pytest -q
 
+      - name: Deployment script tests (offline)
+        run: python3 -m unittest discover -s infra/tests -v
+
       - uses: actions/setup-node@v4
         if: hashFiles('frontend/package-lock.json') != ''
         with:

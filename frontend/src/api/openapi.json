@@ -762,6 +762,84 @@
         "title": "Documentation",
         "type": "object"
       },
+      "EncounterSummary": {
+        "description": "One saved encounter in a list. The transcript stays on the encounter view.",
+        "properties": {
+          "case_id": {
+            "title": "Case Id",
+            "type": "string"
+          },
+          "encounter_id": {
+            "title": "Encounter Id",
+            "type": "string"
+          },
+          "previous_encounter_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous Encounter Id"
+          },
+          "review_flag": {
+            "default": false,
+            "title": "Review Flag",
+            "type": "boolean"
+          },
+          "rubric_total": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rubric Total"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "status": {
+            "enum": [
+              "active",
+              "ended",
+              "complete"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "student_name": {
+            "title": "Student Name",
+            "type": "string"
+          },
+          "visit_id": {
+            "title": "Visit Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "encounter_id",
+          "case_id",
+          "visit_id",
+          "student_name",
+          "status"
+        ],
+        "title": "EncounterSummary",
+        "type": "object"
+      },
       "ErrorItem": {
         "description": "One validation problem. loc is the same path FastAPI already reported, such as [\"body\", \"description\"].",
         "properties": {
@@ -1479,6 +1557,189 @@
         "title": "Profile",
         "type": "object"
       },
+      "PublicBriefing": {
+        "description": "What the student reads before starting. This is the doorway card, not the chart.",
+        "properties": {
+          "goal": {
+            "default": "",
+            "title": "Goal",
+            "type": "string"
+          },
+          "reason_for_visit": {
+            "default": "",
+            "title": "Reason For Visit",
+            "type": "string"
+          },
+          "setting": {
+            "default": "",
+            "title": "Setting",
+            "type": "string"
+          },
+          "show_doorway_vitals": {
+            "default": true,
+            "title": "Show Doorway Vitals",
+            "type": "boolean"
+          },
+          "student_role": {
+            "default": "",
+            "title": "Student Role",
+            "type": "string"
+          }
+        },
+        "title": "PublicBriefing",
+        "type": "object"
+      },
+      "PublicCase": {
+        "description": "One published case as a student lists or opens it.",
+        "properties": {
+          "briefing": {
+            "$ref": "#/components/schemas/PublicBriefing"
+          },
+          "case_id": {
+            "title": "Case Id",
+            "type": "string"
+          },
+          "doorway_vitals": {
+            "items": {
+              "$ref": "#/components/schemas/PublicDoorwayVital"
+            },
+            "title": "Doorway Vitals",
+            "type": "array"
+          },
+          "golden": {
+            "title": "Golden",
+            "type": "boolean"
+          },
+          "patient": {
+            "$ref": "#/components/schemas/PublicPatient"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          },
+          "visits": {
+            "items": {
+              "$ref": "#/components/schemas/PublicVisitSummary"
+            },
+            "title": "Visits",
+            "type": "array"
+          }
+        },
+        "required": [
+          "case_id",
+          "version",
+          "title",
+          "golden",
+          "patient",
+          "briefing",
+          "visits"
+        ],
+        "title": "PublicCase",
+        "type": "object"
+      },
+      "PublicChartEntry": {
+        "description": "One released chart or exam row. source_fact cites the fact that released it, when one did.",
+        "properties": {
+          "body": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body"
+          },
+          "flag": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Flag"
+          },
+          "kind": {
+            "enum": [
+              "vital",
+              "lab",
+              "exam",
+              "artifact",
+              "diagnosis",
+              "medication",
+              "allergy",
+              "fact"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "ref": {
+            "title": "Ref",
+            "type": "string"
+          },
+          "section": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Section"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PublicSource"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source_fact": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Fact"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "kind",
+          "ref",
+          "label"
+        ],
+        "title": "PublicChartEntry",
+        "type": "object"
+      },
       "PublicConfig": {
         "description": "Voice settings the browser may see. Model ids, keys, and account values stay off this object.",
         "properties": {
@@ -1506,6 +1767,302 @@
           "stt_commit_silence_ms"
         ],
         "title": "PublicConfig",
+        "type": "object"
+      },
+      "PublicDoorwayVital": {
+        "description": "A vital shown before the visit starts, with the source faculty recorded.",
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "source": {
+            "$ref": "#/components/schemas/PublicSource"
+          },
+          "unit": {
+            "default": "",
+            "title": "Unit",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "value",
+          "source"
+        ],
+        "title": "PublicDoorwayVital",
+        "type": "object"
+      },
+      "PublicEncounter": {
+        "description": "The encounter a refresh restores. Trust and engine state are not fields on this object.",
+        "properties": {
+          "briefing": {
+            "$ref": "#/components/schemas/PublicBriefing"
+          },
+          "case_id": {
+            "title": "Case Id",
+            "type": "string"
+          },
+          "case_version": {
+            "title": "Case Version",
+            "type": "integer"
+          },
+          "chart": {
+            "items": {
+              "$ref": "#/components/schemas/PublicChartEntry"
+            },
+            "title": "Chart",
+            "type": "array"
+          },
+          "encounter_id": {
+            "title": "Encounter Id",
+            "type": "string"
+          },
+          "ended_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ended At"
+          },
+          "has_next_visit": {
+            "title": "Has Next Visit",
+            "type": "boolean"
+          },
+          "last_turn": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Turn"
+          },
+          "patient": {
+            "$ref": "#/components/schemas/PublicPatient"
+          },
+          "previous_encounter_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous Encounter Id"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "status": {
+            "enum": [
+              "active",
+              "ended",
+              "complete"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "transcript": {
+            "items": {
+              "$ref": "#/components/schemas/TranscriptEntry"
+            },
+            "title": "Transcript",
+            "type": "array"
+          },
+          "visit_id": {
+            "title": "Visit Id",
+            "type": "string"
+          },
+          "visit_label": {
+            "title": "Visit Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "encounter_id",
+          "status",
+          "case_id",
+          "case_version",
+          "visit_id",
+          "visit_label",
+          "has_next_visit",
+          "patient",
+          "briefing"
+        ],
+        "title": "PublicEncounter",
+        "type": "object"
+      },
+      "PublicNotice": {
+        "description": "A short note the student can read, such as an exam that this case does not include.",
+        "properties": {
+          "kind": {
+            "enum": [
+              "exam_unavailable",
+              "order_unavailable",
+              "fallback",
+              "info"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "text"
+        ],
+        "title": "PublicNotice",
+        "type": "object"
+      },
+      "PublicPatient": {
+        "description": "The person on the briefing card. Faculty notes and voice settings are not included.",
+        "properties": {
+          "age": {
+            "title": "Age",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "portrait": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Portrait"
+          },
+          "pronouns": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pronouns"
+          },
+          "sex": {
+            "enum": [
+              "male",
+              "female",
+              "other"
+            ],
+            "title": "Sex",
+            "type": "string"
+          },
+          "speaker": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speaker"
+          }
+        },
+        "required": [
+          "name",
+          "age",
+          "sex"
+        ],
+        "title": "PublicPatient",
+        "type": "object"
+      },
+      "PublicSource": {
+        "description": "Where a released value came from, so the chart can show its citation.",
+        "properties": {
+          "kind": {
+            "enum": [
+              "faculty",
+              "vhs_import",
+              "reference",
+              "rule",
+              "computed",
+              "default",
+              "llm_draft",
+              "nhanes"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "ref": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ref"
+          }
+        },
+        "required": [
+          "kind"
+        ],
+        "title": "PublicSource",
+        "type": "object"
+      },
+      "PublicVisitSummary": {
+        "description": "A visit the student can choose. Decision points and branch changes are not on it.",
+        "properties": {
+          "day": {
+            "title": "Day",
+            "type": "integer"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "day"
+        ],
+        "title": "PublicVisitSummary",
         "type": "object"
       },
       "Release": {
@@ -1733,6 +2290,57 @@
         "title": "TTSRequest",
         "type": "object"
       },
+      "TranscriptEntry": {
+        "description": "One saved exchange. is_last marks the newest turn so refresh can show where the visit stopped.",
+        "properties": {
+          "is_last": {
+            "default": false,
+            "title": "Is Last",
+            "type": "boolean"
+          },
+          "reply_text": {
+            "title": "Reply Text",
+            "type": "string"
+          },
+          "student_end_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Student End Ms"
+          },
+          "student_start_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Student Start Ms"
+          },
+          "student_text": {
+            "title": "Student Text",
+            "type": "string"
+          },
+          "turn": {
+            "title": "Turn",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "turn",
+          "student_text",
+          "reply_text"
+        ],
+        "title": "TranscriptEntry",
+        "type": "object"
+      },
       "TrustConfig": {
         "properties": {
           "start": {
@@ -1749,6 +2357,74 @@
           }
         },
         "title": "TrustConfig",
+        "type": "object"
+      },
+      "TurnResult": {
+        "description": "The verified reply and the chart rows that turn released. The engine log stays stored.",
+        "properties": {
+          "audio_tags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Audio Tags",
+            "type": "array"
+          },
+          "chart_releases": {
+            "items": {
+              "$ref": "#/components/schemas/PublicChartEntry"
+            },
+            "title": "Chart Releases",
+            "type": "array"
+          },
+          "exam_results": {
+            "items": {
+              "$ref": "#/components/schemas/PublicChartEntry"
+            },
+            "title": "Exam Results",
+            "type": "array"
+          },
+          "latency_ms": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Latency Ms",
+            "type": "object"
+          },
+          "mode": {
+            "enum": [
+              "template",
+              "llm"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "notices": {
+            "items": {
+              "$ref": "#/components/schemas/PublicNotice"
+            },
+            "title": "Notices",
+            "type": "array"
+          },
+          "reply_text": {
+            "title": "Reply Text",
+            "type": "string"
+          },
+          "speaker": {
+            "title": "Speaker",
+            "type": "string"
+          },
+          "turn": {
+            "title": "Turn",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "turn",
+          "reply_text",
+          "speaker",
+          "mode"
+        ],
+        "title": "TurnResult",
         "type": "object"
       },
       "Unlock": {
@@ -2029,6 +2705,7 @@
   "paths": {
     "/api/cases": {
       "get": {
+        "description": "Published cases a student can open. Drafts and hidden facts are left out.",
         "operationId": "list_cases_api_cases_get",
         "responses": {
           "200": {
@@ -2036,8 +2713,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "additionalProperties": true,
-                    "type": "object"
+                    "$ref": "#/components/schemas/PublicCase"
                   },
                   "title": "Response List Cases Api Cases Get",
                   "type": "array"
@@ -2055,6 +2731,7 @@
     },
     "/api/cases/{case_id}": {
       "get": {
+        "description": "Briefing for one published visit. This is not the Studio case.",
         "operationId": "get_case_api_cases__case_id__get",
         "parameters": [
           {
@@ -2065,6 +2742,38 @@
               "title": "Case Id",
               "type": "string"
             }
+          },
+          {
+            "in": "query",
+            "name": "version",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Version"
+            }
+          },
+          {
+            "in": "query",
+            "name": "visit_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Visit Id"
+            }
           }
         ],
         "responses": {
@@ -2072,13 +2781,21 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Get Case Api Cases  Case Id  Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/PublicCase"
                 }
               }
             },
             "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No published case with that id."
           },
           "422": {
             "content": {
@@ -2118,6 +2835,7 @@
     },
     "/api/encounters": {
       "get": {
+        "description": "Saved encounters. The list does not include the transcript or hidden engine state.",
         "operationId": "list_encounters_api_encounters_get",
         "parameters": [
           {
@@ -2143,8 +2861,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "additionalProperties": true,
-                    "type": "object"
+                    "$ref": "#/components/schemas/EncounterSummary"
                   },
                   "title": "Response List Encounters Api Encounters Get",
                   "type": "array"
@@ -2170,6 +2887,7 @@
         ]
       },
       "post": {
+        "description": "Saves a new encounter. Refresh must call the encounter read, not this route.",
         "operationId": "start_encounter_api_encounters_post",
         "requestBody": {
           "content": {
@@ -2186,13 +2904,31 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Start Encounter Api Encounters Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/PublicEncounter"
                 }
               }
             },
             "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "The case or visit was not found."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "The encounter cannot be started."
           },
           "422": {
             "content": {
@@ -2213,6 +2949,7 @@
     },
     "/api/encounters/{enc_id}": {
       "get": {
+        "description": "The saved encounter, with its transcript and released chart. Does not create one.",
         "operationId": "get_encounter_api_encounters__enc_id__get",
         "parameters": [
           {
@@ -2230,13 +2967,21 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Get Encounter Api Encounters  Enc Id  Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/PublicEncounter"
                 }
               }
             },
             "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No saved encounter with that id."
           },
           "422": {
             "content": {
@@ -2311,6 +3056,7 @@
     },
     "/api/encounters/{enc_id}/end": {
       "post": {
+        "description": "Marks the encounter ended and returns the same saved view.",
         "operationId": "end_encounter_api_encounters__enc_id__end_post",
         "parameters": [
           {
@@ -2328,13 +3074,21 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response End Encounter Api Encounters  Enc Id  End Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/PublicEncounter"
                 }
               }
             },
             "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No saved encounter with that id."
           },
           "422": {
             "content": {
@@ -2454,6 +3208,7 @@
     },
     "/api/encounters/{enc_id}/utterances": {
       "post": {
+        "description": "Runs one committed utterance. The response is the reply and released rows, not the engine log.",
         "operationId": "add_utterance_api_encounters__enc_id__utterances_post",
         "parameters": [
           {
@@ -2481,13 +3236,31 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Add Utterance Api Encounters  Enc Id  Utterances Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/TurnResult"
                 }
               }
             },
             "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No saved encounter with that id."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "The encounter is not accepting a turn."
           },
           "422": {
             "content": {

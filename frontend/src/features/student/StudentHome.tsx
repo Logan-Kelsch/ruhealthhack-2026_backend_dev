@@ -1,67 +1,106 @@
+import { useEffect, useState } from "react";
+import { asApiError, api, type ApiClient, type PublicCase } from "../../api/client";
 import type { Go } from "../../app/types";
 import { Avatar } from "../../components/Avatar";
-import { ArrowRight, Chevron } from "../../components/Icons";
-import { Badge, Card, CardHead, Page, PrimaryButton, Title } from "../../components/ui";
-import { RECENT_FEEDBACK, STUDENT_VISITS, UP_NEXT } from "../../mock/student";
+import { Card, GhostButton, Page, Title } from "../../components/ui";
+import { portraitFor } from "./portrait";
 
-// Student landing. The next assigned visit is Walter Greene.
-export function StudentHome({ go }: { go: Go }) {
+type LoadState =
+  | { kind: "loading" }
+  | { kind: "error"; message: string }
+  | { kind: "ready"; cases: PublicCase[] };
+
+// Published cases a student can open. There is no cohort list and no due date on this screen.
+export function StudentHome({ go, client = api }: { go: Go; client?: ApiClient }) {
+  const [attempt, setAttempt] = useState(0);
+  const [load, setLoad] = useState<LoadState>({ kind: "loading" });
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoad({ kind: "loading" });
+    client
+      .GET("/api/cases")
+      .then((result) => {
+        if (cancelled) return;
+        if (!result.response?.ok || !result.data) {
+          const status = result.response?.status ?? 0;
+          setLoad({ kind: "error", message: asApiError(status, result.error).message });
+          return;
+        }
+        setLoad({ kind: "ready", cases: result.data });
+      })
+      .catch(() => {
+        if (!cancelled) setLoad({ kind: "error", message: "Cases could not be loaded." });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [client, attempt]);
+
   return (
     <Page width="max-w-[1100px]">
-      <Title kicker="Friday, October 10">Good afternoon, Jordan</Title>
-      <section className="overflow-hidden rounded-[20px] border border-line bg-card">
-        <div className="flex items-center gap-2 bg-panel px-6 py-3 text-[12.5px] font-semibold tracking-[0.3px] text-white">
-          <span className="size-1.5 rounded-full bg-[#8fb0ff]" />
-          {UP_NEXT.banner}
-        </div>
-        <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-6 p-6">
-          <Avatar who={UP_NEXT.who} size={96} />
-          <div className="min-w-0">
-            <div className="font-serif text-[32px] leading-tight font-medium tracking-[-0.6px]">{UP_NEXT.name}</div>
-            <div className="mt-1.5 text-[15px] text-ink-soft">{UP_NEXT.summary}</div>
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {UP_NEXT.chips.map((chip) => (
-                <Badge key={chip}>{chip}</Badge>
-              ))}
+      <Title kicker={kicker(load)}>Cases</Title>
+      <CaseList
+        load={load}
+        onRetry={() => setAttempt((value) => value + 1)}
+        onOpen={(row, visitId) => go("s-brief", { caseId: row.case_id, version: row.version, visitId })}
+      />
+    </Page>
+  );
+}
+
+// The count is the number of published cases. It is not a date or an assignment.
+function kicker(load: LoadState): string | undefined {
+  if (load.kind === "ready") return `${load.cases.length} published`;
+  return undefined;
+}
+
+// Lists each published visit. Opening one goes to its briefing and does not start an encounter.
+function CaseList({
+  load,
+  onRetry,
+  onOpen,
+}: {
+  load: LoadState;
+  onRetry: () => void;
+  onOpen: (row: PublicCase, visitId: string) => void;
+}) {
+  if (load.kind === "loading") {
+    return <p className="text-sm text-muted">Loading published cases</p>;
+  }
+  if (load.kind === "error") {
+    return (
+      <div className="flex flex-col items-start gap-3">
+        <p className="text-sm text-ink">{load.message}</p>
+        <GhostButton onClick={onRetry}>Retry</GhostButton>
+      </div>
+    );
+  }
+  if (load.cases.length === 0) {
+    return <p className="text-sm text-muted">No published cases</p>;
+  }
+  return (
+    <div className="flex flex-col gap-4">
+      {load.cases.map((row) => (
+        <Card key={row.case_id}>
+          <div className="flex items-center gap-4 p-5">
+            <Avatar who={portraitFor(row.patient)} size={64} />
+            <div className="min-w-0">
+              <div className="font-serif text-[28px] leading-tight font-medium tracking-[-0.4px]">
+                {row.patient.name}, {row.patient.age}
+              </div>
+              <div className="mt-1 text-[15px] text-ink-soft">{row.title}</div>
             </div>
           </div>
-          <PrimaryButton size="lg" onClick={() => go("s-brief", { visit: 1 })}>
-            Begin visit
-            <ArrowRight />
-          </PrimaryButton>
-        </div>
-      </section>
-
-      <div className="grid items-start gap-4 [grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr))]">
-        <Card>
-          <CardHead title="Assigned" />
-          {STUDENT_VISITS.map((item) => (
-            <div key={item.name} className="grid grid-cols-[36px_minmax(0,1fr)_auto] items-center gap-3 border-t border-hair px-5 py-3 first:border-t-0">
-              <Avatar who={item.who} size={36} />
-              <div>
-                <div className="text-[14.5px] font-semibold">{item.name}</div>
-                <div className="mt-0.5 text-[12.5px] text-muted">{item.meta}</div>
-              </div>
-              <span className="text-[12.5px] text-ink-soft">{item.due}</span>
-            </div>
-          ))}
+          <div className="flex flex-wrap gap-2 border-t border-hair px-5 py-3">
+            {row.visits.map((visit) => (
+              <GhostButton key={visit.id} onClick={() => onOpen(row, visit.id)}>
+                {visit.label}
+              </GhostButton>
+            ))}
+          </div>
         </Card>
-        <Card>
-          <CardHead title="Recent feedback" />
-          <button
-            type="button"
-            onClick={() => go("s-debrief", { visit: 1 })}
-            className="grid w-full grid-cols-[minmax(0,1fr)_auto_16px] items-center gap-3 border-t border-hair px-5 py-3.5 text-left first:border-t-0 hover:bg-raised"
-          >
-            <div>
-              <div className="text-[14.5px] font-semibold">{RECENT_FEEDBACK.who}</div>
-              <div className="mt-0.5 text-[13px] text-ink-soft">{RECENT_FEEDBACK.next}</div>
-            </div>
-            <span className="text-[13px] font-semibold tabular-nums">{RECENT_FEEDBACK.score}</span>
-            <Chevron />
-          </button>
-        </Card>
-      </div>
-    </Page>
+      ))}
+    </div>
   );
 }

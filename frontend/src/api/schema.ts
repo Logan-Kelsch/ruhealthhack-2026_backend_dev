@@ -11,7 +11,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List Cases */
+        /**
+         * List Cases
+         * @description Published cases a student can open. Drafts and hidden facts are left out.
+         */
         get: operations["list_cases_api_cases_get"];
         put?: never;
         post?: never;
@@ -28,7 +31,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get Case */
+        /**
+         * Get Case
+         * @description Briefing for one published visit. This is not the Studio case.
+         */
         get: operations["get_case_api_cases__case_id__get"];
         put?: never;
         post?: never;
@@ -65,10 +71,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List Encounters */
+        /**
+         * List Encounters
+         * @description Saved encounters. The list does not include the transcript or hidden engine state.
+         */
         get: operations["list_encounters_api_encounters_get"];
         put?: never;
-        /** Start Encounter */
+        /**
+         * Start Encounter
+         * @description Saves a new encounter. Refresh must call the encounter read, not this route.
+         */
         post: operations["start_encounter_api_encounters_post"];
         delete?: never;
         options?: never;
@@ -83,7 +95,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get Encounter */
+        /**
+         * Get Encounter
+         * @description The saved encounter, with its transcript and released chart. Does not create one.
+         */
         get: operations["get_encounter_api_encounters__enc_id__get"];
         put?: never;
         post?: never;
@@ -119,7 +134,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** End Encounter */
+        /**
+         * End Encounter
+         * @description Marks the encounter ended and returns the same saved view.
+         */
         post: operations["end_encounter_api_encounters__enc_id__end_post"];
         delete?: never;
         options?: never;
@@ -157,7 +175,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Add Utterance */
+        /**
+         * Add Utterance
+         * @description Runs one committed utterance. The response is the reply and released rows, not the engine log.
+         */
         post: operations["add_utterance_api_encounters__enc_id__utterances_post"];
         delete?: never;
         options?: never;
@@ -781,6 +802,36 @@ export interface components {
             };
         };
         /**
+         * EncounterSummary
+         * @description One saved encounter in a list. The transcript stays on the encounter view.
+         */
+        EncounterSummary: {
+            /** Case Id */
+            case_id: string;
+            /** Encounter Id */
+            encounter_id: string;
+            /** Previous Encounter Id */
+            previous_encounter_id?: string | null;
+            /**
+             * Review Flag
+             * @default false
+             */
+            review_flag: boolean;
+            /** Rubric Total */
+            rubric_total?: number | null;
+            /** Started At */
+            started_at?: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "active" | "ended" | "complete";
+            /** Student Name */
+            student_name: string;
+            /** Visit Id */
+            visit_id: string;
+        };
+        /**
          * ErrorItem
          * @description One validation problem. loc is the same path FastAPI already reported, such as ["body", "description"].
          */
@@ -1051,6 +1102,83 @@ export interface components {
             voice_id?: string | null;
         };
         /**
+         * PublicBriefing
+         * @description What the student reads before starting. This is the doorway card, not the chart.
+         */
+        PublicBriefing: {
+            /**
+             * Goal
+             * @default
+             */
+            goal: string;
+            /**
+             * Reason For Visit
+             * @default
+             */
+            reason_for_visit: string;
+            /**
+             * Setting
+             * @default
+             */
+            setting: string;
+            /**
+             * Show Doorway Vitals
+             * @default true
+             */
+            show_doorway_vitals: boolean;
+            /**
+             * Student Role
+             * @default
+             */
+            student_role: string;
+        };
+        /**
+         * PublicCase
+         * @description One published case as a student lists or opens it.
+         */
+        PublicCase: {
+            briefing: components["schemas"]["PublicBriefing"];
+            /** Case Id */
+            case_id: string;
+            /** Doorway Vitals */
+            doorway_vitals?: components["schemas"]["PublicDoorwayVital"][];
+            /** Golden */
+            golden: boolean;
+            patient: components["schemas"]["PublicPatient"];
+            /** Title */
+            title: string;
+            /** Version */
+            version: number;
+            /** Visits */
+            visits: components["schemas"]["PublicVisitSummary"][];
+        };
+        /**
+         * PublicChartEntry
+         * @description One released chart or exam row. source_fact cites the fact that released it, when one did.
+         */
+        PublicChartEntry: {
+            /** Body */
+            body?: string | null;
+            /** Flag */
+            flag?: string | null;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "vital" | "lab" | "exam" | "artifact" | "diagnosis" | "medication" | "allergy" | "fact";
+            /** Label */
+            label: string;
+            /** Ref */
+            ref: string;
+            /** Section */
+            section?: string | null;
+            source?: components["schemas"]["PublicSource"] | null;
+            /** Source Fact */
+            source_fact?: string | null;
+            /** Value */
+            value?: string | null;
+        };
+        /**
          * PublicConfig
          * @description Voice settings the browser may see. Model ids, keys, and account values stay off this object.
          */
@@ -1063,6 +1191,120 @@ export interface components {
             stt_provider: string;
             /** Tts */
             tts: boolean;
+        };
+        /**
+         * PublicDoorwayVital
+         * @description A vital shown before the visit starts, with the source faculty recorded.
+         */
+        PublicDoorwayVital: {
+            /** Key */
+            key: string;
+            /** Label */
+            label: string;
+            source: components["schemas"]["PublicSource"];
+            /**
+             * Unit
+             * @default
+             */
+            unit: string;
+            /** Value */
+            value: string;
+        };
+        /**
+         * PublicEncounter
+         * @description The encounter a refresh restores. Trust and engine state are not fields on this object.
+         */
+        PublicEncounter: {
+            briefing: components["schemas"]["PublicBriefing"];
+            /** Case Id */
+            case_id: string;
+            /** Case Version */
+            case_version: number;
+            /** Chart */
+            chart?: components["schemas"]["PublicChartEntry"][];
+            /** Encounter Id */
+            encounter_id: string;
+            /** Ended At */
+            ended_at?: string | null;
+            /** Has Next Visit */
+            has_next_visit: boolean;
+            /** Last Turn */
+            last_turn?: number | null;
+            patient: components["schemas"]["PublicPatient"];
+            /** Previous Encounter Id */
+            previous_encounter_id?: string | null;
+            /** Started At */
+            started_at?: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "active" | "ended" | "complete";
+            /** Transcript */
+            transcript?: components["schemas"]["TranscriptEntry"][];
+            /** Visit Id */
+            visit_id: string;
+            /** Visit Label */
+            visit_label: string;
+        };
+        /**
+         * PublicNotice
+         * @description A short note the student can read, such as an exam that this case does not include.
+         */
+        PublicNotice: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "exam_unavailable" | "order_unavailable" | "fallback" | "info";
+            /** Text */
+            text: string;
+        };
+        /**
+         * PublicPatient
+         * @description The person on the briefing card. Faculty notes and voice settings are not included.
+         */
+        PublicPatient: {
+            /** Age */
+            age: number;
+            /** Name */
+            name: string;
+            /** Portrait */
+            portrait?: string | null;
+            /** Pronouns */
+            pronouns?: string | null;
+            /**
+             * Sex
+             * @enum {string}
+             */
+            sex: "male" | "female" | "other";
+            /** Speaker */
+            speaker?: string | null;
+        };
+        /**
+         * PublicSource
+         * @description Where a released value came from, so the chart can show its citation.
+         */
+        PublicSource: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "faculty" | "vhs_import" | "reference" | "rule" | "computed" | "default" | "llm_draft" | "nhanes";
+            /** Ref */
+            ref?: string | null;
+        };
+        /**
+         * PublicVisitSummary
+         * @description A visit the student can choose. Decision points and branch changes are not on it.
+         */
+        PublicVisitSummary: {
+            /** Day */
+            day: number;
+            /** Id */
+            id: string;
+            /** Label */
+            label: string;
         };
         /** Release */
         Release: {
@@ -1140,6 +1382,27 @@ export interface components {
             /** Voice Id */
             voice_id?: string | null;
         };
+        /**
+         * TranscriptEntry
+         * @description One saved exchange. is_last marks the newest turn so refresh can show where the visit stopped.
+         */
+        TranscriptEntry: {
+            /**
+             * Is Last
+             * @default false
+             */
+            is_last: boolean;
+            /** Reply Text */
+            reply_text: string;
+            /** Student End Ms */
+            student_end_ms?: number | null;
+            /** Student Start Ms */
+            student_start_ms?: number | null;
+            /** Student Text */
+            student_text: string;
+            /** Turn */
+            turn: number;
+        };
         /** TrustConfig */
         TrustConfig: {
             /**
@@ -1151,6 +1414,35 @@ export interface components {
             thresholds?: {
                 [key: string]: number;
             };
+        };
+        /**
+         * TurnResult
+         * @description The verified reply and the chart rows that turn released. The engine log stays stored.
+         */
+        TurnResult: {
+            /** Audio Tags */
+            audio_tags?: string[];
+            /** Chart Releases */
+            chart_releases?: components["schemas"]["PublicChartEntry"][];
+            /** Exam Results */
+            exam_results?: components["schemas"]["PublicChartEntry"][];
+            /** Latency Ms */
+            latency_ms?: {
+                [key: string]: number;
+            };
+            /**
+             * Mode
+             * @enum {string}
+             */
+            mode: "template" | "llm";
+            /** Notices */
+            notices?: components["schemas"]["PublicNotice"][];
+            /** Reply Text */
+            reply_text: string;
+            /** Speaker */
+            speaker: string;
+            /** Turn */
+            turn: number;
         };
         /** Unlock */
         Unlock: {
@@ -1267,16 +1559,17 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    }[];
+                    "application/json": components["schemas"]["PublicCase"][];
                 };
             };
         };
     };
     get_case_api_cases__case_id__get: {
         parameters: {
-            query?: never;
+            query?: {
+                version?: number | null;
+                visit_id?: string | null;
+            };
             header?: never;
             path: {
                 case_id: string;
@@ -1291,9 +1584,16 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["PublicCase"];
+                };
+            };
+            /** @description No published case with that id. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description Validation error */
@@ -1344,9 +1644,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    }[];
+                    "application/json": components["schemas"]["EncounterSummary"][];
                 };
             };
             /** @description Validation error */
@@ -1379,9 +1677,25 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["PublicEncounter"];
+                };
+            };
+            /** @description The case or visit was not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description The encounter cannot be started. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description Validation error */
@@ -1412,9 +1726,16 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["PublicEncounter"];
+                };
+            };
+            /** @description No saved encounter with that id. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description Validation error */
@@ -1482,9 +1803,16 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["PublicEncounter"];
+                };
+            };
+            /** @description No saved encounter with that id. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description Validation error */
@@ -1591,9 +1919,25 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["TurnResult"];
+                };
+            };
+            /** @description No saved encounter with that id. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description The encounter is not accepting a turn. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description Validation error */

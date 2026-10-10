@@ -18,6 +18,11 @@ from app.services import Conflict, NotFound
 SHARED_ERROR_RESPONSES = {
     ("/api/studio/cases/{case_id}", "get"): {404: "No saved case with that id."},
     ("/api/studio/cases/{case_id}/publish", "post"): {409: "The case is not ready to publish."},
+    ("/api/cases/{case_id}", "get"): {404: "No published case with that id."},
+    ("/api/encounters", "post"): {404: "The case or visit was not found.", 409: "The encounter cannot be started."},
+    ("/api/encounters/{enc_id}", "get"): {404: "No saved encounter with that id."},
+    ("/api/encounters/{enc_id}/utterances", "post"): {404: "No saved encounter with that id.", 409: "The encounter is not accepting a turn."},
+    ("/api/encounters/{enc_id}/end", "post"): {404: "No saved encounter with that id."},
 }
 
 

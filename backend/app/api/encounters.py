@@ -9,29 +9,31 @@ from sqlalchemy.orm import Session
 from app import services
 from app.db import get_session
 from app.integrations import elevenlabs
+from app.schemas.student import EncounterSummary, PublicCase, PublicEncounter, TurnResult
+from app.student_view import public_case
 
 router = APIRouter(prefix="/api", tags=["encounters"])
 
 
-def _case_card(row) -> dict:
-    case = services.load_case(row)
-    return {
-        "case_id": case.case_id, "version": case.version, "title": case.title, "golden": case.golden,
-        "patient": {"name": case.profile.name, "age": case.profile.age, "sex": case.profile.sex, "portrait": case.profile.portrait,
-                    "speaker": case.profile.speaker},
-        "briefing": case.briefing.model_dump(),
-        "visits": [{"id": v.id, "label": v.label, "day": v.day} for v in case.visits],
-    }
+@router.get("/cases", response_model=list[PublicCase])
+def list_cases(db: Session = Depends(get_session)) -> list[PublicCase]:
+    """Published cases a student can open. Drafts and hidden facts are left out."""
+    return [public_case(services.load_case(row)) for row in services.latest_rows(db, status="published")]
 
 
-@router.get("/cases")
-def list_cases(db: Session = Depends(get_session)) -> list[dict]:
-    return [_case_card(r) for r in services.latest_rows(db, status="published")]
-
-
-@router.get("/cases/{case_id}")
-def get_case(case_id: str, db: Session = Depends(get_session)) -> dict:
-    return _case_card(services.get_case_row(db, case_id, status="published"))
+@router.get("/cases/{case_id}", response_model=PublicCase)
+def get_case(
+    case_id: str,
+    version: int | None = None,
+    visit_id: str | None = None,
+    db: Session = Depends(get_session),
+) -> PublicCase:
+    """Briefing for one published visit. This is not the Studio case."""
+    case = services.load_case(services.get_case_row(db, case_id, version, status="published"))
+    chosen = visit_id or (case.visits[0].id if case.visits else None)
+    if chosen is not None and case.visit(chosen) is None:
+        raise services.NotFound(f"visit {chosen} not found in {case.case_id}")
+    return public_case(case, chosen)
 
 
 class StartEncounter(BaseModel):
@@ -44,21 +46,24 @@ class StartEncounter(BaseModel):
     previous_encounter_id: str | None = None
 
 
-@router.post("/encounters", status_code=201)
-def start_encounter(body: StartEncounter, db: Session = Depends(get_session)) -> dict:
+@router.post("/encounters", status_code=201, response_model=PublicEncounter)
+def start_encounter(body: StartEncounter, db: Session = Depends(get_session)) -> PublicEncounter:
+    """Saves a new encounter. Refresh must call the encounter read, not this route."""
     enc = services.start_encounter(db, case_id=body.case_id, version=body.version, visit_id=body.visit_id,
                                    student_name=body.student_name, previous_encounter_id=body.previous_encounter_id)
-    return services.encounter_view(enc)
+    return services.encounter_view(db, enc)
 
 
-@router.get("/encounters")
-def list_encounters(case_id: str | None = None, db: Session = Depends(get_session)) -> list[dict]:
+@router.get("/encounters", response_model=list[EncounterSummary])
+def list_encounters(case_id: str | None = None, db: Session = Depends(get_session)) -> list[EncounterSummary]:
+    """Saved encounters. The list does not include the transcript or hidden engine state."""
     return services.list_encounters(db, case_id)
 
 
-@router.get("/encounters/{enc_id}")
-def get_encounter(enc_id: str, db: Session = Depends(get_session)) -> dict:
-    return services.encounter_view(services.get_encounter(db, enc_id))
+@router.get("/encounters/{enc_id}", response_model=PublicEncounter)
+def get_encounter(enc_id: str, db: Session = Depends(get_session)) -> PublicEncounter:
+    """The saved encounter, with its transcript and released chart. Does not create one."""
+    return services.encounter_view(db, services.get_encounter(db, enc_id))
 
 
 class Utterance(BaseModel):
@@ -71,14 +76,16 @@ class Utterance(BaseModel):
     barge_in_remaining_ms: int | None = None
 
 
-@router.post("/encounters/{enc_id}/utterances")
-def add_utterance(enc_id: str, body: Utterance, db: Session = Depends(get_session)) -> dict:
+@router.post("/encounters/{enc_id}/utterances", response_model=TurnResult)
+def add_utterance(enc_id: str, body: Utterance, db: Session = Depends(get_session)) -> TurnResult:
+    """Runs one committed utterance. The response is the reply and released rows, not the engine log."""
     return services.add_utterance(db, enc_id, body.text, body.start_ms, body.end_ms, body.barge_in_remaining_ms)
 
 
-@router.post("/encounters/{enc_id}/end")
-def end_encounter(enc_id: str, db: Session = Depends(get_session)) -> dict:
-    return services.encounter_view(services.end_encounter(db, enc_id))
+@router.post("/encounters/{enc_id}/end", response_model=PublicEncounter)
+def end_encounter(enc_id: str, db: Session = Depends(get_session)) -> PublicEncounter:
+    """Marks the encounter ended and returns the same saved view."""
+    return services.encounter_view(db, services.end_encounter(db, enc_id))
 
 
 class Documentation(BaseModel):

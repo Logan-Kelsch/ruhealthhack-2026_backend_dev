@@ -66,13 +66,18 @@ def _unique_case_id(db: Session, base: str) -> str:
     return cid
 
 
-def create_case(db: Session, case: Case, *, new_id: bool = True) -> CaseRow:
+def create_case(db: Session, case: Case, *, new_id: bool = True, commit: bool = True) -> CaseRow:
+    """Save a new draft. Pass commit=False when several drafts must succeed or fail together."""
     if new_id:
         case.case_id = _unique_case_id(db, case.case_id)
     case.status = "draft"
     row = CaseRow(case_id=case.case_id, version=case.version, status="draft", title=case.title, doc=case.model_dump(mode="json"))
     db.add(row)
-    db.commit()
+    if commit:
+        db.commit()
+    else:
+        # Keep the row in this transaction so a later failure can still roll the set back.
+        db.flush()
     return row
 
 

@@ -15,9 +15,14 @@ from app.schemas.case import (
     Allergy, Briefing, Case, Diagnosis, ExamFinding, Fact, LabResult, Medication, Objective,
     Personality, Profile, Release, Source, Unlock, Vital,
 )
+from app.studio import consistency
 
 VHS_PATH = catalogs.DATA_DIR / "vhs" / "virtual-patient-profiles-sample.json"
 SRC_REF = "data/vhs/virtual-patient-profiles-sample.json"
+
+
+class VhsImportError(Exception):
+    """The bundled sample set could not be turned into drafts. Callers must not save a partial set."""
 
 # Chart-text cues -> topic ids. Topic keywords in vocab/topics.yaml are written for what a
 # student says; these are written for how the profile describes the patient.
@@ -218,7 +223,20 @@ def link_discoveries(expected: list[str], facts: list[Fact]) -> list[str]:
     return ids
 
 
+def _example_lines(opportunities: list[dict]) -> list[str]:
+    """Sponsor reaction lines become example lines. The wording is copied, not rewritten."""
+    lines: list[str] = []
+    for opportunity in opportunities:
+        for line in opportunity.get("possible_patient_reactions", []):
+            text = str(line).strip()
+            # The same sentence can appear on more than one objective. Keep the first copy.
+            if text and text not in lines:
+                lines.append(text)
+    return lines
+
+
 def import_profile(p: dict, index: int) -> Case:
+    """Turn one sponsor profile into a draft case. Free text is mapped with rules, never an LLM."""
     ov, demo, clin = p["patient_overview"], p.get("demographics", {}), p.get("clinical_profile", {})
     meds, nut, psy = p.get("medication_profile", {}), p.get("nutrition_profile", {}), p.get("psychosocial_profile", {})
     disc, learn, meta = p.get("information_disclosure", {}), p.get("learning_opportunities", {}), p.get("metadata", {})
@@ -276,14 +294,15 @@ def import_profile(p: dict, index: int) -> Case:
         m = re.match(r"\s*([^()]+?)\s*(?:\((.+)\))?\s*$", a)
         allergies.append(Allergy(substance=m.group(1) if m else a, reaction=m.group(2) if m else None, source=_src("clinical_profile.allergies")))
 
+    opportunities = learn.get("opportunities", [])
     objectives = []
-    for n, opp in enumerate(learn.get("opportunities", []), 1):
+    for n, opp in enumerate(opportunities, 1):
         expected = opp.get("expected_discoveries", [])
         text = opp["learning_objective"] + (" (VHS expected: " + "; ".join(expected) + ")" if expected else "")
         objectives.append(Objective(id=f"obj_{n}", text=text, expected_discoveries=link_discoveries(expected, facts)))
 
     portrait = f"{case_id}.jpg" if (catalogs.DATA_DIR / "portraits" / f"{case_id}.jpg").exists() else None
-    return Case(
+    case = Case(
         case_id=case_id,
         title=f"{name}: {clin.get('primary_diagnosis', '')}".strip(": "),
         description=ov.get("description", ""),
@@ -295,6 +314,7 @@ def import_profile(p: dict, index: int) -> Case:
             personality=Personality(
                 summary=psy.get("personality", ""), communication_style=psy.get("communication_style", ""),
                 health_literacy="low" if re.search(r"limited|low", " ".join(psy.get("barriers", [])), re.IGNORECASE) else "medium",
+                example_lines=_example_lines(opportunities),
             ),
         ),
         briefing=Briefing(setting="Outpatient clinic", reason_for_visit=clin.get("primary_diagnosis", ""), goal="", student_role=""),
@@ -302,7 +322,20 @@ def import_profile(p: dict, index: int) -> Case:
         objectives=objectives, documentation_template="PES",
         credits=[{"what": "Patient profile", "source": "Rutgers Virtual Health Simulation sample profiles (event-provided)"}],
     )
+    # Run the same rules faculty see later, and keep the findings on the draft for review.
+    case.consistency_findings = consistency.check(case)
+    return case
 
 
-def import_all(path: Path = VHS_PATH) -> list[Case]:
-    return [import_profile(p, i) for i, p in enumerate(load_profiles(path))]
+def import_all(path: Path | None = None) -> list[Case]:
+    """Load the bundled sample set. The path is read at call time so a missing file fails the import."""
+    source = VHS_PATH if path is None else path
+    try:
+        profiles = load_profiles(source)
+        # Build every draft before anything is saved. A bad profile must not leave a partial set.
+        cases = [import_profile(profile, index) for index, profile in enumerate(profiles)]
+    except (OSError, json.JSONDecodeError, KeyError, ValueError, TypeError) as exc:
+        raise VhsImportError("The sponsor sample set could not be imported.") from exc
+    if not cases:
+        raise VhsImportError("The sponsor sample set could not be imported.")
+    return cases

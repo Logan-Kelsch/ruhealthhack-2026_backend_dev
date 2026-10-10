@@ -1111,6 +1111,41 @@
         "title": "IntakeAnswer",
         "type": "object"
       },
+      "IntakeGap": {
+        "description": "One guided question still open. The list is what remains, not a history of answers.",
+        "properties": {
+          "blocking": {
+            "title": "Blocking",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "field",
+              "facts",
+              "objectives",
+              "autofill"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "question": {
+            "title": "Question",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "question",
+          "kind",
+          "blocking"
+        ],
+        "title": "IntakeGap",
+        "type": "object"
+      },
       "LabResult": {
         "properties": {
           "collected": {
@@ -1240,6 +1275,56 @@
           "value"
         ],
         "title": "LabResult",
+        "type": "object"
+      },
+      "LlmCallRecord": {
+        "description": "One logged model call. Offline drafting and intake leave the list empty.",
+        "properties": {
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "latency_ms": {
+            "title": "Latency Ms",
+            "type": "integer"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "ok": {
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "prompt": {
+            "title": "Prompt",
+            "type": "string"
+          },
+          "prompt_version": {
+            "title": "Prompt Version",
+            "type": "string"
+          },
+          "purpose": {
+            "title": "Purpose",
+            "type": "string"
+          }
+        },
+        "required": [
+          "purpose",
+          "model",
+          "prompt",
+          "prompt_version",
+          "latency_ms",
+          "ok"
+        ],
+        "title": "LlmCallRecord",
         "type": "object"
       },
       "Medication": {
@@ -2194,6 +2279,45 @@
         "title": "StartEncounter",
         "type": "object"
       },
+      "StudioCaseDetail": {
+        "description": "A saved case in the authoritative case format, with its remaining gaps and blockers.",
+        "properties": {
+          "blockers": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Blockers",
+            "type": "array"
+          },
+          "case": {
+            "$ref": "#/components/schemas/Case"
+          },
+          "gaps": {
+            "items": {
+              "$ref": "#/components/schemas/IntakeGap"
+            },
+            "title": "Gaps",
+            "type": "array"
+          },
+          "status": {
+            "enum": [
+              "draft",
+              "published",
+              "archived"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "case",
+          "status",
+          "gaps",
+          "blockers"
+        ],
+        "title": "StudioCaseDetail",
+        "type": "object"
+      },
       "StudioCaseSummary": {
         "description": "One saved case as the Case Library lists it. Hidden facts stay out of this object.",
         "properties": {
@@ -2255,6 +2379,53 @@
           "updated_at"
         ],
         "title": "StudioCaseSummary",
+        "type": "object"
+      },
+      "StudioDraftResult": {
+        "description": "Draft creation and intake. Same case view, plus any model calls used to produce it.",
+        "properties": {
+          "blockers": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Blockers",
+            "type": "array"
+          },
+          "case": {
+            "$ref": "#/components/schemas/Case"
+          },
+          "gaps": {
+            "items": {
+              "$ref": "#/components/schemas/IntakeGap"
+            },
+            "title": "Gaps",
+            "type": "array"
+          },
+          "llm_calls": {
+            "items": {
+              "$ref": "#/components/schemas/LlmCallRecord"
+            },
+            "title": "Llm Calls",
+            "type": "array"
+          },
+          "status": {
+            "enum": [
+              "draft",
+              "published",
+              "archived"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "case",
+          "status",
+          "gaps",
+          "blockers",
+          "llm_calls"
+        ],
+        "title": "StudioDraftResult",
         "type": "object"
       },
       "TTSRequest": {
@@ -2522,6 +2693,28 @@
           "high"
         ],
         "title": "ValueRange",
+        "type": "object"
+      },
+      "VhsImportResponse": {
+        "description": "Drafts saved from the bundled sponsor sample set. count is how many drafts were saved.",
+        "properties": {
+          "cases": {
+            "items": {
+              "$ref": "#/components/schemas/StudioCaseSummary"
+            },
+            "title": "Cases",
+            "type": "array"
+          },
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "count",
+          "cases"
+        ],
+        "title": "VhsImportResponse",
         "type": "object"
       },
       "Visit": {
@@ -3326,6 +3519,7 @@
     },
     "/api/studio/cases/{case_id}": {
       "get": {
+        "description": "Return one saved version. Reading the case does not create another one.",
         "operationId": "get_case_api_studio_cases__case_id__get",
         "parameters": [
           {
@@ -3359,9 +3553,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Get Case Api Studio Cases  Case Id  Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/StudioCaseDetail"
                 }
               }
             },
@@ -3658,6 +3850,7 @@
     },
     "/api/studio/cases/{case_id}/intake": {
       "post": {
+        "description": "Apply one answer to its gap and save that same draft. Intake rules decide what changes.",
         "operationId": "intake_answer_api_studio_cases__case_id__intake_post",
         "parameters": [
           {
@@ -3685,13 +3878,21 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Intake Answer Api Studio Cases  Case Id  Intake Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/StudioDraftResult"
                 }
               }
             },
             "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No saved case with that id."
           },
           "422": {
             "content": {
@@ -3821,6 +4022,7 @@
     },
     "/api/studio/drafts": {
       "post": {
+        "description": "Save one draft from the faculty description. The drafting service chooses the content.",
         "operationId": "new_draft_api_studio_drafts_post",
         "requestBody": {
           "content": {
@@ -3837,9 +4039,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response New Draft Api Studio Drafts Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/StudioDraftResult"
                 }
               }
             },
@@ -3864,23 +4064,28 @@
     },
     "/api/studio/import/vhs": {
       "post": {
-        "description": "Imports the eight sponsor VHS profiles as drafts. Each needs review before publishing.",
+        "description": "Imports the full sponsor sample set as drafts. Each saved case stays in review until faculty approve it.",
         "operationId": "import_vhs_api_studio_import_vhs_post",
         "responses": {
           "201": {
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {
-                    "additionalProperties": true,
-                    "type": "object"
-                  },
-                  "title": "Response Import Vhs Api Studio Import Vhs Post",
-                  "type": "array"
+                  "$ref": "#/components/schemas/VhsImportResponse"
                 }
               }
             },
             "description": "Successful Response"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "The sponsor sample set could not be imported."
           }
         },
         "summary": "Import Vhs",

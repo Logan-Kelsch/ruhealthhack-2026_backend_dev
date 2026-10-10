@@ -52,13 +52,17 @@ export function PrimaryButton({
   onClick,
   size = "md",
   block = false,
+  disabled = false,
   className = "",
+  type = "button",
 }: {
   children: ReactNode;
   onClick?: () => void;
   size?: "sm" | "md" | "lg";
   block?: boolean;
+  disabled?: boolean;
   className?: string;
+  type?: "button" | "submit";
 }) {
   const shape =
     size === "lg"
@@ -68,9 +72,10 @@ export function PrimaryButton({
         : "h-10 gap-2 rounded-[10px] px-4 text-sm font-medium";
   return (
     <button
-      type="button"
+      type={type}
       onClick={onClick}
-      className={`inline-flex items-center bg-panel text-white hover:bg-panel-hover ${shape} ${block ? "w-full justify-center" : ""} ${className}`}
+      disabled={disabled}
+      className={`inline-flex items-center bg-panel text-white hover:bg-panel-hover disabled:cursor-not-allowed disabled:opacity-60 ${shape} ${block ? "w-full justify-center" : ""} ${className}`}
     >
       {children}
     </button>

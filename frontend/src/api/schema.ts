@@ -233,7 +233,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get Case */
+        /**
+         * Get Case
+         * @description Return one saved version. Reading the case does not create another one.
+         */
         get: operations["get_case_api_studio_cases__case_id__get"];
         /** Save Case */
         put: operations["save_case_api_studio_cases__case_id__put"];
@@ -327,7 +330,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Intake Answer */
+        /**
+         * Intake Answer
+         * @description Apply one answer to its gap and save that same draft. Intake rules decide what changes.
+         */
         post: operations["intake_answer_api_studio_cases__case_id__intake_post"];
         delete?: never;
         options?: never;
@@ -381,7 +387,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** New Draft */
+        /**
+         * New Draft
+         * @description Save one draft from the faculty description. The drafting service chooses the content.
+         */
         post: operations["new_draft_api_studio_drafts_post"];
         delete?: never;
         options?: never;
@@ -400,7 +409,7 @@ export interface paths {
         put?: never;
         /**
          * Import Vhs
-         * @description Imports the eight sponsor VHS profiles as drafts. Each needs review before publishing.
+         * @description Imports the full sponsor sample set as drafts. Each saved case stays in review until faculty approve it.
          */
         post: operations["import_vhs_api_studio_import_vhs_post"];
         delete?: never;
@@ -941,6 +950,23 @@ export interface components {
             /** Text */
             text: string;
         };
+        /**
+         * IntakeGap
+         * @description One guided question still open. The list is what remains, not a history of answers.
+         */
+        IntakeGap: {
+            /** Blocking */
+            blocking: boolean;
+            /** Id */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "field" | "facts" | "objectives" | "autofill";
+            /** Question */
+            question: string;
+        };
         /** LabResult */
         LabResult: {
             /** Collected */
@@ -977,6 +1003,26 @@ export interface components {
             unit: string;
             /** Value */
             value: number | string;
+        };
+        /**
+         * LlmCallRecord
+         * @description One logged model call. Offline drafting and intake leave the list empty.
+         */
+        LlmCallRecord: {
+            /** Error */
+            error?: string | null;
+            /** Latency Ms */
+            latency_ms: number;
+            /** Model */
+            model: string;
+            /** Ok */
+            ok: boolean;
+            /** Prompt */
+            prompt: string;
+            /** Prompt Version */
+            prompt_version: string;
+            /** Purpose */
+            purpose: string;
         };
         /** Medication */
         Medication: {
@@ -1349,6 +1395,22 @@ export interface components {
             visit_id?: string | null;
         };
         /**
+         * StudioCaseDetail
+         * @description A saved case in the authoritative case format, with its remaining gaps and blockers.
+         */
+        StudioCaseDetail: {
+            /** Blockers */
+            blockers: string[];
+            case: components["schemas"]["Case"];
+            /** Gaps */
+            gaps: components["schemas"]["IntakeGap"][];
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "draft" | "published" | "archived";
+        };
+        /**
          * StudioCaseSummary
          * @description One saved case as the Case Library lists it. Hidden facts stay out of this object.
          */
@@ -1372,6 +1434,24 @@ export interface components {
             updated_at: string | null;
             /** Version */
             version: number;
+        };
+        /**
+         * StudioDraftResult
+         * @description Draft creation and intake. Same case view, plus any model calls used to produce it.
+         */
+        StudioDraftResult: {
+            /** Blockers */
+            blockers: string[];
+            case: components["schemas"]["Case"];
+            /** Gaps */
+            gaps: components["schemas"]["IntakeGap"][];
+            /** Llm Calls */
+            llm_calls: components["schemas"]["LlmCallRecord"][];
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "draft" | "published" | "archived";
         };
         /** TTSRequest */
         TTSRequest: {
@@ -1470,6 +1550,16 @@ export interface components {
             high: number;
             /** Low */
             low: number;
+        };
+        /**
+         * VhsImportResponse
+         * @description Drafts saved from the bundled sponsor sample set. count is how many drafts were saved.
+         */
+        VhsImportResponse: {
+            /** Cases */
+            cases: components["schemas"]["StudioCaseSummary"][];
+            /** Count */
+            count: number;
         };
         /** Visit */
         Visit: {
@@ -2010,9 +2100,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["StudioCaseDetail"];
                 };
             };
             /** @description No saved case with that id. */
@@ -2234,9 +2322,16 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["StudioDraftResult"];
+                };
+            };
+            /** @description No saved case with that id. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description Validation error */
@@ -2348,9 +2443,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["StudioDraftResult"];
                 };
             };
             /** @description Validation error */
@@ -2379,9 +2472,16 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    }[];
+                    "application/json": components["schemas"]["VhsImportResponse"];
+                };
+            };
+            /** @description The sponsor sample set could not be imported. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
         };

@@ -4,6 +4,10 @@ import type { components, paths } from "./schema";
 export type ErrorResponse = components["schemas"]["ErrorResponse"];
 export type ErrorItem = components["schemas"]["ErrorItem"];
 export type StudioCaseSummary = components["schemas"]["StudioCaseSummary"];
+export type StudioCaseDetail = components["schemas"]["StudioCaseDetail"];
+export type StudioDraftResult = components["schemas"]["StudioDraftResult"];
+export type IntakeGap = components["schemas"]["IntakeGap"];
+export type VhsImportResponse = components["schemas"]["VhsImportResponse"];
 export type PublicCase = components["schemas"]["PublicCase"];
 export type PublicEncounter = components["schemas"]["PublicEncounter"];
 export type PublicChartEntry = components["schemas"]["PublicChartEntry"];
@@ -55,4 +59,45 @@ export function asApiError(status: number, error: unknown): ApiError {
   }
   const message = typeof error === "string" && error.trim() ? error : "Request failed";
   return new ApiError(status, { message, errors: [], blockers: [] });
+}
+
+// A missing success body is a failure. Callers then show the shared error instead of inventing a case.
+function unwrap<T>(status: number, data: T | undefined, error: unknown): T {
+  if (data === undefined) throw asApiError(status, error);
+  return data;
+}
+
+// Faculty description in, one saved draft out. The case id and version come from the response.
+export async function createDraft(client: ApiClient, description: string): Promise<StudioDraftResult> {
+  const result = await client.POST("/api/studio/drafts", { body: { description } });
+  return unwrap(result.response.status, result.data, result.error);
+}
+
+// Read a saved version. This does not create a case; refresh uses it to restore the draft.
+export async function loadStudioCase(
+  client: ApiClient,
+  caseId: string,
+  version?: number,
+): Promise<StudioCaseDetail> {
+  const result = await client.GET("/api/studio/cases/{case_id}", {
+    params: {
+      path: { case_id: caseId },
+      ...(version === undefined ? {} : { query: { version } }),
+    },
+  });
+  return unwrap(result.response.status, result.data, result.error);
+}
+
+// Send one answer to the gap the faculty member is looking at, then return the updated draft.
+export async function answerIntake(
+  client: ApiClient,
+  caseId: string,
+  gapId: string,
+  text: string,
+): Promise<StudioDraftResult> {
+  const result = await client.POST("/api/studio/cases/{case_id}/intake", {
+    params: { path: { case_id: caseId } },
+    body: { gap_id: gapId, text },
+  });
+  return unwrap(result.response.status, result.data, result.error);
 }

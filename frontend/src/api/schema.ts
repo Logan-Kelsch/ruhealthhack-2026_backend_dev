@@ -662,9 +662,11 @@ export interface components {
         };
         /**
          * BranchSummary
-         * @description Which authored outcome was taken. Later-visit fact changes are not part of this view.
+         * @description One faculty-written outcome. Later-visit fact changes and likelihood tags are not on it.
          */
         BranchSummary: {
+            /** Evidence */
+            evidence?: components["schemas"]["EvidenceQuote"][];
             /** Id */
             id: string;
             /** Label */
@@ -912,9 +914,11 @@ export interface components {
         };
         /**
          * DecisionPathView
-         * @description The outcome id for this visit. Follow-up selection is a separate screen.
+         * @description The outcome this visit selected, the other authored outcomes, and the evidence for both.
          */
         DecisionPathView: {
+            /** Decisions */
+            decisions?: components["schemas"]["PublicDecision"][];
             /** Ghosts */
             ghosts?: components["schemas"]["BranchSummary"][];
             /** Needs Faculty Review */
@@ -1820,6 +1824,28 @@ export interface components {
             vad_threshold: number;
             /** Voice Id */
             voice_id?: string | null;
+        };
+        /**
+         * PublicDecision
+         * @description A yes/no result the student can read. The predicate that produced it stays on the case.
+         */
+        PublicDecision: {
+            /** Evidence */
+            evidence?: components["schemas"]["EvidenceQuote"][];
+            /**
+             * Feedback
+             * @default
+             */
+            feedback: string;
+            /** Id */
+            id: string;
+            /** Label */
+            label: string;
+            /**
+             * Result
+             * @enum {string}
+             */
+            result: "yes" | "no" | "unclear";
         };
         /**
          * PublicDoorwayVital

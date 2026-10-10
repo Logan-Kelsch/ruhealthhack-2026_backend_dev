@@ -111,10 +111,21 @@ export function routeForScreen(screen: ScreenId, current: StudentRoute, opts?: G
     caseId: opts?.caseId ?? current.caseId,
     version: opts?.version ?? current.version,
     visitId: opts?.visitId ?? current.visitId,
-    // The visit and the debrief reopen the same encounter. Briefing must not resume one by itself.
-    encounterId:
-      screen === "s-encounter" || screen === "s-debrief" ? (opts?.encounterId ?? current.encounterId) : null,
+    encounterId: encounterForScreen(screen, current, opts),
   };
+}
+
+// Which encounter id stays in the address. A first-visit briefing does not keep one.
+function encounterForScreen(screen: ScreenId, current: StudentRoute, opts?: GoOpts): string | null {
+  // The live visit, the debrief, and the pause between visits all reopen the saved encounter.
+  if (screen === "s-encounter" || screen === "s-debrief" || screen === "s-between") {
+    return opts?.encounterId ?? current.encounterId;
+  }
+  // A follow-up briefing is opened with the encounter that was just started. Nothing else is carried in.
+  if (screen === "s-brief") {
+    return opts?.encounterId ?? null;
+  }
+  return null;
 }
 
 export type CaseRoute = {

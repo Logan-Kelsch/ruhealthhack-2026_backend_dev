@@ -22,7 +22,7 @@ export function Welcome({ go }: { go: Go }) {
         <div className="flex flex-col items-center gap-4">
           <Wordmark size={Math.round(Math.min(148, Math.max(80, window.innerWidth * 0.085)))} />
           <div className="font-serif text-[clamp(26px,2.8vw,44px)] leading-tight tracking-[-0.6px] text-ink">
-            Real conversations with patients who aren’t.
+            Talk through a patient visit before the real one.
           </div>
           <div className="max-w-[560px] font-sans text-[clamp(15px,1.2vw,18px)] leading-snug text-ink-soft">
             Practice the conversations that <span className="whitespace-nowrap">value-based</span> care depends on.

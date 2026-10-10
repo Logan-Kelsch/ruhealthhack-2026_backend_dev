@@ -157,9 +157,10 @@ body {
   background: var(--color-paper) url("/assets/street.jpg") center / cover no-repeat;
 }
 
-/* Watercolor banner strip used at the top of Studio and the briefing card. */
+/* Watercolor banner strip used at the top of Studio and the briefing card. It is open sky,
+   not the hills of the page backdrop, so a banner inside the sheet doesn't repeat the header. */
 .bg-banner {
-  background: #f3eefa url("/assets/backdrop.jpg") center 8% / 140% auto no-repeat;
+  background: #f3eefa url("/assets/bloom.jpg") center 42% / cover no-repeat;
 }
 
 /* Dark mode darkens the painting with an overlay, not a filter, so content on top keeps full contrast. */
@@ -179,7 +180,7 @@ body {
   --wash-image: url("/assets/street.jpg");
 }
 .bg-banner {
-  --wash-image: url("/assets/backdrop.jpg");
+  --wash-image: url("/assets/bloom.jpg");
 }
 
 @keyframes rnd-eq {

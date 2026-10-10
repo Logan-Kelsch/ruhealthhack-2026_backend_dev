@@ -20,8 +20,8 @@ export function useModeSwitch() {
 }
 
 // Watercolor wash drawn by a fragment shader at the screen's full pixel density. The reveal is a
-// circle whose edge is pushed around by noise, with a darker pigment rim, so it reads as paint
-// bleeding across paper rather than a vector shape. Everything is in device pixels.
+// circle with a finely deckled edge and a light pigment rim, so it reads as paint on paper rather
+// than a vector shape, without blotches. Everything is in device pixels.
 const FRAGMENT = `
 precision highp float;
 uniform vec2 uRes;
@@ -58,8 +58,8 @@ void main() {
   float t = uTime;
 
   vec2 q = vec2(fbm(uv * 1.6 + vec2(0.0, t * 0.05)), fbm(uv * 1.6 + vec2(5.2, 1.3) - t * 0.04));
-  float f = fbm(uv * 2.0 + q * 1.8);
-  float k = clamp(frag.y / uRes.y + (f - 0.5) * 0.5, 0.0, 1.0);
+  float f = fbm(uv * 2.0 + q * 0.8);
+  float k = clamp(frag.y / uRes.y + (f - 0.5) * 0.3, 0.0, 1.0);
 
   vec3 indigo = vec3(0.29, 0.35, 0.80);
   vec3 lilac = vec3(0.68, 0.60, 0.90);
@@ -71,9 +71,7 @@ void main() {
   col = mix(col, apricot, smoothstep(0.56, 0.78, k));
   col = mix(col, cream, smoothstep(0.78, 1.0, k));
 
-  // Pigment pooling and paper grain.
-  float pool = fbm(uv * 6.0 + q * 3.0);
-  col *= 1.0 - 0.12 * smoothstep(0.5, 0.8, pool);
+  // Paper grain.
   col += (noise(frag * 0.9) * 0.5 + noise(frag * 0.33) * 0.5 - 0.5) * 0.04;
 
   // A pale wash in the middle keeps the navy title readable.
@@ -81,12 +79,13 @@ void main() {
   col = mix(col, vec3(1.0, 0.975, 0.94), 0.62 * exp(-dot(cc, cc) * 4.5));
 
   float d = length(frag - uCenter);
-  float amp = mix(3.0, 80.0, clamp(uRadius / (900.0 * s), 0.0, 1.0)) * s;
-  float edge = d + (fbm(uv * 3.2 + vec2(t * 0.04, 0.0)) - 0.5) * 2.0 * amp;
-  float feather = 14.0 * s;
+  // A fine deckled edge rather than a lumpy one: small amplitude, higher frequency.
+  float amp = mix(3.0, 26.0, clamp(uRadius / (900.0 * s), 0.0, 1.0)) * s;
+  float edge = d + (fbm(uv * 7.0 + vec2(t * 0.04, 0.0)) - 0.5) * 2.0 * amp;
+  float feather = 10.0 * s;
   float a = (1.0 - smoothstep(uRadius - feather, uRadius, edge)) * step(0.5, uRadius);
   float rim = smoothstep(feather * 3.0, 0.0, abs(edge - uRadius + feather)) ;
-  col = mix(col, col * vec3(0.76, 0.72, 0.9), rim * 0.55);
+  col = mix(col, col * vec3(0.76, 0.72, 0.9), rim * 0.3);
 
   gl_FragColor = vec4(col * a, a);
 }`;

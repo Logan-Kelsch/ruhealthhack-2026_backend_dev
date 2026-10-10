@@ -86,7 +86,7 @@ export function Shell({ screen, go, children }: ShellProps) {
           <span className="flex size-8 items-center justify-center rounded-full bg-indigo-soft text-[12px] font-bold text-indigo">{user.initials}</span>
           <span className="hidden leading-tight sm:block">
             <span className="block font-semibold text-ink">{user.name}</span>
-            <span className="block text-[12px]">{role === "faculty" ? "Faculty" : "Student"} · {user.role}</span>
+            <span className="block text-[12px]">{role === "faculty" ? `Faculty · ${user.role}` : user.role}</span>
           </span>
         </div>
       </header>

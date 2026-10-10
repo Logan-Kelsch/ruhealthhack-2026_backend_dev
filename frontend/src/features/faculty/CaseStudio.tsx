@@ -1,405 +1,775 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState, type FormEvent, type ReactNode } from "react";
+import {
+  ApiError,
+  answerIntake,
+  api,
+  autofillStudioCase,
+  createDraft,
+  loadStudioCase,
+  loadStudioVocab,
+  lookupDiagnosis,
+  publishStudioCase,
+  saveStudioCase,
+  setItemApproval,
+  type ApiClient,
+  type ApprovalGroup,
+  type CaseDocument,
+  type Icd10Match,
+  type IntakeGap,
+  type ItemStatus,
+  type StudioCaseDetail,
+  type StudioDraftResult,
+  type StudioVocab,
+} from "../../api/client";
+import { factReferenceNotes, saveProblem } from "./caseDraft";
+import { CaseReview } from "./CaseReview";
+import { CaseEditor, ObjectiveEditor, type SavePhase } from "./caseForm";
 import type { Go, StudioTab } from "../../app/types";
-import { PlusIcon } from "../../components/Icons";
-import { BuildTag, Mark, TabNav } from "../../components/ui";
-import { RUBRIC_DOMAINS } from "../../lib/rubric";
-import { STUDIO_CASES, STUDIO_OBJECTIVES, STUDIO_SUGGESTED_FACTS, studioPatientColumns, type StudioItem } from "../../mock/studio";
-import { DecisionTree } from "./DecisionTree";
-import { DocDot, DocIcon } from "./ImportPatients";
-
-type FactState = "pending" | "approved" | "dismissed";
+import { Avatar, type Portrait } from "../../components/Avatar";
+import { BackLink, Badge, Card, CardHead, PrimaryButton, TabNav } from "../../components/ui";
 
 const TABS: { id: StudioTab; label: string }[] = [
-  { id: "patient", label: "Diagnoses and medicines" },
+  { id: "patient", label: "Patient" },
   { id: "objectives", label: "Learning objectives" },
   { id: "files", label: "Files and sources" },
   { id: "tree", label: "Decision tree" },
+  { id: "review", label: "Review" },
 ];
 
-// Patient Studio. Publishing stays blocked until every check in the publish list is clear.
-export function CaseStudio({ go, tab }: { go: Go; tab: StudioTab }) {
+type CreatePhase = { kind: "editing" } | { kind: "saving" } | { kind: "error"; message: string };
+
+type LoadPhase =
+  | { kind: "loading" }
+  | { kind: "error"; message: string }
+  | { kind: "ready"; detail: StudioCaseDetail };
+
+type AnswerPhase =
+  | { kind: "idle" }
+  | { kind: "saving"; gapId: string }
+  | { kind: "error"; gapId: string; message: string };
+
+type PublishPhase =
+  | { kind: "idle" }
+  | { kind: "publishing" }
+  | { kind: "rejected"; message: string; blockers: string[] }
+  | { kind: "error"; message: string };
+
+// Patient Studio. Supported case content can be edited and approved. Files and the decision tree cannot.
+export function CaseStudio({
+  go,
+  tab,
+  caseId,
+  version,
+  client = api,
+}: {
+  go: Go;
+  tab: StudioTab;
+  caseId?: string;
+  version?: number;
+  client?: ApiClient;
+}) {
   const [current, setCurrent] = useState<StudioTab>(tab);
-  const [facts, setFacts] = useState<Record<"a" | "b", FactState>>({ a: "pending", b: "pending" });
-  const [drugFixed, setDrugFixed] = useState(false);
-  const [checklist, setChecklist] = useState(false);
+  const [description, setDescription] = useState("");
+  const [createPhase, setCreatePhase] = useState<CreatePhase>({ kind: "editing" });
+  const [load, setLoad] = useState<LoadPhase>({ kind: "loading" });
+  const [attempt, setAttempt] = useState(0);
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [answerPhase, setAnswerPhase] = useState<AnswerPhase>({ kind: "idle" });
+  const [draft, setDraft] = useState<CaseDocument | null>(null);
+  const [dirty, setDirty] = useState(false);
+  const [savePhase, setSavePhase] = useState<SavePhase>({ kind: "idle" });
+  const [reviewMessage, setReviewMessage] = useState<string | null>(null);
+  const [factHold, setFactHold] = useState<string | null>(null);
+  const [notes, setNotes] = useState<string[]>([]);
+  const [vocab, setVocab] = useState<StudioVocab | null>(null);
+  const [vocabError, setVocabError] = useState<string | null>(null);
+  const [lookupResults, setLookupResults] = useState<Icd10Match[]>([]);
+  const [lookupMessage, setLookupMessage] = useState<string | null>(null);
+  const [publishPhase, setPublishPhase] = useState<PublishPhase>({ kind: "idle" });
 
   // Follow the shell when another screen opens Studio on a chosen tab.
-  // Local tab clicks update `current` and are not overwritten until `tab` changes again.
   useEffect(() => {
     setCurrent(tab);
   }, [tab]);
 
-  const pendingFacts = Object.values(facts).filter((state) => state === "pending").length;
-  const tree = current === "tree";
-  const header = tree ? STUDIO_CASES.tree : STUDIO_CASES.patient;
-  const checks = [
-    { label: "Patient profile", ok: true, note: "", tab: "patient" as const },
-    { label: "Medicines recognized", ok: drugFixed, note: "Epirocil not found in RxNorm", tab: "patient" as const },
-    { label: "Learning objectives", ok: true, note: "", tab: "objectives" as const },
-    { label: "Rubric attached", ok: true, note: "", tab: "objectives" as const },
-    { label: "Suggested facts reviewed", ok: pendingFacts === 0, note: pendingFacts ? `${pendingFacts} awaiting approval` : "", tab: "files" as const },
-    { label: "Every path has an outcome", ok: true, note: "", tab: "tree" as const },
-  ];
-  const open = checks.filter((check) => !check.ok).length;
+  // Opening a case id loads that saved version. It does not create a draft.
+  useEffect(() => {
+    if (!caseId) return;
+    let cancelled = false;
+    setLoad({ kind: "loading" });
+    loadStudioCase(client, caseId, version)
+      .then((detail) => {
+        if (!cancelled) setLoad({ kind: "ready", detail });
+      })
+      .catch((error: unknown) => {
+        if (!cancelled) setLoad({ kind: "error", message: failureMessage(error, "The draft could not be loaded.") });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [caseId, version, client, attempt]);
 
-  function badgeFor(id: StudioTab) {
-    if (id === "patient" && !drugFixed) return "1";
-    if (id === "files" && pendingFacts) return String(pendingFacts);
-    return "";
+  // Copy the saved case into the editor only when the faculty member has no unsaved edits.
+  useEffect(() => {
+    if (load.kind !== "ready" || dirty) return;
+    setDraft(load.detail.case);
+  }, [load, dirty]);
+
+  // Topics, maneuvers, and panels come from the vocabulary route. A failure does not invent a list.
+  useEffect(() => {
+    if (!caseId) return;
+    let cancelled = false;
+    setVocab(null);
+    setVocabError(null);
+    loadStudioVocab(client)
+      .then((next) => {
+        if (cancelled) return;
+        // A 200 that is not the vocabulary must not be treated as a maneuver list.
+        if (!isStudioVocab(next)) {
+          setVocabError("The vocabulary could not be loaded.");
+          return;
+        }
+        setVocab(next);
+      })
+      .catch((error: unknown) => {
+        if (!cancelled) setVocabError(failureMessage(error, "The vocabulary could not be loaded."));
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [caseId, client]);
+
+  const detail = load.kind === "ready" ? load.detail : null;
+  const heading = detail?.case.profile.name ?? "New case";
+
+  // Save the description, then open the case id and version the server returned.
+  async function submitDescription(event: FormEvent) {
+    event.preventDefault();
+    setCreatePhase({ kind: "saving" });
+    try {
+      const result = await createDraft(client, description);
+      go("f-studio", {
+        studioTab: "patient",
+        caseId: result.case.case_id,
+        version: result.case.version,
+      });
+    } catch (error: unknown) {
+      // Stay on the form. A failed create has no case id to open.
+      setCreatePhase({ kind: "error", message: failureMessage(error, "The draft could not be saved.") });
+    }
   }
 
-  return (
-    <div className="rnd-enter flex flex-col gap-5 px-5 pt-5 pb-8">
-      <header className="bg-banner relative flex min-h-[120px] items-center justify-between gap-4 overflow-hidden rounded-[14px] px-10 py-6">
-        <div className="absolute inset-0 bg-gradient-to-r from-white/45 via-white/10 to-transparent" />
-        <h1 className="relative m-0 font-serif text-[clamp(38px,3.6vw,56px)] leading-none font-normal tracking-[-1.2px] text-[#141a55]">{header.name}</h1>
-        <div className="relative flex items-center gap-1 rounded-full bg-white/80 p-1 font-serif text-[18px] text-[#141a55] backdrop-blur-sm">
-          <button type="button" onClick={() => go("f-cases")} className="h-9 rounded-full px-4 hover:bg-indigo-soft">
-            All cases
-          </button>
-          <span className="pr-4">Patient Studio · Draft</span>
-        </div>
-      </header>
+  // Send the text to this gap only. A failure leaves the saved draft on screen.
+  async function submitAnswer(event: FormEvent, gap: IntakeGap) {
+    event.preventDefault();
+    if (!caseId) return;
+    const text = (answers[gap.id] ?? "").trim();
+    // An empty box is not a saved answer, and it is not sent.
+    if (!text) {
+      setAnswerPhase({ kind: "error", gapId: gap.id, message: "Write an answer before saving." });
+      return;
+    }
+    // Intake replaces the saved case. Unsaved edits have to be stored first or they would disappear.
+    if (dirty) {
+      setAnswerPhase({ kind: "error", gapId: gap.id, message: "Save these edits before answering intake." });
+      return;
+    }
+    setAnswerPhase({ kind: "saving", gapId: gap.id });
+    try {
+      const result = await answerIntake(client, caseId, gap.id, text);
+      setLoad({ kind: "ready", detail: detailFromResult(result) });
+      setAnswers((currentAnswers) => {
+        const next = { ...currentAnswers };
+        delete next[gap.id];
+        return next;
+      });
+      setAnswerPhase({ kind: "idle" });
+      setDraft(result.case);
+      setDirty(false);
+    } catch (error: unknown) {
+      // Keep the previous case on screen. The answer stays in the box for an explicit retry.
+      setAnswerPhase({
+        kind: "error",
+        gapId: gap.id,
+        message: failureMessage(error, "The answer could not be saved."),
+      });
+    }
+  }
 
-      <div className="relative flex flex-wrap items-end justify-between gap-4 px-3">
-        <TabNav
-          items={TABS.map((item) => ({ ...item, badge: badgeFor(item.id) || undefined }))}
-          active={current}
-          onChange={setCurrent}
-        />
-        <div className="relative flex items-center gap-2 pb-2">
-          <button type="button" className="h-11 rounded-xl border border-line-2 bg-card px-4 font-serif text-[17px] hover:bg-wash" title="Runs the test students on this case (PRD S-14)">
-            Preview as student
-          </button>
-          <button
-            type="button"
-            onClick={() => setChecklist((value) => !value)}
-            aria-expanded={checklist}
-            className={`h-11 rounded-xl px-5 font-serif text-[17px] text-white ${open ? "bg-inactive" : "bg-panel"}`}
-          >
-            {open ? `Publish · ${open} to fix` : "Publish"}
-          </button>
-          {checklist ? (
-            <div className="absolute top-full right-0 z-20 mt-2 w-[320px] overflow-hidden rounded-[14px] border border-line bg-card shadow-[0_24px_50px_-24px_rgba(25,31,92,.45)]">
-              <div className="border-b border-hair-2 px-[18px] py-3.5">
-                <div className="font-serif text-[20px]">Ready to publish?</div>
-                <div className="font-sans text-[12.5px] text-muted">
-                  {open ? `${open} of ${checks.length} checks need attention` : "All checks passed"}
-                </div>
+  // Keep the edited case locally. A later failed save still has this copy.
+  function edit(next: CaseDocument) {
+    setDraft(next);
+    setDirty(true);
+    setSavePhase({ kind: "idle" });
+  }
+
+  // Publish only moves the badge when the server saved a published version. A rejection stays on the draft.
+  async function publishDraft() {
+    if (!caseId || load.kind !== "ready") return;
+    if (dirty) {
+      setPublishPhase({ kind: "error", message: "Save these edits before publishing." });
+      return;
+    }
+    setPublishPhase({ kind: "publishing" });
+    try {
+      const result = await publishStudioCase(client, caseId);
+      setPublishPhase({ kind: "idle" });
+      remember(result);
+    } catch (error: unknown) {
+      if (error instanceof ApiError && (error.status === 409 || error.blockers.length > 0)) {
+        setPublishPhase({ kind: "rejected", message: error.message, blockers: error.blockers });
+        return;
+      }
+      setPublishPhase({ kind: "error", message: failureMessage(error, "The case could not be published.") });
+    }
+  }
+
+  // Point the address bar at the case the server just stored, so a refresh opens that version.
+  function remember(next: StudioCaseDetail) {
+    setLoad({ kind: "ready", detail: next });
+    setDraft(next.case);
+    setDirty(false);
+    go("f-studio", { studioTab: current, caseId: next.case.case_id, version: next.case.version });
+  }
+
+  // Write the editor's case. Validation and request failures stay on the form.
+  async function saveEdits() {
+    if (!caseId || !draft) return;
+    const problem = saveProblem(draft);
+    if (problem) {
+      setSavePhase({ kind: "error", message: problem });
+      return;
+    }
+    setSavePhase({ kind: "saving" });
+    try {
+      const result = await saveStudioCase(client, caseId, draft);
+      setSavePhase({ kind: "saved" });
+      setFactHold(null);
+      setReviewMessage(null);
+      remember(result);
+    } catch (error: unknown) {
+      setSavePhase({ kind: "error", message: failureMessage(error, "The case could not be saved.") });
+    }
+  }
+
+  // Approval reads the saved case, so unsaved edits must be stored before it runs.
+  async function review(group: ApprovalGroup, key: string, status: ItemStatus) {
+    if (!caseId) return;
+    if (dirty) {
+      setReviewMessage("Save these edits before changing approval.");
+      return;
+    }
+    try {
+      const result = await setItemApproval(client, caseId, group, status, [key]);
+      setReviewMessage(null);
+      remember(result);
+    } catch (error: unknown) {
+      setReviewMessage(failureMessage(error, "The approval could not be saved."));
+    }
+  }
+
+  // Auto-fill also reads the saved case. Faculty overrides have to be saved before it proposes values.
+  async function propose(panels: string[], vitals: boolean) {
+    if (!caseId) return;
+    if (dirty) {
+      setReviewMessage("Save these edits before auto-fill so faculty entries are kept.");
+      return;
+    }
+    if (panels.length === 0 && !vitals) {
+      setReviewMessage("Choose a lab panel or vital signs before proposing values.");
+      return;
+    }
+    try {
+      const result = await autofillStudioCase(client, caseId, panels, vitals);
+      setNotes(result.notes);
+      setReviewMessage(null);
+      remember({ case: result.case, status: result.status, gaps: result.gaps, blockers: result.blockers });
+    } catch (error: unknown) {
+      // Drop any older notes so a failure does not still look like a proposal.
+      setNotes([]);
+      setReviewMessage(failureMessage(error, "Auto-fill could not be saved."));
+    }
+  }
+
+  // Show the lookup rows the API returned. A failure clears them instead of leaving a previous list.
+  async function searchDiagnosis(query: string) {
+    const trimmed = query.trim();
+    if (trimmed.length < 2) {
+      setLookupResults([]);
+      setLookupMessage("Type at least two letters to look up a diagnosis.");
+      return;
+    }
+    try {
+      const matches = await lookupDiagnosis(client, trimmed);
+      setLookupResults(matches);
+      setLookupMessage(matches.length === 0 ? "No matching diagnosis." : null);
+    } catch (error: unknown) {
+      setLookupResults([]);
+      setLookupMessage(failureMessage(error, "Diagnosis lookup failed."));
+    }
+  }
+
+  // Store the diagnosis the faculty member picked. The code is the one the lookup returned.
+  function useDiagnosis(match: Icd10Match) {
+    if (!draft) return;
+    const diagnoses = draft.diagnoses ?? [];
+    if (diagnoses.some((item) => (item.codes ?? []).some((code) => code.code === match.code))) {
+      setLookupMessage("That diagnosis is already on the case.");
+      return;
+    }
+    edit({
+      ...draft,
+      diagnoses: [
+        ...diagnoses,
+        {
+          name: match.display,
+          status: "draft",
+          codes: [{ system: "ICD-10-CM", code: match.code, display: match.display }],
+          source: { kind: "faculty", ref: "icd10 lookup", by: null },
+        },
+      ],
+    });
+    setLookupMessage(null);
+  }
+
+  // Show references and keep the fact when something else still names it.
+  function removeFact(factId: string) {
+    if (!draft) return;
+    const held = factReferenceNotes(draft, factId);
+    if (held.length > 0) {
+      setFactHold(held.join(" "));
+      return;
+    }
+    setFactHold(null);
+    edit({ ...draft, facts: (draft.facts ?? []).filter((fact) => fact.id !== factId) });
+  }
+
+  const editorProps = draft
+    ? {
+        caseDocument: draft,
+        vocab,
+        vocabError,
+        savePhase,
+        reviewMessage,
+        lookupResults,
+        lookupMessage,
+        factHold,
+        notes,
+        onChange: edit,
+        onSave: () => {
+          void saveEdits();
+        },
+        onApprove: (group: ApprovalGroup, key: string, status: ItemStatus) => {
+          void review(group, key, status);
+        },
+        onAutofill: (panels: string[], vitals: boolean) => {
+          void propose(panels, vitals);
+        },
+        onLookup: (query: string) => {
+          void searchDiagnosis(query);
+        },
+        onUseDiagnosis: useDiagnosis,
+        onRemoveFact: removeFact,
+      }
+    : null;
+
+  return (
+    <div className="mx-auto flex max-w-[1320px] flex-col gap-5 px-10 pt-7 pb-12">
+      <header className="flex flex-col gap-3.5">
+        <BackLink label="Cases" onClick={() => go("f-cases")} />
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5">
+            <Avatar who={caseId ? portraitFor(caseId) : "generic"} size={52} />
+            <div>
+              <div className="flex items-center gap-2.5">
+                <h1 className="m-0 font-serif text-[34px] leading-none font-medium tracking-[-0.7px]">{heading}</h1>
+                {detail ? (
+                  <Badge tone={detail.status === "published" ? "ok" : "warn"} dot>
+                    {statusLabel(detail.status)}
+                  </Badge>
+                ) : null}
               </div>
-              {checks.map((check) => (
-                <button
-                  key={check.label}
-                  type="button"
-                  onClick={() => {
-                    setCurrent(check.tab);
-                    setChecklist(false);
-                  }}
-                  className="grid w-full grid-cols-[24px_minmax(0,1fr)] items-start gap-2.5 border-t border-hair px-[18px] py-2.5 text-left first:border-t-0 hover:bg-raised"
-                >
-                  <Mark tone={check.ok ? "ok" : "warn"}>{check.ok ? "✓" : "!"}</Mark>
-                  <span>
-                    <span className="block font-serif text-[16px]">{check.label}</span>
-                    {check.ok ? null : <span className="block font-sans text-[12.5px] text-warn">{check.note}</span>}
-                  </span>
-                </button>
-              ))}
+              <div className="mt-1 text-[13px] text-muted">{metaLine(detail)}</div>
             </div>
-          ) : null}
-        </div>
-      </div>
-
-      {current === "patient" ? <PatientTab drugFixed={drugFixed} onFix={() => setDrugFixed(true)} /> : null}
-      {current === "objectives" ? <ObjectivesTab /> : null}
-      {current === "files" ? <FilesTab facts={facts} setFacts={setFacts} /> : null}
-      {tree ? <DecisionTree /> : null}
-    </div>
-  );
-}
-
-function Panel({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <section className={`rounded-[14px] border border-line bg-card ${className}`}>{children}</section>;
-}
-
-const ROW_ICONS: Record<string, { tone: string; icon: ReactNode }> = {
-  Diagnoses: { tone: "bg-indigo-soft text-indigo", icon: <DocIcon size={26} /> },
-  Medicines: { tone: "bg-indigo-soft text-indigo", icon: <PillIcon /> },
-  Allergies: { tone: "bg-danger-soft text-danger", icon: <WarnIcon /> },
-};
-
-function PatientTab({ drugFixed, onFix }: { drugFixed: boolean; onFix: () => void }) {
-  const columns = studioPatientColumns(drugFixed);
-
-  return (
-    <Panel className="px-5 pt-6 pb-5">
-      <div className="flex flex-wrap items-center justify-between gap-4 px-2 pb-5">
-        <div className="flex flex-wrap items-center gap-4">
-          <h2 className="m-0 font-serif text-[clamp(30px,2.8vw,44px)] font-normal tracking-[-1px]">Diagnoses, medicines and allergies</h2>
-          <BuildTag kind="sample" feature="S-08" />
-        </div>
-        <label className="flex h-14 w-full max-w-[520px] items-center gap-3 rounded-xl border border-line-2 bg-card px-4 text-muted">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-            <circle cx="11" cy="11" r="7" />
-            <path d="M20 20l-4-4" />
-          </svg>
-          <input placeholder="Search diagnoses or medicines" className="min-w-0 flex-1 bg-transparent font-serif text-[19px] text-ink outline-none placeholder:text-muted" />
-        </label>
-      </div>
-      <div className="grid items-start gap-4 [grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))]">
-        {columns.map((column) => (
-          <div key={column.title} className="rounded-[14px] border border-line px-4 pt-4 pb-2">
-            <div className="flex items-center justify-between gap-3 border-b border-hair-2 pb-4">
-              <span className="font-serif text-[clamp(24px,2vw,32px)] tracking-[-0.5px]">
-                {column.title} ({column.count})
-              </span>
-              <button type="button" className="inline-flex h-11 items-center gap-2 rounded-[10px] border border-indigo-line bg-card px-4 font-serif text-[17px] whitespace-nowrap text-ink hover:bg-indigo-soft">
-                <PlusIcon size={16} />
-                {column.add}
+          </div>
+          <div className="flex flex-col items-end gap-2">
+            <div className="flex gap-2">
+              <button
+                type="button"
+                disabled={!caseId || load.kind !== "ready"}
+                onClick={() => setCurrent("review")}
+                className="inline-flex h-10 items-center rounded-[10px] border border-line-2 bg-card px-4 text-sm font-medium text-ink disabled:cursor-not-allowed disabled:text-muted"
+              >
+                {caseId && load.kind === "ready" ? "Preview" : "Preview unavailable"}
+              </button>
+              <button
+                type="button"
+                disabled={!caseId || load.kind !== "ready" || publishPhase.kind === "publishing"}
+                onClick={() => {
+                  void publishDraft();
+                }}
+                className="h-10 rounded-[10px] bg-panel px-[18px] text-sm font-medium text-white disabled:cursor-not-allowed disabled:bg-inactive"
+              >
+                {publishLabel(Boolean(caseId) && load.kind === "ready", publishPhase)}
               </button>
             </div>
-            {column.items.map((item) => (
-              <StudioRow key={item.name + item.sub} item={item} kind={column.title} onFix={onFix} />
-            ))}
+            <PublishNotice phase={publishPhase} />
           </div>
-        ))}
-      </div>
-    </Panel>
+        </div>
+        <TabNav items={TABS} active={current} onChange={setCurrent} />
+      </header>
+
+      {current === "patient" ? (
+        caseId ? (
+          <LoadedDraft
+            load={load}
+            editor={editorProps ? <CaseEditor {...editorProps} /> : null}
+            answers={answers}
+            answerPhase={answerPhase}
+            onRetryLoad={() => setAttempt((value) => value + 1)}
+            onAnswerChange={(gapId, text) => setAnswers((currentAnswers) => ({ ...currentAnswers, [gapId]: text }))}
+            onAnswer={(event, gap) => {
+              void submitAnswer(event, gap);
+            }}
+          />
+        ) : (
+          <DescriptionForm
+            description={description}
+            phase={createPhase}
+            onChange={setDescription}
+            onSubmit={(event) => {
+              void submitDescription(event);
+            }}
+          />
+        )
+      ) : current === "objectives" ? (
+        editorProps ? (
+          <ObjectiveEditor
+            caseDocument={editorProps.caseDocument}
+            vocab={editorProps.vocab}
+            savePhase={editorProps.savePhase}
+            reviewMessage={editorProps.reviewMessage}
+            onChange={editorProps.onChange}
+            onSave={editorProps.onSave}
+            onApprove={editorProps.onApprove}
+          />
+        ) : (
+          <LoadStatus load={load} onRetry={() => setAttempt((value) => value + 1)} />
+        )
+      ) : current === "review" ? (
+        load.kind === "ready" && caseId ? (
+          <CaseReview client={client} caseId={caseId} visits={load.detail.case.visits ?? []} />
+        ) : (
+          <LoadStatus load={load} onRetry={() => setAttempt((value) => value + 1)} />
+        )
+      ) : (
+        <Card>
+          <div className="px-5 py-8 text-sm text-ink">This part of the studio is not available yet.</div>
+        </Card>
+      )}
+    </div>
   );
 }
 
-function StudioRow({ item, kind, onFix }: { item: StudioItem; kind: string; onFix: () => void }) {
-  const look = item.issue ? { tone: "bg-warn-pill text-[#e08a2e]", icon: <WarnIcon /> } : ROW_ICONS[kind];
+// The plain-language description. Nothing here is shown as a saved patient until the request succeeds.
+function DescriptionForm({
+  description,
+  phase,
+  onChange,
+  onSubmit,
+}: {
+  description: string;
+  phase: CreatePhase;
+  onChange: (value: string) => void;
+  onSubmit: (event: FormEvent) => void;
+}) {
+  const saving = phase.kind === "saving";
   return (
-    <div className={`-mx-2 my-1 grid grid-cols-[56px_minmax(0,1fr)_20px] items-center gap-4 rounded-xl border-t border-hair-2 px-2 py-3 first:border-t-0 ${item.issue ? "border-t-0 bg-warn-wash" : ""}`}>
-      <span className={`flex size-14 items-center justify-center rounded-full ${look.tone}`}>{look.icon}</span>
-      <div className="min-w-0">
-        {item.code ? <div className="font-sans text-[15px] text-muted tabular-nums">{item.code}</div> : null}
-        <div className="font-serif text-[21px] leading-snug">{item.name}</div>
-        {item.sub ? <div className={`font-sans text-[15px] ${item.issue ? "text-warn" : "text-muted"}`}>{item.issue ? "Not found in RxNorm, worth review" : item.sub}</div> : null}
-        {item.issue ? (
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            <button type="button" onClick={onFix} className="h-8 rounded-lg border border-warn-line bg-card px-3 font-sans text-[13px] font-medium text-warn-deep">
-              Replace with eplerenone
-            </button>
-            <button type="button" onClick={onFix} className="h-8 rounded-lg px-3 font-sans text-[13px] text-warn-deep">
-              Keep as written
-            </button>
+    <Card>
+      <CardHead title="New draft" />
+      <form onSubmit={onSubmit} className="flex flex-col gap-3 px-5 py-5">
+        <label htmlFor="patient-description" className="text-sm font-medium">
+          Describe the patient
+        </label>
+        <textarea
+          id="patient-description"
+          value={description}
+          onChange={(event) => onChange(event.target.value)}
+          disabled={saving}
+          className="min-h-28 w-full rounded-xl border border-line-2 bg-card px-3 py-2 text-sm text-ink outline-none"
+        />
+        {phase.kind === "error" ? (
+          <p role="alert" className="text-sm text-ink">
+            {phase.message}
+          </p>
+        ) : null}
+        <div>
+          <PrimaryButton type="submit" disabled={saving}>
+            {saving ? "Saving draft" : phase.kind === "error" ? "Try again" : "Create draft"}
+          </PrimaryButton>
+        </div>
+      </form>
+    </Card>
+  );
+}
+
+// Loading and load errors. The editor is not shown until a saved case is in hand.
+function LoadStatus({ load, onRetry }: { load: LoadPhase; onRetry: () => void }) {
+  if (load.kind === "error") {
+    return (
+      <div className="flex flex-col items-start gap-3">
+        <p role="alert" className="text-sm text-ink">
+          {load.message}
+        </p>
+        <PrimaryButton onClick={onRetry}>Try again</PrimaryButton>
+      </div>
+    );
+  }
+  return <p className="text-sm text-muted">Loading draft</p>;
+}
+
+// The saved draft's questions sit beside the editor. The editor is the case itself.
+function LoadedDraft({
+  load,
+  editor,
+  answers,
+  answerPhase,
+  onRetryLoad,
+  onAnswerChange,
+  onAnswer,
+}: {
+  load: LoadPhase;
+  editor: ReactNode;
+  answers: Record<string, string>;
+  answerPhase: AnswerPhase;
+  onRetryLoad: () => void;
+  onAnswerChange: (gapId: string, text: string) => void;
+  onAnswer: (event: FormEvent, gap: IntakeGap) => void;
+}) {
+  if (load.kind !== "ready" || !editor) {
+    return <LoadStatus load={load} onRetry={onRetryLoad} />;
+  }
+  const { detail } = load;
+  const gaps = detail.gaps;
+  const required = gaps.filter((gap) => gap.blocking).length;
+  return (
+    <div className="flex flex-wrap items-start gap-5">
+      <div className="min-w-0 flex-[1_1_560px]">{editor}</div>
+      <aside className="sticky top-5 max-w-[420px] min-w-[280px] flex-[1_1_280px] overflow-hidden rounded-2xl border border-line bg-card">
+        <div className="border-b border-hair-2 px-[18px] py-4">
+          <div className="text-[15px] font-semibold">Guided intake</div>
+          <p className="mt-1 text-[13px] text-muted">{openQuestionLabel(gaps.length)}</p>
+          <p className="mt-0.5 text-[13px] text-ink">{requiredLabel(required)}</p>
+        </div>
+        {detail.blockers.length > 0 ? (
+          <div className="border-b border-hair-2 px-[18px] py-4">
+            <div className="text-[13px] font-semibold">Still needed</div>
+            <ul className="mt-2 flex flex-col gap-1 text-[13px] text-ink">
+              {detail.blockers.map((blocker) => (
+                <li key={blocker}>{blocker}</li>
+              ))}
+            </ul>
           </div>
         ) : null}
-      </div>
-      <Kebab />
+        {gaps.length === 0 ? (
+          <p className="px-[18px] py-4 text-sm text-muted">No intake questions left</p>
+        ) : (
+          gaps.map((gap) => (
+            <GapForm
+              key={gap.id}
+              gap={gap}
+              value={answers[gap.id] ?? ""}
+              phase={answerPhase}
+              onChange={(text) => onAnswerChange(gap.id, text)}
+              onSubmit={(event) => onAnswer(event, gap)}
+            />
+          ))
+        )}
+      </aside>
     </div>
   );
 }
 
-function ObjectivesTab() {
-  return (
-    <Panel className="px-6 pt-6 pb-6">
-      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-line-3 pb-3">
-        <div>
-          <h2 className="m-0 font-serif text-[clamp(34px,3vw,48px)] leading-none font-normal tracking-[-1px]">Learning objectives</h2>
-          <div className="mt-2 font-serif text-[22px] text-ink">Walter Greene, 72</div>
-        </div>
-        <BuildTag kind="sample" feature="S-13" />
-      </div>
-      <div className="mt-5 grid items-start gap-5 [grid-template-columns:minmax(0,1.6fr)_minmax(300px,1fr)] max-lg:grid-cols-1">
-        <div className="flex flex-col gap-4">
-          {STUDIO_OBJECTIVES.map((item) => (
-            <div key={item.n} className="grid grid-cols-[84px_minmax(0,1fr)] items-start gap-5 rounded-[14px] border border-line px-6 py-6">
-              <DocDot size={84} />
-              <div className="flex flex-col gap-4">
-                <div className="font-serif text-[clamp(22px,2vw,30px)] leading-tight tracking-[-0.4px]">{item.text}</div>
-                <div className="flex flex-wrap gap-2.5">
-                  {item.facts.map((fact) => (
-                    <span key={fact} className="inline-flex h-12 items-center gap-2.5 rounded-xl bg-indigo-soft px-4 font-serif text-[18px]">
-                      <span className="text-indigo">
-                        <DocIcon size={20} />
-                      </span>
-                      {fact}
-                    </span>
-                  ))}
-                  {item.checks.map((check) => (
-                    <span key={check} className="inline-flex h-12 items-center gap-2.5 rounded-xl bg-ok-soft px-4 font-serif text-[18px]">
-                      <span className="flex size-7 items-center justify-center rounded-full bg-ok text-white">✓</span>
-                      {check.charAt(0).toUpperCase() + check.slice(1)}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="rounded-[14px] border border-line px-6 py-6">
-          <div className="font-serif text-[clamp(24px,2vw,32px)] leading-tight tracking-[-0.5px]">Rubric: official 7 domains, 1 to 4 each</div>
-          <div className="mt-4">
-            {RUBRIC_DOMAINS.map((label, index) => (
-              <div key={label} className="grid grid-cols-[52px_minmax(0,1fr)] items-center gap-4 border-t border-hair-2 py-3 first:border-t-0">
-                <span className="flex size-[52px] items-center justify-center rounded-full bg-indigo-soft font-serif text-[22px]">{index + 1}</span>
-                <span className="font-serif text-[20px]">{label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </Panel>
-  );
-}
-
-function FilesTab({
-  facts,
-  setFacts,
+// One question from the backend gap list. The answer is sent only for this gap id.
+function GapForm({
+  gap,
+  value,
+  phase,
+  onChange,
+  onSubmit,
 }: {
-  facts: Record<"a" | "b", FactState>;
-  setFacts: (next: Record<"a" | "b", FactState>) => void;
+  gap: IntakeGap;
+  value: string;
+  phase: AnswerPhase;
+  onChange: (text: string) => void;
+  onSubmit: (event: FormEvent) => void;
 }) {
+  const saving = phase.kind === "saving" && phase.gapId === gap.id;
+  const failed = phase.kind === "error" && phase.gapId === gap.id;
   return (
-    <div className="flex flex-col gap-5">
-      <Panel className="px-6 pt-5 pb-6">
-        <div className="flex flex-wrap items-center gap-4 pb-4">
-          <h2 className="m-0 font-serif text-[clamp(30px,2.6vw,42px)] font-normal tracking-[-1px]">Files and sources</h2>
-          <BuildTag kind="sample" feature="S-09" />
-        </div>
-        <div className="grid gap-5 [grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr))]">
-          <FileCard title="12-lead ECG" art={<EcgSketch />} />
-          <FileCard title="Chest X-ray (PA view)" art={<XraySketch />} />
-        </div>
-      </Panel>
-      <Panel className="px-6 pt-5 pb-6">
-        <div className="flex flex-wrap items-center gap-4 pb-4">
-          <h2 className="m-0 font-serif text-[clamp(30px,2.6vw,42px)] font-normal tracking-[-1px]">Knowledge sources</h2>
-          <BuildTag kind="planned" feature="S-17" />
-        </div>
-        <div className="grid gap-5 [grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))]">
-          <div className="flex gap-5 rounded-[14px] border border-line px-5 py-6">
-            <span className="flex size-[78px] shrink-0 items-center justify-center rounded-full bg-danger-soft font-sans text-[15px] font-bold text-danger">PDF</span>
-            <div>
-              <div className="font-serif text-[26px] leading-tight tracking-[-0.4px]">ADA Standards of Care in Diabetes</div>
-              <div className="mt-4 font-serif text-[17px] text-indigo">PDF · uploaded by faculty</div>
-              <div className="mt-1 font-serif text-[17px] text-indigo">American Diabetes Association</div>
-            </div>
-          </div>
-          {STUDIO_SUGGESTED_FACTS.map((row) => {
-            const state = facts[row.id];
-            return (
-              <div key={row.id} className={`flex gap-4 rounded-[14px] border px-5 py-5 ${state === "pending" ? "border-warn-line-soft bg-warn-wash/50" : "border-line"}`}>
-                <span className="flex size-14 shrink-0 items-center justify-center rounded-full bg-warn-pill font-serif text-[30px] text-[#3a2a12]">?</span>
-                <div className="flex min-w-0 flex-1 flex-col">
-                  <div className="font-serif text-[17px]">
-                    Suggested fact {state === "pending" ? "(awaiting approval)" : state === "approved" ? "(approved)" : "(dismissed)"}
-                  </div>
-                  <div className={`mt-1 font-serif text-[20px] leading-snug ${state === "dismissed" ? "text-faint line-through" : ""}`}>{row.text}</div>
-                  <div className="mt-3 font-serif text-[16px]">Page {row.page}</div>
-                  {state === "pending" ? (
-                    <div className="mt-4 grid grid-cols-2 gap-2.5">
-                      <button type="button" onClick={() => setFacts({ ...facts, [row.id]: "approved" })} className="h-11 rounded-[10px] border border-indigo-line bg-indigo-soft font-serif text-[18px] hover:bg-indigo-soft-2">
-                        ✓ Approve
-                      </button>
-                      <button type="button" onClick={() => setFacts({ ...facts, [row.id]: "dismissed" })} className="h-11 rounded-[10px] border border-line-2 bg-card font-serif text-[18px] hover:bg-wash">
-                        ✕ Dismiss
-                      </button>
-                    </div>
-                  ) : null}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </Panel>
-    </div>
-  );
-}
-
-// The pictures are drawn in code as placeholders, so the license stays unset until a real file is attached.
-function FileCard({ title, art }: { title: string; art: ReactNode }) {
-  return (
-    <div className="grid grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] items-center gap-6 rounded-[14px] border border-line p-4">
-      <div className="aspect-[16/10] overflow-hidden rounded-lg">{art}</div>
-      <div className="flex flex-col gap-2.5 font-serif text-[17px]">
-        <div className="mb-1 font-serif text-[clamp(22px,1.8vw,28px)] tracking-[-0.4px]">{title}</div>
-        <div>
-          License: <span className="text-indigo underline underline-offset-4">add license</span>
-        </div>
-        <div>
-          Attribution: <span className="text-indigo underline underline-offset-4">add source</span>
-        </div>
-        <div>Release rule: Released when the student orders it</div>
-        <div className="font-sans text-[12px] text-muted">Placeholder drawing until a licensed file is attached.</div>
+    <form onSubmit={onSubmit} className="flex flex-col gap-2 border-t border-hair px-[18px] py-4">
+      <label htmlFor={`gap-${gap.id}`} className="text-[14.5px] font-medium">
+        {gap.question}
+      </label>
+      <p className="text-[12.5px] text-muted">
+        {gapKindLabel(gap.kind)}
+        {gap.blocking ? " · Required" : ""}
+      </p>
+      <textarea
+        id={`gap-${gap.id}`}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        disabled={saving}
+        className="min-h-20 w-full rounded-xl border border-line-2 bg-card px-3 py-2 text-sm text-ink outline-none"
+      />
+      {failed ? (
+        <p role="alert" className="text-sm text-ink">
+          {phase.message}
+        </p>
+      ) : null}
+      <div>
+        <PrimaryButton type="submit" disabled={saving}>
+          {saving ? "Saving answer" : failed ? "Try again" : "Save answer"}
+        </PrimaryButton>
       </div>
-    </div>
+    </form>
   );
 }
 
-function EcgSketch() {
-  const beats = Array.from({ length: 6 }, (_, i) => i * 54);
-  const trace = (y: number) => beats.map((x) => `L${x + 18} ${y} l4 -3 4 3 l4 0 l3 6 l4 -34 l4 40 l3 -12 l6 0 l6 -6 l6 6`).join(" ");
+// Intake returns the same case view as a load, plus model calls the screen does not show.
+function detailFromResult(result: StudioDraftResult): StudioCaseDetail {
+  return {
+    case: result.case,
+    status: result.status,
+    gaps: result.gaps,
+    blockers: result.blockers,
+  };
+}
+
+// The editor only offers a vocabulary that has the four lists. Anything else is a failed load.
+function isStudioVocab(value: StudioVocab): boolean {
   return (
-    <svg viewBox="0 0 320 200" preserveAspectRatio="none" className="h-full w-full bg-[#fdf0f2]" aria-hidden>
-      <defs>
-        <pattern id="ecg-small" width="8" height="8" patternUnits="userSpaceOnUse">
-          <path d="M8 0H0V8" fill="none" stroke="#f3c3cc" strokeWidth="0.5" />
-        </pattern>
-        <pattern id="ecg-big" width="40" height="40" patternUnits="userSpaceOnUse">
-          <rect width="40" height="40" fill="url(#ecg-small)" />
-          <path d="M40 0H0V40" fill="none" stroke="#eba1ae" strokeWidth="0.9" />
-        </pattern>
-      </defs>
-      <rect width="320" height="200" fill="url(#ecg-big)" />
-      <path d={`M0 70 ${trace(70)} L320 70`} fill="none" stroke="#2a2a3a" strokeWidth="1.3" />
-      <path d={`M0 150 ${trace(150)} L320 150`} fill="none" stroke="#2a2a3a" strokeWidth="1.3" />
-    </svg>
+    Array.isArray(value.topics) &&
+    Array.isArray(value.actions) &&
+    Array.isArray(value.maneuvers) &&
+    Array.isArray(value.lab_panels)
   );
 }
 
-function XraySketch() {
+// Prefer the server message. A network failure still gets a sentence instead of a blank screen.
+function failureMessage(error: unknown, fallback: string): string {
+  if (error instanceof ApiError && error.message.trim()) return error.message;
+  return fallback;
+}
+
+// The line under the name. Numbers and words come from the saved case.
+function metaLine(detail: StudioCaseDetail | null): string {
+  if (!detail) return "Not saved yet";
+  return `Version ${detail.case.version} · ${ageLabel(detail.case.profile.age)} · ${sexLabel(detail.case.profile.sex)}`;
+}
+
+// Age 0 means the description did not include an age. Do not present 0 as a real age.
+function ageLabel(age: number): string {
+  if (age > 0) return `Age ${age}`;
+  return "Age not recorded";
+}
+
+// The sex word is the signal. The portrait does not carry it.
+function sexLabel(sex: StudioCaseDetail["case"]["profile"]["sex"]): string {
+  switch (sex) {
+    case "male":
+      return "Male";
+    case "female":
+      return "Female";
+    case "other":
+      return "Other";
+    default: {
+      const unreachable: never = sex;
+      return unreachable;
+    }
+  }
+}
+
+// The publish control names the state it is in. A draft that can be sent does not say it is already published.
+function publishLabel(ready: boolean, phase: PublishPhase): string {
+  if (!ready) return "Publish unavailable";
+  if (phase.kind === "publishing") return "Publishing";
+  return "Publish";
+}
+
+// Blockers stay sentences from the server. A rejection is not shown as a published case.
+function PublishNotice({ phase }: { phase: PublishPhase }) {
+  if (phase.kind === "idle" || phase.kind === "publishing") return null;
+  if (phase.kind === "rejected") {
+    return (
+      <div role="alert" className="max-w-md text-sm text-ink">
+        <p>{phase.message}</p>
+        <ul className="mt-1 flex flex-col gap-1">
+          {phase.blockers.map((blocker) => (
+            <li key={blocker}>{blocker}</li>
+          ))}
+        </ul>
+      </div>
+    );
+  }
   return (
-    <svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" className="h-full w-full" aria-hidden>
-      <defs>
-        <radialGradient id="xr-bg" cx="50%" cy="45%" r="70%">
-          <stop offset="0" stopColor="#3b4048" />
-          <stop offset="1" stopColor="#0d1014" />
-        </radialGradient>
-        <filter id="xr-blur">
-          <feGaussianBlur stdDeviation="3" />
-        </filter>
-      </defs>
-      <rect width="320" height="200" fill="url(#xr-bg)" />
-      <g filter="url(#xr-blur)">
-        <ellipse cx="118" cy="105" rx="46" ry="74" fill="#14181e" />
-        <ellipse cx="202" cy="105" rx="46" ry="74" fill="#14181e" />
-        <rect x="150" y="10" width="20" height="190" fill="#8b9097" />
-        <ellipse cx="180" cy="150" rx="40" ry="34" fill="#9aa0a6" opacity="0.8" />
-        {[40, 62, 84, 106, 128].map((y) => (
-          <path key={y} d={`M70 ${y} Q118 ${y - 18} 152 ${y + 4} M250 ${y} Q202 ${y - 18} 168 ${y + 4}`} stroke="#6d737b" strokeWidth="4" fill="none" />
-        ))}
-      </g>
-    </svg>
+    <p role="alert" className="max-w-md text-sm text-ink">
+      {phase.message}
+    </p>
   );
 }
 
-function PillIcon() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" aria-hidden>
-      <rect x="2.8" y="8.5" width="18.4" height="7" rx="3.5" transform="rotate(-45 12 12)" />
-      <path d="M9.5 9.5l5 5" />
-    </svg>
-  );
+// Status text matches the saved value. The badge color repeats it.
+function statusLabel(status: StudioCaseDetail["status"]): string {
+  switch (status) {
+    case "draft":
+      return "Draft";
+    case "published":
+      return "Published";
+    case "archived":
+      return "Archived";
+    default: {
+      const unreachable: never = status;
+      return unreachable;
+    }
+  }
 }
 
-function WarnIcon() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinejoin="round" aria-hidden>
-      <path d="M12 3.5L2.5 20h19z" />
-      <path d="M12 10v4.5M12 17.2v.3" strokeLinecap="round" />
-    </svg>
-  );
+// How many questions the backend still wants, written out so the count is not only a bar.
+function openQuestionLabel(count: number): string {
+  const noun = count === 1 ? "question" : "questions";
+  return `${count} intake ${noun} still open`;
 }
 
-function Kebab() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-indigo" aria-hidden>
-      <circle cx="12" cy="5" r="1.9" />
-      <circle cx="12" cy="12" r="1.9" />
-      <circle cx="12" cy="19" r="1.9" />
-    </svg>
-  );
+// Required questions are the blocking gaps. Zero of them is a complete required intake.
+function requiredLabel(count: number): string {
+  if (count === 0) return "Required intake questions are answered";
+  const noun = count === 1 ? "question" : "questions";
+  return `${count} required ${noun} still open`;
+}
+
+// A short name for the gap kind, so the question says what kind of answer it stores.
+function gapKindLabel(kind: IntakeGap["kind"]): string {
+  switch (kind) {
+    case "field":
+      return "Profile";
+    case "facts":
+      return "Patient fact";
+    case "objectives":
+      return "Learning objective";
+    case "autofill":
+      return "Auto-fill";
+    default: {
+      const unreachable: never = kind;
+      return unreachable;
+    }
+  }
+}
+
+// The three golden cases keep their drawn portraits. Every other case uses the generic face.
+function portraitFor(caseId: string): Portrait {
+  if (caseId === "walter_greene") return "walter";
+  if (caseId === "alina_reyes") return "alina";
+  if (caseId === "eli_brooks") return "eli";
+  return "generic";
 }

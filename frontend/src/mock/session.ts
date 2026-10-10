@@ -8,5 +8,5 @@ export const FACULTY_USER = {
 export const STUDENT_USER = {
   initials: "JL",
   name: "Jordan Lee",
-  role: "Dietetics cohort A",
+  role: "Student",
 };

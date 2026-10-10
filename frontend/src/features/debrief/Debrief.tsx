@@ -1,211 +1,342 @@
-import { useState, type ReactNode } from "react";
-import type { Go, VisitNumber } from "../../app/types";
-import { ArrowRight } from "../../components/Icons";
-import { BigMark, BuildTag, Page, PrimaryButton, TabNav, type TabItem } from "../../components/ui";
-import { RUBRIC_DOMAINS } from "../../lib/rubric";
-import {
-  DEBRIEF_IMPROVEMENTS,
-  DEBRIEF_NEXT_STEP,
-  DEBRIEF_NOTE_CHECK,
-  DEBRIEF_SAFETY_CHECK,
-  DEBRIEF_STRENGTHS,
-  DEBRIEF_TRANSCRIPT,
-  DEBRIEF_TRUST,
-  RUBRIC_SCORES,
-} from "../../mock/debrief";
-import { DocIcon } from "../faculty/ImportPatients";
+import { useEffect, useState } from "react";
+import { asApiError, api, type ApiClient, type PublicEncounter } from "../../api/client";
+import type { components } from "../../api/schema";
+import type { Go, StudentRoute } from "../../app/types";
+import { Page, PageHeader, PrimaryButton } from "../../components/ui";
 
-type TabId = "next" | "scores" | "trust" | "transcript";
+type FeedbackResponse = components["schemas"]["FeedbackResponse"];
+type RubricResult = components["schemas"]["RubricResult"];
+type DomainScore = components["schemas"]["DomainScore"];
+type ScoreValue = DomainScore["score"];
 
-const TABS: TabItem<TabId>[] = [
-  { id: "next", label: "Next time" },
-  { id: "scores", label: "Scores" },
-  { id: "trust", label: "Trust" },
-  { id: "transcript", label: "Transcript" },
-];
+// The debrief is the first place trust, scores, and the note check are shown.
+export function Debrief({ go, route, client = api }: { go: Go; route: StudentRoute; client?: ApiClient }) {
+  const [attempt, setAttempt] = useState(0);
+  const [loading, setLoading] = useState(Boolean(route.encounterId));
+  const [encounter, setEncounter] = useState<PublicEncounter | null>(null);
+  const [feedback, setFeedback] = useState<FeedbackResponse | null>(null);
+  const [encounterError, setEncounterError] = useState<string | null>(null);
+  const [feedbackError, setFeedbackError] = useState<string | null>(null);
 
-// After the visit: one next step, the 7-domain scores, how trust moved, and the transcript those cite.
-export function Debrief({ go, visit }: { go: Go; visit: VisitNumber }) {
-  const [tab, setTab] = useState<TabId>("next");
-  const visitTwo = visit === 2;
+  useEffect(() => {
+    if (!route.encounterId) {
+      setLoading(false);
+      return;
+    }
+    let cancelled = false;
+    const encounterId = route.encounterId;
+    setLoading(true);
+    // Read the saved visit and its debrief. Neither call starts an encounter.
+    Promise.all([
+      client.GET("/api/encounters/{enc_id}", { params: { path: { enc_id: encounterId } } }),
+      client.GET("/api/encounters/{enc_id}/feedback", { params: { path: { enc_id: encounterId } } }),
+    ])
+      .then(([encounterResult, feedbackResult]) => {
+        if (cancelled) return;
+        if (encounterResult.data) {
+          setEncounter(encounterResult.data);
+          setEncounterError(null);
+        } else {
+          setEncounterError(asApiError(encounterResult.response?.status ?? 0, encounterResult.error).message);
+        }
+        if (feedbackResult.data) {
+          setFeedback(feedbackResult.data);
+          setFeedbackError(null);
+        } else {
+          // Keep a debrief we already showed. A failed refresh must not replace it with an empty score.
+          setFeedbackError(asApiError(feedbackResult.response?.status ?? 0, feedbackResult.error).message);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setFeedbackError("Feedback could not be loaded.");
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [client, route.encounterId, attempt]);
+
+  if (!route.encounterId) {
+    return <p className="px-6 py-8 text-sm text-muted">This visit has not been started.</p>;
+  }
+
+  const patient = encounter?.patient;
+  const title = patient ? `${patient.name}, ${patient.age}` : "Feedback";
+  const saved = encounter?.saved_documentation ?? null;
 
   return (
     <Page>
-      <header className="flex flex-wrap items-end justify-between gap-4 border-b border-line-3">
-        <div>
-          <h1 className="m-0 font-serif text-[clamp(40px,4vw,58px)] leading-none font-normal tracking-[-1.2px]">Walter Greene, 72</h1>
-          <div className="mt-4 -mb-px">
-            <TabNav items={TABS} active={tab} onChange={setTab} />
-          </div>
-        </div>
-        <div className="flex flex-wrap items-center gap-4 pb-3">
-          <BuildTag kind="sample" feature="F-01, F-05" />
-          <PrimaryButton size="lg" onClick={() => go(visitTwo ? "s-home" : "s-between")}>
-            {visitTwo ? "Back to home" : "See what happened next"}
-            <ArrowRight />
-          </PrimaryButton>
-        </div>
-      </header>
-
-      {tab === "next" ? <NextTime /> : null}
-      {tab === "scores" ? <Scores /> : null}
-      {tab === "trust" ? <Trust /> : null}
-      {tab === "transcript" ? <Transcript /> : null}
+      <PageHeader kicker={encounter?.visit_label ?? "Feedback"} title={title}>
+        <PrimaryButton size="lg" onClick={() => go("s-home")}>
+          Back to home
+        </PrimaryButton>
+      </PageHeader>
+      {loading ? <p className="text-sm text-muted">Loading feedback</p> : null}
+      {encounterError ? <p className="text-sm text-ink">{encounterError}</p> : null}
+      {feedbackError ? <p className="text-sm text-ink">{feedbackError}</p> : null}
+      {saved ? <SavedNote saved={saved} /> : null}
+      {feedback ? <FeedbackBody feedback={feedback} /> : null}
+      {!loading && (encounterError || feedbackError) ? (
+        <button type="button" onClick={() => setAttempt((value) => value + 1)} className="h-10 w-fit rounded-[10px] border border-line-2 px-4 text-sm font-medium">
+          Retry
+        </button>
+      ) : null}
     </Page>
   );
 }
 
-function Box({ title, children, className = "" }: { title: string; children: ReactNode; className?: string }) {
+// The note that was already stored. It stays on screen when the score request fails.
+function SavedNote({ saved }: { saved: Record<string, string> }) {
+  const entries = Object.entries(saved).filter(([, value]) => value.trim());
+  if (entries.length === 0) return null;
   return (
-    <section className={`rounded-[14px] border border-line bg-card px-6 pt-5 pb-4 ${className}`}>
-      <h2 className="m-0 font-serif text-[clamp(26px,2.2vw,34px)] font-normal tracking-[-0.5px]">{title}</h2>
-      {children}
+    <section aria-label="Saved documentation" className="rounded-[14px] border border-line bg-card px-6 py-5 shadow-[0_10px_30px_-24px_rgba(25,31,92,.35)]">
+      <h2 className="m-0 font-serif text-[24px] font-normal tracking-[-0.3px]">Saved documentation</h2>
+      {entries.map(([field, value]) => (
+        <p key={field} className="mt-2 font-serif text-[18px] leading-snug">
+          <span className="font-semibold">{field}. </span>
+          {value}
+        </p>
+      ))}
     </section>
   );
 }
 
-function NextTime() {
+// Scores, evidence, trust, and the note check from the saved feedback response.
+function FeedbackBody({ feedback }: { feedback: FeedbackResponse }) {
+  const rubric = feedback.rubric;
   return (
-    <div className="flex flex-col gap-5">
-      <div className="grid items-stretch gap-5 [grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))]">
-        <NoteList title="What you did well" ok items={DEBRIEF_STRENGTHS} />
-        <NoteList title="What to improve" ok={false} items={DEBRIEF_IMPROVEMENTS} />
-        <Box title="Next attempt suggestion">
-          <div className="mt-4 flex items-center gap-5 rounded-xl bg-indigo-soft px-5 py-5">
-            <span className="flex size-[64px] shrink-0 items-center justify-center rounded-full bg-indigo-soft-2 text-indigo">
-              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" aria-hidden>
-                <path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z" />
-              </svg>
-            </span>
-            <span className="font-serif text-[21px] leading-snug">{DEBRIEF_NEXT_STEP}</span>
-          </div>
-        </Box>
-      </div>
-      <div className="grid items-stretch gap-5 [grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr))]">
-        <Box title="Safety check">
-          <div className="mt-4 flex items-center gap-6 rounded-xl bg-ok-soft/70 px-5 py-5">
-            <span className="flex size-[64px] shrink-0 items-center justify-center rounded-full bg-ok-soft">
-              <span className="flex size-10 items-center justify-center rounded-full bg-ok text-[22px] text-white">✓</span>
-            </span>
-            <span className="font-serif text-[21px] leading-snug">{DEBRIEF_SAFETY_CHECK}</span>
-          </div>
-        </Box>
-        <Box title="Note check">
-          <div className="mt-4 flex items-center gap-6 rounded-xl bg-danger-soft/70 px-5 py-5">
-            <span className="flex size-[64px] shrink-0 items-center justify-center rounded-full bg-danger-soft text-danger">
-              <DocIcon size={30} />
-            </span>
-            <span className="font-serif text-[21px] leading-snug">
-              {DEBRIEF_NOTE_CHECK.title}
-              <br />
-              {DEBRIEF_NOTE_CHECK.quote}
-            </span>
-          </div>
-        </Box>
-      </div>
+    <div className="grid items-start gap-5 [grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr))]">
+      <section aria-label="Rubric" className="row-span-3 rounded-[14px] border border-line bg-card px-6 py-5 shadow-[0_10px_30px_-24px_rgba(25,31,92,.35)]">
+        <h2 className="m-0 font-serif text-[24px] font-normal tracking-[-0.3px]">{rubric.rubric_title}</h2>
+        <p className="mt-2 font-serif text-[56px] leading-none tracking-[-1.4px]">
+          {rubric.total} <span className="text-[24px] text-muted">/ {rubric.max_total}</span>
+        </p>
+        <p className="mt-2 font-serif text-[18px] leading-snug text-ink-soft">{rubric.interpretation}</p>
+        {rubric.review_flag ? (
+          <p className="mt-3 text-sm font-semibold text-ink">
+            Needs review. {(rubric.review_reasons ?? []).join(". ")}
+          </p>
+        ) : null}
+        <div className="mt-4 flex flex-col">
+          {rubric.domains.map((domain) => (
+            <DomainRow key={domain.key} domain={domain} />
+          ))}
+        </div>
+      </section>
+      <NoteList title="What you did well" items={strengthLines(rubric)} empty="No strengths were recorded." />
+      <NoteList title="What to improve" items={gapLines(rubric)} empty="No gaps were recorded." />
+      <NoteList title="Try this next time" items={rubric.next_attempt ?? []} empty="No next attempt was recorded." />
+      <SafetyList feedback={feedback} />
+      <ElicitedList feedback={feedback} />
+      <MetricList feedback={feedback} />
+      <TrustList feedback={feedback} />
+      <DocumentationCheck feedback={feedback} />
+      {(feedback.communication_notes ?? []).length > 0 ? (
+        <NoteList title="Communication notes" items={feedback.communication_notes ?? []} empty="" />
+      ) : null}
+      <TranscriptList feedback={feedback} />
     </div>
   );
 }
 
-function NoteList({ title, ok, items }: { title: string; ok: boolean; items: string[] }) {
+// One domain. The number is written out so the score is not only a colored bar.
+function DomainRow({ domain }: { domain: DomainScore }) {
+  const flagged = (domain.id === 6 || domain.id === 7) && domain.score === 1;
   return (
-    <Box title={title}>
-      <div className="mt-3">
-        {items.map((item) => (
-          <div key={item} className="grid grid-cols-[56px_1fr] items-center gap-5 border-t border-hair-2 py-3.5">
-            <BigMark tone={ok ? "ok" : "danger"} />
-            <span className="font-serif text-[20px] leading-snug">{item}</span>
-          </div>
-        ))}
+    <div className="border-t border-hair py-3 first:border-t-0">
+      <div className="flex items-baseline justify-between gap-4">
+        <span className="font-serif text-[18px]">{domain.name}</span>
+        <span className={`font-serif text-[18px] whitespace-nowrap tabular-nums ${domain.score === 1 ? "text-danger" : "text-ink"}`}>
+          {scoreLabel(domain.score)}
+          {flagged ? <span className="ml-2 text-sm font-semibold text-ink">Needs review</span> : null}
+        </span>
       </div>
-    </Box>
+      {(domain.evidence ?? []).map((span) => (
+        <p key={`${span.turn}-${span.quote}`} className="mt-1 text-sm text-ink-soft">
+          Turn {span.turn}: {span.quote}
+        </p>
+      ))}
+      {domain.safety_or_accuracy_concern ? <p className="mt-1 text-sm">{domain.safety_or_accuracy_concern}</p> : null}
+    </div>
   );
 }
 
-function Scores() {
-  const total = RUBRIC_SCORES.reduce((sum, score) => sum + score, 0);
-  const review = RUBRIC_SCORES[5] === 1 || RUBRIC_SCORES[6] === 1;
+// Turns the official score into words. N/A is not shown as zero.
+function scoreLabel(score: ScoreValue): string {
+  if (score === "N/A") return "N/A";
+  return `${score} / 4`;
+}
+
+// Domain comments plus the short list. Blank lines are left out so the screen does not invent one.
+function strengthLines(rubric: RubricResult): string[] {
+  const fromDomains = rubric.domains.map((domain) => domain.strength_demonstrated.trim()).filter(Boolean);
+  const fromList = (rubric.strengths ?? []).map((item) => item.text.trim()).filter(Boolean);
+  return [...fromDomains, ...fromList];
+}
+
+// Gaps from the domain comments and the improvement list.
+function gapLines(rubric: RubricResult): string[] {
+  const fromDomains = rubric.domains.map((domain) => domain.important_gap_or_missed_opportunity.trim()).filter(Boolean);
+  const fromList = (rubric.improvements ?? []).map((item) => item.text.trim()).filter(Boolean);
+  return [...fromDomains, ...fromList];
+}
+
+// A heading and the lines under it. An empty list says so instead of filling in an example.
+function NoteList({ title, items, empty }: { title: string; items: string[]; empty: string }) {
+  const lines = items.map((item) => item.trim()).filter(Boolean);
   return (
-    <Box title="Official 7-domain rubric">
-      <div className="mt-2 flex flex-wrap items-baseline gap-x-4 gap-y-1">
-        <span className="font-serif text-[44px] leading-none tabular-nums">{total}</span>
-        <span className="font-serif text-[20px] text-ink-soft">of {RUBRIC_DOMAINS.length * 4}</span>
-        <span className="font-sans text-[14px] text-muted">A discussion aid, not a pass/fail grade.</span>
-        {review ? <span className="rounded-full bg-danger-soft px-3 py-1 font-sans text-[13px] text-danger">Flagged for faculty review</span> : null}
-      </div>
-      <div className="mt-4">
-        {RUBRIC_DOMAINS.map((label, index) => {
-          const score = RUBRIC_SCORES[index];
-          return (
-            <div key={label} className="grid grid-cols-[48px_minmax(0,1fr)_minmax(120px,240px)_52px] items-center gap-5 border-t border-hair-2 py-3">
-              <span className="flex size-12 items-center justify-center rounded-full bg-indigo-soft font-serif text-[20px]">{index + 1}</span>
-              <span className="font-serif text-[19px]">{label}</span>
-              <div className="grid grid-cols-4 gap-1">
-                {[1, 2, 3, 4].map((pip) => (
-                  <span key={pip} className="h-2 rounded-full" style={{ background: pip <= score ? (score === 1 ? "var(--color-danger-bright)" : "var(--color-indigo)") : "var(--color-track)" }} />
-                ))}
-              </div>
-              <span className={`text-right font-serif text-[19px] tabular-nums ${score === 1 ? "text-danger" : ""}`}>{score} of 4</span>
-            </div>
-          );
-        })}
-      </div>
-    </Box>
+    <section className="rounded-[14px] border border-line bg-card px-6 py-5 shadow-[0_10px_30px_-24px_rgba(25,31,92,.35)]">
+      <h2 className="m-0 font-serif text-[24px] font-normal tracking-[-0.3px]">{title}</h2>
+      {lines.length === 0 ? <p className="mt-2 text-sm text-muted">{empty}</p> : null}
+      {lines.map((line) => (
+        <p key={line} className="mt-2 font-serif text-[18px] leading-snug">
+          {line}
+        </p>
+      ))}
+    </section>
   );
 }
 
-// Trust stays hidden during the visit (PRD E-12) and is shown here, one quoted span per change.
-function Trust() {
-  const W = 760;
-  const H = 180;
-  const end = 260;
-  let level = 2;
-  const points = [{ x: 0, y: level }, ...DEBRIEF_TRUST.map((event) => ({ x: event.seconds, y: (level += event.change) }))];
-  const x = (seconds: number) => 30 + (seconds / end) * (W - 60);
-  const y = (value: number) => H - 24 - (value / 5) * (H - 48);
-  const line = points.map((point, index) => `${index ? "L" : "M"}${x(point.x)} ${y(point.y)}`).join(" ") + ` L${x(end)} ${y(level)}`;
-
+// Safety facts from the case, with words for found and addressed so color is not the only signal.
+function SafetyList({ feedback }: { feedback: FeedbackResponse }) {
+  const items = feedback.safety ?? [];
   return (
-    <Box title="How Walter’s trust moved">
-      <div className="mt-1 flex items-center gap-3">
-        <BuildTag kind="sample" feature="F-04" />
-        <span className="font-sans text-[14px] text-muted">Hidden during the visit. Each change quotes what caused it.</span>
-      </div>
-      <svg viewBox={`0 0 ${W} ${H}`} className="mt-4 w-full" aria-hidden>
-        <line x1="30" x2={W - 30} y1={H - 24} y2={H - 24} stroke="var(--color-line)" />
-        <path d={line} fill="none" stroke="var(--color-indigo)" strokeWidth="3" strokeLinejoin="round" />
-        {DEBRIEF_TRUST.map((event, index) => (
-          <circle key={event.time} cx={x(event.seconds)} cy={y(points[index + 1].y)} r="7" fill={event.change > 0 ? "var(--color-ok)" : "var(--color-danger-bright)"} stroke="white" strokeWidth="2.5" />
-        ))}
-      </svg>
-      <div className="mt-2">
-        {DEBRIEF_TRUST.map((event) => (
-          <div key={event.time} className="grid grid-cols-[64px_44px_minmax(0,1fr)] items-baseline gap-4 border-t border-hair-2 py-3">
-            <span className="font-sans text-[14px] text-muted tabular-nums">{event.time}</span>
-            <span className={`font-serif text-[19px] ${event.change > 0 ? "text-ok" : "text-danger"}`}>{event.change > 0 ? "+1" : "−1"}</span>
-            <span>
-              <span className="block font-serif text-[19px]">{event.label}</span>
-              <span className="block font-serif text-[17px] text-ink-soft italic">“{event.quote}”</span>
-            </span>
+    <section aria-label="Safety" className="rounded-[14px] border border-line bg-card px-6 py-5 shadow-[0_10px_30px_-24px_rgba(25,31,92,.35)]">
+      <h2 className="m-0 font-serif text-[24px] font-normal tracking-[-0.3px]">Safety</h2>
+      {items.length === 0 ? <p className="mt-2 text-sm text-muted">No safety items were recorded.</p> : null}
+      {items.map((item) => (
+        <div key={item.fact_id} className="mt-3 font-serif text-[17px] leading-snug">
+          <div>
+            Fact {item.fact_id}. {item.text}
           </div>
-        ))}
-      </div>
-    </Box>
+          <div className="text-sm text-ink-soft">
+            {item.discovered ? "Found" : "Not found"}
+            {item.addressed === null || item.addressed === undefined ? "" : item.addressed ? ". Addressed" : ". Not addressed"}
+          </div>
+          {item.patient_words ? <div className="text-sm text-ink-soft">{item.patient_words}</div> : null}
+        </div>
+      ))}
+    </section>
   );
 }
 
-function Transcript() {
+// What the student elicited and what stayed missing, each with its fact id.
+function ElicitedList({ feedback }: { feedback: FeedbackResponse }) {
   return (
-    <Box title="Transcript">
-      <div className="mt-3">
-        {DEBRIEF_TRANSCRIPT.map(([time, who, text]) => (
-          <div key={time} className="grid grid-cols-[64px_84px_minmax(0,1fr)] items-baseline gap-4 border-t border-hair-2 py-3">
-            <span className="font-sans text-[14px] text-muted tabular-nums">{time}</span>
-            <span className="font-serif text-[17px] text-ink-soft">{who === "You" ? "Student" : who}</span>
-            <span className="font-serif text-[19px] leading-snug">{text}</span>
+    <section aria-label="Elicited and missed" className="rounded-[14px] border border-line bg-card px-6 py-5 shadow-[0_10px_30px_-24px_rgba(25,31,92,.35)]">
+      <h2 className="m-0 font-serif text-[24px] font-normal tracking-[-0.3px]">Elicited and missed</h2>
+      {feedback.elicited.map((objective) => (
+        <div key={objective.objective_id} className="mt-3">
+          <div className="text-sm font-semibold">{objective.objective}</div>
+          {(objective.found ?? []).map((item) => (
+            <p key={item.fact_id} className="mt-1 font-serif text-[17px] leading-snug">
+              Found. Fact {item.fact_id}. Turn {item.turn}. {item.text}
+            </p>
+          ))}
+          {(objective.missed ?? []).map((item) => (
+            <p key={item.fact_id} className="mt-1 font-serif text-[17px] leading-snug">
+              Missed. Fact {item.fact_id}. {item.text} {item.suggestion}
+            </p>
+          ))}
+        </div>
+      ))}
+    </section>
+  );
+}
+
+// The counts the pipeline stored. Null ratios are skipped rather than shown as zero.
+function MetricList({ feedback }: { feedback: FeedbackResponse }) {
+  const metrics = feedback.metrics;
+  const rows: string[] = [
+    `Turns: ${metrics.turns}`,
+    `Open questions: ${metrics.open_questions}`,
+    `Closed questions: ${metrics.closed_questions}`,
+    `Reflections: ${metrics.reflections}`,
+    `Validations: ${metrics.validations}`,
+    `Interruptions: ${metrics.interruptions}`,
+  ];
+  if (metrics.percent_open !== null && metrics.percent_open !== undefined) rows.push(`Open question share: ${metrics.percent_open}%`);
+  if (metrics.reflection_to_question_ratio !== null && metrics.reflection_to_question_ratio !== undefined) {
+    rows.push(`Reflection to question ratio: ${metrics.reflection_to_question_ratio}`);
+  }
+  if (metrics.student_talk_share !== null && metrics.student_talk_share !== undefined) {
+    rows.push(`Student talk share: ${metrics.student_talk_share}%`);
+  }
+  for (const jargon of metrics.unexplained_jargon ?? []) {
+    rows.push(`Unexplained jargon: ${jargon.term}. ${jargon.quote}`);
+  }
+  return (
+    <section aria-label="Communication" className="rounded-[14px] border border-line bg-card px-6 py-5 shadow-[0_10px_30px_-24px_rgba(25,31,92,.35)]">
+      <h2 className="m-0 font-serif text-[24px] font-normal tracking-[-0.3px]">Communication</h2>
+      {rows.map((row) => (
+        <p key={row} className="mt-1 font-serif text-[17px] leading-snug">
+          {row}
+        </p>
+      ))}
+    </section>
+  );
+}
+
+// Trust is listed here with the words that changed it. The visit screen does not render this.
+function TrustList({ feedback }: { feedback: FeedbackResponse }) {
+  return (
+    <section aria-label="Trust" className="rounded-[14px] border border-line bg-card px-6 py-5 shadow-[0_10px_30px_-24px_rgba(25,31,92,.35)]">
+      <h2 className="m-0 font-serif text-[24px] font-normal tracking-[-0.3px]">Trust</h2>
+      {feedback.trust_timeline.map((point) => (
+        <div key={point.turn} className="mt-3">
+          <div className="text-[15px]">
+            Turn {point.turn}: trust {point.trust}
           </div>
-        ))}
-      </div>
-    </Box>
+          {(point.events ?? []).map((event) => (
+            <blockquote key={`${event.turn}-${event.event}-${event.span}`} className="mt-1 text-sm text-ink-soft">
+              “{event.span}”
+            </blockquote>
+          ))}
+        </div>
+      ))}
+    </section>
+  );
+}
+
+// Unsupported claims and missing findings, including the fact or chart id the check kept.
+function DocumentationCheck({ feedback }: { feedback: FeedbackResponse }) {
+  const check = feedback.documentation;
+  return (
+    <section aria-label="Documentation check" className="rounded-[14px] border border-line bg-card px-6 py-5 shadow-[0_10px_30px_-24px_rgba(25,31,92,.35)]">
+      <h2 className="m-0 font-serif text-[24px] font-normal tracking-[-0.3px]">Documentation check</h2>
+      {!check ? <p className="mt-2 text-sm text-muted">No documentation check was saved.</p> : null}
+      {(check?.unsupported ?? []).map((claim) => (
+        <p key={claim.statement} className="mt-2 font-serif text-[18px] leading-snug">
+          Unsupported. {claim.statement} {claim.reason}
+        </p>
+      ))}
+      {(check?.missing ?? []).map((item) => (
+        <p key={item.id} className="mt-2 font-serif text-[18px] leading-snug">
+          Missing. Fact {item.id}. {item.text}
+        </p>
+      ))}
+      {check && (check.unsupported ?? []).length === 0 && (check.missing ?? []).length === 0 ? (
+        <p className="mt-2 text-sm text-muted">No unsupported claims or missing findings were flagged.</p>
+      ) : null}
+    </section>
+  );
+}
+
+// The transcript the scores cite. Captions stay visible with the feedback.
+function TranscriptList({ feedback }: { feedback: FeedbackResponse }) {
+  return (
+    <section aria-label="Transcript" className="rounded-[14px] border border-line bg-card px-6 py-5 shadow-[0_10px_30px_-24px_rgba(25,31,92,.35)]">
+      <h2 className="m-0 font-serif text-[24px] font-normal tracking-[-0.3px]">Transcript</h2>
+      {feedback.transcript.map((line) => (
+        <div key={line.turn} className="mt-3 font-serif text-[17px] leading-snug">
+          <div>Turn {line.turn}</div>
+          <div>Student: {line.student}</div>
+          <div>Patient: {line.patient}</div>
+        </div>
+      ))}
+    </section>
   );
 }

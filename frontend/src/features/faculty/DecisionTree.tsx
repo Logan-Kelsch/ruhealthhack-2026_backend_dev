@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { TREE_EDGES, TREE_START_NODES, type TreeNode, type TreeNodeId, type TreeNodeKind } from "../../mock/studio";
 import { BuildTag } from "../../components/ui";
-import { DocIcon } from "./ImportPatients";
+import { DocIcon } from "../../components/Icons";
 
 // Fixed card heights so connectors meet the card edges exactly.
 const HEIGHT: Record<TreeNodeKind, number> = { start: 58, decision: 88, outcome: 122 };

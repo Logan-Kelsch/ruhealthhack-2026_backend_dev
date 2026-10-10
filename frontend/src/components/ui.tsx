@@ -100,19 +100,24 @@ export function PrimaryButton({
   onClick,
   size = "md",
   block = false,
+  disabled = false,
   className = "",
+  type = "button",
 }: {
   children: ReactNode;
   onClick?: () => void;
   size?: "sm" | "md" | "lg";
   block?: boolean;
+  disabled?: boolean;
   className?: string;
+  type?: "button" | "submit";
 }) {
   return (
     <button
-      type="button"
+      type={type}
       onClick={onClick}
-      className={`inline-flex items-center bg-panel font-serif text-white shadow-[0_8px_20px_-10px_rgba(37,45,120,.6)] transition-colors hover:bg-panel-hover ${BUTTON_SIZES[size]} ${block ? "w-full justify-center" : ""} ${className}`}
+      disabled={disabled}
+      className={`inline-flex items-center bg-panel font-serif text-white shadow-[0_8px_20px_-10px_rgba(37,45,120,.6)] transition-colors hover:bg-panel-hover disabled:cursor-not-allowed disabled:opacity-60 ${BUTTON_SIZES[size]} ${block ? "w-full justify-center" : ""} ${className}`}
     >
       {children}
     </button>

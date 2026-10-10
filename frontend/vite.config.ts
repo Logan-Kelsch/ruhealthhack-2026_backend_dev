@@ -7,5 +7,10 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
     port: 5173,
+    // Same-origin /api calls in dev reach the local API. The launcher owns process startup.
+    proxy: {
+      "/api": "http://localhost:8000",
+      "/portraits": "http://localhost:8000",
+    },
   },
 });

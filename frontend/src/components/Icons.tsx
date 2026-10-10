@@ -95,3 +95,13 @@ export function MoonIcon() {
     </svg>
   );
 }
+
+// Page with a folded corner and two lines, for documents and visits.
+export function DocIcon({ size = 22 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinejoin="round" strokeLinecap="round" aria-hidden>
+      <path d="M6 3h8l4.5 4.5V21H6z" />
+      <path d="M14 3v4.5h4.5M9 12h6M9 15.5h6" />
+    </svg>
+  );
+}

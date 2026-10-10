@@ -1,14 +1,19 @@
 import type { ReactNode } from "react";
 import type { Go } from "../../app/types";
 import { Chevron } from "../../components/Icons";
-import { BigMark, BuildTag, Card, CardHead, Page, SoftButton, Title } from "../../components/ui";
+import { BigMark, BuildTag, Card, CardHead, GhostButton, Page, PageHeader, SoftButton } from "../../components/ui";
 import { ASSIGNMENTS, FACULTY_CASES, REVIEW_QUEUE } from "../../mock/faculty";
 
 // Faculty landing: visits flagged for review, assignment progress, and the case list.
 export function FacultyHome({ go }: { go: Go }) {
   return (
     <Page>
-      <Title>Good morning</Title>
+      <PageHeader title="Good morning">
+        <div className="flex gap-3 whitespace-nowrap">
+          <GhostButton onClick={() => go("f-import")}>Import sample set</GhostButton>
+          <SoftButton onClick={() => go("f-studio", { studioTab: "patient" })}>New case</SoftButton>
+        </div>
+      </PageHeader>
 
       <div className="grid items-start gap-5 [grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr))]">
         <Card>

@@ -1,226 +1,665 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
-import type { Go, VisitNumber } from "../../app/types";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { asApiError, api, type ApiClient, type PublicChartEntry, type PublicEncounter } from "../../api/client";
+import type { components } from "../../api/schema";
+import type { Go, StudentRoute } from "../../app/types";
+import { Documentation } from "./Documentation";
 import { PatientCall } from "../../components/PatientCall";
-import { BuildTag, Wordmark } from "../../components/ui";
+import { GhostButton, Wordmark } from "../../components/ui";
+import { stopOwnedAudio as stopPageAudio, type ScribeConnector, type ScribeEvent } from "../../voice/scribe";
+import { connectElevenLabsScribe } from "../../voice/scribeLive";
 import {
-  WALTER_ENCOUNTER_VITALS,
-  WALTER_EXAMS,
-  WALTER_GOAL,
-  WALTER_MEDS,
-  WALTER_ORDERS,
-  WALTER_SCRIPT,
-} from "../../mock/walter";
+  createBrowserVoice,
+  createMpegPlayback,
+  verifiedAudioSource,
+  type BrowserVoice,
+  type SpeechPlayback,
+} from "../../voice/speech";
 
-const VITAL_UNITS: Record<string, string> = { BP: " mmHg", HR: " bpm", RR: " /min", Temp: "C" };
+type TurnResult = components["schemas"]["TurnResult"];
+type TranscriptEntry = components["schemas"]["TranscriptEntry"];
 
-// Hands-free encounter. Lines appear on a timer. There is no text box.
-// Mute pauses the clock and the script. End visit opens the debrief.
-export function Encounter({ go, visit }: { go: Go; visit: VisitNumber }) {
-  const [seconds, setSeconds] = useState(0);
-  const [muted, setMuted] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [exams, setExams] = useState<number[]>([0]);
-  const [ordered, setOrdered] = useState<Record<string, boolean>>({});
-  const mutedRef = useRef(muted);
-  mutedRef.current = muted;
-  const transcript = useRef<HTMLDivElement>(null);
+type LoadState =
+  | { kind: "missing" }
+  | { kind: "loading" }
+  | { kind: "error"; message: string }
+  | { kind: "ready"; encounter: PublicEncounter };
+
+type VoiceState = "off" | "connecting" | "live" | "muted";
+
+const UNCERTAIN = "This turn may not have been saved. The saved visit is shown. It was not sent again.";
+
+// The live visit. Speech goes through Scribe, and only committed turns hit the encounter API.
+export function Encounter({
+  route,
+  client = api,
+  connectScribe = connectElevenLabsScribe,
+  stopOwnedAudio = stopPageAudio,
+  playSpeech,
+  browserVoice,
+  go,
+}: {
+  route: StudentRoute;
+  client?: ApiClient;
+  connectScribe?: ScribeConnector;
+  stopOwnedAudio?: () => void;
+  playSpeech?: SpeechPlayback;
+  browserVoice?: BrowserVoice;
+  go?: Go;
+}) {
+  const [attempt, setAttempt] = useState(0);
+  const [load, setLoad] = useState<LoadState>(route.encounterId ? { kind: "loading" } : { kind: "missing" });
+  // One player and one browser voice for this screen. Tests pass their own.
+  const playback = useMemo(() => playSpeech ?? createMpegPlayback(), [playSpeech]);
+  const spoken = useMemo(() => browserVoice ?? createBrowserVoice(), [browserVoice]);
 
   useEffect(() => {
-    // The interval stays up for the whole visit. Mute is read from a ref so pausing does not reset the timer.
-    const timer = window.setInterval(() => {
-      if (!mutedRef.current) setSeconds((value) => value + 1);
-    }, 1000);
-    return () => window.clearInterval(timer);
-  }, []);
+    if (!route.encounterId) {
+      setLoad({ kind: "missing" });
+      return;
+    }
+    let cancelled = false;
+    setLoad({ kind: "loading" });
+    const encounterId = route.encounterId;
+    // Refresh reads the saved encounter. It does not call the start route or open the microphone.
+    client
+      .GET("/api/encounters/{enc_id}", { params: { path: { enc_id: encounterId } } })
+      .then((result) => {
+        if (cancelled) return;
+        if (!result.response?.ok || !result.data) {
+          const status = result.response?.status ?? 0;
+          setLoad({ kind: "error", message: asApiError(status, result.error).message });
+          return;
+        }
+        setLoad({ kind: "ready", encounter: result.data });
+      })
+      .catch(() => {
+        if (!cancelled) setLoad({ kind: "error", message: "The encounter could not be loaded." });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [client, route.encounterId, attempt]);
 
-  // The first lines wait for the call-connect animation to finish.
-  const shown = Math.min(WALTER_SCRIPT.length, seconds < 3 ? 0 : 1 + Math.floor((seconds - 3) / 4));
-  const lines = WALTER_SCRIPT.slice(0, shown);
+  if (load.kind === "missing") {
+    return <p className="px-6 py-8 text-sm text-muted">This visit has not been started.</p>;
+  }
+  if (load.kind === "loading") {
+    return <p className="px-6 py-8 text-sm text-muted">Loading the encounter</p>;
+  }
+  if (load.kind === "error") {
+    return (
+      <div className="flex flex-col items-start gap-3 px-6 py-8">
+        <p className="text-sm text-ink">{load.message}</p>
+        <GhostButton onClick={() => setAttempt((value) => value + 1)}>Retry</GhostButton>
+      </div>
+    );
+  }
+  return (
+    <EncounterLive
+      initial={load.encounter}
+      client={client}
+      connectScribe={connectScribe}
+      stopOwnedAudio={stopOwnedAudio}
+      playback={playback}
+      browserVoice={spoken}
+      go={go}
+    />
+  );
+}
+
+// Patient in the center, transcript under the patient, notes on the left, chart on the right.
+function EncounterLive({
+  initial,
+  client,
+  connectScribe,
+  stopOwnedAudio,
+  playback,
+  browserVoice,
+  go,
+}: {
+  initial: PublicEncounter;
+  client: ApiClient;
+  connectScribe: ScribeConnector;
+  stopOwnedAudio: () => void;
+  playback: SpeechPlayback;
+  browserVoice: BrowserVoice;
+  go?: Go;
+}) {
+  const [view, setView] = useState(initial);
+  const [voice, setVoice] = useState<VoiceState>("off");
+  const [partial, setPartial] = useState("");
+  const [banner, setBanner] = useState<string | null>(null);
+  const [notices, setNotices] = useState<string[]>([]);
+  const [voiceLabel, setVoiceLabel] = useState<string | null>(null);
+  // Mirrors speechActiveRef for the call frame's speaking glow. Display only.
+  const [speaking, setSpeaking] = useState(false);
+  const sessionRef = useRef<Awaited<ReturnType<ScribeConnector>> | null>(null);
+  const queueRef = useRef(Promise.resolve());
+  const closedRef = useRef(false);
+  const mutedRef = useRef(false);
+  const ttsRef = useRef(false);
+  const speechQueueRef = useRef<{ turn: number; text: string }[]>([]);
+  const drainingRef = useRef(false);
+  const speechActiveRef = useRef(false);
+  const bargeMsRef = useRef<number | undefined>(undefined);
+  const abortRef = useRef<AbortController | null>(null);
+  const encounterId = view.encounter_id;
+
+  // Drops queued replies and the stream that is playing. Leaving is not an interruption.
+  function stopSpeech() {
+    speechQueueRef.current = [];
+    speechActiveRef.current = false;
+    setSpeaking(false);
+    abortRef.current?.abort();
+    playback.stop();
+    browserVoice.cancel();
+  }
 
   useEffect(() => {
-    transcript.current?.scrollTo({ top: transcript.current.scrollHeight, behavior: "smooth" });
-  }, [shown]);
+    return () => {
+      // Leaving the screen stops the mic, the provider socket, and any audio we started.
+      closedRef.current = true;
+      sessionRef.current?.stop();
+      sessionRef.current = null;
+      stopSpeech();
+      stopOwnedAudio();
+    };
+  }, [browserVoice, playback, stopOwnedAudio]);
 
-  // Walter "speaks" for the first two seconds after one of his lines appears.
-  const walterTalking = !muted && shown > 0 && WALTER_SCRIPT[shown - 1][0] === "Walter" && (seconds - 3) % 4 < 2;
-  // The Ibuprofen row lights up once the script line that mentions it has played.
-  const advilLine = WALTER_SCRIPT.findIndex(([, text]) => text.includes("Advil"));
-  const advilMentioned = shown > advilLine;
-  const clock = `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
-  const vitals = WALTER_ENCOUNTER_VITALS[visit];
+  // Turns one Scribe event into a caption, a queued turn, or a visible failure.
+  function onEvent(event: ScribeEvent) {
+    if (closedRef.current) return;
+    switch (event.type) {
+      case "partial":
+        if (mutedRef.current) return;
+        // Student speech stops the patient. The microphone stays open.
+        if (speechActiveRef.current || drainingRef.current) interruptSpeech();
+        setPartial(event.text);
+        return;
+      case "committed":
+        if (mutedRef.current) return;
+        setPartial("");
+        queueRef.current = queueRef.current.then(() => submitCommitted(event)).catch(() => undefined);
+        return;
+      case "disconnected":
+        sessionRef.current = null;
+        setVoice("off");
+        setPartial("");
+        setBanner("The transcription service disconnected. Connect the microphone again.");
+        return;
+      case "token_expired":
+        sessionRef.current?.stop();
+        sessionRef.current = null;
+        setVoice("off");
+        setPartial("");
+        setBanner("The transcription token expired. Connect the microphone again.");
+        return;
+      case "error":
+        setBanner(event.message);
+        return;
+      default: {
+        const unreachable: never = event;
+        return unreachable;
+      }
+    }
+  }
+
+  // A click opens the mic. Refresh does not, because the browser requires a user action.
+  async function connect() {
+    if (closedRef.current || voice === "connecting") return;
+    setBanner(null);
+    setVoice("connecting");
+    const configResult = await client.GET("/api/config");
+    if (!configResult.data) {
+      setVoice("off");
+      setBanner(asApiError(configResult.response?.status ?? 0, configResult.error).message);
+      return;
+    }
+    const tokenResult = await client.POST("/api/stt/token");
+    if (!tokenResult.data) {
+      setVoice("off");
+      setBanner(asApiError(tokenResult.response?.status ?? 0, tokenResult.error).message);
+      return;
+    }
+    const config = configResult.data;
+    try {
+      const session = await connectScribe({
+        token: tokenResult.data.token,
+        modelId: config.stt_model_id,
+        vadSilenceSecs: config.vad_silence_secs,
+        vadThreshold: config.vad_threshold,
+        echoCancellation: true,
+        noiseSuppression: true,
+        includeTimestamps: config.include_timestamps,
+        onEvent,
+      });
+      if (closedRef.current) {
+        session.stop();
+        return;
+      }
+      sessionRef.current = session;
+      mutedRef.current = false;
+      ttsRef.current = config.tts;
+      setVoice("live");
+    } catch (error) {
+      setVoice("off");
+      setBanner(permissionMessage(error));
+    }
+  }
+
+  // Privacy mute stays on the same connection. It is not a push-to-talk control.
+  function toggleMute() {
+    const session = sessionRef.current;
+    if (!session) return;
+    if (mutedRef.current) {
+      mutedRef.current = false;
+      session.unmute();
+      setVoice("live");
+      return;
+    }
+    mutedRef.current = true;
+    session.mute();
+    setPartial("");
+    setVoice("muted");
+  }
+
+  // Sends one committed turn. The queue calls this only after the previous turn has a result.
+  async function submitCommitted(event: Extract<ScribeEvent, { type: "committed" }>) {
+    if (closedRef.current) return;
+    try {
+      const result = await client.POST("/api/encounters/{enc_id}/utterances", {
+        params: { path: { enc_id: encounterId } },
+        body: utteranceBody(event),
+      });
+      if (closedRef.current) return;
+      if (!result.response || result.data === undefined) {
+        if (!result.response) {
+          await reconcile();
+          return;
+        }
+        setBanner(asApiError(result.response.status, result.error).message);
+        return;
+      }
+      applyTurn(result.data, event.text);
+    } catch {
+      // No response means we cannot tell whether the turn was saved. Do not send it again.
+      if (!closedRef.current) await reconcile();
+    }
+  }
+
+  // Loads the saved visit after a turn with no response. It does not submit the turn again.
+  async function reconcile() {
+    try {
+      const result = await client.GET("/api/encounters/{enc_id}", { params: { path: { enc_id: encounterId } } });
+      if (result.data) setView(result.data);
+      setBanner(UNCERTAIN);
+    } catch {
+      setBanner(UNCERTAIN);
+    }
+  }
+
+  // Copies the reply and the released rows onto the screen. The fact ids stay on those rows.
+  function applyTurn(turn: TurnResult, studentText: string) {
+    setNotices((turn.notices ?? []).map((notice) => notice.text));
+    setView((current) => {
+      const chart = mergeChart(current.chart ?? [], [...(turn.chart_releases ?? []), ...(turn.exam_results ?? [])]);
+      const previous = (current.transcript ?? []).map((line) => ({ ...line, is_last: false }));
+      const entry: TranscriptEntry = {
+        turn: turn.turn,
+        student_text: studentText,
+        reply_text: turn.reply_text,
+        mode: turn.mode,
+        is_last: true,
+      };
+      return { ...current, chart, transcript: [...previous, entry], last_turn: turn.turn };
+    });
+    enqueueSpeech(turn.turn, turn.reply_text);
+  }
+
+  // Builds the saved-turn request. Remaining audio is included only when playback reported it.
+  function utteranceBody(event: Extract<ScribeEvent, { type: "committed" }>) {
+    const body: {
+      text: string;
+      start_ms: number | null;
+      end_ms: number | null;
+      words: { text: string; start_ms: number; end_ms: number }[];
+      barge_in_remaining_ms?: number;
+    } = {
+      text: event.text,
+      start_ms: event.startMs,
+      end_ms: event.endMs,
+      words: event.words.map((word) => ({ text: word.text, start_ms: word.startMs, end_ms: word.endMs })),
+    };
+    if (typeof bargeMsRef.current === "number") {
+      body.barge_in_remaining_ms = bargeMsRef.current;
+      bargeMsRef.current = undefined;
+    }
+    return body;
+  }
+
+  // Keeps the reply that just arrived behind any reply still playing.
+  function enqueueSpeech(turn: number, text: string) {
+    speechQueueRef.current.push({ turn, text });
+    speechActiveRef.current = true;
+    setSpeaking(true);
+    void drainSpeech();
+  }
+
+  // Plays one saved reply at a time. A barge-in clears the queue from under this loop.
+  async function drainSpeech() {
+    if (drainingRef.current) return;
+    drainingRef.current = true;
+    while (speechQueueRef.current.length > 0 && !closedRef.current) {
+      const next = speechQueueRef.current.shift();
+      if (!next) break;
+      await playVerified(next.turn, next.text);
+    }
+    drainingRef.current = false;
+    speechActiveRef.current = speechQueueRef.current.length > 0;
+    setSpeaking(speechActiveRef.current);
+  }
+
+  // Stops what is playing and what is waiting. Transcription is left running.
+  function interruptSpeech() {
+    const remaining = playback.remainingMs();
+    // No duration means we do not invent how much of a sentence was left.
+    if (typeof remaining === "number") bargeMsRef.current = remaining;
+    stopSpeech();
+  }
+
+  // Speaks one verified reply. The caption is already on screen before this runs.
+  async function playVerified(turn: number, text: string) {
+    if (closedRef.current) return;
+    if (!ttsRef.current) {
+      browserVoice.speak(text);
+      setVoiceLabel("Browser voice");
+      return;
+    }
+    const controller = new AbortController();
+    abortRef.current = controller;
+    setVoiceLabel(null);
+    try {
+      const result = await client.POST("/api/encounters/{enc_id}/turns/{turn}/speech", {
+        params: { path: { enc_id: encounterId, turn } },
+        parseAs: "stream",
+        signal: controller.signal,
+      });
+      if (controller.signal.aborted || closedRef.current) return;
+      if (result.response?.status === 204) {
+        browserVoice.speak(text);
+        setVoiceLabel("Browser voice");
+        return;
+      }
+      if (!result.response?.ok || !result.data) {
+        setBanner(asApiError(result.response?.status ?? 0, result.error).message);
+        return;
+      }
+      await playback.play(verifiedAudioSource(result.data, controller));
+    } catch {
+      if (controller.signal.aborted || closedRef.current) return;
+      setBanner("The reply could not be played. The caption is still shown.");
+    }
+  }
+
+  // Ending drops queued speech and anything still playing, then marks the visit ended.
+  async function endVisit() {
+    closedRef.current = true;
+    sessionRef.current?.stop();
+    sessionRef.current = null;
+    setVoice("off");
+    setPartial("");
+    stopSpeech();
+    stopOwnedAudio();
+    const result = await client.POST("/api/encounters/{enc_id}/end", { params: { path: { enc_id: encounterId } } });
+    if (result.data) setView(result.data);
+    else setBanner(asApiError(result.response?.status ?? 0, result.error).message);
+  }
+
+  const chart = view.chart ?? [];
+  const notes = chart.filter((item) => item.kind === "artifact");
+  const exams = chart.filter((item) => item.kind === "exam");
+  const released = chart.filter((item) => item.kind !== "artifact" && item.kind !== "exam");
+  const patient = view.patient;
+  const simplified = (view.transcript ?? []).some((line) => line.mode === "template");
+  const active = view.status === "active";
+  // The note opens only after the visit has ended, and only with the template the case saved.
+  const template = view.documentation_template;
+  const showDocumentation = !active && template !== undefined && template.fields.length > 0;
 
   return (
-    <div className="relative flex h-full min-h-[700px] flex-col overflow-hidden text-ink">
-      <div className="bg-world absolute inset-0" />
+    <div className="relative flex h-full min-h-[700px] flex-col overflow-auto text-ink">
+      <div className="bg-world fixed inset-0" aria-hidden />
 
-      <header className="relative flex items-center justify-between gap-4 px-[clamp(24px,3vw,48px)] pt-5 pb-3">
+      <header className="relative flex flex-wrap items-center justify-between gap-4 px-[clamp(24px,3vw,48px)] pt-5 pb-3">
         <div className="flex items-center gap-5">
           <Wordmark size="md" />
-          <span className="rounded-full bg-white/75 px-4 py-1.5 font-serif text-[17px] backdrop-blur-sm">
-            {visit === 2 ? "Visit 2 of 2" : "Visit 1 of 2"}
-          </span>
+          <span className="rounded-full bg-white/75 px-4 py-1.5 font-serif text-[17px] backdrop-blur-sm">{view.visit_label}</span>
+          <span className="font-sans text-[13px] text-ink-soft">{timingLabel(view.started_at, view.ended_at)}</span>
         </div>
         <div className="flex items-center gap-4">
+          {active ? (
+            <button
+              type="button"
+              onClick={() => {
+                if (voice === "live" || voice === "muted") toggleMute();
+                else void connect();
+              }}
+              disabled={voice === "connecting"}
+              className="inline-flex h-[54px] items-center gap-3 rounded-full border border-indigo-line/50 bg-white/85 px-6 font-serif text-[20px] backdrop-blur-sm hover:bg-white disabled:opacity-70"
+            >
+              <span className={`size-3.5 rounded-full ${voice === "live" ? "rnd-blink bg-bright" : "bg-inactive"}`} />
+              {micLabel(voice)}
+            </button>
+          ) : (
+            <span className="rounded-full bg-white/80 px-5 py-2.5 font-serif text-[18px] text-ink-soft backdrop-blur-sm">This visit has ended.</span>
+          )}
           <button
             type="button"
-            onClick={() => setMuted((value) => !value)}
-            aria-pressed={muted}
-            className="inline-flex h-[54px] items-center gap-3 rounded-full border border-indigo-line/50 bg-white/85 px-6 font-serif text-[20px] backdrop-blur-sm hover:bg-white"
-          >
-            <span className={`size-3.5 rounded-full ${muted ? "bg-inactive" : "rnd-blink bg-bright"}`} />
-            {muted ? "Muted" : "Listening"}
-          </button>
-          <button
-            type="button"
-            onClick={() => go("s-debrief", { visit })}
-            className="h-[54px] rounded-full bg-danger-strong px-8 font-serif text-[20px] text-white shadow-[0_10px_24px_-14px_rgba(217,70,62,.9)] hover:bg-[#c23a33]"
+            onClick={() => void endVisit()}
+            disabled={!active}
+            className="h-[54px] rounded-full bg-danger px-7 font-serif text-[20px] text-white shadow-[0_12px_26px_-14px_rgba(200,50,50,.8)] hover:brightness-95 disabled:bg-inactive disabled:shadow-none"
           >
             End visit
           </button>
         </div>
       </header>
 
-      <div className="relative grid min-h-0 flex-1 gap-[clamp(16px,2.4vw,40px)] px-[clamp(24px,3vw,48px)] pt-2 pb-6 [grid-template-columns:minmax(280px,0.9fr)_minmax(0,1.45fr)_minmax(280px,0.9fr)] max-xl:[grid-template-columns:minmax(260px,1fr)_minmax(0,1.5fr)]">
-        <Glass className="flex flex-col gap-5 overflow-auto">
-          <div className="rounded-xl bg-indigo-soft px-5 py-4 font-serif text-[20px] leading-snug">{WALTER_GOAL[visit]}</div>
-          <div className="border-t border-hair-2 pt-4">
-            <h3 className="m-0 font-serif text-[23px] leading-tight font-normal">From primary care: nutrition counseling</h3>
-            <div className="mt-3 rounded-xl bg-wash px-5 py-3.5">
-              <div className="font-serif text-[19px]">PCP (primary care provider)</div>
-              <div className="mt-1 font-serif text-[16.5px] leading-snug text-ink-soft">Heart failure, kidney disease and type 2 diabetes. Review sodium and diet.</div>
-            </div>
-          </div>
-          <div className="border-t border-hair-2 pt-4">
-            <div className="flex items-center justify-between">
-              <h3 className="m-0 font-serif text-[26px] font-normal">Exam log</h3>
-              <button
-                type="button"
-                onClick={() => setMenuOpen((open) => !open)}
-                aria-expanded={menuOpen}
-                aria-label="Examine"
-                className="flex size-10 items-center justify-center rounded-full bg-indigo-soft text-[22px] hover:bg-indigo-soft-2"
-              >
-                +
-              </button>
-            </div>
-            <p className="mt-1 mb-0 font-sans text-[13px] text-muted">Say what you are examining, or pick it here.</p>
-            {menuOpen ? (
-              <div className="mt-3 flex flex-col overflow-hidden rounded-xl border border-line bg-card">
-                {WALTER_EXAMS.map((exam, index) =>
-                  exams.includes(index) ? null : (
-                    <button
-                      key={exam.label}
-                      type="button"
-                      onClick={() => {
-                        setExams([...exams, index]);
-                        setMenuOpen(false);
-                      }}
-                      className="border-t border-hair px-4 py-2.5 text-left font-serif text-[17px] text-indigo first:border-t-0 hover:bg-indigo-soft"
-                    >
-                      {exam.label}
-                    </button>
-                  ),
-                )}
+      <div className="relative mx-auto grid w-full max-w-[1680px] flex-1 items-start gap-5 px-[clamp(16px,2.4vw,40px)] pt-2 pb-8 lg:grid-cols-[minmax(240px,300px)_minmax(0,1fr)_minmax(260px,320px)]">
+        <aside aria-label="Visit notes" className="flex flex-col gap-4">
+          <section className="rounded-[18px] bg-panel px-5 py-4 text-white shadow-[0_18px_40px_-24px_rgba(25,31,92,.7)]">
+            <div className="font-sans text-[11.5px] font-semibold tracking-[0.6px] text-indigo-on-ink uppercase">Goal</div>
+            <div className="mt-1 font-serif text-[21px] leading-snug">{view.briefing.goal}</div>
+          </section>
+          <section className="rounded-[18px] border border-white/70 bg-card/85 shadow-[0_18px_40px_-28px_rgba(25,31,92,.5)] backdrop-blur-md px-5 py-4">
+            <div className="font-serif text-[22px]">Referral</div>
+            {notes.length === 0 ? <div className="mt-1 font-serif text-[17px] text-ink-soft">No referral has been released.</div> : null}
+            {notes.map((note) => (
+              <div key={note.ref} className="mt-2">
+                <div className="font-serif text-[18px]">{note.label}</div>
+                {note.body ? <div className="mt-1 font-serif text-[17px] leading-snug text-ink-soft">{note.body}</div> : null}
+                <Provenance item={note} />
               </div>
-            ) : null}
-            <div className="mt-3 flex flex-col gap-2.5">
-              {exams.map((index) => (
-                <div
-                  key={WALTER_EXAMS[index].text}
-                  className={`rounded-xl px-5 py-3.5 font-serif text-[18px] ${WALTER_EXAMS[index].flag ? "border-l-4 border-apricot bg-warn-wash" : "bg-wash"}`}
-                >
-                  {WALTER_EXAMS[index].text}
-                </div>
-              ))}
-            </div>
-          </div>
-        </Glass>
+            ))}
+          </section>
+          <section className="rounded-[18px] border border-white/70 bg-card/85 shadow-[0_18px_40px_-28px_rgba(25,31,92,.5)] backdrop-blur-md overflow-hidden">
+            <div className="px-5 pt-4 pb-2 font-serif text-[22px]">Exam log</div>
+            {exams.length === 0 ? <div className="px-5 pb-4 font-serif text-[17px] text-ink-soft">No exam has been released.</div> : null}
+            {exams.map((exam) => (
+              <div key={exam.ref} className="border-t border-hair px-5 py-3 font-serif text-[17px]">
+                <div>{exam.label}</div>
+                {exam.value ? <div className="text-ink-soft">{exam.value}</div> : null}
+                <Provenance item={exam} />
+              </div>
+            ))}
+          </section>
+        </aside>
 
-        <div className="flex min-h-0 min-w-0 flex-col items-center">
-          <div className="w-full max-w-[720px]">
-            <PatientCall speaking={walterTalking} muted={muted} clock={clock} />
-          </div>
-          <h2 className="mt-4 mb-2 font-serif text-[clamp(30px,2.6vw,42px)] leading-none font-normal tracking-[-0.8px]">Walter Greene, 72</h2>
-          <div ref={transcript} className="flex min-h-0 w-full max-w-[600px] flex-1 flex-col gap-2 overflow-auto px-1 pb-2 [mask-image:linear-gradient(transparent,black_24px)]">
-            {lines.map(([who, text]) => {
-              const student = who === "You";
-              return (
-                <div key={text} className="rnd-line flex flex-col items-start gap-1 pt-2">
-                  <span className="px-3 font-serif text-[16px] text-ink-soft">{student ? "Student" : "Walter"}</span>
-                  <div className={`max-w-[92%] rounded-xl px-5 py-2.5 font-serif text-[19px] leading-snug ${student ? "bg-bubble-student" : "bg-bubble-patient"}`}>{text}</div>
-                </div>
-              );
-            })}
-            {shown ? null : <div className="pt-6 text-center font-serif text-[18px] text-ink-soft">Say hello when the call connects.</div>}
-          </div>
-          <BuildTag kind="planned" feature="E-03 voice in, sample script shown" className="mt-1" />
+        <div className="flex min-w-0 flex-col gap-4">
+          <section aria-label="Patient" className="rounded-[18px] border border-white/70 bg-card/85 shadow-[0_18px_40px_-28px_rgba(25,31,92,.5)] backdrop-blur-md p-3">
+            <PatientCall name={patient.speaker || patient.name} speaking={speaking} muted={voice === "muted"} listening={voice === "live"} />
+            <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-2 pt-3 pb-1">
+              <div className="font-serif text-[clamp(26px,2.2vw,34px)] leading-none tracking-[-0.6px]">
+                {patient.name}, {patient.age}
+              </div>
+              <div className="font-sans text-[13px] text-ink-soft">
+                {statusLabel(voice, active)} · Headphones recommended, so the patient's voice doesn't echo
+              </div>
+            </div>
+          </section>
+          <section aria-label="Transcript" className="rounded-[18px] border border-white/70 bg-card/85 shadow-[0_18px_40px_-28px_rgba(25,31,92,.5)] backdrop-blur-md flex flex-col gap-3 px-5 py-4">
+            {banner ? <p className="font-serif text-[17px] text-ink">{banner}</p> : null}
+            {voiceLabel ? <p className="font-serif text-[17px] text-ink">{voiceLabel}</p> : null}
+            {simplified || notices.includes("Simplified responses") ? (
+              <p className="font-sans text-[13px] text-ink-soft">Simplified responses</p>
+            ) : null}
+            {notices
+              .filter((notice) => notice !== "Simplified responses")
+              .map((notice) => (
+                <p key={notice} className="font-sans text-[13px] text-ink-soft">
+                  {notice}
+                </p>
+              ))}
+            {(view.transcript ?? []).length === 0 && !partial ? <p className="font-serif text-[17px] text-ink-soft">No transcript yet.</p> : null}
+            {(view.transcript ?? []).map((line) => (
+              <div key={line.turn} className="flex flex-col gap-2">
+                <TurnLine who="Student" text={line.student_text} align="end" />
+                <TurnLine who={patient.speaker || patient.name} text={line.reply_text} align="start" />
+                {line.is_last ? <div className="font-sans text-[11.5px] font-semibold text-muted">Latest turn</div> : null}
+              </div>
+            ))}
+            {partial ? <p className="font-serif text-[17px] text-ink-soft italic">{partial}</p> : null}
+          </section>
+          {showDocumentation && view.status !== "active" ? (
+            <Documentation
+              template={template}
+              saved={view.saved_documentation ?? null}
+              status={view.status}
+              encounterId={view.encounter_id}
+              client={client}
+              connectScribe={connectScribe}
+              go={go}
+            />
+          ) : null}
         </div>
 
-        <Glass className="flex flex-col gap-4 overflow-auto max-xl:col-span-2">
-          <h3 className="m-0 border-b border-hair-2 pb-3 font-serif text-[34px] leading-none font-normal">Chart</h3>
-          <div>
-            <h4 className="m-0 mb-2 font-serif text-[24px] font-normal">Vitals</h4>
-            <div className="rounded-xl bg-wash px-5 py-1.5">
-              {vitals.map((vital) => (
-                <div key={vital.k} className="grid grid-cols-[90px_1fr] border-t border-hair-2 py-2 font-serif text-[17px] first:border-t-0">
-                  <span>{vital.k}</span>
-                  <span className={`tabular-nums ${vital.tone === "danger" ? "text-danger" : ""}`}>
-                    {vital.v}
-                    {VITAL_UNITS[vital.k] ?? ""}
-                  </span>
+        <aside aria-label="Chart" className="flex flex-col gap-4">
+          {groupChart(released).map((group) => (
+            <section key={group.section} className="rounded-[18px] border border-white/70 bg-card/85 shadow-[0_18px_40px_-28px_rgba(25,31,92,.5)] backdrop-blur-md overflow-hidden">
+              <div className="px-5 pt-4 pb-2 font-serif text-[22px]">{group.section}</div>
+              {group.items.map((item) => (
+                <div key={`${item.kind}-${item.ref}`} className="border-t border-hair px-5 py-3">
+                  <div className="font-serif text-[18px]">{item.label}</div>
+                  {item.value ? <div className="font-serif text-[17px] text-ink-soft tabular-nums">{item.value}</div> : null}
+                  <Provenance item={item} />
                 </div>
               ))}
-            </div>
-          </div>
-          <div className="border-t border-hair-2 pt-3">
-            <h4 className="m-0 mb-2 font-serif text-[24px] font-normal">Medications</h4>
-            <div className="flex flex-col gap-2">
-              {WALTER_MEDS.map((med) => {
-                const mentioned = advilMentioned && med.id === "ibuprofen";
-                return (
-                  <div
-                    key={med.name}
-                    className={`rounded-xl border px-5 py-2.5 transition-colors duration-500 ${mentioned ? "border-l-4 border-apricot border-y-transparent border-r-transparent bg-warn-wash" : "border-line bg-card"}`}
-                  >
-                    <div className="font-serif text-[18px]">{med.name}</div>
-                    <div className="font-serif text-[15px] text-ink-soft">
-                      {med.sub.toLowerCase()}
-                      {mentioned ? " · Walter mentioned this" : ""}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-          <div className="border-t border-hair-2 pt-3">
-            <h4 className="m-0 mb-2 font-serif text-[24px] font-normal">Orders</h4>
-            {WALTER_ORDERS.map(({ id, name }) => {
-              const ready = Boolean(ordered[id]);
-              return (
-                <div key={id} className="flex items-center justify-between gap-3 py-1.5 font-serif text-[17px]">
-                  <span>
-                    {name}
-                    <span className={`block text-[14px] ${ready ? "text-ok" : "text-muted"}`}>{ready ? "Result in chart" : "Ask for it out loud, or order here"}</span>
-                  </span>
-                  {ready ? null : (
-                    <button type="button" onClick={() => setOrdered({ ...ordered, [id]: true })} className="h-9 rounded-lg border border-indigo-line bg-card px-4 hover:bg-indigo-soft">
-                      Order
-                    </button>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </Glass>
+            </section>
+          ))}
+          {released.length === 0 ? (
+            <section className="rounded-[18px] border border-white/70 bg-card/85 shadow-[0_18px_40px_-28px_rgba(25,31,92,.5)] backdrop-blur-md px-5 py-4 font-serif text-[17px] text-ink-soft">No chart entries have been released.</section>
+          ) : null}
+        </aside>
       </div>
     </div>
   );
 }
 
-function Glass({ children, className = "" }: { children: ReactNode; className?: string }) {
+// A denied prompt is named by the browser. Anything else is the provider not connecting.
+function permissionMessage(error: unknown): string {
+  if (typeof error === "object" && error !== null && "name" in error && error.name === "NotAllowedError") {
+    return "Microphone permission was denied.";
+  }
+  return "The transcription service could not be reached.";
+}
+
+// The button name is the next action: connect, mute, or unmute.
+function micLabel(voice: VoiceState): string {
+  switch (voice) {
+    case "off":
+      return "Connect microphone";
+    case "connecting":
+      return "Connecting microphone";
+    case "live":
+      return "Mute microphone";
+    case "muted":
+      return "Unmute microphone";
+    default: {
+      const unreachable: never = voice;
+      return unreachable;
+    }
+  }
+}
+
+// Short status under the patient. Color is not the only signal; the words say the state.
+function statusLabel(voice: VoiceState, active: boolean): string {
+  if (!active) return "This visit has ended.";
+  switch (voice) {
+    case "off":
+      return "Connect the microphone to speak.";
+    case "connecting":
+      return "Connecting microphone";
+    case "live":
+      return "Microphone live";
+    case "muted":
+      return "Microphone muted";
+    default: {
+      const unreachable: never = voice;
+      return unreachable;
+    }
+  }
+}
+
+// Keeps doorway rows and adds the rows this turn released. A repeated ref is replaced.
+function mergeChart(current: PublicChartEntry[], incoming: PublicChartEntry[]): PublicChartEntry[] {
+  const next = [...current];
+  for (const item of incoming) {
+    const index = next.findIndex((row) => row.kind === item.kind && row.ref === item.ref);
+    if (index >= 0) next[index] = item;
+    else next.push(item);
+  }
+  return next;
+}
+
+// Shows the saved start or end time. The clock is the saved time, not a running timer.
+function timingLabel(startedAt: string | null | undefined, endedAt: string | null | undefined): string {
+  if (endedAt) return `Ended ${endedAt}`;
+  if (startedAt) return `Started ${startedAt}`;
+  return "Not started";
+}
+
+// Keeps the fact id and the source kind on screen so a released value can be traced.
+function Provenance({ item }: { item: PublicChartEntry }) {
+  if (!item.source_fact && !item.source?.kind) return null;
   return (
-    <section className={`min-h-0 rounded-[18px] border border-white/80 bg-card/90 px-6 py-5 shadow-[0_24px_60px_-34px_rgba(25,31,92,.45)] backdrop-blur-md ${className}`}>
-      {children}
-    </section>
+    <div className="mt-0.5 text-xs text-muted">
+      {item.source_fact ? <span>Fact {item.source_fact}</span> : null}
+      {item.source_fact && item.source?.kind ? <span> · </span> : null}
+      {item.source?.kind ? <span>Source: {item.source.kind}</span> : null}
+    </div>
+  );
+}
+
+// Groups released rows by chart section without dropping their order.
+function groupChart(items: PublicChartEntry[]): { section: string; items: PublicChartEntry[] }[] {
+  const groups: { section: string; items: PublicChartEntry[] }[] = [];
+  for (const item of items) {
+    const section = item.section || "Chart";
+    const existing = groups.find((group) => group.section === section);
+    if (existing) existing.items.push(item);
+    else groups.push({ section, items: [item] });
+  }
+  return groups;
+}
+
+// One transcript bubble. align puts the student on the right and the patient on the left.
+function TurnLine({ who, text, align }: { who: string; text: string; align: "start" | "end" }) {
+  const student = align === "end";
+  return (
+    <div className={`flex flex-col gap-0.5 ${student ? "items-end" : "items-start"}`}>
+      <span className="px-1 text-[11.5px] font-semibold text-muted">{who}</span>
+      <div className={`max-w-[88%] rounded-[16px] px-4 py-2.5 font-serif text-[18px] leading-snug ${student ? "bg-panel text-white" : "bg-indigo-soft text-ink"}`}>
+        {text}
+      </div>
+    </div>
   );
 }

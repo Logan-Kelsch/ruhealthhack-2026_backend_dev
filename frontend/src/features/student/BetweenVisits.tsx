@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import type { Go } from "../../app/types";
 import { BuildTag, Page, Title } from "../../components/ui";
 import { WALTER_BETWEEN_VISITS_EVENTS } from "../../mock/walter";
-import { DocIcon } from "../faculty/ImportPatients";
+import { DocIcon } from "../../components/Icons";
 
 const EVENT_LOOK: { tone: string; icon: ReactNode }[] = [
   { tone: "bg-indigo-soft text-indigo", icon: <PillIcon /> },

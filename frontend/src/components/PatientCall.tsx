@@ -5,7 +5,17 @@ import { BuildTag } from "./ui";
 // 16:9 "video call" frame for the patient. Iteration 1 has no video, so the frame opens from a
 // watercolor disc into a call and a painted head-and-shoulders silhouette fades in. It breathes
 // while listening and glows while the patient speaks. Tavus video replaces the silhouette in iteration 2.
-export function PatientCall({ speaking, muted, clock }: { speaking: boolean; muted: boolean; clock: string }) {
+export function PatientCall({
+  name,
+  speaking,
+  muted,
+  listening,
+}: {
+  name: string;
+  speaking: boolean;
+  muted: boolean;
+  listening: boolean;
+}) {
   const root = useRef<HTMLDivElement>(null);
   const halo = useRef<gsap.core.Tween | null>(null);
 
@@ -84,16 +94,16 @@ export function PatientCall({ speaking, muted, clock }: { speaking: boolean; mut
           <span className="rounded-full bg-white/80 px-4 py-1.5 font-serif text-[17px] text-ink backdrop-blur-sm">Connecting…</span>
         </div>
 
-        <span className="pc-chrome absolute top-3.5 left-3.5 inline-flex h-8 items-center gap-2 rounded-full bg-[#141a55]/55 px-3 font-sans text-[13px] text-white tabular-nums backdrop-blur-md">
-          <span className={`size-2 rounded-full ${muted ? "bg-white/60" : "rnd-blink bg-[#ff6b5e]"}`} />
-          {clock}
+        <span className="pc-chrome absolute top-3.5 left-3.5 inline-flex h-8 items-center gap-2 rounded-full bg-[#141a55]/55 px-3 font-sans text-[13px] text-white backdrop-blur-md">
+          <span className={`size-2 rounded-full ${listening ? "rnd-blink bg-[#ff6b5e]" : "bg-white/60"}`} />
+          {listening ? "Mic live" : "Mic off"}
         </span>
         <span className="pc-chrome absolute right-3.5 bottom-3.5">
           <BuildTag kind="planned" feature="E-15 video" className="bg-white/85 backdrop-blur-sm" />
         </span>
         <span className="pc-chrome absolute bottom-3.5 left-3.5 inline-flex h-8 items-center gap-2 rounded-full bg-white/80 px-3 font-sans text-[13px] text-ink backdrop-blur-sm">
           <Bars on={speaking && !muted} />
-          {muted ? "Paused while muted" : speaking ? "Walter is speaking" : "Listening to you"}
+          {speaking ? `${name} is speaking` : muted ? "Paused while muted" : listening ? "Listening to you" : "Waiting for your microphone"}
         </span>
       </div>
     </div>

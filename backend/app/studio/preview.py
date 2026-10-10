@@ -184,11 +184,21 @@ def run_test_student(case: Case, level: str, driver: str = "scripted", max_turns
         calls += out.llm_calls
     debrief, _ = build_debrief(case, visit, turns, state, None, use_llm=False)
     sent = len(turns)
+    failing_audit = sum(1 for t in turns if t["audit_problems"])
+    # Faculty preview reads these names. The script still uses the grounding and rubric keys below.
     return {
-        "level": level, "driver": driver, "turns": turns,
+        "level": level,
+        "driver": driver,
+        "visit_id": visit.id,
+        "turns": turns,
+        "transcript": [{"turn": t["idx"], "student": t["student_text"], "patient": t["reply_text"]} for t in turns],
+        "discoveries": _discoveries(debrief),
+        "blocked_replies": _blocked_replies(turns),
+        "feedback": _feedback(debrief),
+        "replies_failing_audit": failing_audit,
         "grounding": {
             "replies": sent,
-            "replies_failing_audit": sum(1 for t in turns if t["audit_problems"]),
+            "replies_failing_audit": failing_audit,
             "llm_replies": sum(1 for t in turns if t["verifier"]["mode"] == "llm"),
             "template_replies": sum(1 for t in turns if t["verifier"]["mode"] == "template"),
             "attempts_blocked_by_verifier": sum(t["verifier"]["blocked_attempts"] for t in turns),
@@ -200,4 +210,59 @@ def run_test_student(case: Case, level: str, driver: str = "scripted", max_turns
         "decision_points": [{"id": d["id"], "result": d["result"]} for d in debrief["decision_points"]],
         "branch": (debrief["decision_path"]["taken"] or {}).get("id"),
         "llm_calls": len(calls),
+    }
+
+
+def _discoveries(debrief: dict) -> list[dict]:
+    """Facts the debrief counted as found. Missed facts stay out of the preview list."""
+    found: list[dict] = []
+    for objective in debrief["elicited"]:
+        for item in objective["found"]:
+            found.append(
+                {
+                    "fact_id": item["fact_id"],
+                    "text": item["text"],
+                    "turn": item["turn"],
+                    "objective_id": objective["objective_id"],
+                }
+            )
+    return found
+
+
+def _blocked_replies(turns: list[dict]) -> list[dict]:
+    """Verifier attempts that were refused. A template-only run has none, and that is reported as an empty list."""
+    blocked: list[dict] = []
+    for turn in turns:
+        for attempt in turn["verifier"].get("attempts", []):
+            problems = attempt.get("problems") or []
+            if not problems:
+                continue
+            blocked.append(
+                {
+                    "turn": turn["idx"],
+                    "student": turn["student_text"],
+                    "reply": str(attempt.get("reply") or ""),
+                    "problems": [str(problem) for problem in problems],
+                }
+            )
+    return blocked
+
+
+def _feedback(debrief: dict) -> dict:
+    """The rubric block faculty see. Scores and the discussion-aid sentence come from the debrief, not a new scale."""
+    rubric = debrief["rubric"]
+    return {
+        "total": rubric["total"],
+        "max_total": rubric["max_total"],
+        "interpretation": rubric["interpretation"],
+        "review_flag": rubric["review_flag"],
+        "domains": [
+            {
+                "key": domain["key"],
+                "name": domain["name"],
+                "score": domain["score"],
+                "evidence": domain.get("evidence") or [],
+            }
+            for domain in rubric["domains"]
+        ],
     }

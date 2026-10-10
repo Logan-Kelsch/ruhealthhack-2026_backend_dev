@@ -1,82 +1,118 @@
-import type { ReactNode } from "react";
+import { useEffect, useState } from "react";
+import { asApiError, api, type ApiClient, type PublicCase } from "../../api/client";
 import type { Go } from "../../app/types";
 import { Avatar } from "../../components/Avatar";
-import { Chevron } from "../../components/Icons";
-import { BuildTag, Card, CardHead, Page, Title } from "../../components/ui";
-import { RECENT_FEEDBACK, STUDENT_VISITS, UP_NEXT } from "../../mock/student";
+import { GhostButton, Page, Title } from "../../components/ui";
+import { portraitFor } from "./portrait";
 
-// Student landing. The next assigned visit is Walter Greene.
-export function StudentHome({ go }: { go: Go }) {
+type LoadState =
+  | { kind: "loading" }
+  | { kind: "error"; message: string }
+  | { kind: "ready"; cases: PublicCase[] };
+
+// Published cases a student can open. There is no cohort list and no due date on this screen.
+export function StudentHome({ go, client = api }: { go: Go; client?: ApiClient }) {
+  const [attempt, setAttempt] = useState(0);
+  const [load, setLoad] = useState<LoadState>({ kind: "loading" });
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoad({ kind: "loading" });
+    client
+      .GET("/api/cases")
+      .then((result) => {
+        if (cancelled) return;
+        if (!result.response?.ok || !result.data) {
+          const status = result.response?.status ?? 0;
+          setLoad({ kind: "error", message: asApiError(status, result.error).message });
+          return;
+        }
+        setLoad({ kind: "ready", cases: result.data });
+      })
+      .catch(() => {
+        if (!cancelled) setLoad({ kind: "error", message: "Cases could not be loaded." });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [client, attempt]);
+
   return (
     <Page>
-      <Title>Good afternoon, Jordan</Title>
-
-      <section className="overflow-hidden rounded-[14px] border border-line bg-card shadow-[0_10px_30px_-24px_rgba(25,31,92,.35)]">
-        <div className="bg-banner flex items-center justify-between gap-4 px-8 py-4">
-          <span className="rounded-full bg-white/80 px-4 py-1.5 font-serif text-[17px] text-[#141a55] backdrop-blur-sm">{UP_NEXT.banner}</span>
-          <BuildTag kind="planned" feature="D-01 assignments" className="bg-white/85" />
-        </div>
-        <div className="grid items-center gap-x-8 gap-y-5 px-8 py-7 [grid-template-columns:auto_minmax(0,1fr)_auto] max-md:grid-cols-1">
-          <Avatar who={UP_NEXT.who} size={128} />
-          <div className="min-w-0">
-            <div className="font-serif text-[clamp(32px,3vw,46px)] leading-none tracking-[-1px]">{UP_NEXT.name}</div>
-            <div className="mt-3 font-serif text-[21px] text-ink-soft">{UP_NEXT.summary}</div>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {UP_NEXT.chips.map((chip) => (
-                <span key={chip} className="inline-flex h-10 items-center rounded-full bg-indigo-soft px-4 font-serif text-[17px]">
-                  {chip}
-                </span>
-              ))}
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={() => go("s-brief", { visit: 1 })}
-            className="h-[60px] rounded-xl bg-bright px-10 font-serif text-[24px] text-white shadow-[0_14px_30px_-16px_rgba(74,95,217,.9)] hover:bg-indigo"
-          >
-            Begin visit →
-          </button>
-        </div>
-      </section>
-
-      <div className="grid items-start gap-5 [grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr))]">
-        <Card>
-          <CardHead title="Assigned" underline={false} aside={<Count>{STUDENT_VISITS.length} visits</Count>} />
-          <div className="px-6 pb-3">
-            {STUDENT_VISITS.map((item) => (
-              <div key={item.name} className="grid grid-cols-[56px_minmax(0,1fr)_auto] items-center gap-4 border-t border-hair-2 py-3.5">
-                <Avatar who={item.who} size={56} />
-                <div>
-                  <div className="font-serif text-[22px] leading-tight">{item.name}</div>
-                  <div className="mt-0.5 font-serif text-[16px] text-ink-soft">{item.meta}</div>
-                </div>
-                <span className="font-serif text-[17px] text-ink-soft">Due {item.due}</span>
-              </div>
-            ))}
-          </div>
-        </Card>
-        <Card>
-          <CardHead title="Recent feedback" underline={false} aside={<BuildTag kind="sample" feature="F-05" />} />
-          <div className="px-6 pb-3">
-            <button
-              type="button"
-              onClick={() => go("s-debrief", { visit: 1 })}
-              className="grid w-full grid-cols-[minmax(0,1fr)_auto_20px] items-center gap-4 border-t border-hair-2 py-4 text-left hover:bg-raised"
-            >
-              <div>
-                <div className="font-serif text-[22px] leading-tight">{RECENT_FEEDBACK.who}</div>
-                <div className="mt-1 font-serif text-[17px] text-indigo">{RECENT_FEEDBACK.next}</div>
-              </div>
-              <span className="font-serif text-[18px] tabular-nums">{RECENT_FEEDBACK.score.replace("/", " of ")}</span>
-              <Chevron className="text-ink-soft" />
-            </button>
-          </div>
-        </Card>
-      </div>
+      <Title kicker={kicker(load)}>Your cases</Title>
+      <CaseList
+        load={load}
+        onRetry={() => setAttempt((value) => value + 1)}
+        onOpen={(row, visitId) => go("s-brief", { caseId: row.case_id, version: row.version, visitId })}
+      />
     </Page>
   );
 }
 
-function Count({ children }: { children: ReactNode }) {
-  return <span className="font-serif text-[18px] whitespace-nowrap">{children}</span>;
+// The count is the number of published cases. It is not a date or an assignment.
+function kicker(load: LoadState): string | undefined {
+  if (load.kind === "ready") return `${load.cases.length} published`;
+  return undefined;
+}
+
+// Lists each published visit. Opening one goes to its briefing and does not start an encounter.
+function CaseList({
+  load,
+  onRetry,
+  onOpen,
+}: {
+  load: LoadState;
+  onRetry: () => void;
+  onOpen: (row: PublicCase, visitId: string) => void;
+}) {
+  if (load.kind === "loading") {
+    return <p className="text-sm text-muted">Loading published cases</p>;
+  }
+  if (load.kind === "error") {
+    return (
+      <div className="flex flex-col items-start gap-3">
+        <p className="text-sm text-ink">{load.message}</p>
+        <GhostButton onClick={onRetry}>Retry</GhostButton>
+      </div>
+    );
+  }
+  if (load.cases.length === 0) {
+    return <p className="text-sm text-muted">No published cases</p>;
+  }
+  return (
+    <div className="grid gap-5 [grid-template-columns:repeat(auto-fill,minmax(min(100%,520px),1fr))]">
+      {load.cases.map((row) => (
+        <section
+          key={row.case_id}
+          className="overflow-hidden rounded-[14px] border border-line bg-card shadow-[0_10px_30px_-24px_rgba(25,31,92,.35)]"
+        >
+          <div className="bg-banner h-[58px]" aria-hidden />
+          <div className="-mt-8 flex items-end gap-5 px-7">
+            <span className="rounded-full bg-card p-1.5">
+              <Avatar who={portraitFor(row.patient)} size={104} />
+            </span>
+            <div className="min-w-0 pb-2">
+              <div className="font-serif text-[clamp(28px,2.4vw,38px)] leading-none tracking-[-0.8px]">
+                {row.patient.name}, {row.patient.age}
+              </div>
+              <div className="mt-2 font-serif text-[19px] text-ink-soft">{row.title}</div>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-3 px-7 pt-5 pb-6">
+            {row.visits.map((visit) => (
+              <button
+                key={visit.id}
+                type="button"
+                onClick={() => onOpen(row, visit.id)}
+                className="inline-flex h-12 items-center gap-2 rounded-xl border border-indigo-line bg-indigo-soft px-5 font-serif text-[19px] text-ink hover:bg-indigo-soft-2"
+              >
+                {visit.label}
+                <span aria-hidden>→</span>
+              </button>
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+  );
 }

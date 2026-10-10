@@ -1,94 +1,151 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { asApiError, api, type ApiClient, type StudioCaseSummary } from "../../api/client";
 import type { Go } from "../../app/types";
-import { BuildTag, Page } from "../../components/ui";
-import { SAMPLE_PATIENTS } from "../../mock/faculty";
-import { PersonDot } from "./FacultyHome";
+import { Badge, BackLink, GhostButton, Page, PrimaryButton, Title } from "../../components/ui";
 
-// Sample-patient importer. Opening a row shows the consistency notes for that profile.
-export function ImportPatients({ go }: { go: Go }) {
-  const [open, setOpen] = useState<string | null>("Walter Greene");
+type ImportState =
+  | { kind: "ready" }
+  | { kind: "importing" }
+  | { kind: "done"; count: number; cases: StudioCaseSummary[] }
+  | { kind: "error"; message: string };
+
+// Faculty import the bundled sponsor sample set. One request creates every draft.
+export function ImportPatients({ go, client = api }: { go: Go; client?: ApiClient }) {
+  const [state, setState] = useState<ImportState>({ kind: "ready" });
+  // Blocks a second click while the first request is still out. A retry of an uncertain import would duplicate drafts.
+  const inFlight = useRef(false);
 
   return (
     <Page>
-      <header className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="m-0 font-serif text-[clamp(40px,4vw,54px)] leading-none font-normal tracking-[-1.2px]">Import sample patients</h1>
-          <p className="mt-2.5 font-serif text-[19px] text-ink-soft">These sample profiles are ready to explore in Studio.</p>
+      <header>
+        <BackLink label="Cases" onClick={() => go("f-cases")} />
+        <div className="mt-2.5">
+          <Title>Import sample set</Title>
         </div>
-        <BuildTag kind="sample" feature="S-16, S-12" />
+        <p className="mt-3 max-w-[680px] font-serif text-[19px] leading-snug text-ink-soft">
+          This imports the full sponsor sample set as drafts. Each case needs faculty review before it can be published.
+        </p>
       </header>
 
-      <div className="overflow-hidden rounded-[14px] border border-line bg-card">
-        {SAMPLE_PATIENTS.map((item) => {
-          const expanded = open === item.name;
-          const count = item.flags.length;
-          return (
-            <div key={item.name} className={`border-t border-hair-2 first:border-t-0 ${expanded ? "bg-raised" : ""}`}>
-              <button
-                type="button"
-                onClick={() => setOpen(expanded ? null : item.name)}
-                aria-expanded={expanded}
-                className="grid w-full grid-cols-[44px_minmax(0,1fr)_24px] items-center gap-5 px-5 py-2.5 text-left hover:bg-raised"
-              >
-                <PersonDot size={44} />
-                <span className="flex flex-wrap items-center gap-x-5 gap-y-1">
-                  <span className="font-serif text-[clamp(20px,1.7vw,26px)] tracking-[-0.3px]">{item.name}</span>
-                  <span className="font-serif text-[20px] text-ink-soft">{item.age}</span>
-                  {count ? (
-                    <span className="inline-flex h-9 items-center rounded-full bg-warn-pill px-4 font-serif text-[17px] text-warn-deep">
-                      {count} worth review
-                    </span>
-                  ) : null}
-                </span>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className={`text-ink-soft transition-transform ${expanded ? "rotate-180" : ""}`} aria-hidden>
-                  <path d="M6 9l6 6 6-6" />
-                </svg>
-              </button>
-              {expanded ? (
-                <div className="grid items-center gap-4 px-5 pb-4 pl-[84px] [grid-template-columns:minmax(0,1fr)_auto]">
-                  {count ? (
-                    <div className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(260px,1fr))]">
-                      {item.flags.map((flag) => (
-                        <div key={flag} className="flex items-center gap-4 rounded-xl border border-line bg-card px-4 py-3">
-                          <DocDot />
-                          <span className="font-serif text-[17px] leading-snug">{flag}</span>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="font-serif text-[18px] text-ok">{item.summary} No inconsistencies found.</div>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => go("f-studio", { studioTab: "patient" })}
-                    className="inline-flex h-14 items-center gap-3 rounded-xl border border-indigo-line bg-card px-7 font-serif text-[20px] text-ink hover:bg-indigo-soft"
-                  >
-                    <DocIcon />
-                    Open in Studio
-                  </button>
-                </div>
-              ) : null}
-            </div>
-          );
-        })}
-      </div>
+      <section className="overflow-hidden rounded-[14px] border border-line bg-card shadow-[0_10px_30px_-24px_rgba(25,31,92,.35)]" aria-live="polite">
+        <div className="bg-banner h-[52px]" aria-hidden />
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-hair-2 px-7 py-6">
+          <div>
+            <div className="font-serif text-[28px] tracking-[-0.4px]">Sponsor sample set</div>
+            <p className="mt-1 max-w-[560px] font-serif text-[18px] text-ink-soft">{statusLine(state)}</p>
+          </div>
+          <ImportAction state={state} onImport={() => void importSampleSet(client, inFlight, setState)} />
+        </div>
+        <ImportResult state={state} onViewCases={() => go("f-cases")} />
+      </section>
     </Page>
   );
 }
 
-export function DocIcon({ size = 22 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinejoin="round" strokeLinecap="round" aria-hidden>
-      <path d="M6 3h8l4.5 4.5V21H6z" />
-      <path d="M14 3v4.5h4.5M9 12h6M9 15.5h6" />
-    </svg>
-  );
+// Sends the bulk import once. A failure stays on screen and does not start another request.
+async function importSampleSet(
+  client: ApiClient,
+  inFlight: { current: boolean },
+  setState: (state: ImportState) => void,
+) {
+  if (inFlight.current) return;
+  inFlight.current = true;
+  setState({ kind: "importing" });
+  try {
+    const result = await client.POST("/api/studio/import/vhs");
+    if (!result.response?.ok || result.data == null) {
+      const status = result.response?.status ?? 0;
+      setState({ kind: "error", message: asApiError(status, result.error).message });
+      return;
+    }
+    setState({ kind: "done", count: result.data.count, cases: result.data.cases });
+  } catch {
+    // The request may have reached the server. Do not send it again from here.
+    setState({ kind: "error", message: "The sample set could not be imported." });
+  } finally {
+    inFlight.current = false;
+  }
 }
 
-export function DocDot({ size = 40 }: { size?: number }) {
-  return (
-    <span className="flex shrink-0 items-center justify-center rounded-full bg-indigo-soft text-indigo" style={{ width: size, height: size }}>
-      <DocIcon size={size * 0.5} />
-    </span>
-  );
+// The button for the current step. Import stays disabled while the request is running.
+function ImportAction({ state, onImport }: { state: ImportState; onImport: () => void }) {
+  switch (state.kind) {
+    case "done":
+      return null;
+    case "error":
+      return <GhostButton onClick={onImport}>Try again</GhostButton>;
+    case "ready":
+    case "importing":
+      return (
+        <PrimaryButton size="lg" onClick={onImport} disabled={state.kind === "importing"}>
+          Import sample set
+        </PrimaryButton>
+      );
+    default: {
+      const unreachable: never = state;
+      return unreachable;
+    }
+  }
+}
+
+// The short line under the heading. It names the step without inventing a result count.
+function statusLine(state: ImportState): string {
+  switch (state.kind) {
+    case "ready":
+      return "Every profile in the sample set is saved together.";
+    case "importing":
+      return "Importing the sample set.";
+    case "done":
+      return "These drafts came back from the import. Open Cases to see the saved records.";
+    case "error":
+      return "The import did not finish.";
+    default: {
+      const unreachable: never = state;
+      return unreachable;
+    }
+  }
+}
+
+// Returned drafts, or the error. Nothing here is filled in from sample fixtures.
+function ImportResult({ state, onViewCases }: { state: ImportState; onViewCases: () => void }) {
+  switch (state.kind) {
+    case "done": {
+      const noun = state.count === 1 ? "case" : "cases";
+      return (
+        <div className="flex flex-col gap-3 px-7 py-6">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <div className="font-serif text-[24px]">
+                Imported {state.count} {noun}
+              </div>
+              <div className="mt-0.5 text-[13px] text-muted">Needs faculty review</div>
+            </div>
+            <GhostButton onClick={onViewCases}>View cases</GhostButton>
+          </div>
+          <div className="overflow-hidden rounded-xl border border-line">
+            {state.cases.map((row) => (
+              <div
+                key={row.case_id}
+                className="flex items-center justify-between gap-3 border-t border-hair px-4 py-3 first:border-t-0"
+              >
+                <span className="font-serif text-[19px]">{row.patient}</span>
+                <Badge tone="warn" dot>
+                  Draft
+                </Badge>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+    case "error":
+      return <p className="px-7 py-6 font-serif text-[18px] text-ink">{state.message}</p>;
+    case "ready":
+    case "importing":
+      return null;
+    default: {
+      const unreachable: never = state;
+      return unreachable;
+    }
+  }
 }

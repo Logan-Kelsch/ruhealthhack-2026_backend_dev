@@ -6,5 +6,6 @@ __pycache__/
 *.env.local
 node_modules/
 dist/
-design/
+design/*
+!design/ui-refs/
 *.db

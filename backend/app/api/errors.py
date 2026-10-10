@@ -24,7 +24,15 @@ SHARED_ERROR_RESPONSES = {
     ("/api/studio/cases/{case_id}/intake", "post"): {404: "No saved case with that id."},
     ("/api/studio/cases/{case_id}/approve", "post"): {404: "No saved case with that id."},
     ("/api/studio/cases/{case_id}/autofill", "post"): {404: "No saved case with that id."},
-    ("/api/studio/cases/{case_id}/publish", "post"): {409: "The case is not ready to publish."},
+    ("/api/studio/cases/{case_id}/consistency", "get"): {404: "No saved case with that id."},
+    ("/api/studio/cases/{case_id}/consistency/{finding_id}/dismiss", "post"): {
+        404: "The case or finding was not found.",
+    },
+    ("/api/studio/cases/{case_id}/preview", "post"): {404: "The case or visit was not found."},
+    ("/api/studio/cases/{case_id}/publish", "post"): {
+        404: "No saved case with that id.",
+        409: "The case is not ready to publish.",
+    },
     ("/api/studio/import/vhs", "post"): {500: "The sponsor sample set could not be imported."},
     ("/api/cases/{case_id}", "get"): {404: "No published case with that id."},
     ("/api/encounters", "post"): {404: "The case or visit was not found.", 409: "The encounter cannot be started."},

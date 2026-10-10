@@ -8,6 +8,9 @@ export type StudioCaseDetail = components["schemas"]["StudioCaseDetail"];
 export type StudioDraftResult = components["schemas"]["StudioDraftResult"];
 export type StudioAutofillResult = components["schemas"]["StudioAutofillResult"];
 export type StudioVocab = components["schemas"]["StudioVocab"];
+export type ConsistencyFinding = components["schemas"]["ConsistencyFinding"];
+export type PreviewRun = components["schemas"]["PreviewRun"];
+export type PreviewRequest = components["schemas"]["Preview"];
 export type Icd10Match = components["schemas"]["Icd10Match"];
 export type IntakeGap = components["schemas"]["IntakeGap"];
 export type VhsImportResponse = components["schemas"]["VhsImportResponse"];
@@ -153,6 +156,43 @@ export async function autofillStudioCase(
 // Closed lists for topics, actions, exam maneuvers, and lab panels.
 export async function loadStudioVocab(client: ApiClient): Promise<StudioVocab> {
   const result = await client.GET("/api/studio/vocab");
+  return unwrap(result.response.status, result.data, result.error);
+}
+
+// Findings from the consistency rules. Dismissal is a separate save, so this list can be read again after refresh.
+export async function loadConsistency(client: ApiClient, caseId: string): Promise<ConsistencyFinding[]> {
+  const result = await client.GET("/api/studio/cases/{case_id}/consistency", {
+    params: { path: { case_id: caseId } },
+  });
+  return unwrap(result.response.status, result.data, result.error);
+}
+
+// Mark one finding as intended. The returned case is the saved draft, including that dismissal.
+export async function dismissFinding(client: ApiClient, caseId: string, findingId: string): Promise<StudioCaseDetail> {
+  const result = await client.POST("/api/studio/cases/{case_id}/consistency/{finding_id}/dismiss", {
+    params: { path: { case_id: caseId, finding_id: findingId } },
+  });
+  return unwrap(result.response.status, result.data, result.error);
+}
+
+// Run the selected test student against the saved draft. The transcript is the run that came back.
+export async function previewStudioCase(
+  client: ApiClient,
+  caseId: string,
+  body: PreviewRequest,
+): Promise<PreviewRun> {
+  const result = await client.POST("/api/studio/cases/{case_id}/preview", {
+    params: { path: { case_id: caseId } },
+    body,
+  });
+  return unwrap(result.response.status, result.data, result.error);
+}
+
+// Ask the server to publish. A rejection throws, so the caller does not treat blockers as a saved version.
+export async function publishStudioCase(client: ApiClient, caseId: string): Promise<StudioCaseDetail> {
+  const result = await client.POST("/api/studio/cases/{case_id}/publish", {
+    params: { path: { case_id: caseId } },
+  });
   return unwrap(result.response.status, result.data, result.error);
 }
 

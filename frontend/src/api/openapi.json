@@ -1608,6 +1608,295 @@
         "title": "Preview",
         "type": "object"
       },
+      "PreviewBlockedReply": {
+        "description": "A reply the verifier refused. reply is the text that was not delivered.",
+        "properties": {
+          "problems": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Problems",
+            "type": "array"
+          },
+          "reply": {
+            "title": "Reply",
+            "type": "string"
+          },
+          "student": {
+            "title": "Student",
+            "type": "string"
+          },
+          "turn": {
+            "title": "Turn",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "turn",
+          "student",
+          "reply",
+          "problems"
+        ],
+        "title": "PreviewBlockedReply",
+        "type": "object"
+      },
+      "PreviewDiscovery": {
+        "description": "A case fact the test student elicited. text is that fact's authored text.",
+        "properties": {
+          "fact_id": {
+            "title": "Fact Id",
+            "type": "string"
+          },
+          "objective_id": {
+            "title": "Objective Id",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "turn": {
+            "title": "Turn",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "fact_id",
+          "text",
+          "turn",
+          "objective_id"
+        ],
+        "title": "PreviewDiscovery",
+        "type": "object"
+      },
+      "PreviewDomainScore": {
+        "description": "One official rubric domain for this preview. N/A means the visit did not call for that domain.",
+        "properties": {
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/PreviewEvidence"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "const": "N/A",
+                "type": "string"
+              }
+            ],
+            "title": "Score"
+          }
+        },
+        "required": [
+          "key",
+          "name",
+          "score"
+        ],
+        "title": "PreviewDomainScore",
+        "type": "object"
+      },
+      "PreviewEvidence": {
+        "description": "A transcript quote the rubric used for this domain.",
+        "properties": {
+          "quote": {
+            "title": "Quote",
+            "type": "string"
+          },
+          "turn": {
+            "title": "Turn",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "turn",
+          "quote"
+        ],
+        "title": "PreviewEvidence",
+        "type": "object"
+      },
+      "PreviewFallback": {
+        "description": "Set when the requested driver did not run. used is the driver that produced the transcript.",
+        "properties": {
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "requested": {
+            "enum": [
+              "scripted",
+              "llm"
+            ],
+            "title": "Requested",
+            "type": "string"
+          },
+          "used": {
+            "enum": [
+              "scripted",
+              "llm"
+            ],
+            "title": "Used",
+            "type": "string"
+          }
+        },
+        "required": [
+          "requested",
+          "used",
+          "reason"
+        ],
+        "title": "PreviewFallback",
+        "type": "object"
+      },
+      "PreviewFeedback": {
+        "description": "Rubric result for the preview. interpretation is the rubric's own discussion-aid wording.",
+        "properties": {
+          "domains": {
+            "items": {
+              "$ref": "#/components/schemas/PreviewDomainScore"
+            },
+            "title": "Domains",
+            "type": "array"
+          },
+          "interpretation": {
+            "title": "Interpretation",
+            "type": "string"
+          },
+          "max_total": {
+            "title": "Max Total",
+            "type": "integer"
+          },
+          "review_flag": {
+            "title": "Review Flag",
+            "type": "boolean"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total",
+          "max_total",
+          "interpretation",
+          "review_flag",
+          "domains"
+        ],
+        "title": "PreviewFeedback",
+        "type": "object"
+      },
+      "PreviewRun": {
+        "description": "One test-student preview. The transcript, discoveries, and scores are from that run.",
+        "properties": {
+          "blocked_replies": {
+            "items": {
+              "$ref": "#/components/schemas/PreviewBlockedReply"
+            },
+            "title": "Blocked Replies",
+            "type": "array"
+          },
+          "discoveries": {
+            "items": {
+              "$ref": "#/components/schemas/PreviewDiscovery"
+            },
+            "title": "Discoveries",
+            "type": "array"
+          },
+          "driver": {
+            "enum": [
+              "scripted",
+              "llm"
+            ],
+            "title": "Driver",
+            "type": "string"
+          },
+          "fallback": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PreviewFallback"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "feedback": {
+            "$ref": "#/components/schemas/PreviewFeedback"
+          },
+          "level": {
+            "enum": [
+              "novice",
+              "competent",
+              "expert",
+              "adversarial"
+            ],
+            "title": "Level",
+            "type": "string"
+          },
+          "replies_failing_audit": {
+            "title": "Replies Failing Audit",
+            "type": "integer"
+          },
+          "transcript": {
+            "items": {
+              "$ref": "#/components/schemas/PreviewTranscriptTurn"
+            },
+            "title": "Transcript",
+            "type": "array"
+          },
+          "visit_id": {
+            "title": "Visit Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "level",
+          "driver",
+          "visit_id",
+          "transcript",
+          "discoveries",
+          "blocked_replies",
+          "feedback",
+          "replies_failing_audit"
+        ],
+        "title": "PreviewRun",
+        "type": "object"
+      },
+      "PreviewTranscriptTurn": {
+        "description": "One exchange from the test-student run. The words are what the pipeline produced.",
+        "properties": {
+          "patient": {
+            "title": "Patient",
+            "type": "string"
+          },
+          "student": {
+            "title": "Student",
+            "type": "string"
+          },
+          "turn": {
+            "title": "Turn",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "turn",
+          "student",
+          "patient"
+        ],
+        "title": "PreviewTranscriptTurn",
+        "type": "object"
+      },
       "Profile": {
         "properties": {
           "age": {
@@ -4118,6 +4407,7 @@
     },
     "/api/studio/cases/{case_id}/consistency": {
       "get": {
+        "description": "Recompute findings and mark the ones faculty already dismissed. Ids are not stored as the source of truth.",
         "operationId": "consistency_check_api_studio_cases__case_id__consistency_get",
         "parameters": [
           {
@@ -4136,8 +4426,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "additionalProperties": true,
-                    "type": "object"
+                    "$ref": "#/components/schemas/ConsistencyFinding"
                   },
                   "title": "Response Consistency Check Api Studio Cases  Case Id  Consistency Get",
                   "type": "array"
@@ -4145,6 +4434,16 @@
               }
             },
             "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No saved case with that id."
           },
           "422": {
             "content": {
@@ -4192,13 +4491,21 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Dismiss Finding Api Studio Cases  Case Id  Consistency  Finding Id  Dismiss Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/StudioCaseDetail"
                 }
               }
             },
             "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "The case or finding was not found."
           },
           "422": {
             "content": {
@@ -4282,7 +4589,7 @@
     },
     "/api/studio/cases/{case_id}/preview": {
       "post": {
-        "description": "Runs a test student through the case without saving an encounter.",
+        "description": "Runs a test student through the draft. This does not save an encounter.",
         "operationId": "preview_case_api_studio_cases__case_id__preview_post",
         "parameters": [
           {
@@ -4310,13 +4617,21 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Preview Case Api Studio Cases  Case Id  Preview Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/PreviewRun"
                 }
               }
             },
             "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "The case or visit was not found."
           },
           "422": {
             "content": {
@@ -4337,6 +4652,7 @@
     },
     "/api/studio/cases/{case_id}/publish": {
       "post": {
+        "description": "Publish the latest draft when every check passes. The response is the version that was saved.",
         "operationId": "publish_case_api_studio_cases__case_id__publish_post",
         "parameters": [
           {
@@ -4354,13 +4670,21 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Publish Case Api Studio Cases  Case Id  Publish Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/StudioCaseDetail"
                 }
               }
             },
             "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No saved case with that id."
           },
           "409": {
             "content": {

@@ -317,7 +317,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Consistency Check */
+        /**
+         * Consistency Check
+         * @description Recompute findings and mark the ones faculty already dismissed. Ids are not stored as the source of truth.
+         */
         get: operations["consistency_check_api_studio_cases__case_id__consistency_get"];
         put?: never;
         post?: never;
@@ -378,7 +381,7 @@ export interface paths {
         put?: never;
         /**
          * Preview Case
-         * @description Runs a test student through the case without saving an encounter.
+         * @description Runs a test student through the draft. This does not save an encounter.
          */
         post: operations["preview_case_api_studio_cases__case_id__preview_post"];
         delete?: never;
@@ -396,7 +399,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Publish Case */
+        /**
+         * Publish Case
+         * @description Publish the latest draft when every check passes. The response is the version that was saved.
+         */
         post: operations["publish_case_api_studio_cases__case_id__publish_post"];
         delete?: never;
         options?: never;
@@ -1172,6 +1178,132 @@ export interface components {
             level: "novice" | "competent" | "expert" | "adversarial";
             /** Visit Id */
             visit_id?: string | null;
+        };
+        /**
+         * PreviewBlockedReply
+         * @description A reply the verifier refused. reply is the text that was not delivered.
+         */
+        PreviewBlockedReply: {
+            /** Problems */
+            problems: string[];
+            /** Reply */
+            reply: string;
+            /** Student */
+            student: string;
+            /** Turn */
+            turn: number;
+        };
+        /**
+         * PreviewDiscovery
+         * @description A case fact the test student elicited. text is that fact's authored text.
+         */
+        PreviewDiscovery: {
+            /** Fact Id */
+            fact_id: string;
+            /** Objective Id */
+            objective_id: string;
+            /** Text */
+            text: string;
+            /** Turn */
+            turn: number;
+        };
+        /**
+         * PreviewDomainScore
+         * @description One official rubric domain for this preview. N/A means the visit did not call for that domain.
+         */
+        PreviewDomainScore: {
+            /** Evidence */
+            evidence?: components["schemas"]["PreviewEvidence"][];
+            /** Key */
+            key: string;
+            /** Name */
+            name: string;
+            /** Score */
+            score: number | "N/A";
+        };
+        /**
+         * PreviewEvidence
+         * @description A transcript quote the rubric used for this domain.
+         */
+        PreviewEvidence: {
+            /** Quote */
+            quote: string;
+            /** Turn */
+            turn: number;
+        };
+        /**
+         * PreviewFallback
+         * @description Set when the requested driver did not run. used is the driver that produced the transcript.
+         */
+        PreviewFallback: {
+            /** Reason */
+            reason: string;
+            /**
+             * Requested
+             * @enum {string}
+             */
+            requested: "scripted" | "llm";
+            /**
+             * Used
+             * @enum {string}
+             */
+            used: "scripted" | "llm";
+        };
+        /**
+         * PreviewFeedback
+         * @description Rubric result for the preview. interpretation is the rubric's own discussion-aid wording.
+         */
+        PreviewFeedback: {
+            /** Domains */
+            domains: components["schemas"]["PreviewDomainScore"][];
+            /** Interpretation */
+            interpretation: string;
+            /** Max Total */
+            max_total: number;
+            /** Review Flag */
+            review_flag: boolean;
+            /** Total */
+            total: number;
+        };
+        /**
+         * PreviewRun
+         * @description One test-student preview. The transcript, discoveries, and scores are from that run.
+         */
+        PreviewRun: {
+            /** Blocked Replies */
+            blocked_replies: components["schemas"]["PreviewBlockedReply"][];
+            /** Discoveries */
+            discoveries: components["schemas"]["PreviewDiscovery"][];
+            /**
+             * Driver
+             * @enum {string}
+             */
+            driver: "scripted" | "llm";
+            fallback?: components["schemas"]["PreviewFallback"] | null;
+            feedback: components["schemas"]["PreviewFeedback"];
+            /**
+             * Level
+             * @enum {string}
+             */
+            level: "novice" | "competent" | "expert" | "adversarial";
+            /** Replies Failing Audit */
+            replies_failing_audit: number;
+            /** Transcript */
+            transcript: components["schemas"]["PreviewTranscriptTurn"][];
+            /** Visit Id */
+            visit_id: string;
+        };
+        /**
+         * PreviewTranscriptTurn
+         * @description One exchange from the test-student run. The words are what the pipeline produced.
+         */
+        PreviewTranscriptTurn: {
+            /** Patient */
+            patient: string;
+            /** Student */
+            student: string;
+            /** Turn */
+            turn: number;
         };
         /** Profile */
         Profile: {
@@ -2477,9 +2609,16 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    }[];
+                    "application/json": components["schemas"]["ConsistencyFinding"][];
+                };
+            };
+            /** @description No saved case with that id. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description Validation error */
@@ -2511,9 +2650,16 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["StudioCaseDetail"];
+                };
+            };
+            /** @description The case or finding was not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description Validation error */
@@ -2592,9 +2738,16 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["PreviewRun"];
+                };
+            };
+            /** @description The case or visit was not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description Validation error */
@@ -2625,9 +2778,16 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["StudioCaseDetail"];
+                };
+            };
+            /** @description No saved case with that id. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description The case is not ready to publish. */

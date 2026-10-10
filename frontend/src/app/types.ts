@@ -12,7 +12,7 @@ export type ScreenId =
   | "s-debrief"
   | "s-between";
 
-export type StudioTab = "patient" | "objectives" | "files" | "tree";
+export type StudioTab = "patient" | "objectives" | "files" | "tree" | "review";
 
 export type VisitNumber = 1 | 2;
 

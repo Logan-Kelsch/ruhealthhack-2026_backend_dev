@@ -10,7 +10,7 @@ export function StudentHome({ go }: { go: Go }) {
     <Page width="max-w-[1100px]">
       <Title kicker="Friday, October 10">Good afternoon, Jordan</Title>
       <section className="overflow-hidden rounded-[20px] border border-line bg-card">
-        <div className="flex items-center gap-2 bg-ink px-6 py-3 text-[12.5px] font-semibold tracking-[0.3px] text-white">
+        <div className="flex items-center gap-2 bg-panel px-6 py-3 text-[12.5px] font-semibold tracking-[0.3px] text-white">
           <span className="size-1.5 rounded-full bg-[#8fb0ff]" />
           {UP_NEXT.banner}
         </div>

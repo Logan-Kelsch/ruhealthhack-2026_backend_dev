@@ -76,7 +76,7 @@ export function Encounter({ go, visit }: { go: Go; visit: VisitNumber }) {
 
       <div className="mx-auto grid w-full max-w-[1440px] flex-1 items-start gap-4 px-6 py-5 [grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr))]">
         <aside className="flex flex-col gap-3">
-          <section className="rounded-2xl bg-ink px-[18px] py-4 text-white">
+          <section className="rounded-2xl bg-panel px-[18px] py-4 text-white">
             <div className="text-[11.5px] font-semibold tracking-[0.6px] text-indigo-on-ink uppercase">Goal</div>
             <div className="mt-1 font-serif text-[19px] leading-snug">{goal}</div>
           </section>
@@ -144,7 +144,7 @@ export function Encounter({ go, visit }: { go: Go; visit: VisitNumber }) {
               return (
                 <div key={text} className={`flex flex-col gap-0.5 ${student ? "items-end" : "items-start"}`}>
                   <span className="px-1 text-[11.5px] font-semibold text-muted">{who}</span>
-                  <div className={`max-w-[88%] rounded-[14px] px-3.5 py-2.5 text-[15px] leading-snug ${student ? "bg-ink text-white" : "bg-segment text-ink"}`}>
+                  <div className={`max-w-[88%] rounded-[14px] px-3.5 py-2.5 text-[15px] leading-snug ${student ? "bg-panel text-white" : "bg-segment text-ink"}`}>
                     {text}
                   </div>
                 </div>

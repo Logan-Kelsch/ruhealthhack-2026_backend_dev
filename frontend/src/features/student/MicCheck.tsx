@@ -35,7 +35,7 @@ export function MicCheck({ go }: { go: Go }) {
           </div>
           <div className="relative flex size-[140px] items-center justify-center">
             <div className={`absolute inset-0 rounded-full bg-indigo-soft-2 ${muted ? "" : "rnd-pulse"}`} />
-            <div className={`relative flex size-24 items-center justify-center rounded-full text-white ${muted ? "bg-inactive" : "bg-ink"}`}>
+            <div className={`relative flex size-24 items-center justify-center rounded-full text-white ${muted ? "bg-inactive" : "bg-panel"}`}>
               <MicIcon size={36} />
             </div>
           </div>
@@ -57,7 +57,7 @@ export function MicCheck({ go }: { go: Go }) {
               Headphones recommended, so the patient’s voice doesn’t echo
             </CheckRow>
             <button type="button" onClick={() => setMuted((value) => !value)} className="flex items-center gap-3 border-t border-hair px-3.5 py-3 text-left text-sm">
-              <span className={`relative h-5 w-[34px] shrink-0 rounded-full transition-colors ${muted ? "bg-ink" : "bg-line-4"}`}>
+              <span className={`relative h-5 w-[34px] shrink-0 rounded-full transition-colors ${muted ? "bg-panel" : "bg-line-4"}`}>
                 <span className={`absolute top-0.5 size-4 rounded-full bg-white shadow-[0_1px_2px_rgba(0,0,0,.25)] transition-[left] ${muted ? "left-4" : "left-0.5"}`} />
               </span>
               {muted ? "Muted. Tap to unmute." : "You can mute any time"}

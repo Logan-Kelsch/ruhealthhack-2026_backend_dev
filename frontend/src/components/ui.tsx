@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { BackArrow } from "./Icons";
+import type { Theme } from "../lib/theme";
+import { BackArrow, MoonIcon, SunIcon } from "./Icons";
 
 // Shared page width. Each screen picks its own max so the design's columns stay intact.
 export function Page({
@@ -69,7 +70,7 @@ export function PrimaryButton({
     <button
       type="button"
       onClick={onClick}
-      className={`inline-flex items-center bg-ink text-white hover:bg-indigo ${shape} ${block ? "w-full justify-center" : ""} ${className}`}
+      className={`inline-flex items-center bg-panel text-white hover:bg-panel-hover ${shape} ${block ? "w-full justify-center" : ""} ${className}`}
     >
       {children}
     </button>
@@ -95,6 +96,22 @@ export function GhostButton({
       className={`inline-flex items-center border border-line-2 bg-card font-medium text-ink hover:bg-wash ${shape} ${className}`}
     >
       {children}
+    </button>
+  );
+}
+
+// Light/dark switch. Lives on the welcome screen and in the sidebar.
+export function ThemeToggle({ theme, onToggle, className = "" }: { theme: Theme; onToggle: () => void; className?: string }) {
+  const dark = theme === "dark";
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-pressed={dark}
+      className={`inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-line-2 bg-card px-3 text-[13px] font-medium text-ink-soft hover:bg-wash ${className}`}
+    >
+      {dark ? <SunIcon /> : <MoonIcon />}
+      {dark ? "Light mode" : "Dark mode"}
     </button>
   );
 }

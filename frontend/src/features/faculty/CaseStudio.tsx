@@ -69,7 +69,7 @@ export function CaseStudio({ go, tab }: { go: Go; tab: StudioTab }) {
             <GhostButton>Preview as student</GhostButton>
             <button
               type="button"
-              className={`h-10 rounded-[10px] px-[18px] text-sm font-medium text-white ${open ? "cursor-not-allowed bg-inactive" : "bg-ink"}`}
+              className={`h-10 rounded-[10px] px-[18px] text-sm font-medium text-white ${open ? "cursor-not-allowed bg-inactive" : "bg-panel"}`}
             >
               {open ? `Publish · ${open} to fix` : "Publish"}
             </button>
@@ -151,7 +151,7 @@ function PatientTab({ drugFixed, onFix }: { drugFixed: boolean; onFix: () => voi
               ) : null}
               {item.issue ? (
                 <div className="mt-2.5 flex gap-1.5">
-                  <button type="button" onClick={onFix} className="h-7 rounded-[7px] border border-[#e7c9a6] bg-card px-2.5 text-[12.5px] font-medium text-warn-deep">
+                  <button type="button" onClick={onFix} className="h-7 rounded-[7px] border border-[#e7c9a6] bg-card px-2.5 text-[12.5px] font-medium text-warn-deep dark:border-[#5a4426]">
                     Replace with eplerenone
                   </button>
                   <button type="button" onClick={onFix} className="h-7 rounded-[7px] px-2.5 text-[12.5px] text-warn-deep">

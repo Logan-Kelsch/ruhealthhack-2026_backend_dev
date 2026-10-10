@@ -65,7 +65,7 @@ function NextTime() {
   return (
     <div className="flex flex-col gap-3.5">
       <section className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-4 rounded-2xl border border-indigo-line bg-indigo-soft px-[22px] py-[18px]">
-        <span className="flex size-10 items-center justify-center rounded-xl bg-ink text-white">
+        <span className="flex size-10 items-center justify-center rounded-xl bg-panel text-white">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" aria-hidden>
             <path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z" />
           </svg>

@@ -23,7 +23,7 @@ export function Briefing({ go, visit }: { go: Go; visit: VisitNumber }) {
           <h1 className="m-0 mt-0.5 font-serif text-[38px] leading-none font-medium tracking-[-0.8px]">Walter Greene, 72</h1>
         </div>
       </header>
-      <section className="rounded-2xl bg-ink px-6 py-5 text-white">
+      <section className="rounded-2xl bg-panel px-6 py-5 text-white">
         <div className="text-xs font-semibold tracking-[0.6px] text-indigo-on-ink uppercase">Your goal</div>
         <div className="mt-1.5 font-serif text-2xl leading-snug text-pretty">{WALTER_GOAL[visit]}</div>
       </section>

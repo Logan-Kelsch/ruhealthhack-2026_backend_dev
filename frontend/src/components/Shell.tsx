@@ -1,8 +1,9 @@
 import type { ReactNode } from "react";
 import type { Go, ScreenId } from "../app/types";
+import { useTheme } from "../lib/theme";
 import { FACULTY_USER, STUDENT_USER } from "../mock/session";
 import { ICONS, StrokeIcon, type IconName } from "./Icons";
-import { Wordmark } from "./ui";
+import { ThemeToggle, Wordmark } from "./ui";
 
 type Role = "faculty" | "student";
 
@@ -53,6 +54,7 @@ type ShellProps = {
 // Signed-in frame from Rounds.dc.html: sidebar, wordmark, and the current screen.
 // Mic check and the encounter hide the sidebar so the visit can use the full window.
 export function Shell({ screen, go, children }: ShellProps) {
+  const { theme, toggle } = useTheme();
   const role: Role = screen.startsWith("f-") ? "faculty" : "student";
   const focus = screen === "s-mic" || screen === "s-encounter";
   const section = sectionFor(screen);
@@ -101,10 +103,11 @@ export function Shell({ screen, go, children }: ShellProps) {
                 <div className="truncate text-xs text-muted">{user.role}</div>
               </div>
             </div>
+            <ThemeToggle theme={theme} onToggle={toggle} className="mt-2 w-full" />
             <button
               type="button"
               onClick={() => go("welcome")}
-              className="mt-2 rounded-lg px-2.5 py-2 text-center text-[12.5px] text-ink-soft hover:bg-card/80"
+              className="mt-1.5 rounded-lg px-2.5 py-2 text-center text-[12.5px] text-ink-soft hover:bg-card/80"
             >
               Switch role
             </button>

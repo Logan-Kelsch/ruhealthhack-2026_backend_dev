@@ -1,0 +1,261 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >-
+  [Product name] CI access (PRD P-04). GitHub OIDC provider, a deploy role that only the
+  repository's main branch can assume, and the CloudFormation execution role that does the
+  actual resource changes. Deployed once by hand; CI cannot change this stack.
+
+Metadata:
+  AWSToolsMetrics:
+    AWSAgentToolkit: aws-cloudformation@3
+  com.aws.cloudformation.Context:
+    why: >-
+      GitHub Actions gets short-lived credentials through OIDC, so no AWS keys are stored in
+      GitHub. The deploy role can only drive CloudFormation, the frontend bucket, CloudFront
+      invalidations, SSM commands to the app instance and the /<Prefix>/app-env parameter. Broad
+      create/delete rights sit on the execution role, which only CloudFormation can assume.
+    must:
+      - The trust policy must stay pinned to one repository and refs/heads/main.
+      - The deploy role must never be able to change this stack or the data stack.
+
+Parameters:
+  Prefix:
+    Type: String
+    Default: rounds-dev
+    AllowedPattern: '^[a-z][a-z0-9-]{1,30}$'
+    Description: Shared name prefix; must match the other stacks.
+  GitHubRepo:
+    Type: String
+    AllowedPattern: '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$'
+    Description: owner/name of the GitHub repository allowed to deploy.
+  GitHubOidcSubjectPrefix:
+    Type: String
+    Default: ""
+    AllowedPattern: '^$|^repo:[A-Za-z0-9_.-]+(@[0-9]+)?/[A-Za-z0-9_.-]+(@[0-9]+)?$'
+    Description: >-
+      Repository OIDC subject prefix from GitHub, including immutable IDs when enabled.
+      Empty uses the legacy repo:owner/name format. bootstrap-github.sh resolves this value.
+  DeployBranch:
+    Type: String
+    Default: main
+    Description: Only workflow runs on this branch can assume the deploy role.
+  ExistingOidcProviderArn:
+    Type: String
+    Default: ""
+    Description: >-
+      Leave blank to create the token.actions.githubusercontent.com provider. An account can
+      have only one, so pass its ARN if it already exists.
+
+Conditions:
+  CreateOidcProvider: !Equals [!Ref ExistingOidcProviderArn, ""]
+  HasGitHubOidcSubjectPrefix: !Not [!Equals [!Ref GitHubOidcSubjectPrefix, ""]]
+
+Resources:
+  GitHubOidcProvider:
+    Type: AWS::IAM::OIDCProvider
+    Condition: CreateOidcProvider
+    Properties:
+      Url: https://token.actions.githubusercontent.com
+      ClientIdList: [sts.amazonaws.com]
+
+  DeployRole:
+    Type: AWS::IAM::Role
+    Metadata:
+      com.aws.cloudformation.Context:
+        why: >-
+          Assumed by GitHub Actions through aws-actions/configure-aws-credentials. The exact
+          subject prefix follows the repository's OIDC settings, including immutable IDs.
+        must:
+          - Match the exact repository subject and deploy branch; never use a subject wildcard.
+    Properties:
+      Description: !Sub "GitHub Actions deploys for ${GitHubRepo}@${DeployBranch}"
+      MaxSessionDuration: 3600
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !If [CreateOidcProvider, !Ref GitHubOidcProvider, !Ref ExistingOidcProviderArn]
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                "token.actions.githubusercontent.com:aud": sts.amazonaws.com
+                "token.actions.githubusercontent.com:sub": !If
+                  - HasGitHubOidcSubjectPrefix
+                  - !Sub "${GitHubOidcSubjectPrefix}:ref:refs/heads/${DeployBranch}"
+                  - !Sub "repo:${GitHubRepo}:ref:refs/heads/${DeployBranch}"
+      Policies:
+        - PolicyName: deploy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: ReadStacks
+                Effect: Allow
+                Action:
+                  - cloudformation:DescribeStacks
+                  - cloudformation:DescribeStackEvents
+                  - cloudformation:DescribeChangeSet
+                  - cloudformation:GetTemplateSummary
+                  - cloudformation:ValidateTemplate
+                Resource: "*"
+              - Sid: ResolveAmiParameter
+                Effect: Allow
+                Action: [ssm:GetParameter, ssm:GetParameters]
+                Resource: !Sub "arn:${AWS::Partition}:ssm:${AWS::Region}::parameter/aws/service/*"
+              - Sid: ChangeAppStacks
+                Effect: Allow
+                Action:
+                  - cloudformation:CreateChangeSet
+                  - cloudformation:ExecuteChangeSet
+                  - cloudformation:DeleteChangeSet
+                Resource: !Sub "arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/${Prefix}-*/*"
+              - Sid: KeepOutOfDataAndCiStacks
+                Effect: Deny
+                Action:
+                  - cloudformation:CreateChangeSet
+                  - cloudformation:ExecuteChangeSet
+                  - cloudformation:UpdateStack
+                  - cloudformation:DeleteStack
+                Resource:
+                  - !Sub "arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/${Prefix}-data/*"
+                  - !Sub "arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/${AWS::StackName}/*"
+              - Sid: PassExecutionRole
+                Effect: Allow
+                Action: iam:PassRole
+                Resource: !GetAtt ExecutionRole.Arn
+                Condition:
+                  StringEquals: { "iam:PassedToService": cloudformation.amazonaws.com }
+              - Sid: FrontendBucket
+                Effect: Allow
+                Action: [s3:ListBucket, s3:GetObject, s3:PutObject, s3:DeleteObject]
+                Resource:
+                  # Generated bucket names start with the lower-cased stack and logical ID.
+                  - !Sub "arn:${AWS::Partition}:s3:::${Prefix}-edge-frontendbucket-*"
+                  - !Sub "arn:${AWS::Partition}:s3:::${Prefix}-edge-frontendbucket-*/*"
+              - Sid: Invalidate
+                Effect: Allow
+                Action: [cloudfront:CreateInvalidation, cloudfront:GetInvalidation]
+                Resource: !Sub "arn:${AWS::Partition}:cloudfront::${AWS::AccountId}:distribution/*"
+              - Sid: RunDeployCommandOnAppInstance
+                Effect: Allow
+                Action: ssm:SendCommand
+                Resource: !Sub "arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:instance/*"
+                Condition:
+                  StringEquals: { "ssm:resourceTag/aws:cloudformation:stack-name": !Sub "${Prefix}-app" }
+              - Sid: RunShellScriptDocument
+                Effect: Allow
+                Action: ssm:SendCommand
+                Resource: !Sub "arn:${AWS::Partition}:ssm:${AWS::Region}::document/AWS-RunShellScript"
+              - Sid: ReadCommandResults
+                Effect: Allow
+                Action: [ssm:GetCommandInvocation, ssm:ListCommandInvocations]
+                Resource: "*"
+              - Sid: WriteSharedEnvAndDeployMarker
+                Effect: Allow
+                Action: [ssm:GetParameter, ssm:PutParameter]
+                Resource:
+                  # The shared .env (GitHub secret APP_ENV), read by the instance on deploy.
+                  - !Sub "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Prefix}/app-env"
+                  # Last commit deployed; CI diffs against it so a skipped run never drops a change.
+                  - !Sub "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Prefix}/deployed-sha"
+
+  ExecutionRole:
+    Type: AWS::IAM::Role
+    Metadata:
+      com.aws.cloudformation.Context:
+        why: >-
+          CloudFormation service role for the network, data, edge, auth and app stacks. Once a
+          stack has used it, later updates from laptops use it too.
+        must:
+          - IAM rights stay limited to roles, instance profiles, users and policies named after the Prefix stacks.
+    Properties:
+      Description: !Sub "CloudFormation service role for ${Prefix}-* stacks"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: { Service: cloudformation.amazonaws.com }
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals: { "aws:SourceAccount": !Ref AWS::AccountId }
+      Policies:
+        - PolicyName: manage-app-resources
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: Services
+                Effect: Allow
+                Action:
+                  - ec2:*
+                  - rds:*
+                  - s3:*
+                  - cloudfront:*
+                  - cognito-idp:*
+                  - ses:GetIdentityVerificationAttributes
+                Resource: "*"
+              - Sid: AmiLookup
+                Effect: Allow
+                Action: [ssm:GetParameter, ssm:GetParameters]
+                Resource: !Sub "arn:${AWS::Partition}:ssm:${AWS::Region}::parameter/aws/service/*"
+              - Sid: EncryptedVolumesAndDatabase
+                Effect: Allow
+                Action: [kms:DescribeKey, kms:CreateGrant, kms:Decrypt, kms:GenerateDataKey*, kms:ReEncrypt*]
+                Resource: "*"
+                Condition:
+                  StringLike:
+                    "kms:ViaService": [!Sub "ec2.${AWS::Region}.amazonaws.com", !Sub "rds.${AWS::Region}.amazonaws.com"]
+              - Sid: ServiceLinkedRoles
+                Effect: Allow
+                Action: iam:CreateServiceLinkedRole
+                Resource: "*"
+                Condition:
+                  StringLike:
+                    "iam:AWSServiceName": [rds.amazonaws.com, cognito-idp.amazonaws.com]
+              - Sid: AppRoleAndProfile
+                Effect: Allow
+                Action:
+                  - iam:CreateRole
+                  - iam:DeleteRole
+                  - iam:GetRole
+                  - iam:UpdateRole
+                  - iam:TagRole
+                  - iam:UntagRole
+                  - iam:PutRolePolicy
+                  - iam:GetRolePolicy
+                  - iam:DeleteRolePolicy
+                  - iam:AttachRolePolicy
+                  - iam:DetachRolePolicy
+                  - iam:UpdateAssumeRolePolicy
+                  - iam:PassRole
+                  - iam:CreateUser
+                  - iam:DeleteUser
+                  - iam:GetUser
+                  - iam:TagUser
+                  - iam:UntagUser
+                  - iam:AttachUserPolicy
+                  - iam:DetachUserPolicy
+                  - iam:ListAttachedUserPolicies
+                  - iam:CreatePolicy
+                  - iam:DeletePolicy
+                  - iam:GetPolicy
+                  - iam:CreatePolicyVersion
+                  - iam:DeletePolicyVersion
+                  - iam:GetPolicyVersion
+                  - iam:ListPolicyVersions
+                  - iam:CreateInstanceProfile
+                  - iam:DeleteInstanceProfile
+                  - iam:GetInstanceProfile
+                  - iam:AddRoleToInstanceProfile
+                  - iam:RemoveRoleFromInstanceProfile
+                Resource:
+                  - !Sub "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${Prefix}-*"
+                  - !Sub "arn:${AWS::Partition}:iam::${AWS::AccountId}:instance-profile/${Prefix}-*"
+                  - !Sub "arn:${AWS::Partition}:iam::${AWS::AccountId}:user/${Prefix}-*"
+                  - !Sub "arn:${AWS::Partition}:iam::${AWS::AccountId}:policy/${Prefix}-*"
+
+Outputs:
+  DeployRoleArn:
+    Description: Store as the GitHub secret AWS_DEPLOY_ROLE_ARN
+    Value: !GetAtt DeployRole.Arn
+  ExecutionRoleArn:
+    Description: deploy-stacks.sh passes this to CloudFormation automatically when the stack exists
+    Value: !GetAtt ExecutionRole.Arn

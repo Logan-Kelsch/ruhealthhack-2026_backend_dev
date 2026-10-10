@@ -1,0 +1,252 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >-
+  [Product name] network (PRD P-04), stack 1 of 5. VPC with no NAT gateway, two public subnets
+  (backend in A, RDS across A and B), security groups, and the Elastic IP that CloudFront uses
+  as the API origin.
+
+Metadata:
+  AWSToolsMetrics:
+    AWSAgentToolkit: aws-cloudformation@3
+  com.aws.cloudformation.Context:
+    why: >-
+      Holds everything other stacks attach to. The Elastic IP lives here, not in the app stack,
+      so the edge stack can build the origin hostname before the instance exists and the
+      stacks deploy in one direction: network, data, edge, auth, app.
+    must:
+      - No NAT gateway; EC2 sits in a public subnet and only accepts CloudFront traffic on AppPort.
+      - RDS is reachable from the internet only through rules in DbDevAccessSecurityGroup, which hold single team IPs (/32).
+      - Exports are imported by later stacks; check `aws cloudformation list-imports` before changing one.
+
+Parameters:
+  Prefix:
+    Type: String
+    Default: rounds-dev
+    AllowedPattern: '^[a-z][a-z0-9-]{1,30}$'
+    Description: Shared name prefix. Stack names and export names start with it.
+  AppPort:
+    Type: Number
+    Default: 8000
+    MinValue: 1024
+    MaxValue: 65535
+    Description: Port the backend listens on. CloudFront connects to it over HTTP.
+  SshCidr:
+    Type: String
+    Default: ""
+    AllowedPattern: '^$|^(\d{1,3}\.){3}\d{1,3}/(2[4-9]|3[0-2])$'
+    ConstraintDescription: Must be blank or a /24 to /32 CIDR (for example your IP with /32).
+    Description: Optional CIDR allowed to SSH (port 22). Leave blank to keep port 22 closed.
+  CloudFrontPrefixListId:
+    Type: String
+    Default: pl-3b927c52
+    Description: >-
+      Managed prefix list com.amazonaws.global.cloudfront.origin-facing. pl-3b927c52 is the
+      us-east-1 ID; look it up with `aws ec2 describe-managed-prefix-lists` in other regions.
+
+Conditions:
+  HasSshCidr: !Not [!Equals [!Ref SshCidr, ""]]
+  IsUsEast1: !Equals [!Ref "AWS::Region", us-east-1]
+
+Resources:
+  Vpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.20.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags: [{ Key: Name, Value: !Ref Prefix }]
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+
+  GatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref Vpc
+      InternetGatewayId: !Ref InternetGateway
+
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Metadata:
+      com.aws.cloudformation.Context:
+        why: Holds the backend so it can reach Bedrock, ElevenLabs and Tavus without a NAT gateway.
+    Properties:
+      VpcId: !Ref Vpc
+      CidrBlock: 10.20.0.0/24
+      AvailabilityZone: !Select [0, !GetAZs ""]
+      MapPublicIpOnLaunch: true
+      Tags: [{ Key: Name, Value: !Sub "${Prefix}-public-a" }]
+
+  PublicSubnetB:
+    Type: AWS::EC2::Subnet
+    Metadata:
+      com.aws.cloudformation.Context:
+        why: >-
+          RDS subnet groups need two AZs even for a single-AZ instance. Public so laptops can
+          reach the dev database; security groups decide who actually gets in.
+    Properties:
+      VpcId: !Ref Vpc
+      CidrBlock: 10.20.1.0/24
+      AvailabilityZone: !Select [1, !GetAZs ""]
+      MapPublicIpOnLaunch: false
+      Tags: [{ Key: Name, Value: !Sub "${Prefix}-public-b" }]
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref Vpc
+
+  PublicDefaultRoute:
+    Type: AWS::EC2::Route
+    DependsOn: GatewayAttachment
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PublicSubnetRouteAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet
+      RouteTableId: !Ref PublicRouteTable
+
+  PublicSubnetBRouteAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnetB
+      RouteTableId: !Ref PublicRouteTable
+
+  AppSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Metadata:
+      com.aws.cloudformation.Context:
+        why: Only CloudFront edge servers may reach the backend port; there is no direct public access.
+        must:
+          - Never add 0.0.0.0/0 ingress.
+          - The CloudFront prefix list counts as ~55 rules toward the 60-rule limit, so keep other rules few.
+    Properties:
+      GroupDescription: Backend instance; ingress from CloudFront only (plus optional SSH)
+      VpcId: !Ref Vpc
+      SecurityGroupIngress:
+        - Description: CloudFront origin-facing servers
+          IpProtocol: tcp
+          FromPort: !Ref AppPort
+          ToPort: !Ref AppPort
+          SourcePrefixListId: !Ref CloudFrontPrefixListId
+        - !If
+          - HasSshCidr
+          - Description: SSH from the team
+            IpProtocol: tcp
+            FromPort: 22
+            ToPort: 22
+            CidrIp: !Ref SshCidr
+          - !Ref AWS::NoValue
+      SecurityGroupEgress:
+        - Description: Outbound HTTPS to AWS APIs and voice/avatar vendors
+          IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        - Description: Outbound HTTP for package mirrors during setup
+          IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+
+  AppToDbEgress:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      GroupId: !Ref AppSecurityGroup
+      Description: Postgres
+      IpProtocol: tcp
+      FromPort: 5432
+      ToPort: 5432
+      DestinationSecurityGroupId: !Ref DbSecurityGroup
+
+  DbSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: RDS Postgres; reachable from the backend instance only
+      VpcId: !Ref Vpc
+      SecurityGroupIngress:
+        - Description: Postgres from backend
+          IpProtocol: tcp
+          FromPort: 5432
+          ToPort: 5432
+          SourceSecurityGroupId: !Ref AppSecurityGroup
+      SecurityGroupEgress:
+        - Description: No outbound traffic needed
+          IpProtocol: "-1"
+          CidrIp: 127.0.0.1/32
+
+  DbDevAccessSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Metadata:
+      com.aws.cloudformation.Context:
+        why: >-
+          Lets team laptops reach Postgres for the shared dev database. Rules are added and
+          removed by infra/scripts/db-allow-me.sh (one /32 per person, described "dev:<IAM user>"),
+          so IP changes on event Wi-Fi don't need a stack update.
+        must:
+          - Never add 0.0.0.0/0 or any range wider than a single address.
+          - Keep SecurityGroupIngress out of this template; CloudFormation would remove the script's rules.
+    Properties:
+      GroupDescription: Postgres from team laptops (rules managed by db-allow-me.sh)
+      VpcId: !Ref Vpc
+      SecurityGroupEgress:
+        - Description: No outbound traffic needed
+          IpProtocol: "-1"
+          CidrIp: 127.0.0.1/32
+
+  AppEip:
+    Type: AWS::EC2::EIP
+    DependsOn: GatewayAttachment
+    Metadata:
+      com.aws.cloudformation.Context:
+        why: >-
+          CloudFront needs a stable origin hostname. The app stack associates this address with
+          the instance, so replacing the instance never changes the origin.
+        must:
+          - Replacing this resource changes the origin hostname; redeploy the edge stack afterwards.
+    Properties:
+      Domain: vpc
+      Tags: [{ Key: Name, Value: !Sub "${Prefix}-api" }]
+
+Outputs:
+  VpcId:
+    Value: !Ref Vpc
+    Export: { Name: !Sub "${Prefix}-VpcId" }
+  PublicSubnetId:
+    Value: !Ref PublicSubnet
+    Export: { Name: !Sub "${Prefix}-PublicSubnetId" }
+  DbSubnetIds:
+    Value: !Join [",", [!Ref PublicSubnet, !Ref PublicSubnetB]]
+    Export: { Name: !Sub "${Prefix}-DbSubnetIds" }
+  AppSecurityGroupId:
+    Value: !Ref AppSecurityGroup
+    Export: { Name: !Sub "${Prefix}-AppSecurityGroupId" }
+  DbSecurityGroupId:
+    Value: !Ref DbSecurityGroup
+    Export: { Name: !Sub "${Prefix}-DbSecurityGroupId" }
+  DbDevAccessSecurityGroupId:
+    Description: db-allow-me.sh adds your IP here
+    Value: !Ref DbDevAccessSecurityGroup
+    Export: { Name: !Sub "${Prefix}-DbDevAccessSecurityGroupId" }
+  AppEipAllocationId:
+    Value: !GetAtt AppEip.AllocationId
+    Export: { Name: !Sub "${Prefix}-AppEipAllocationId" }
+  AppPublicIp:
+    Value: !Ref AppEip
+  AppOriginDomain:
+    Description: Public DNS name of the Elastic IP; CloudFront cannot use a bare IP as an origin.
+    Value: !If
+      - IsUsEast1
+      - !Sub
+        - "ec2-${Dashed}.compute-1.amazonaws.com"
+        - Dashed: !Join ["-", !Split [".", !Ref AppEip]]
+      - !Sub
+        - "ec2-${Dashed}.${AWS::Region}.compute.amazonaws.com"
+        - Dashed: !Join ["-", !Split [".", !Ref AppEip]]
+    Export: { Name: !Sub "${Prefix}-AppOriginDomain" }
+  AppPort:
+    Value: !Ref AppPort
+    Export: { Name: !Sub "${Prefix}-AppPort" }

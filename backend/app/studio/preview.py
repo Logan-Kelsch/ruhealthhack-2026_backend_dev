@@ -172,10 +172,12 @@ def run_test_student(case: Case, level: str, driver: str = "scripted", max_turns
                     continue
                 break
         previously = list(state.get("disclosed", {}).keys())
+        # Same window the pipeline's verifier uses, so the audit doesn't flag teach-back it allowed.
+        student_said = " ".join([s for s, _ in history[-6:]] + [utterance])
         out = run_turn(case, state, utterance, history)
         state = out.state
         history.append((utterance, out.reply_text))
-        audit = deterministic_checks(case, out.reply_text, out.cited_fact_ids, out.engine.allowed_fact_ids, previously + out.engine.repeat_fact_ids, utterance)
+        audit = deterministic_checks(case, out.reply_text, out.cited_fact_ids, out.engine.allowed_fact_ids, previously + out.engine.repeat_fact_ids, student_said)
         turns.append({"idx": state["turn"], "student_text": utterance, "reply_text": out.reply_text, "intent": out.intent.model_dump(),
                       "engine": out.engine.model_dump(), "verifier": out.verifier, "cited_fact_ids": out.cited_fact_ids,
                       "latency_ms": out.latency_ms, "audit_problems": audit})

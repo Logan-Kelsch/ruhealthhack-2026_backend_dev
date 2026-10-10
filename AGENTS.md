@@ -51,7 +51,8 @@ Working product name is **Rounds** (may change); keep writing `[Product name]` i
 
 ### Secrets and accounts
 13. **No secrets, account IDs, emails or keys in the repo, in commits or in chat.** Keys go in `.env` (git-ignored), with names listed in `.env.example`.
-14. **Never log in to accounts or enter credentials on someone's behalf.** Each person uses their own IAM user; root is never shared.
+    - The team shares one `.env` directly (not through the repo). The same file is stored as the GitHub secret `APP_ENV`, which CI copies to the server (see `infra/README.md`).
+14. **Never log in to accounts or enter credentials on someone's behalf.** Root is never shared. For local development the team shares one IAM key, limited to the app's own permissions (`AppPermissions` in `infra/cloudformation/app.yaml`), so a new teammate only needs the shared `.env`. Account admin work (deploying stacks, creating keys) uses each person's own IAM user.
 15. **AWS region and resource names come from config** (one settings module plus `.env`). Model IDs come from config, never hard-coded.
 16. Keep costs low: small instances, no always-on extras, and tear down after the event. A budget alert exists on the account.
 
@@ -61,13 +62,13 @@ Working product name is **Rounds** (may change); keep writing `[Product name]` i
 - **Backend:** Python 3.12, FastAPI, Pydantic v2, SQLAlchemy 2, Alembic, boto3, pytest.
 - **Frontend:** React + TypeScript (Vite), Tailwind, shadcn/ui, React Flow, Recharts.
 - **Database:** Postgres (Docker locally, RDS in the cloud).
-- **AI:** AWS Bedrock (Claude).
+- **AI:** AWS Bedrock (Claude; optional Nova Micro for the fast tier).
 - **Voice:** ElevenLabs (Scribe v2 Realtime STT, Eleven v4 / v4 Turbo TTS).
 - **Avatar:** Tavus (iteration 2).
 
 ### Style
 - **Modular, not over-engineered.** One module per responsibility (see the PRD §13 layout).
-  - No microservices, Redis, Cognito, vector databases or Kubernetes.
+  - No microservices, Redis, vector databases or Kubernetes. Cognito is used for sign-in only (see `infra/README.md`).
   - Add a dependency only when it removes real work, and say why in the pull request.
 - **The case is one JSON document** validated by Pydantic (`backend/app/schemas/case.py`) and stored in a JSONB column. Change the schema there first, then migrations, then generated types.
 - **Generated API types:** the frontend uses types generated from FastAPI's OpenAPI schema (`openapi-typescript`). Don't hand-write API types; regenerate after backend changes.
@@ -110,7 +111,7 @@ Docs never refer to "the coder" as a particular person and never take sides betw
 - **Tests before merge:**
   - `pytest` for the backend;
   - type check and build for the frontend;
-  - for pipeline changes, run `backend/scripts/run_test_students.py` on the golden cases (once it exists).
+  - for pipeline changes, run `python -m scripts.run_test_students` (from `backend/`) on the golden cases; it exits non-zero if any reply fails the audit.
 - **Golden-case gate:** before recording any video, run the test students on all golden cases and check that grounding is 100% and nothing regressed.
 - **Commit messages:** imperative mood, plain language, reference feature IDs. No AI co-author trailers or "generated with" lines; commits are authored by the person who pushes them.
 
@@ -136,10 +137,11 @@ cd backend && .venv/Scripts/python -m uvicorn app.main:app --reload
 
 Checks:
 - Tests (offline, SQLite): `cd backend && LLM_ENABLED=false .venv/Scripts/python -m pytest -q`
+- Test students on the golden cases, no database: `.venv/Scripts/python -m scripts.run_test_students` (`--offline` for no Bedrock, `--transcript` to print the conversations, `--save` to write `docs/validation/test_students.json`)
 - Verifier on labeled lines (needs Bedrock): `.venv/Scripts/python -m scripts.eval_verifier --runs 2`
 - Set `LLM_ENABLED=false` to run everything without AWS (keyword classifier and template replies).
 
-Frontend (not built yet):
+Frontend (the Rounds prototype, all screens on mock data; build check: `npm run build`):
 ```bash
 cd frontend && npm install && npm run dev
 ```

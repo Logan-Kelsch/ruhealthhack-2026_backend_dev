@@ -10,3 +10,7 @@ design/*
 !design/ui-refs/
 *.db
 *.egg-info/
+**.cursor/
+.cursor/
+.design-import/
+frontend/.vite/

@@ -14,7 +14,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Callable
 
-from app.settings import get_settings
+from app.settings import aws_session, get_settings
 
 log = logging.getLogger(__name__)
 PROMPT_DIR = Path(__file__).resolve().parent.parent / "prompts"
@@ -62,12 +62,10 @@ def load_prompt(name: str) -> tuple[str, str]:
 
 @lru_cache
 def _client():
-    import boto3
     from botocore.config import Config
 
     s = get_settings()
-    session = boto3.Session(profile_name=s.aws_profile, region_name=s.aws_region) if s.aws_profile else boto3.Session(region_name=s.aws_region)
-    return session.client("bedrock-runtime", config=Config(read_timeout=s.llm_timeout_s, connect_timeout=5, retries={"max_attempts": 1}))
+    return aws_session().client("bedrock-runtime", config=Config(read_timeout=s.llm_timeout_s, connect_timeout=5, retries={"max_attempts": 1}))
 
 
 def llm_available() -> bool:

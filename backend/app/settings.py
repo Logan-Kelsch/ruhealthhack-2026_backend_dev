@@ -15,6 +15,11 @@ class Settings(BaseSettings):
 
     aws_region: str = "us-east-1"
     aws_profile: str | None = None
+    # The team's shared laptop key (infra/README.md). pydantic-settings does not export .env to
+    # the process environment, so boto3 only sees these when passed explicitly. Left out on the
+    # server, which uses its instance role.
+    aws_access_key_id: str | None = None
+    aws_secret_access_key: str | None = None
     # Set LLM_ENABLED=false to run fully offline (keyword classifier + template replies).
     llm_enabled: bool = True
     bedrock_model_fast: str = "us.anthropic.claude-haiku-4-5-20251001-v1:0"
@@ -39,3 +44,17 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
+
+
+def aws_session():
+    """boto3 session from settings: shared key, else AWS_PROFILE, else the default chain."""
+    import boto3
+
+    s = get_settings()
+    if s.aws_access_key_id and s.aws_secret_access_key:
+        return boto3.Session(
+            aws_access_key_id=s.aws_access_key_id,
+            aws_secret_access_key=s.aws_secret_access_key,
+            region_name=s.aws_region,
+        )
+    return boto3.Session(profile_name=s.aws_profile or None, region_name=s.aws_region)

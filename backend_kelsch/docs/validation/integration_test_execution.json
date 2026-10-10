@@ -1,0 +1,29 @@
+{
+  "date_utc": "2026-10-10",
+  "non_http": {
+    "command": "LLM_ENABLED=false PYTHONPATH=backend python -m pytest -q backend_kelsch/tests backend/tests/test_feedback_and_studio.py backend/tests/test_encounter.py",
+    "passed": 69,
+    "failed": 0,
+    "notebook_07_tests_passed": 7
+  },
+  "notebooks": {
+    "execution": "Code cells of each notebook concatenated and run in an isolated Python process with IPython display helpers and MPLBACKEND=Agg; not a Jupyter kernel execution",
+    "code_cells_passed_by_notebook": {
+      "01": 12,
+      "02": 8,
+      "03": 8,
+      "04": 8,
+      "05": 6,
+      "06": 6,
+      "07": 5
+    }
+  },
+  "http_api": {
+    "collection_command": "LLM_ENABLED=false PYTHONPATH=backend python -m pytest --collect-only -q backend/tests/test_api.py",
+    "collected": 7,
+    "run_command": "timeout 25s env LLM_ENABLED=false PYTHONPATH=backend python -m pytest -q backend/tests/test_api.py",
+    "exit_code": 124,
+    "completed": 0,
+    "status": "TIMEOUT; no HTTP API tests counted as passed"
+  }
+}

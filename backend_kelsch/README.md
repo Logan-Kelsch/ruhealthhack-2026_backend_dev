@@ -1,6 +1,6 @@
 # Kelsch notebook work
 
-Notebooks 01–06, their Python modules, scripts, tests, source fixtures, and reports live here. This folder is separate from the shared `backend/` application. It imports the existing case schema, disclosure engine, Studio importer, verifier, feedback, and visit contracts; those shared contracts and the three cases remain in their original locations.
+Notebooks 01–07, their Python modules, scripts, tests, source fixtures, and reports live here. This folder is separate from the shared `backend/` application. It imports the existing case schema, disclosure engine, Studio importer, verifier, feedback, and visit contracts; those shared contracts and the three cases remain in their original locations.
 
 From the repository root in the backend's Python environment:
 
@@ -18,3 +18,5 @@ Notebook 04 runs with `LLM_ENABLED=false PYTHONPATH=backend python -m backend_ke
 Notebook 05 runs with `LLM_ENABLED=false PYTHONPATH=backend python -m backend_kelsch.scripts.eval_debrief`. Read `notebooks/05_evidence_debrief.ipynb` and `docs/validation/debrief_eval.md`. Its compressed trace preserves anchored claims, provisional review flags and deterministic next-visit branches. Export pending claim checks using `--export-review-queue`; no fixture intent or provisional rubric output is a faculty-approved grade. The Notebook 02 and 04 model/clinical gates remain NOT EVALUABLE.
 
 Notebook 06 runs with `LLM_ENABLED=false PYTHONPATH=backend python -m backend_kelsch.scripts.eval_study`. The [proposed protocol](app/data/study_protocol_v1.json), `notebooks/06_prospective_evaluation.ipynb` and `docs/validation/study_protocol.md` describe blinded independent review and an optional consenting learner corpus. Export pending packets with `--export-packets` to a controlled location; review data and learner transcripts must not be committed. The report stores aggregates and source hashes only. No review or learner data is bundled, so clinical, model and learning gates remain NOT EVALUABLE.
+
+Notebook 07 runs with `LLM_ENABLED=false PYTHONPATH=backend python -m backend_kelsch.scripts.eval_integration`. The [integration readiness report](docs/validation/integration_readiness.md) and `notebooks/07_integration_readiness.ipynb` check the Notebook 06 source lock, approval metadata, blinded packet quality, review imports, and audit integrity. No independent institutional approval is documented, so prospective learner intake is blocked and all study performance gates remain NOT EVALUABLE. The next step is in `docs/notebook_08_prompt.txt`.

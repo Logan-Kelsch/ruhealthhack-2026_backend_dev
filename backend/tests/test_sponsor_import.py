@@ -89,7 +89,6 @@ def test_sponsor_sample_import_saves_reviewable_drafts(client):
     assert {
         "what": "Patient profile",
         "source": "Rutgers Virtual Health Simulation sample profiles (event-provided)",
-        "license": None,
     } in case["credits"]
 
     operation = app.openapi()["paths"]["/api/studio/import/vhs"]["post"]

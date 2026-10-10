@@ -7,6 +7,7 @@ They do not call private helpers.
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -252,6 +253,7 @@ def _run(command: list[str], cwd: Path) -> subprocess.CompletedProcess[str]:
     return subprocess.run(command, cwd=cwd, capture_output=True, text=True, timeout=120, check=False)
 
 
+@pytest.mark.skipif(shutil.which("bun") is None, reason="needs bun")
 def test_api_check_rejects_drift_without_rewriting_artifacts():
     """bun run api:check fails on a missing or stale artifact and leaves the tree alone."""
     repo = Path(__file__).resolve().parents[2]

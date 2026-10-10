@@ -17,7 +17,7 @@ from app.main import app
 from app.settings import get_settings
 
 SAVED_REPLY = "Advil for my back. Two, three times a week. It's just Advil. Melatonin at night, for sleep."
-REPEAT_REPLY = "I already told you that. Advil for my back. Two, three times a week. It's just Advil."
+REPEAT_REPLY = "Advil for my back. Two, three times a week. It's just Advil."
 QUESTION = "Do you take anything over the counter for pain?"
 CASE_VOICE = "voice_case_walter"
 API_KEY = "test-eleven-key"

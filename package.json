@@ -1,0 +1,8 @@
+{
+  "name": "rounds",
+  "private": true,
+  "scripts": {
+    "api:generate": "bun run --cwd=frontend api:generate",
+    "api:check": "bun run --cwd=frontend api:check"
+  }
+}

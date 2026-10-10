@@ -1,5 +1,5 @@
-// Prototype fixtures for the faculty screens (home, case library, import).
-// Swapped for the cases API later.
+// Prototype fixtures for faculty screens that are not on the API yet.
+// The Case Library does not use these. It loads saved cases.
 
 export const FACULTY_STATS: { label: string; value: string; note: string; accent: "none" | "danger" }[] = [
   { label: "Needs your review", value: "3", note: "visits flagged", accent: "danger" },
@@ -11,23 +11,6 @@ export const WEAKEST_DOMAIN = {
   title: "Professionalism, safety, and closure",
   note: "Class average 1.8 of 4",
 };
-
-export type CaseRow = {
-  name: string;
-  learner: string;
-  visits: number;
-  status: "Published" | "Draft";
-  tag: string;
-  updated: string;
-  who: "walter" | "alina" | "eli" | "generic";
-};
-
-export const CASE_ROWS: CaseRow[] = [
-  { name: "Walter Greene, 72", learner: "Dietetics student", visits: 2, status: "Published", tag: "Typical", updated: "Oct 3", who: "walter" },
-  { name: "Alina Reyes, 21", learner: "Third-year medical student", visits: 2, status: "Published", tag: "Typical", updated: "Sep 28", who: "alina" },
-  { name: "Eli Brooks, 6", learner: "Physician assistant student", visits: 1, status: "Published", tag: "Typical", updated: "Sep 20", who: "eli" },
-  { name: "Depression follow-up", learner: "Psychiatry clerkship", visits: 2, status: "Draft", tag: "Branching · decision tree", updated: "Today", who: "generic" },
-];
 
 export const FACULTY_CASES: { name: string; meta: string; who: "walter" | "alina" | "eli" }[] = [
   { name: "Walter Greene, 72", meta: "Published", who: "walter" },

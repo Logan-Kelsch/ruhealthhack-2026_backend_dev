@@ -26,7 +26,12 @@ export function App() {
     setScreen(next);
     if (opts?.visit) setVisit(opts.visit);
     if (opts?.studioTab) setStudioTab(opts.studioTab);
-    window.history.replaceState(null, "", `#${next}`);
+    // Keep the chosen case id with the screen change so a later screen can open that case.
+    window.history.replaceState(
+      { caseId: opts?.caseId ?? null, version: opts?.version ?? null },
+      "",
+      `#${next}`,
+    );
   };
 
   // A full navigation to /#screen reloads and picks this up in the initial state.

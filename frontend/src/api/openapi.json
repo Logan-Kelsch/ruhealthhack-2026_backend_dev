@@ -1,0 +1,3234 @@
+{
+  "components": {
+    "schemas": {
+      "Allergy": {
+        "properties": {
+          "reaction": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reaction"
+          },
+          "release": {
+            "$ref": "#/components/schemas/Release"
+          },
+          "source": {
+            "$ref": "#/components/schemas/Source"
+          },
+          "status": {
+            "default": "draft",
+            "enum": [
+              "draft",
+              "approved"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "substance": {
+            "title": "Substance",
+            "type": "string"
+          }
+        },
+        "required": [
+          "substance"
+        ],
+        "title": "Allergy",
+        "type": "object"
+      },
+      "Approve": {
+        "properties": {
+          "group": {
+            "title": "Group",
+            "type": "string"
+          },
+          "keys": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Keys"
+          },
+          "status": {
+            "default": "approved",
+            "enum": [
+              "approved",
+              "draft"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "group"
+        ],
+        "title": "Approve",
+        "type": "object"
+      },
+      "Artifact": {
+        "properties": {
+          "attribution": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attribution"
+          },
+          "body": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "default": "other",
+            "enum": [
+              "prior_note",
+              "referral",
+              "lab_report",
+              "ecg",
+              "xray",
+              "ct",
+              "image",
+              "questionnaire",
+              "other"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "license": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "License"
+          },
+          "release": {
+            "$ref": "#/components/schemas/Release"
+          },
+          "source": {
+            "$ref": "#/components/schemas/Source"
+          },
+          "status": {
+            "default": "draft",
+            "enum": [
+              "draft",
+              "approved"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          }
+        },
+        "required": [
+          "id",
+          "title"
+        ],
+        "title": "Artifact",
+        "type": "object"
+      },
+      "Autofill": {
+        "properties": {
+          "panels": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Panels",
+            "type": "array"
+          },
+          "vitals": {
+            "default": true,
+            "title": "Vitals",
+            "type": "boolean"
+          }
+        },
+        "title": "Autofill",
+        "type": "object"
+      },
+      "Belief": {
+        "description": "What the patient believes when it differs from the chart (unreliable narrator).",
+        "properties": {
+          "say": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Say"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "Belief",
+        "type": "object"
+      },
+      "Branch": {
+        "description": "A faculty-written outcome applied to the next visit when its conditions match.",
+        "properties": {
+          "after_branches": {
+            "items": {
+              "type": "string"
+            },
+            "title": "After Branches",
+            "type": "array"
+          },
+          "changes": {
+            "$ref": "#/components/schemas/VisitChanges"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "status": {
+            "default": "draft",
+            "enum": [
+              "draft",
+              "approved"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "summary": {
+            "default": "",
+            "title": "Summary",
+            "type": "string"
+          },
+          "tag": {
+            "anyOf": [
+              {
+                "enum": [
+                  "common",
+                  "rare"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tag"
+          },
+          "when": {
+            "additionalProperties": {
+              "type": "boolean"
+            },
+            "title": "When",
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "label"
+        ],
+        "title": "Branch",
+        "type": "object"
+      },
+      "Briefing": {
+        "properties": {
+          "goal": {
+            "default": "",
+            "title": "Goal",
+            "type": "string"
+          },
+          "reason_for_visit": {
+            "default": "",
+            "title": "Reason For Visit",
+            "type": "string"
+          },
+          "setting": {
+            "default": "",
+            "title": "Setting",
+            "type": "string"
+          },
+          "show_doorway_vitals": {
+            "default": true,
+            "title": "Show Doorway Vitals",
+            "type": "boolean"
+          },
+          "student_role": {
+            "default": "",
+            "title": "Student Role",
+            "type": "string"
+          }
+        },
+        "title": "Briefing",
+        "type": "object"
+      },
+      "Case": {
+        "properties": {
+          "actions": {
+            "items": {
+              "$ref": "#/components/schemas/CaseVocabItem"
+            },
+            "title": "Actions",
+            "type": "array"
+          },
+          "allergies": {
+            "items": {
+              "$ref": "#/components/schemas/Allergy"
+            },
+            "title": "Allergies",
+            "type": "array"
+          },
+          "artifacts": {
+            "items": {
+              "$ref": "#/components/schemas/Artifact"
+            },
+            "title": "Artifacts",
+            "type": "array"
+          },
+          "briefing": {
+            "$ref": "#/components/schemas/Briefing"
+          },
+          "case_id": {
+            "title": "Case Id",
+            "type": "string"
+          },
+          "consistency_findings": {
+            "items": {
+              "$ref": "#/components/schemas/ConsistencyFinding"
+            },
+            "title": "Consistency Findings",
+            "type": "array"
+          },
+          "created_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By"
+          },
+          "credits": {
+            "items": {
+              "$ref": "#/components/schemas/Credit"
+            },
+            "title": "Credits",
+            "type": "array"
+          },
+          "description": {
+            "default": "",
+            "title": "Description",
+            "type": "string"
+          },
+          "diagnoses": {
+            "items": {
+              "$ref": "#/components/schemas/Diagnosis"
+            },
+            "title": "Diagnoses",
+            "type": "array"
+          },
+          "difficulty": {
+            "$ref": "#/components/schemas/Difficulty"
+          },
+          "documentation_template": {
+            "default": "SOAP",
+            "enum": [
+              "PES",
+              "ADIME",
+              "SBAR",
+              "SOAP"
+            ],
+            "title": "Documentation Template",
+            "type": "string"
+          },
+          "exam": {
+            "items": {
+              "$ref": "#/components/schemas/ExamFinding"
+            },
+            "title": "Exam",
+            "type": "array"
+          },
+          "facts": {
+            "items": {
+              "$ref": "#/components/schemas/Fact"
+            },
+            "title": "Facts",
+            "type": "array"
+          },
+          "golden": {
+            "default": false,
+            "title": "Golden",
+            "type": "boolean"
+          },
+          "labs": {
+            "items": {
+              "$ref": "#/components/schemas/LabResult"
+            },
+            "title": "Labs",
+            "type": "array"
+          },
+          "medications": {
+            "items": {
+              "$ref": "#/components/schemas/Medication"
+            },
+            "title": "Medications",
+            "type": "array"
+          },
+          "objectives": {
+            "items": {
+              "$ref": "#/components/schemas/Objective"
+            },
+            "title": "Objectives",
+            "type": "array"
+          },
+          "profile": {
+            "$ref": "#/components/schemas/Profile"
+          },
+          "rubric_id": {
+            "default": "shp_patient_encounter_v1",
+            "title": "Rubric Id",
+            "type": "string"
+          },
+          "seed": {
+            "default": 1,
+            "title": "Seed",
+            "type": "integer"
+          },
+          "status": {
+            "default": "draft",
+            "enum": [
+              "draft",
+              "published",
+              "archived"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "topics": {
+            "items": {
+              "$ref": "#/components/schemas/CaseVocabItem"
+            },
+            "title": "Topics",
+            "type": "array"
+          },
+          "trust": {
+            "$ref": "#/components/schemas/TrustConfig"
+          },
+          "version": {
+            "default": 1,
+            "title": "Version",
+            "type": "integer"
+          },
+          "visits": {
+            "items": {
+              "$ref": "#/components/schemas/Visit"
+            },
+            "title": "Visits",
+            "type": "array"
+          },
+          "vitals": {
+            "items": {
+              "$ref": "#/components/schemas/Vital"
+            },
+            "title": "Vitals",
+            "type": "array"
+          }
+        },
+        "required": [
+          "case_id",
+          "title",
+          "profile"
+        ],
+        "title": "Case",
+        "type": "object"
+      },
+      "CaseVocabItem": {
+        "description": "A case-specific topic or action, added to the classifier's closed label set.",
+        "properties": {
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "keywords": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Keywords",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "description"
+        ],
+        "title": "CaseVocabItem",
+        "type": "object"
+      },
+      "Code": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "display": {
+            "title": "Display",
+            "type": "string"
+          },
+          "system": {
+            "enum": [
+              "ICD-10-CM",
+              "LOINC",
+              "RxNorm",
+              "SNOMED-CT"
+            ],
+            "title": "System",
+            "type": "string"
+          }
+        },
+        "required": [
+          "system",
+          "code",
+          "display"
+        ],
+        "title": "Code",
+        "type": "object"
+      },
+      "ConsistencyFinding": {
+        "properties": {
+          "dismissed": {
+            "default": false,
+            "title": "Dismissed",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "refs": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Refs",
+            "type": "array"
+          },
+          "rule": {
+            "title": "Rule",
+            "type": "string"
+          },
+          "severity": {
+            "default": "review",
+            "enum": [
+              "review",
+              "info"
+            ],
+            "title": "Severity",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "rule",
+          "message"
+        ],
+        "title": "ConsistencyFinding",
+        "type": "object"
+      },
+      "Credit": {
+        "properties": {
+          "license": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "License"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "what": {
+            "title": "What",
+            "type": "string"
+          }
+        },
+        "required": [
+          "what",
+          "source"
+        ],
+        "title": "Credit",
+        "type": "object"
+      },
+      "DecisionPoint": {
+        "description": "A yes/no condition checked at the end of a visit (PRD L-03).\n\npredicate grammar (JSON):\n  {\"topic\": id} | {\"action\": id} | {\"maneuver\": id} | {\"order\": panel}\n  {\"fact_disclosed\": fact_id} | {\"any\": [p, ...]} | {\"all\": [p, ...]} | {\"not\": p}\n  {\"before\": [p_first, p_second]}  # p_first happened in an earlier turn than p_second",
+        "properties": {
+          "affects": {
+            "default": "patient",
+            "enum": [
+              "patient",
+              "score"
+            ],
+            "title": "Affects",
+            "type": "string"
+          },
+          "feedback_if_no": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Feedback If No"
+          },
+          "feedback_if_yes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Feedback If Yes"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "predicate": {
+            "additionalProperties": true,
+            "title": "Predicate",
+            "type": "object"
+          },
+          "rubric_domain": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rubric Domain"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "predicate"
+        ],
+        "title": "DecisionPoint",
+        "type": "object"
+      },
+      "Diagnosis": {
+        "properties": {
+          "codes": {
+            "items": {
+              "$ref": "#/components/schemas/Code"
+            },
+            "title": "Codes",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "release": {
+            "$ref": "#/components/schemas/Release"
+          },
+          "source": {
+            "$ref": "#/components/schemas/Source"
+          },
+          "status": {
+            "default": "draft",
+            "enum": [
+              "draft",
+              "approved"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "Diagnosis",
+        "type": "object"
+      },
+      "Difficulty": {
+        "properties": {
+          "params": {
+            "additionalProperties": true,
+            "title": "Params",
+            "type": "object"
+          },
+          "preset": {
+            "default": "typical",
+            "enum": [
+              "straightforward",
+              "typical",
+              "difficult",
+              "custom"
+            ],
+            "title": "Preset",
+            "type": "string"
+          }
+        },
+        "title": "Difficulty",
+        "type": "object"
+      },
+      "Documentation": {
+        "properties": {
+          "fields": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Fields",
+            "type": "object"
+          }
+        },
+        "required": [
+          "fields"
+        ],
+        "title": "Documentation",
+        "type": "object"
+      },
+      "ErrorItem": {
+        "description": "One validation problem. loc is the same path FastAPI already reported, such as [\"body\", \"description\"].",
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Loc",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Msg",
+            "type": "string"
+          },
+          "type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Type"
+          }
+        },
+        "required": [
+          "msg"
+        ],
+        "title": "ErrorItem",
+        "type": "object"
+      },
+      "ErrorResponse": {
+        "description": "One error body for validation failures and application failures. The HTTP status stays on the response.",
+        "properties": {
+          "blockers": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Blockers",
+            "type": "array"
+          },
+          "errors": {
+            "items": {
+              "$ref": "#/components/schemas/ErrorItem"
+            },
+            "title": "Errors",
+            "type": "array"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "title": "ErrorResponse",
+        "type": "object"
+      },
+      "ExamFinding": {
+        "properties": {
+          "abnormal": {
+            "default": true,
+            "title": "Abnormal",
+            "type": "boolean"
+          },
+          "finding": {
+            "title": "Finding",
+            "type": "string"
+          },
+          "maneuver": {
+            "title": "Maneuver",
+            "type": "string"
+          },
+          "source": {
+            "$ref": "#/components/schemas/Source"
+          },
+          "status": {
+            "default": "draft",
+            "enum": [
+              "draft",
+              "approved"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "maneuver",
+          "finding"
+        ],
+        "title": "ExamFinding",
+        "type": "object"
+      },
+      "Fact": {
+        "properties": {
+          "belief": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Belief"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "category": {
+            "default": "history",
+            "title": "Category",
+            "type": "string"
+          },
+          "chart_section": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chart Section"
+          },
+          "codes": {
+            "items": {
+              "$ref": "#/components/schemas/Code"
+            },
+            "title": "Codes",
+            "type": "array"
+          },
+          "cue": {
+            "default": false,
+            "title": "Cue",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "safety": {
+            "default": false,
+            "title": "Safety",
+            "type": "boolean"
+          },
+          "say": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Say"
+          },
+          "source": {
+            "$ref": "#/components/schemas/Source"
+          },
+          "status": {
+            "default": "draft",
+            "enum": [
+              "draft",
+              "approved"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "tier": {
+            "default": "discoverable",
+            "enum": [
+              "initial",
+              "discoverable",
+              "reluctant",
+              "hidden"
+            ],
+            "title": "Tier",
+            "type": "string"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit"
+          },
+          "unlock": {
+            "$ref": "#/components/schemas/Unlock"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "id",
+          "text"
+        ],
+        "title": "Fact",
+        "type": "object"
+      },
+      "HealthResponse": {
+        "description": "Liveness. True means this process can answer; it does not check the database.",
+        "properties": {
+          "ok": {
+            "title": "Ok",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok"
+        ],
+        "title": "HealthResponse",
+        "type": "object"
+      },
+      "IntakeAnswer": {
+        "properties": {
+          "faculty": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Faculty"
+          },
+          "gap_id": {
+            "title": "Gap Id",
+            "type": "string"
+          },
+          "text": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "gap_id",
+          "text"
+        ],
+        "title": "IntakeAnswer",
+        "type": "object"
+      },
+      "LabResult": {
+        "properties": {
+          "collected": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Collected"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "loinc": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Loinc"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "panel": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Panel"
+          },
+          "range": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ValueRange"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ref_high": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ref High"
+          },
+          "ref_low": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ref Low"
+          },
+          "ref_source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ref Source"
+          },
+          "release": {
+            "$ref": "#/components/schemas/Release"
+          },
+          "source": {
+            "$ref": "#/components/schemas/Source"
+          },
+          "status": {
+            "default": "draft",
+            "enum": [
+              "draft",
+              "approved"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "unit": {
+            "default": "",
+            "title": "Unit",
+            "type": "string"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "id",
+          "key",
+          "name",
+          "value"
+        ],
+        "title": "LabResult",
+        "type": "object"
+      },
+      "Medication": {
+        "properties": {
+          "codes": {
+            "items": {
+              "$ref": "#/components/schemas/Code"
+            },
+            "title": "Codes",
+            "type": "array"
+          },
+          "dose": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dose"
+          },
+          "frequency": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Frequency"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "purpose": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Purpose"
+          },
+          "release": {
+            "$ref": "#/components/schemas/Release"
+          },
+          "source": {
+            "$ref": "#/components/schemas/Source"
+          },
+          "status": {
+            "default": "draft",
+            "enum": [
+              "draft",
+              "approved"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "Medication",
+        "type": "object"
+      },
+      "NewDraft": {
+        "properties": {
+          "description": {
+            "maxLength": 8000,
+            "minLength": 10,
+            "title": "Description",
+            "type": "string"
+          },
+          "faculty": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Faculty"
+          }
+        },
+        "required": [
+          "description"
+        ],
+        "title": "NewDraft",
+        "type": "object"
+      },
+      "Objective": {
+        "properties": {
+          "expected_actions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Expected Actions",
+            "type": "array"
+          },
+          "expected_discoveries": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Expected Discoveries",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "rubric_domains": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Rubric Domains",
+            "type": "array"
+          },
+          "status": {
+            "default": "draft",
+            "enum": [
+              "draft",
+              "approved"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "text"
+        ],
+        "title": "Objective",
+        "type": "object"
+      },
+      "Personality": {
+        "properties": {
+          "communication_style": {
+            "default": "",
+            "title": "Communication Style",
+            "type": "string"
+          },
+          "example_lines": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Example Lines",
+            "type": "array"
+          },
+          "health_literacy": {
+            "default": "medium",
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ],
+            "title": "Health Literacy",
+            "type": "string"
+          },
+          "mood": {
+            "default": "neutral",
+            "title": "Mood",
+            "type": "string"
+          },
+          "summary": {
+            "default": "",
+            "title": "Summary",
+            "type": "string"
+          },
+          "traits": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "Traits",
+            "type": "object"
+          }
+        },
+        "title": "Personality",
+        "type": "object"
+      },
+      "Preview": {
+        "properties": {
+          "driver": {
+            "default": "scripted",
+            "enum": [
+              "scripted",
+              "llm"
+            ],
+            "title": "Driver",
+            "type": "string"
+          },
+          "level": {
+            "default": "competent",
+            "enum": [
+              "novice",
+              "competent",
+              "expert",
+              "adversarial"
+            ],
+            "title": "Level",
+            "type": "string"
+          },
+          "visit_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Visit Id"
+          }
+        },
+        "title": "Preview",
+        "type": "object"
+      },
+      "Profile": {
+        "properties": {
+          "age": {
+            "title": "Age",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "occupation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Occupation"
+          },
+          "personality": {
+            "$ref": "#/components/schemas/Personality"
+          },
+          "portrait": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Portrait"
+          },
+          "pronouns": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pronouns"
+          },
+          "sex": {
+            "default": "other",
+            "enum": [
+              "male",
+              "female",
+              "other"
+            ],
+            "title": "Sex",
+            "type": "string"
+          },
+          "speaker": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speaker"
+          },
+          "summary": {
+            "default": "",
+            "title": "Summary",
+            "type": "string"
+          },
+          "voice_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Voice Id"
+          }
+        },
+        "required": [
+          "name",
+          "age"
+        ],
+        "title": "Profile",
+        "type": "object"
+      },
+      "PublicConfig": {
+        "description": "Voice settings the browser may see. Model ids, keys, and account values stay off this object.",
+        "properties": {
+          "llm": {
+            "title": "Llm",
+            "type": "boolean"
+          },
+          "stt_commit_silence_ms": {
+            "title": "Stt Commit Silence Ms",
+            "type": "integer"
+          },
+          "stt_provider": {
+            "title": "Stt Provider",
+            "type": "string"
+          },
+          "tts": {
+            "title": "Tts",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "llm",
+          "tts",
+          "stt_provider",
+          "stt_commit_silence_ms"
+        ],
+        "title": "PublicConfig",
+        "type": "object"
+      },
+      "Release": {
+        "properties": {
+          "fact_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fact Id"
+          },
+          "on": {
+            "default": "order",
+            "enum": [
+              "visit_start",
+              "order",
+              "topic",
+              "fact"
+            ],
+            "title": "On",
+            "type": "string"
+          },
+          "topics": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Topics",
+            "type": "array"
+          }
+        },
+        "title": "Release",
+        "type": "object"
+      },
+      "Source": {
+        "properties": {
+          "by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "By"
+          },
+          "kind": {
+            "default": "faculty",
+            "enum": [
+              "faculty",
+              "vhs_import",
+              "reference",
+              "rule",
+              "computed",
+              "default",
+              "llm_draft",
+              "nhanes"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "ref": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ref"
+          }
+        },
+        "title": "Source",
+        "type": "object"
+      },
+      "StartEncounter": {
+        "properties": {
+          "case_id": {
+            "title": "Case Id",
+            "type": "string"
+          },
+          "previous_encounter_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous Encounter Id"
+          },
+          "student_name": {
+            "default": "",
+            "title": "Student Name",
+            "type": "string"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          },
+          "visit_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Visit Id"
+          }
+        },
+        "required": [
+          "case_id"
+        ],
+        "title": "StartEncounter",
+        "type": "object"
+      },
+      "StudioCaseSummary": {
+        "description": "One saved case as the Case Library lists it. Hidden facts stay out of this object.",
+        "properties": {
+          "blockers": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Blockers",
+            "type": "array"
+          },
+          "case_id": {
+            "title": "Case Id",
+            "type": "string"
+          },
+          "golden": {
+            "title": "Golden",
+            "type": "boolean"
+          },
+          "patient": {
+            "title": "Patient",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "draft",
+              "published",
+              "archived"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "case_id",
+          "version",
+          "status",
+          "title",
+          "golden",
+          "patient",
+          "updated_at"
+        ],
+        "title": "StudioCaseSummary",
+        "type": "object"
+      },
+      "TTSRequest": {
+        "properties": {
+          "audio_tags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Audio Tags",
+            "type": "array"
+          },
+          "text": {
+            "maxLength": 1500,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          },
+          "voice_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Voice Id"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "TTSRequest",
+        "type": "object"
+      },
+      "TrustConfig": {
+        "properties": {
+          "start": {
+            "default": 0,
+            "title": "Start",
+            "type": "integer"
+          },
+          "thresholds": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Thresholds",
+            "type": "object"
+          }
+        },
+        "title": "TrustConfig",
+        "type": "object"
+      },
+      "Unlock": {
+        "properties": {
+          "min_trust": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min Trust"
+          },
+          "requires_facts": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Requires Facts",
+            "type": "array"
+          },
+          "topics": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Topics",
+            "type": "array"
+          }
+        },
+        "title": "Unlock",
+        "type": "object"
+      },
+      "Utterance": {
+        "properties": {
+          "barge_in_remaining_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Barge In Remaining Ms"
+          },
+          "end_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Ms"
+          },
+          "start_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Ms"
+          },
+          "text": {
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "Utterance",
+        "type": "object"
+      },
+      "ValueRange": {
+        "properties": {
+          "high": {
+            "title": "High",
+            "type": "number"
+          },
+          "low": {
+            "title": "Low",
+            "type": "number"
+          }
+        },
+        "required": [
+          "low",
+          "high"
+        ],
+        "title": "ValueRange",
+        "type": "object"
+      },
+      "Visit": {
+        "properties": {
+          "branches": {
+            "items": {
+              "$ref": "#/components/schemas/Branch"
+            },
+            "title": "Branches",
+            "type": "array"
+          },
+          "changes": {
+            "$ref": "#/components/schemas/VisitChanges"
+          },
+          "day": {
+            "default": 0,
+            "title": "Day",
+            "type": "integer"
+          },
+          "decision_points": {
+            "items": {
+              "$ref": "#/components/schemas/DecisionPoint"
+            },
+            "title": "Decision Points",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label"
+        ],
+        "title": "Visit",
+        "type": "object"
+      },
+      "VisitChanges": {
+        "properties": {
+          "add_facts": {
+            "items": {
+              "$ref": "#/components/schemas/Fact"
+            },
+            "title": "Add Facts",
+            "type": "array"
+          },
+          "artifacts": {
+            "items": {
+              "$ref": "#/components/schemas/Artifact"
+            },
+            "title": "Artifacts",
+            "type": "array"
+          },
+          "briefing": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Briefing"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "exam": {
+            "items": {
+              "$ref": "#/components/schemas/ExamFinding"
+            },
+            "title": "Exam",
+            "type": "array"
+          },
+          "labs": {
+            "items": {
+              "$ref": "#/components/schemas/LabResult"
+            },
+            "title": "Labs",
+            "type": "array"
+          },
+          "medications": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Medication"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Medications"
+          },
+          "mood": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mood"
+          },
+          "remove_facts": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Remove Facts",
+            "type": "array"
+          },
+          "update_facts": {
+            "additionalProperties": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Update Facts",
+            "type": "object"
+          },
+          "vitals": {
+            "items": {
+              "$ref": "#/components/schemas/Vital"
+            },
+            "title": "Vitals",
+            "type": "array"
+          }
+        },
+        "title": "VisitChanges",
+        "type": "object"
+      },
+      "Vital": {
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "source": {
+            "$ref": "#/components/schemas/Source"
+          },
+          "status": {
+            "default": "draft",
+            "enum": [
+              "draft",
+              "approved"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "unit": {
+            "default": "",
+            "title": "Unit",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "value"
+        ],
+        "title": "Vital",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "title": "[Product name] API",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/cases": {
+      "get": {
+        "operationId": "list_cases_api_cases_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "title": "Response List Cases Api Cases Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Cases",
+        "tags": [
+          "encounters"
+        ]
+      }
+    },
+    "/api/cases/{case_id}": {
+      "get": {
+        "operationId": "get_case_api_cases__case_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "title": "Case Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Get Case Api Cases  Case Id  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Get Case",
+        "tags": [
+          "encounters"
+        ]
+      }
+    },
+    "/api/config": {
+      "get": {
+        "description": "What the frontend needs to pick its voice path. No secrets.",
+        "operationId": "config_api_config_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicConfig"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Config"
+      }
+    },
+    "/api/encounters": {
+      "get": {
+        "operationId": "list_encounters_api_encounters_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "case_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Case Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "title": "Response List Encounters Api Encounters Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "List Encounters",
+        "tags": [
+          "encounters"
+        ]
+      },
+      "post": {
+        "operationId": "start_encounter_api_encounters_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartEncounter"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Start Encounter Api Encounters Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Start Encounter",
+        "tags": [
+          "encounters"
+        ]
+      }
+    },
+    "/api/encounters/{enc_id}": {
+      "get": {
+        "operationId": "get_encounter_api_encounters__enc_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "enc_id",
+            "required": true,
+            "schema": {
+              "title": "Enc Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Get Encounter Api Encounters  Enc Id  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Get Encounter",
+        "tags": [
+          "encounters"
+        ]
+      }
+    },
+    "/api/encounters/{enc_id}/documentation": {
+      "post": {
+        "operationId": "submit_documentation_api_encounters__enc_id__documentation_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "enc_id",
+            "required": true,
+            "schema": {
+              "title": "Enc Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Documentation"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Submit Documentation Api Encounters  Enc Id  Documentation Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Submit Documentation",
+        "tags": [
+          "encounters"
+        ]
+      }
+    },
+    "/api/encounters/{enc_id}/end": {
+      "post": {
+        "operationId": "end_encounter_api_encounters__enc_id__end_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "enc_id",
+            "required": true,
+            "schema": {
+              "title": "Enc Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response End Encounter Api Encounters  Enc Id  End Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "End Encounter",
+        "tags": [
+          "encounters"
+        ]
+      }
+    },
+    "/api/encounters/{enc_id}/feedback": {
+      "get": {
+        "operationId": "get_feedback_api_encounters__enc_id__feedback_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "enc_id",
+            "required": true,
+            "schema": {
+              "title": "Enc Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Get Feedback Api Encounters  Enc Id  Feedback Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Get Feedback",
+        "tags": [
+          "encounters"
+        ]
+      },
+      "patch": {
+        "description": "Faculty overrides (score changes, review notes). Kept beside the generated feedback, never merged into it.",
+        "operationId": "override_feedback_api_encounters__enc_id__feedback_patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "enc_id",
+            "required": true,
+            "schema": {
+              "title": "Enc Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "title": "Overrides",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Override Feedback Api Encounters  Enc Id  Feedback Patch",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Override Feedback",
+        "tags": [
+          "encounters"
+        ]
+      }
+    },
+    "/api/encounters/{enc_id}/utterances": {
+      "post": {
+        "operationId": "add_utterance_api_encounters__enc_id__utterances_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "enc_id",
+            "required": true,
+            "schema": {
+              "title": "Enc Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Utterance"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Add Utterance Api Encounters  Enc Id  Utterances Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Add Utterance",
+        "tags": [
+          "encounters"
+        ]
+      }
+    },
+    "/api/health": {
+      "get": {
+        "description": "Lets a laptop or deploy check that the API process is up.",
+        "operationId": "health_api_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health"
+      }
+    },
+    "/api/studio/cases": {
+      "get": {
+        "description": "Newest saved version of each case, for the faculty Case Library.",
+        "operationId": "list_cases_api_studio_cases_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/StudioCaseSummary"
+                  },
+                  "title": "Response List Cases Api Studio Cases Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Cases",
+        "tags": [
+          "studio"
+        ]
+      }
+    },
+    "/api/studio/cases/{case_id}": {
+      "get": {
+        "operationId": "get_case_api_studio_cases__case_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "title": "Case Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "version",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Get Case Api Studio Cases  Case Id  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No saved case with that id."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Get Case",
+        "tags": [
+          "studio"
+        ]
+      },
+      "put": {
+        "operationId": "save_case_api_studio_cases__case_id__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "title": "Case Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Case"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Save Case Api Studio Cases  Case Id  Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Save Case",
+        "tags": [
+          "studio"
+        ]
+      }
+    },
+    "/api/studio/cases/{case_id}/approve": {
+      "post": {
+        "operationId": "approve_api_studio_cases__case_id__approve_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "title": "Case Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Approve"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Approve Api Studio Cases  Case Id  Approve Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Approve",
+        "tags": [
+          "studio"
+        ]
+      }
+    },
+    "/api/studio/cases/{case_id}/autofill": {
+      "post": {
+        "description": "Adds proposed values as drafts. Each value records where it came from.",
+        "operationId": "autofill_api_studio_cases__case_id__autofill_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "title": "Case Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Autofill"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Autofill Api Studio Cases  Case Id  Autofill Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Autofill",
+        "tags": [
+          "studio"
+        ]
+      }
+    },
+    "/api/studio/cases/{case_id}/consistency": {
+      "get": {
+        "operationId": "consistency_check_api_studio_cases__case_id__consistency_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "title": "Case Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "title": "Response Consistency Check Api Studio Cases  Case Id  Consistency Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Consistency Check",
+        "tags": [
+          "studio"
+        ]
+      }
+    },
+    "/api/studio/cases/{case_id}/consistency/{finding_id}/dismiss": {
+      "post": {
+        "description": "Faculty marks a finding as intended. Stored by message, since ids are recomputed on each check.",
+        "operationId": "dismiss_finding_api_studio_cases__case_id__consistency__finding_id__dismiss_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "title": "Case Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "finding_id",
+            "required": true,
+            "schema": {
+              "title": "Finding Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Dismiss Finding Api Studio Cases  Case Id  Consistency  Finding Id  Dismiss Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Dismiss Finding",
+        "tags": [
+          "studio"
+        ]
+      }
+    },
+    "/api/studio/cases/{case_id}/intake": {
+      "post": {
+        "operationId": "intake_answer_api_studio_cases__case_id__intake_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "title": "Case Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IntakeAnswer"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Intake Answer Api Studio Cases  Case Id  Intake Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Intake Answer",
+        "tags": [
+          "studio"
+        ]
+      }
+    },
+    "/api/studio/cases/{case_id}/preview": {
+      "post": {
+        "description": "Runs a test student through the case without saving an encounter.",
+        "operationId": "preview_case_api_studio_cases__case_id__preview_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "title": "Case Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Preview"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Preview Case Api Studio Cases  Case Id  Preview Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Preview Case",
+        "tags": [
+          "studio"
+        ]
+      }
+    },
+    "/api/studio/cases/{case_id}/publish": {
+      "post": {
+        "operationId": "publish_case_api_studio_cases__case_id__publish_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "title": "Case Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Publish Case Api Studio Cases  Case Id  Publish Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "The case is not ready to publish."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Publish Case",
+        "tags": [
+          "studio"
+        ]
+      }
+    },
+    "/api/studio/drafts": {
+      "post": {
+        "operationId": "new_draft_api_studio_drafts_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewDraft"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response New Draft Api Studio Drafts Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "New Draft",
+        "tags": [
+          "studio"
+        ]
+      }
+    },
+    "/api/studio/import/vhs": {
+      "post": {
+        "description": "Imports the eight sponsor VHS profiles as drafts. Each needs review before publishing.",
+        "operationId": "import_vhs_api_studio_import_vhs_post",
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "title": "Response Import Vhs Api Studio Import Vhs Post",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Import Vhs",
+        "tags": [
+          "studio"
+        ]
+      }
+    },
+    "/api/studio/lookup/icd10": {
+      "get": {
+        "operationId": "lookup_icd10_api_studio_lookup_icd10_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": true,
+            "schema": {
+              "title": "Q",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "title": "Response Lookup Icd10 Api Studio Lookup Icd10 Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Lookup Icd10",
+        "tags": [
+          "studio"
+        ]
+      }
+    },
+    "/api/studio/vocab": {
+      "get": {
+        "description": "Closed label sets the editor offers (topics, actions, exam maneuvers, lab panels).",
+        "operationId": "vocab_api_studio_vocab_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Vocab Api Studio Vocab Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Vocab",
+        "tags": [
+          "studio"
+        ]
+      }
+    },
+    "/api/tts": {
+      "post": {
+        "operationId": "tts_api_tts_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TTSRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              },
+              "audio/mpeg": {}
+            },
+            "description": "Successful Response"
+          },
+          "204": {
+            "description": "No voice service; the browser voice is used instead."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Tts",
+        "tags": [
+          "encounters"
+        ]
+      }
+    }
+  }
+}

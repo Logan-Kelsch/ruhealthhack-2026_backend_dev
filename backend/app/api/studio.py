@@ -13,17 +13,26 @@ from app.db import get_session
 from app.integrations.bedrock import llm_available
 from app.integrations.nlm_tables import search_icd10
 from app.schemas.case import Case, ConsistencyFinding
+from app.schemas.http import StudioCaseSummary
 from app.studio import consistency, drafting, intake, preview, publish, vhs_import
 from app.studio.autofill import autofill_labs, autofill_vitals
 
 router = APIRouter(prefix="/api/studio", tags=["studio"])
 
 
-def _summary(row) -> dict:
+def _summary(row) -> StudioCaseSummary:
+    """Case Library row. Publish blockers are included for a draft so faculty can see why it is held."""
     case = services.load_case(row)
-    return {"case_id": row.case_id, "version": row.version, "status": row.status, "title": row.title, "golden": case.golden,
-            "patient": case.profile.name, "updated_at": row.updated_at.isoformat() if row.updated_at else None,
-            "blockers": publish.blockers(case) if row.status == "draft" else []}
+    return StudioCaseSummary(
+        case_id=row.case_id,
+        version=row.version,
+        status=row.status,
+        title=row.title,
+        golden=case.golden,
+        patient=case.profile.name,
+        updated_at=row.updated_at.isoformat() if row.updated_at else None,
+        blockers=publish.blockers(case) if row.status == "draft" else [],
+    )
 
 
 def _full(row) -> dict:
@@ -35,8 +44,9 @@ def _draft(db: Session, case_id: str) -> Case:
     return services.load_case(services.get_case_row(db, case_id))
 
 
-@router.get("/cases")
-def list_cases(db: Session = Depends(get_session)) -> list[dict]:
+@router.get("/cases", response_model=list[StudioCaseSummary])
+def list_cases(db: Session = Depends(get_session)) -> list[StudioCaseSummary]:
+    """Newest saved version of each case, for the faculty Case Library."""
     return [_summary(r) for r in services.latest_rows(db)]
 
 

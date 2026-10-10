@@ -20,6 +20,9 @@ export type VisitNumber = 1 | 2;
 export type GoOpts = {
   visit?: VisitNumber;
   studioTab?: StudioTab;
+  // Which saved case the faculty member picked. This is navigation state, not an API type.
+  caseId?: string;
+  version?: number;
 };
 
 export type Go = (screen: ScreenId, opts?: GoOpts) => void;

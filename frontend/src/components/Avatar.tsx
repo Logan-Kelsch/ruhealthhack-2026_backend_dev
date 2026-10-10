@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-type Portrait = "walter" | "alina" | "eli" | "generic";
+export type Portrait = "walter" | "alina" | "eli" | "generic";
 
 type AvatarProps = {
   who: Portrait;

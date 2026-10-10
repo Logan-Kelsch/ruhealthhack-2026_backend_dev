@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Class-based dark mode: the `.dark` class on <html> selects the dark values
+   below and enables `dark:` utilities for the few places tokens cannot reach. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* Palette taken from the Rounds design file. Names match how the screens use them. */
 @theme {
   --font-sans: "Hanken Grotesk", system-ui, sans-serif;
@@ -12,15 +16,94 @@
   --color-soon: #9a9fc0;
   --color-line: #e7e8f0;
   --color-line-2: #dcdfea;
+  --color-line-3: #e3e4ee; /* tab underline, thin separators, timeline connectors */
+  --color-line-4: #c9cce0; /* dashed borders, inactive dots */
   --color-hair: #f0f1f6;
+  --color-hair-2: #eeeff5; /* underline under card headers, boxed lists */
+  --color-track: #eceef5; /* progress and meter troughs */
+  --color-segment: #f1f2f7; /* segmented control, quiet chips, patient bubbles */
+  --color-raised: #fafafd; /* row hover, table header band */
   --color-paper: #f7f6f3;
   --color-wash: #f6f6fa;
+  --color-card: #ffffff; /* cards, controls and glass surfaces */
+  --color-panel: #141b4d; /* dark hero surfaces: goal panels, primary buttons, bubbles */
+  --color-panel-hover: #2b3ab8;
   --color-danger: #b42b24;
   --color-danger-strong: #c63a31;
+  --color-danger-bright: #e2685f; /* one-of-four scores and hot mic levels */
+  --color-danger-soft: #fdecea;
   --color-warn: #9a5212;
   --color-warn-deep: #7a4210;
+  --color-warn-soft: #fdf1e3;
+  --color-warn-wash: #fffaf4; /* rows waiting on a review */
+  --color-warn-pill: #fde6cc;
+  --color-warn-line: #f3dcc2;
+  --color-warn-line-soft: #f6e6d3;
   --color-ok: #1f7a50;
+  --color-ok-soft: #e6f4ec;
+  --color-ok-wash: #f1f9f4;
+  --color-indigo-soft: #eef0fd;
+  --color-indigo-soft-2: #e3e8fd;
+  --color-indigo-line: #dde1fa;
+  --color-indigo-on-ink: #a9b6ff; /* indigo labels on the dark goal panels */
   --color-chip: #f4f5f9;
+  --color-inactive: #a3a7c6; /* muted controls and status dots */
+  --color-select: #d9defa; /* text selection */
+  --color-canvas: #fbfbfd; /* decision tree canvas */
+  --color-canvas-dot: #dfe1ec;
+}
+
+/* Dark theme: the same token names get dark values, so every utility and the
+   inline `var(--color-*)` uses follow along without edits to the screens.
+   Values are drafts until the design pass. */
+.dark {
+  --color-ink: #eeeff4;
+  --color-ink-soft: #b9bacb;
+  --color-muted: #9a9baf;
+  --color-faint: #7d7e93;
+  --color-soon: #63647a;
+  --color-line: #2c2c3a;
+  --color-line-2: #353545;
+  --color-line-3: #2f2f3e;
+  --color-line-4: #3d3d4f;
+  --color-hair: #282834;
+  --color-hair-2: #2f2f3e;
+  --color-track: #2b2b38;
+  --color-segment: #272733;
+  --color-raised: #262632;
+  --color-paper: #16161c;
+  --color-wash: #1a1a22;
+  --color-card: #1f1f29;
+  --color-panel: #2c3160;
+  --color-panel-hover: #3a4078;
+  --color-danger: #f08a82;
+  --color-danger-bright: #ef7f75;
+  --color-danger-soft: #3a2320;
+  --color-warn: #e0a866;
+  --color-warn-deep: #e8b87e;
+  --color-warn-soft: #3a2b17;
+  --color-warn-wash: #2e2416;
+  --color-warn-pill: #4a3419;
+  --color-warn-line: #5a4426;
+  --color-warn-line-soft: #4a3820;
+  --color-ok: #6fcf9d;
+  --color-ok-soft: #1e3529;
+  --color-ok-wash: #1c2d24;
+  --color-indigo: #93a0ff;
+  --color-indigo-soft: #262a4a;
+  --color-indigo-soft-2: #2d3260;
+  --color-indigo-line: #3c4270;
+  --color-indigo-on-ink: #a9b6ff;
+  --color-chip: #272733;
+  --color-inactive: #5c5f78;
+  --color-select: #2b3162;
+  --color-canvas: #1a1a24;
+  --color-canvas-dot: #2a2a38;
+  color-scheme: dark;
+}
+
+:root {
+  color-scheme: light;
 }
 
 html,
@@ -37,12 +120,12 @@ body {
 }
 
 ::selection {
-  background: #d9defa;
+  background: var(--color-select);
 }
 
 /* Washed pastel trees behind signed-in screens. Matches the design's Muted setting. */
 .bg-wash {
-  background: #f7f6f3 url("/assets/app-wash.png") center / cover no-repeat;
+  background: var(--color-paper) url("/assets/app-wash.png") center / cover no-repeat;
   filter: saturate(0.55);
   opacity: 0.45;
 }
@@ -51,6 +134,16 @@ body {
 .bg-painting {
   background: #fbf8f4 url("/assets/painting.png") center / cover no-repeat;
   filter: saturate(1.15);
+}
+
+/* The artwork was painted for the light base; dark mode dims it in place. */
+.dark .bg-wash {
+  filter: saturate(0.3) brightness(0.4);
+  opacity: 0.25;
+}
+
+.dark .bg-painting {
+  filter: saturate(0.75) brightness(0.3);
 }
 
 @keyframes rnd-pulse {

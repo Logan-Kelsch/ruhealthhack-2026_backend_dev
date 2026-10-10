@@ -1,7 +1,11 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./app/App";
+import { applyStoredTheme } from "./lib/theme";
 import "./index.css";
+
+// Set the theme class before the first paint so the app never flashes light in dark mode.
+applyStoredTheme();
 
 const root = document.getElementById("root");
 if (!root) throw new Error("Missing #root");

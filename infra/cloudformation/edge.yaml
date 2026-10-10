@@ -1,8 +1,8 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: >-
   [Product name] edge (PRD P-04), stack 3 of 5. Private S3 bucket for the React build and one
-  CloudFront distribution that serves it and forwards /api/* (including WebSockets) to the
-  backend's Elastic IP. Needs the network stack.
+  CloudFront distribution that serves it and forwards /api/* (including WebSockets) and
+  /portraits/* to the backend's Elastic IP. Needs the network stack.
 
 Metadata:
   AWSToolsMetrics:
@@ -99,9 +99,12 @@ Resources:
     Type: AWS::CloudFront::Distribution
     Metadata:
       com.aws.cloudformation.Context:
-        why: Single HTTPS entry point. Default behavior serves the SPA; /api/* goes to EC2 uncached.
+        why: >-
+          Single HTTPS entry point. Default behavior serves the SPA; /api/* goes to EC2 uncached,
+          and /portraits/* serves cached images from the backend.
         must:
           - /api/* must stay uncached and forward all viewer headers (WebSocket upgrade, Authorization).
+          - /portraits/* must use the backend origin without the SPA rewrite function.
     Properties:
       DistributionConfig:
         Enabled: true
@@ -139,12 +142,19 @@ Resources:
             CachedMethods: [GET, HEAD]
             CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad          # Managed-CachingDisabled
             OriginRequestPolicyId: b689b0a8-53d0-40ab-baf2-68738e2966ac  # Managed-AllViewerExceptHostHeader
+          - PathPattern: /portraits/*
+            TargetOriginId: api
+            ViewerProtocolPolicy: redirect-to-https
+            Compress: true
+            AllowedMethods: [GET, HEAD, OPTIONS]
+            CachedMethods: [GET, HEAD]
+            CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6  # Managed-CachingOptimized
         ViewerCertificate:
           CloudFrontDefaultCertificate: true
 
 Outputs:
   SiteUrl:
-    Description: Public URL for the app (frontend and /api)
+    Description: Public URL for the app (frontend, /api and /portraits)
     Value: !Sub "https://${Distribution.DomainName}"
   DistributionId:
     Value: !Ref Distribution

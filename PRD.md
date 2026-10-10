@@ -798,6 +798,8 @@ Postgres (Docker locally → AWS RDS)   S3 (audio, images)   AWS Bedrock (Claude
 
 ## 15. Validation and metrics (what the video can honestly claim)
 
+The optional [simulation demonstration through MCPT](backend_kelsch/docs/simulation_demo.md) substitutes explicitly synthetic inputs for unavailable reviews, preset decisions, annotations, ratings and learner outcomes. It exercises backend contracts and statistical mechanics for a development pitch. Its authoring statuses exist only in a disposable database and are not clinical approvals. Report simulation readiness separately; human, clinical, authorization and learning-effect gates remain unevaluable. Simulated learner effects must never be presented as observed improvement.
+
 | ID | Metric | Method |
 |---|---|---|
 | V-01 | **Grounding rate** | Run N scripted test-student encounters per golden case (including adversarial students who ask for things not in the case). Report the percentage of delivered clinical statements mapped to facts, the number of attempted unsupported statements blocked by the verifier, and the fallback rate. |

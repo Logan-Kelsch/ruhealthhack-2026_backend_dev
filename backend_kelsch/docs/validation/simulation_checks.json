@@ -1,0 +1,65 @@
+{
+  "version": "simulation_checks_v1",
+  "base_main": "576743210728117e91b93d47d77648fa4b3d0d9d",
+  "scope": "Offline engineering simulation only; no clinical approval, human reviewer or observed learner result",
+  "default_run": {
+    "command": "LLM_ENABLED=false PYTHONPATH=backend python -m scripts.run_simulation_demo --mode simulation --output ~/rounds-private/simulation-v1",
+    "exit_code": 0,
+    "demo_readiness": "PASS",
+    "report_sha256": "494f838423e87216150dc85d61489384d912b1684ba7b7d0cbbdfa39c9da8e2b",
+    "seed": 2026,
+    "draws_per_scenario": 4999,
+    "bootstrap_draws_per_scenario": 1999,
+    "api_requests": 29,
+    "difficulty_replays": 27,
+    "progression_controls": 5,
+    "synthetic_action_spans": 900,
+    "synthetic_review_items": 304,
+    "mcpt_scenarios": [
+      "no_effect",
+      "beneficial_effect",
+      "adverse_effect",
+      "missingness",
+      "repeated_encounters"
+    ]
+  },
+  "golden_case_audit": {
+    "command": "LLM_ENABLED=false PYTHONPATH=backend python -m scripts.run_test_students --offline",
+    "exit_code": 0,
+    "delivered_replies": 172,
+    "audit_passes": 172,
+    "llm_calls": 0,
+    "interpretation": "Actual offline mechanical checks on authored test students; not clinical accuracy"
+  },
+  "static_html": {
+    "tables": 5,
+    "consistent_table_row_widths": true,
+    "scripts_or_frames": false
+  },
+  "receipt_integrity": "Current code/data source hashes and report source-manifest hash verified",
+  "human_evidence": {
+    "clinical_approval": "NOT EVALUABLE",
+    "independent_human_labels": "NOT EVALUABLE",
+    "real_learner_action_performance": "NOT EVALUABLE",
+    "faculty_rubric_agreement": "NOT EVALUABLE",
+    "full_difficulty_calibration": "NOT EVALUABLE",
+    "authorization_and_consent": "NOT EVALUABLE",
+    "learning_effect": "NOT EVALUABLE"
+  },
+  "not_executed": [
+    "live Bedrock",
+    "integrated microphone/STT/TTS",
+    "PostgreSQL/cloud deployment",
+    "voice first-audio latency",
+    "paid service cost measurement",
+    "genuine authorized learner analysis"
+  ],
+  "tests": {
+    "command": "LLM_ENABLED=false PYTHONPATH=backend python -m pytest -q backend/tests backend_kelsch/tests --durations=5",
+    "exit_code": 0,
+    "passed": 180,
+    "elapsed_seconds": 325.51,
+    "python": "3.12.14",
+    "includes": "15 simulation checks plus existing backend and notebook tests; grouped splits, frozen predictions, exact repeat reproduction, N/A, missingness, learner weights, tamper rejection, observed-intake blocking and actual HTTP integration"
+  }
+}

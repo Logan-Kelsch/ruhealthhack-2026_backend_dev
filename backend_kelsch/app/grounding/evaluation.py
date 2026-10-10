@@ -174,10 +174,12 @@ def check_challenges(rows: list[dict], *, use_llm: bool = False) -> dict:
             try:
                 issues, call = verifier.judge(case, row["reply"], row["allowed_fact_ids"],
                                               row["previously_disclosed"], row["student_utterance"])
-                row["llm_judge"] = {"status": "EVALUATED", "call": call.to_dict(), "problems": issues}
+                row["llm_judge"] = {"status": "EVALUATED", "call": call.to_dict(),
+                    "calls": call.to_dicts(), "problems": issues}
             except LLMUnavailable as exc:
                 row["llm_judge"] = {"status": "UNAVAILABLE",
                     "call": exc.call.to_dict() if exc.call is not None else None,
+                    "calls": exc.call.to_dicts() if exc.call is not None else [],
                     "problems": [str(exc)]}
     return {"counts": dict(counts), "examples": examples}
 

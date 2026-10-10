@@ -53,6 +53,16 @@ ACK_BY_ACTION = [
 ]
 
 
+def _valid_response(data: object) -> bool:
+    return (
+        isinstance(data, dict)
+        and isinstance(data.get("reply_text"), str)
+        and bool(data["reply_text"].strip())
+        and isinstance(data.get("cited_fact_ids"), list)
+        and all(isinstance(fid, str) and bool(fid.strip()) for fid in data["cited_fact_ids"])
+    )
+
+
 def template_reply(
     case: Case, res: EngineResult, topic_ids: set[str], action_ids: set[str] | frozenset = frozenset(), empathy: bool = False
 ) -> tuple[str, list[str]]:
@@ -132,13 +142,14 @@ def phrase(
     if retry_reason:
         user += f"\n\nYOUR PREVIOUS REPLY WAS REJECTED: {retry_reason}. Fix it."
     try:
-        data, call = complete_json(purpose="phrase", prompt_name="phraser", user=user, max_tokens=400, temperature=0.6)
+        data, call = complete_json(purpose="phrase", prompt_name="phraser", user=user,
+                                  max_tokens=400, temperature=0.6, response_validator=_valid_response)
     except LLMUnavailable as exc:
         failed = last_failed_call("phrase")
         raise LLMUnavailable(failed.error if failed else "phraser failed", call=failed or exc.call) from None
-    if not isinstance(data, dict) or not isinstance(data.get("reply_text"), str):
+    if not _valid_response(data):
         call.ok = False
         call.error = "phraser returned an unexpected shape"
         raise LLMUnavailable(call.error, call=call)
-    cited = [str(c) for c in data.get("cited_fact_ids") or []]
+    cited = data["cited_fact_ids"]
     return data["reply_text"].strip(), cited, [call]

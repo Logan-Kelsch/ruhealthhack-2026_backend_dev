@@ -34,6 +34,7 @@ from app.schemas.http import (
 from app.studio import consistency, drafting, intake, preview, publish, vhs_import
 from app.studio.autofill import autofill_labs, autofill_vitals
 from app.studio.fact_refs import dropped_fact_errors
+from app.studio.visit_authoring import apply_review_status, authored_visit_errors
 
 router = APIRouter(prefix="/api/studio", tags=["studio"])
 
@@ -107,13 +108,13 @@ def new_draft(body: NewDraft, db: Session = Depends(get_session)) -> StudioDraft
     return _result(row, calls)
 
 
-@router.get("/cases/{case_id}", response_model=StudioCaseDetail)
+@router.get("/cases/{case_id}", response_model=StudioCaseDetail, response_model_exclude_none=True)
 def get_case(case_id: str, version: int | None = None, db: Session = Depends(get_session)) -> StudioCaseDetail:
     """Return one saved version. Reading the case does not create another one."""
     return _detail(services.get_case_row(db, case_id, version))
 
 
-@router.put("/cases/{case_id}", response_model=StudioCaseDetail)
+@router.put("/cases/{case_id}", response_model=StudioCaseDetail, response_model_exclude_none=True)
 def save_case(case_id: str, case: Case, db: Session = Depends(get_session)) -> StudioCaseDetail:
     """Store faculty edits on the draft. The body is the same case a refresh loads."""
     if case.case_id != case_id:
@@ -127,6 +128,16 @@ def save_case(case_id: str, case: Case, db: Session = Depends(get_session)) -> S
             {
                 "message": "A fact is still referenced. Remove those references before deleting it.",
                 "errors": [item.model_dump() for item in blocked],
+            },
+        )
+    # Shape is already checked. This rejects unknown labels, dangling ids, and uncovered results.
+    problems = authored_visit_errors(case)
+    if problems:
+        raise HTTPException(
+            422,
+            {
+                "message": problems[0].msg,
+                "errors": [item.model_dump() for item in problems],
             },
         )
     return _detail(services.save_draft(db, case))
@@ -167,6 +178,7 @@ class Approve(BaseModel):
         "allergies",
         "objectives",
         "branches",
+        "visit_changes",
     ]
     keys: list[str] | None = None  # None approves the whole group
     status: Literal["approved", "draft"] = "approved"
@@ -178,6 +190,8 @@ def approve(case_id: str, body: Approve, db: Session = Depends(get_session)) -> 
     case = _draft(db, case_id)
     if body.group == "branches":
         items = [(b, b.id) for v in case.visits for b in v.branches]
+    elif body.group == "visit_changes":
+        items = [(v, v.id) for v in case.visits]
     elif body.group in APPROVABLE:
         attr, key = APPROVABLE[body.group]
         items = [(i, str(getattr(i, key))) for i in getattr(case, attr)]
@@ -185,7 +199,15 @@ def approve(case_id: str, body: Approve, db: Session = Depends(get_session)) -> 
         raise HTTPException(422, f"unknown group {body.group}")
     wanted = set(body.keys) if body.keys is not None else None
     for item, key in items:
-        if wanted is None or key in wanted:
+        if wanted is not None and key not in wanted:
+            continue
+        # Outcomes and the clinical changes inside them stay draft until this approval.
+        if body.group == "branches":
+            item.status = body.status
+            apply_review_status(item.changes, body.status)
+        elif body.group == "visit_changes":
+            apply_review_status(item.changes, body.status)
+        else:
             item.status = body.status
     return _detail(services.save_draft(db, case))
 

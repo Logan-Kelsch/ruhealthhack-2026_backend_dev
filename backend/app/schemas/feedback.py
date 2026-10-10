@@ -173,19 +173,32 @@ class DocumentationCheck(BaseModel):
 
 
 class BranchSummary(BaseModel):
-    """Which authored outcome was taken. Later-visit fact changes are not part of this view."""
+    """One faculty-written outcome. Later-visit fact changes and likelihood tags are not on it."""
 
     id: str
     label: str
     summary: str = ""
+    # Transcript spans for the decision points that define this outcome.
+    evidence: list[EvidenceQuote] = Field(default_factory=list)
+
+
+class PublicDecision(BaseModel):
+    """A yes/no result the student can read. The predicate that produced it stays on the case."""
+
+    id: str
+    label: str
+    result: Literal["yes", "no", "unclear"]
+    evidence: list[EvidenceQuote] = Field(default_factory=list)
+    feedback: str = ""
 
 
 class DecisionPathView(BaseModel):
-    """The outcome id for this visit. Follow-up selection is a separate screen."""
+    """The outcome this visit selected, the other authored outcomes, and the evidence for both."""
 
     visit_id: str
     taken: BranchSummary | None = None
     ghosts: list[BranchSummary] = Field(default_factory=list)
+    decisions: list[PublicDecision] = Field(default_factory=list)
     needs_faculty_review: list[str] = Field(default_factory=list)
 
 

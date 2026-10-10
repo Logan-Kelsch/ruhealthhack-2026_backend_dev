@@ -104,7 +104,7 @@ function renderScreen(
     case "s-debrief":
       return <Debrief go={go} route={route} client={client} />;
     case "s-between":
-      return <BetweenVisits go={go} />;
+      return <BetweenVisits go={go} route={route} client={client} />;
     default: {
       const unreachable: never = screen;
       return unreachable;

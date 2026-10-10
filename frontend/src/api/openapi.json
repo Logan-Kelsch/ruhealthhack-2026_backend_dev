@@ -54,7 +54,8 @@
               "medications",
               "allergies",
               "objectives",
-              "branches"
+              "branches",
+              "visit_changes"
             ],
             "title": "Group",
             "type": "string"
@@ -316,8 +317,15 @@
         "type": "object"
       },
       "BranchSummary": {
-        "description": "Which authored outcome was taken. Later-visit fact changes are not part of this view.",
+        "description": "One faculty-written outcome. Later-visit fact changes and likelihood tags are not on it.",
         "properties": {
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/EvidenceQuote"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
           "id": {
             "title": "Id",
             "type": "string"
@@ -833,8 +841,15 @@
         "type": "object"
       },
       "DecisionPathView": {
-        "description": "The outcome id for this visit. Follow-up selection is a separate screen.",
+        "description": "The outcome this visit selected, the other authored outcomes, and the evidence for both.",
         "properties": {
+          "decisions": {
+            "items": {
+              "$ref": "#/components/schemas/PublicDecision"
+            },
+            "title": "Decisions",
+            "type": "array"
+          },
           "ghosts": {
             "items": {
               "$ref": "#/components/schemas/BranchSummary"
@@ -871,7 +886,7 @@
         "type": "object"
       },
       "DecisionPoint": {
-        "description": "A yes/no condition checked at the end of a visit (PRD L-03).\n\npredicate grammar (JSON):\n  {\"topic\": id} | {\"action\": id} | {\"maneuver\": id} | {\"order\": panel}\n  {\"fact_disclosed\": fact_id} | {\"any\": [p, ...]} | {\"all\": [p, ...]} | {\"not\": p}\n  {\"before\": [p_first, p_second]}  # p_first happened in an earlier turn than p_second",
+        "description": "A yes/no condition checked at the end of a visit (PRD L-03).\n\nThe predicate is one supported operator, not a free-text rule.",
         "properties": {
           "affects": {
             "default": "patient",
@@ -913,9 +928,7 @@
             "type": "string"
           },
           "predicate": {
-            "additionalProperties": true,
-            "title": "Predicate",
-            "type": "object"
+            "$ref": "#/components/schemas/Predicate"
           },
           "rubric_domain": {
             "anyOf": [
@@ -1505,6 +1518,93 @@
           "text"
         ],
         "title": "Fact",
+        "type": "object"
+      },
+      "FactPatch": {
+        "additionalProperties": false,
+        "description": "Fields a later visit may replace on a fact that already exists.\n\nAny other key is not a change. This does not add a new clinical fact.",
+        "properties": {
+          "say": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Say"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "enum": [
+                  "draft",
+                  "approved"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          },
+          "tier": {
+            "anyOf": [
+              {
+                "enum": [
+                  "initial",
+                  "discoverable",
+                  "reluctant",
+                  "hidden"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tier"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "title": "FactPatch",
         "type": "object"
       },
       "FeedbackResponse": {
@@ -2205,6 +2305,137 @@
         "title": "Personality",
         "type": "object"
       },
+      "Predicate": {
+        "additionalProperties": false,
+        "description": "One supported yes/no check. Exactly one operator is set.\n\nA sentence, or a second key beside an operator, is not a predicate. The\nevaluator reads these same keys and does not infer a rule from other text.",
+        "properties": {
+          "action": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Action"
+          },
+          "all": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Predicate"
+                },
+                "minItems": 1,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "All"
+          },
+          "any": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Predicate"
+                },
+                "minItems": 1,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Any"
+          },
+          "before": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Predicate"
+                },
+                "maxItems": 2,
+                "minItems": 2,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Before"
+          },
+          "fact_disclosed": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fact Disclosed"
+          },
+          "maneuver": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Maneuver"
+          },
+          "not": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Predicate"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "open_question": {
+            "anyOf": [
+              {
+                "const": true,
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Open Question"
+          },
+          "order": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Order"
+          },
+          "topic": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Topic"
+          }
+        },
+        "title": "Predicate",
+        "type": "object"
+      },
       "Preview": {
         "properties": {
           "driver": {
@@ -2870,6 +3101,47 @@
           "include_timestamps"
         ],
         "title": "PublicConfig",
+        "type": "object"
+      },
+      "PublicDecision": {
+        "description": "A yes/no result the student can read. The predicate that produced it stays on the case.",
+        "properties": {
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/EvidenceQuote"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "feedback": {
+            "default": "",
+            "title": "Feedback",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "result": {
+            "enum": [
+              "yes",
+              "no",
+              "unclear"
+            ],
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "result"
+        ],
+        "title": "PublicDecision",
         "type": "object"
       },
       "PublicDoorwayVital": {
@@ -4383,6 +4655,7 @@
           },
           "day": {
             "default": 0,
+            "minimum": 0.0,
             "title": "Day",
             "type": "integer"
           },
@@ -4483,8 +4756,7 @@
           },
           "update_facts": {
             "additionalProperties": {
-              "additionalProperties": true,
-              "type": "object"
+              "$ref": "#/components/schemas/FactPatch"
             },
             "title": "Update Facts",
             "type": "object"

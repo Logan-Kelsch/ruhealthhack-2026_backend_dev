@@ -54,12 +54,29 @@ def test_public_config_names_voice_settings_and_hides_secrets():
     assert response.json() == {
         "llm": False,
         "tts": False,
-        "stt_provider": "browser",
-        "stt_commit_silence_ms": 1200,
+        "stt_provider": "elevenlabs",
+        "stt_model_id": "scribe_v2_realtime",
+        "voice_id": None,
+        "tts_model_id": "eleven_turbo_v2_5",
+        "vad_silence_secs": 1.2,
+        "vad_threshold": 0.4,
+        "commit_strategy": "vad",
+        "include_timestamps": True,
     }
 
     config = app.openapi()["components"]["schemas"]["PublicConfig"]
-    assert set(config["properties"]) == {"llm", "tts", "stt_provider", "stt_commit_silence_ms"}
+    assert set(config["properties"]) == {
+        "llm",
+        "tts",
+        "stt_provider",
+        "stt_model_id",
+        "voice_id",
+        "tts_model_id",
+        "vad_silence_secs",
+        "vad_threshold",
+        "commit_strategy",
+        "include_timestamps",
+    }
     assert config.get("additionalProperties") is not True
     body = app.openapi()["paths"]["/api/config"]["get"]["responses"]["200"]["content"]["application/json"]["schema"]
     assert body["$ref"] == "#/components/schemas/PublicConfig"
@@ -186,6 +203,11 @@ def test_openapi_export_is_deterministic_and_omits_local_config(tmp_path):
             "CORS_ORIGINS": "http://sentinel-cors.invalid",
             "BEDROCK_MODEL_FAST": "sentinel-model-fast",
             "BEDROCK_MODEL_STRONG": "sentinel-model-strong",
+            "ELEVENLABS_STT_MODEL": "sentinel-stt-model",
+            "ELEVENLABS_DEFAULT_VOICE_ID": "sentinel-voice-id",
+            "ELEVENLABS_TTS_MODEL_LIVE": "sentinel-tts-model",
+            "STT_VAD_SILENCE_SECS": "9.5",
+            "STT_VAD_THRESHOLD": "0.25",
         }
     )
     first = tmp_path / "one.json"
@@ -212,6 +234,9 @@ def test_openapi_export_is_deterministic_and_omits_local_config(tmp_path):
         "sentinel-cors.invalid",
         "sentinel-model-fast",
         "sentinel-model-strong",
+        "sentinel-stt-model",
+        "sentinel-voice-id",
+        "sentinel-tts-model",
     ):
         assert secret not in text
     schema = json.loads(text)

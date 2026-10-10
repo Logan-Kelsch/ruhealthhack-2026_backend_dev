@@ -20,9 +20,27 @@ export type VisitNumber = 1 | 2;
 export type GoOpts = {
   visit?: VisitNumber;
   studioTab?: StudioTab;
-  // Which saved case the faculty member picked. This is navigation state, not an API type.
+  // Which saved case the faculty member or student picked. These are navigation ids, not API types.
   caseId?: string;
   version?: number;
+  visitId?: string;
+  encounterId?: string | null;
+};
+
+// Identifiers kept in the URL so a refresh can reopen the same visit.
+// They are plain strings from the address bar, not generated response types.
+export type StudentRoute = {
+  caseId: string | null;
+  version: number | null;
+  visitId: string | null;
+  encounterId: string | null;
+};
+
+export const emptyStudentRoute: StudentRoute = {
+  caseId: null,
+  version: null,
+  visitId: null,
+  encounterId: null,
 };
 
 export type Go = (screen: ScreenId, opts?: GoOpts) => void;
@@ -41,10 +59,53 @@ const SCREENS: ScreenId[] = [
   "s-between",
 ];
 
+// Reads #screen?case=&version=&visit=&encounter= so refresh can restore the visit.
+export function parseHash(hash: string): { screen: ScreenId | null; route: StudentRoute } {
+  const raw = hash.replace(/^#/, "");
+  const [screenPart, queryPart] = raw.split("?");
+  const screen = SCREENS.includes(screenPart as ScreenId) ? (screenPart as ScreenId) : null;
+  const params = new URLSearchParams(queryPart ?? "");
+  const versionRaw = params.get("version");
+  const version = versionRaw !== null && /^\d+$/.test(versionRaw) ? Number(versionRaw) : null;
+  return {
+    screen,
+    route: {
+      caseId: params.get("case"),
+      version,
+      visitId: params.get("visit"),
+      encounterId: params.get("encounter"),
+    },
+  };
+}
+
+// Writes the screen and the student ids in a stable order.
+export function writeHash(screen: ScreenId, route: StudentRoute): string {
+  const params = new URLSearchParams();
+  if (route.caseId) params.set("case", route.caseId);
+  if (route.version !== null) params.set("version", String(route.version));
+  if (route.visitId) params.set("visit", route.visitId);
+  if (route.encounterId) params.set("encounter", route.encounterId);
+  const query = params.toString();
+  return query ? `#${screen}?${query}` : `#${screen}`;
+}
+
 // Hash links like #s-encounter let a refresh keep the current screen.
 export function screenFromHash(hash: string): ScreenId | null {
-  const id = hash.replace(/^#/, "").split(/[?&]/)[0] as ScreenId;
-  return SCREENS.includes(id) ? id : null;
+  return parseHash(hash).screen;
+}
+
+// Student screens keep the case in the URL. Other screens do not carry an encounter forward.
+export function routeForScreen(screen: ScreenId, current: StudentRoute, opts?: GoOpts): StudentRoute {
+  if (!screen.startsWith("s-") || screen === "s-home") {
+    return emptyStudentRoute;
+  }
+  return {
+    caseId: opts?.caseId ?? current.caseId,
+    version: opts?.version ?? current.version,
+    visitId: opts?.visitId ?? current.visitId,
+    // Only the encounter screen keeps an encounter id. Briefing must not resume one by itself.
+    encounterId: screen === "s-encounter" ? (opts?.encounterId ?? current.encounterId) : null,
+  };
 }
 
 export type CaseRoute = {

@@ -14,6 +14,9 @@ export type VhsImportResponse = components["schemas"]["VhsImportResponse"];
 export type CaseDocument = components["schemas"]["Case"];
 export type ApprovalGroup = components["schemas"]["Approve"]["group"];
 export type ItemStatus = "draft" | "approved";
+export type PublicCase = components["schemas"]["PublicCase"];
+export type PublicEncounter = components["schemas"]["PublicEncounter"];
+export type PublicChartEntry = components["schemas"]["PublicChartEntry"];
 
 // One error for every failed response, so screens do not each invent a fallback.
 export class ApiError extends Error {
@@ -31,7 +34,11 @@ export class ApiError extends Error {
 }
 
 // baseUrl is empty in the app (same origin, or the Vite proxy) and set in tests.
-export function createApi(baseUrl = "") {
+// fetchImpl lets a test stand in for the network without replacing the global fetch.
+export function createApi(baseUrl = "", fetchImpl?: typeof fetch) {
+  if (fetchImpl) {
+    return createClient<paths>({ baseUrl, fetch: fetchImpl });
+  }
   return createClient<paths>({ baseUrl });
 }
 

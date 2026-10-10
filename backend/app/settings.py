@@ -29,13 +29,15 @@ class Settings(BaseSettings):
     elevenlabs_api_key: str | None = None
     elevenlabs_tts_model_live: str = "eleven_turbo_v2_5"
     elevenlabs_default_voice_id: str | None = None
+    # Scribe v2 Realtime. The browser connects with a single-use token, not this key.
+    elevenlabs_stt_model: str = "scribe_v2_realtime"
     # Only turn on for models that support inline audio tags such as [sighs].
     elevenlabs_audio_tags: bool = False
 
-    # Speech-to-text runs in the browser in V1 (Web Speech API). Silence before an
-    # utterance is committed, mirrored by the frontend.
-    stt_provider: str = "browser"
-    stt_commit_silence_ms: int = 1200
+    # Silence that makes Scribe commit a turn, and how sure the detector must be.
+    # ElevenLabs takes the silence value in seconds.
+    stt_vad_silence_secs: float = 1.2
+    stt_vad_threshold: float = 0.4
 
     nlm_lookup_enabled: bool = True
     cors_origins: str = "http://localhost:5173"

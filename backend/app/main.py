@@ -45,12 +45,20 @@ def create_app() -> FastAPI:
 
     @app.get("/api/config", response_model=PublicConfig)
     def config() -> PublicConfig:
-        """What the frontend needs to pick its voice path. No secrets."""
+        """What the browser needs to open Scribe. The long-lived key is not included."""
+        # Read settings on each request so a changed environment is what the client sees.
+        current = get_settings()
         return PublicConfig(
             llm=llm_available(),
             tts=elevenlabs.tts_available(),
-            stt_provider=settings.stt_provider,
-            stt_commit_silence_ms=settings.stt_commit_silence_ms,
+            stt_provider="elevenlabs",
+            stt_model_id=current.elevenlabs_stt_model,
+            voice_id=current.elevenlabs_default_voice_id,
+            tts_model_id=current.elevenlabs_tts_model_live,
+            vad_silence_secs=current.stt_vad_silence_secs,
+            vad_threshold=current.stt_vad_threshold,
+            commit_strategy="vad",
+            include_timestamps=True,
         )
 
     app.include_router(encounters.router)

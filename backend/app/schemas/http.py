@@ -19,12 +19,24 @@ class HealthResponse(BaseModel):
 
 
 class PublicConfig(BaseModel):
-    """Voice settings the browser may see. Model ids, keys, and account values stay off this object."""
+    """Voice settings the browser may see. The long-lived key is not a field on this object."""
 
     llm: bool
     tts: bool
-    stt_provider: str
-    stt_commit_silence_ms: int
+    stt_provider: Literal["elevenlabs"]
+    stt_model_id: str
+    voice_id: str | None = None
+    tts_model_id: str
+    vad_silence_secs: float
+    vad_threshold: float
+    commit_strategy: Literal["vad"]
+    include_timestamps: bool
+
+
+class ScribeToken(BaseModel):
+    """One single-use Scribe token. It expires at the provider and is not the API key."""
+
+    token: str
 
 
 class StudioCaseSummary(BaseModel):

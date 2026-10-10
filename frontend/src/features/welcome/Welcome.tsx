@@ -21,11 +21,14 @@ export function Welcome({ go }: { go: Go }) {
       <div className="relative flex min-h-full flex-col items-center justify-center gap-12 px-8 py-12 text-center text-ink">
         <div className="flex flex-col items-center gap-4">
           <Wordmark size={Math.round(Math.min(148, Math.max(80, window.innerWidth * 0.085)))} />
+          <div className="rounded-full border border-indigo-line/40 bg-white/70 px-4 py-1.5 font-sans text-[13px] font-semibold tracking-[0.4px] text-indigo uppercase backdrop-blur-sm">
+            Training for value-based care
+          </div>
           <div className="font-serif text-[clamp(26px,2.8vw,44px)] leading-tight tracking-[-0.6px] text-ink">
             Real conversations with patients who aren’t.
           </div>
           <div className="max-w-[560px] font-sans text-[clamp(15px,1.2vw,18px)] leading-snug text-ink-soft">
-            Learners talk with a virtual patient by voice. Educators decide every fact it can say, and every score points back to the words that earned it.
+            Value-based care is decided in conversations: the allergy that gets caught, the plan a patient can follow at home. Learners practice those conversations out loud. Educators build a case in minutes, and every score points back to the words that earned it.
           </div>
         </div>
         <div className="grid w-full max-w-[960px] justify-center gap-[clamp(20px,3vw,48px)] [grid-template-columns:repeat(auto-fit,minmax(280px,450px))]">

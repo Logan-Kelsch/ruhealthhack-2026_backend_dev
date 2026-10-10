@@ -1,6 +1,5 @@
 {
-  "format": "clinical_script_review_v2",
-  "debrief_delivery": "after_encounter",
+  "format": "clinical_script_review_v3",
   "scenario_id": 2,
   "title": "Tobacco use and readiness to change",
   "patient": {
@@ -19,8 +18,7 @@
   "teaching_notes": [
     "Use the fixed suggested sequence for a coherent rehearsal.",
     "This is an authored demonstration, not a diagnosis or grading engine.",
-    "Complete or explicitly end the student-patient conversation before opening the separate debrief.",
-    "The debrief reviews completed transcript evidence. evidence_turn identifies an exchange to review; it never triggers feedback during the conversation."
+    "Show the single debrief only after the entire student-patient dialogue is complete and the encounter has ended."
   ],
   "sources": [
     {
@@ -78,26 +76,25 @@
       "chart": []
     }
   ],
-  "debrief": [
-    {
-      "evidence_turn": 4,
-      "rubric_domain": "Rapport, respect, and empathy",
-      "question": "Looking back at the patient's response to the quit-date question, how did your wording affect the conversation, and what would you adjust in a future encounter?"
-    },
-    {
-      "evidence_turn": 6,
-      "rubric_domain": "Listening and response to cues",
-      "question": "Review the priorities the patient described. How well did your response reflect what mattered to him without assuming a decision to change?"
-    },
-    {
-      "evidence_turn": 7,
-      "rubric_domain": "Explanation and shared decisions",
-      "question": "Looking back at the permission discussion, what did the patient actually agree to, and how would you check that understanding in a future visit?"
-    },
-    {
-      "evidence_turn": 8,
-      "rubric_domain": "Professionalism, safety, and closure",
-      "question": "At the end of the encounter, how well did your closing plan fit the willingness the patient expressed throughout the conversation?"
-    }
-  ]
+  "debrief": {
+    "delivery": "after_dialogue",
+    "questions": [
+      {
+        "rubric_domain": "Rapport, respect, and empathy",
+        "question": "Looking back at the patient's response to the quit-date question, how did your wording affect the conversation, and what would you adjust in a future encounter?"
+      },
+      {
+        "rubric_domain": "Listening and response to cues",
+        "question": "Review the priorities the patient described. How well did your response reflect what mattered to him without assuming a decision to change?"
+      },
+      {
+        "rubric_domain": "Explanation and shared decisions",
+        "question": "Looking back at the permission discussion, what did the patient actually agree to, and how would you check that understanding in a future visit?"
+      },
+      {
+        "rubric_domain": "Professionalism, safety, and closure",
+        "question": "At the end of the encounter, how well did your closing plan fit the willingness the patient expressed throughout the conversation?"
+      }
+    ]
+  }
 }

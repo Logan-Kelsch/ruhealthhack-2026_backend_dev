@@ -9,7 +9,7 @@ clinician, and edit the wording inside quotation marks. No Python edits are need
 | `02_smoking_cessation.json` | Smoking cessation; the patient remains unwilling to change |
 | `03_cardiac.json` | A 45-year-old woman with anxiety history and ST elevation on an electrocardiogram |
 
-These are authored synthetic teaching scripts awaiting clinical review. Each file explicitly sets `debrief_delivery: "after_encounter"`; its debrief is read only after the student-patient conversation ends.
+These are authored synthetic teaching scripts awaiting clinical review. Each file ends with a single debrief for the entire completed dialogue.
 
 ## What to edit
 
@@ -22,14 +22,12 @@ These are authored synthetic teaching scripts awaiting clinical review. Each fil
 - `chart`: findings shown after that dialogue entry. Move a finding to another
   entry to change when it appears. Keep its `id` unique. For a new finding, use a
   unique short ID, label, text, source, and `urgent: true` or `false`.
-- `debrief`: the separate review delivered **after the encounter has ended**.
-  `evidence_turn: 4` identifies evidence from the fourth student/patient exchange;
-  it does not schedule a question after the fourth turn. No debrief question or
-  coaching notice appears during conversation. Only completed exchanges may be
-  cited. Adjust these evidence numbers when changing the dialogue order.
-  `rubric_domain` uses an official domain name listed below.
+- `debrief`: one block after the entire `dialogue` array. Its `delivery` is
+  `after_dialogue`, and `questions` contains the reflection questions for the
+  completed encounter. Questions have a rubric domain and text only. They have
+  no turn numbers, evidence references, or triggers.
 
-Keep `format`, `scenario_id`, and `debrief_delivery: "after_encounter"` unchanged. Background, dialogue, findings, and goals
+Keep `format`, `scenario_id`, and the debrief `delivery: "after_dialogue"` unchanged. Background, dialogue, findings, and goals
 should agree. Debrief questions should guide reflection without giving away the
 answer. Mark urgent chart findings directly; chart data still appears during the
 encounter. Teaching guidance about those findings belongs in the later debrief.
@@ -71,10 +69,10 @@ The script validates the whole batch before writing anything. It updates
 generates exact dialogue fact citations and chart release references, recalculates
 estimated display delays, and increments only changed case versions. Importing the
 same content again makes no change. No database, model call, or server is needed.
-Clinical review remains pending. The importer also accepts the original `clinical_script_review_v1` files with `after_turn` evidence references. New exports use `clinical_script_review_v2` and the clearer `evidence_turn` label; an inline debrief delivery value is rejected.
+Clinical review remains pending. Use the current `clinical_script_review_v3` files. The importer rejects per-turn debrief fields and any delivery other than `after_dialogue`.
 
 The notebook and `/api/demo` endpoints read this runtime file for **new preparations**.
-Prepare/start a fresh session to see edits; existing sessions keep their saved script.
+Prepare/start a fresh session to see edits; existing sessions keep their saved script. Complete every dialogue exchange and end the encounter before opening its debrief. An early ending does not release a partial debrief.
 For a remote server, deploy the changed runtime file there too. The saved HTML
 preview and notebook outputs are snapshots; rerun the notebook to refresh them.
 

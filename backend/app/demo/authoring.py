@@ -7,7 +7,7 @@ import tempfile
 from pathlib import Path
 from typing import Annotated, Literal
 
-from pydantic import AliasChoices, BaseModel, ConfigDict, Field, StringConstraints, model_validator
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
 
 from app import catalogs
 from app.schemas.demo import PatientMetadata, ScriptCase, ScriptFixture
@@ -40,9 +40,13 @@ class ReviewTurn(ReviewModel):
 
 
 class ReviewReflection(ReviewModel):
-    evidence_turn: int = Field(ge=1, validation_alias=AliasChoices("evidence_turn", "after_turn"))
     rubric_domain: Text
     question: Text
+
+
+class ReviewDebrief(ReviewModel):
+    delivery: Literal["after_dialogue"]
+    questions: list[ReviewReflection]
 
 
 class ReviewSource(ReviewModel):
@@ -51,8 +55,7 @@ class ReviewSource(ReviewModel):
 
 
 class ReviewScript(ReviewModel):
-    format: Literal["clinical_script_review_v1", "clinical_script_review_v2"]
-    debrief_delivery: Literal["after_encounter"] = "after_encounter"
+    format: Literal["clinical_script_review_v3"]
     scenario_id: int = Field(ge=1, le=3)
     title: Text
     patient: PatientMetadata
@@ -62,14 +65,12 @@ class ReviewScript(ReviewModel):
     teaching_notes: list[Text]
     sources: list[ReviewSource]
     dialogue: list[ReviewTurn] = Field(min_length=1, max_length=100)
-    debrief: list[ReviewReflection]
+    debrief: ReviewDebrief
 
     @model_validator(mode="after")
-    def check_anchors(self):
+    def check_domains(self):
         domains = {d["name"] for d in catalogs.rubric()["domains"]}
-        for question in self.debrief:
-            if question.evidence_turn > len(self.dialogue):
-                raise ValueError("Debrief evidence_turn must refer to an existing dialogue turn")
+        for question in self.debrief.questions:
             if question.rubric_domain not in domains:
                 raise ValueError(f"Unknown rubric_domain: {question.rubric_domain}; use {sorted(domains)}")
         return self
@@ -78,7 +79,7 @@ class ReviewScript(ReviewModel):
 def to_review(case: ScriptCase) -> ReviewScript:
     domains = {d["id"]: d["name"] for d in catalogs.rubric()["domains"]}
     return ReviewScript.model_validate({
-        "format": "clinical_script_review_v2", "scenario_id": case.scenario_id,
+        "format": "clinical_script_review_v3", "scenario_id": case.scenario_id,
         "title": case.title, "patient": case.patient.model_dump(),
         "learning_goal": case.educator.goal,
         "educator_description": case.educator.example_description,
@@ -88,8 +89,9 @@ def to_review(case: ScriptCase) -> ReviewScript:
                       "chart": [c.model_dump(exclude={"release_step", "provenance"})
                                 for c in case.chart if c.release_step == t.step]}
                      for t in case.turns],
-        "debrief": [{"evidence_turn": q.anchor_step, "rubric_domain": domains[q.domain_id],
-                     "question": q.question} for q in case.debrief],
+        "debrief": {"delivery": "after_dialogue", "questions": [
+            {"rubric_domain": domains[q.domain_id], "question": q.question}
+            for q in case.debrief.questions]},
     })
 
 
@@ -114,9 +116,10 @@ def to_case(review: ReviewScript, version: int) -> ScriptCase:
                      "learner_role": review.learner_role, "teaching_notes": review.teaching_notes,
                      "sources": [s.model_dump() for s in review.sources]},
         "facts": facts, "turns": turns, "chart": chart,
-        "debrief": [{"id": f"{review.scenario_id}.reflection.{n}",
-                     "domain_id": domains[q.rubric_domain], "anchor_step": q.evidence_turn,
-                     "question": q.question} for n, q in enumerate(review.debrief, 1)],
+        "debrief": {"delivery": "after_dialogue", "questions": [
+            {"id": f"{review.scenario_id}.reflection.{n}",
+             "domain_id": domains[q.rubric_domain], "question": q.question}
+            for n, q in enumerate(review.debrief.questions, 1)]},
     })
 
 

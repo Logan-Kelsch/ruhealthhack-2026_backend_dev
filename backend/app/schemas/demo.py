@@ -100,14 +100,13 @@ class Reflection(StrictModel):
     domain_id: int
     domain_name: str
     question: str
-    anchor_step: int
-    student_quote: str
-    patient_quote: str
 
 class DemoDebrief(StrictModel):
     session_id: str
+    delivery: Literal["after_dialogue"] = "after_dialogue"
     method: Literal["scripted_guided_reflection"] = "scripted_guided_reflection"
     reflections: list[Reflection]
+    transcript: list[TranscriptTurn]
     completed_steps: int
     total_steps: int
     follows_rehearsal_script: bool
@@ -145,8 +144,11 @@ class ScriptChart(ChartItem):
 class ScriptReflection(StrictModel):
     id: str
     domain_id: int = Field(ge=1, le=7)
-    anchor_step: int = Field(ge=1)  # Transcript evidence, not a during-encounter trigger.
     question: str
+
+class ScriptDebrief(StrictModel):
+    delivery: Literal["after_dialogue"]
+    questions: list[ScriptReflection]
 
 class ScriptEducator(StrictModel):
     goal: str
@@ -168,7 +170,7 @@ class ScriptCase(StrictModel):
     facts: dict[str, ScriptFact]
     turns: list[ScriptTurn] = Field(min_length=1)
     chart: list[ScriptChart]
-    debrief: list[ScriptReflection]
+    debrief: ScriptDebrief
 
     @model_validator(mode="after")
     def validate_references(self):
@@ -184,8 +186,8 @@ class ScriptCase(StrictModel):
                 raise ValueError("A reply needs an exact authored dialogue source")
             if set(t.release_chart_ids) != {c.id for c in self.chart if c.release_step == t.step}:
                 raise ValueError("Chart release references must agree")
-        if any(c.release_step > count for c in self.chart) or any(q.anchor_step > count for q in self.debrief):
-            raise ValueError("Chart or reflection references a nonexistent turn")
+        if any(c.release_step > count for c in self.chart):
+            raise ValueError("Chart references a nonexistent turn")
         return self
 
 class ScriptFixture(StrictModel):

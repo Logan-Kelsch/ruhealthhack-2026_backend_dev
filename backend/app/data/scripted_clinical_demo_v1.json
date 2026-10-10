@@ -4,7 +4,7 @@
     {
       "schema_version": "scripted_clinical_demo_v1",
       "scenario_id": 1,
-      "fixture_version": 2,
+      "fixture_version": 3,
       "title": "Fever and respiratory symptoms",
       "clinical_review_status": "pending",
       "provenance": "authored_synthetic_script",
@@ -25,8 +25,7 @@
         "teaching_notes": [
           "Use the fixed suggested sequence for a coherent rehearsal.",
           "This is an authored demonstration, not a diagnosis or grading engine.",
-          "Complete or explicitly end the student-patient conversation before opening the separate debrief.",
-          "The debrief reviews completed transcript evidence. evidence_turn identifies an exchange to review; it never triggers feedback during the conversation."
+          "Show the single debrief only after the entire student-patient dialogue is complete and the encounter has ended."
         ],
         "sources": [
           {
@@ -218,31 +217,31 @@
           "release_step": 8
         }
       ],
-      "debrief": [
-        {
-          "id": "1.reflection.1",
-          "domain_id": 3,
-          "anchor_step": 4,
-          "question": "Looking back at the completed encounter, which details influenced your assessment, and which parts of your explanation remained uncertain?"
-        },
-        {
-          "id": "1.reflection.2",
-          "domain_id": 6,
-          "anchor_step": 6,
-          "question": "When reviewing the examination findings, what influenced how quickly you sought help, and what would you prioritize in a similar encounter?"
-        },
-        {
-          "id": "1.reflection.3",
-          "domain_id": 5,
-          "anchor_step": 9,
-          "question": "Review your treatment discussion. How clearly did you separate known findings from working explanations, and what wording would you improve next time?"
-        }
-      ]
+      "debrief": {
+        "delivery": "after_dialogue",
+        "questions": [
+          {
+            "id": "1.reflection.1",
+            "domain_id": 3,
+            "question": "Looking back at the completed encounter, which details influenced your assessment, and which parts of your explanation remained uncertain?"
+          },
+          {
+            "id": "1.reflection.2",
+            "domain_id": 6,
+            "question": "When reviewing the examination findings, what influenced how quickly you sought help, and what would you prioritize in a similar encounter?"
+          },
+          {
+            "id": "1.reflection.3",
+            "domain_id": 5,
+            "question": "Review your treatment discussion. How clearly did you separate known findings from working explanations, and what wording would you improve next time?"
+          }
+        ]
+      }
     },
     {
       "schema_version": "scripted_clinical_demo_v1",
       "scenario_id": 2,
-      "fixture_version": 2,
+      "fixture_version": 3,
       "title": "Tobacco use and readiness to change",
       "clinical_review_status": "pending",
       "provenance": "authored_synthetic_script",
@@ -264,8 +263,7 @@
         "teaching_notes": [
           "Use the fixed suggested sequence for a coherent rehearsal.",
           "This is an authored demonstration, not a diagnosis or grading engine.",
-          "Complete or explicitly end the student-patient conversation before opening the separate debrief.",
-          "The debrief reviews completed transcript evidence. evidence_turn identifies an exchange to review; it never triggers feedback during the conversation."
+          "Show the single debrief only after the entire student-patient dialogue is complete and the encounter has ended."
         ],
         "sources": [
           {
@@ -403,37 +401,36 @@
           "release_step": 3
         }
       ],
-      "debrief": [
-        {
-          "id": "2.reflection.1",
-          "domain_id": 2,
-          "anchor_step": 4,
-          "question": "Looking back at the patient's response to the quit-date question, how did your wording affect the conversation, and what would you adjust in a future encounter?"
-        },
-        {
-          "id": "2.reflection.2",
-          "domain_id": 4,
-          "anchor_step": 6,
-          "question": "Review the priorities the patient described. How well did your response reflect what mattered to him without assuming a decision to change?"
-        },
-        {
-          "id": "2.reflection.3",
-          "domain_id": 5,
-          "anchor_step": 7,
-          "question": "Looking back at the permission discussion, what did the patient actually agree to, and how would you check that understanding in a future visit?"
-        },
-        {
-          "id": "2.reflection.4",
-          "domain_id": 7,
-          "anchor_step": 8,
-          "question": "At the end of the encounter, how well did your closing plan fit the willingness the patient expressed throughout the conversation?"
-        }
-      ]
+      "debrief": {
+        "delivery": "after_dialogue",
+        "questions": [
+          {
+            "id": "2.reflection.1",
+            "domain_id": 2,
+            "question": "Looking back at the patient's response to the quit-date question, how did your wording affect the conversation, and what would you adjust in a future encounter?"
+          },
+          {
+            "id": "2.reflection.2",
+            "domain_id": 4,
+            "question": "Review the priorities the patient described. How well did your response reflect what mattered to him without assuming a decision to change?"
+          },
+          {
+            "id": "2.reflection.3",
+            "domain_id": 5,
+            "question": "Looking back at the permission discussion, what did the patient actually agree to, and how would you check that understanding in a future visit?"
+          },
+          {
+            "id": "2.reflection.4",
+            "domain_id": 7,
+            "question": "At the end of the encounter, how well did your closing plan fit the willingness the patient expressed throughout the conversation?"
+          }
+        ]
+      }
     },
     {
       "schema_version": "scripted_clinical_demo_v1",
       "scenario_id": 3,
-      "fixture_version": 2,
+      "fixture_version": 3,
       "title": "Nausea, fatigue, and chest unease",
       "clinical_review_status": "pending",
       "provenance": "authored_synthetic_script",
@@ -455,8 +452,7 @@
         "teaching_notes": [
           "Use the fixed suggested sequence for a coherent rehearsal.",
           "This is an authored demonstration, not a diagnosis or grading engine.",
-          "Complete or explicitly end the student-patient conversation before opening the separate debrief.",
-          "The debrief reviews completed transcript evidence. evidence_turn identifies an exchange to review; it never triggers feedback during the conversation."
+          "Show the single debrief only after the entire student-patient dialogue is complete and the encounter has ended."
         ],
         "sources": [
           {
@@ -608,32 +604,31 @@
           "release_step": 3
         }
       ],
-      "debrief": [
-        {
-          "id": "3.reflection.1",
-          "domain_id": 6,
-          "anchor_step": 1,
-          "question": "After reviewing the completed encounter, how did the patient's initial explanation influence your thinking, and what other possibilities would you keep open next time?"
-        },
-        {
-          "id": "3.reflection.2",
-          "domain_id": 3,
-          "anchor_step": 3,
-          "question": "Reflect on the timing of your initial assessment. Which information made prompt testing worth prioritizing over a longer interview?"
-        },
-        {
-          "id": "3.reflection.3",
-          "domain_id": 6,
-          "anchor_step": 5,
-          "question": "Looking back, which findings changed your plan, and how clearly did your handover communicate the urgency?"
-        },
-        {
-          "id": "3.reflection.4",
-          "domain_id": 2,
-          "anchor_step": 6,
-          "question": "Review your response to the patient's fear. How did your words acknowledge it without promising an outcome, and what would you refine next time?"
-        }
-      ]
+      "debrief": {
+        "delivery": "after_dialogue",
+        "questions": [
+          {
+            "id": "3.reflection.1",
+            "domain_id": 6,
+            "question": "After reviewing the completed encounter, how did the patient's initial explanation influence your thinking, and what other possibilities would you keep open next time?"
+          },
+          {
+            "id": "3.reflection.2",
+            "domain_id": 3,
+            "question": "Reflect on the timing of your initial assessment. Which information made prompt testing worth prioritizing over a longer interview?"
+          },
+          {
+            "id": "3.reflection.3",
+            "domain_id": 6,
+            "question": "Looking back, which findings changed your plan, and how clearly did your handover communicate the urgency?"
+          },
+          {
+            "id": "3.reflection.4",
+            "domain_id": 2,
+            "question": "Review your response to the patient's fear. How did your words acknowledge it without promising an outcome, and what would you refine next time?"
+          }
+        ]
+      }
     }
   ]
 }

@@ -51,8 +51,8 @@ Alternatively set `SCRIPTED_DEMO_ENABLED=true` in the existing `.env`. The route
 | Start | `POST /api/demo/sessions` | `{preparation_id, accept_fixed_script: true}` → current public session |
 | Resume | `GET /api/demo/sessions/{sid}` | Transcript, released chart, next step; no future replies, goal, or full instructor metadata |
 | Advance | `POST /api/demo/sessions/{sid}/turns` | `{expected_step, request_id, text}` → static patient turn, new chart items, assumed display delay; no teaching feedback |
-| End | `POST /api/demo/sessions/{sid}/end` | Ended session; conversation stops, no debrief returned; early ending allowed |
-| Debrief | `GET /api/demo/sessions/{sid}/debrief` | Separate post-encounter review citing completed exchanges; 409 until ended, no grade |
+| End | `POST /api/demo/sessions/{sid}/end` | Ended session; conversation stops, no debrief returned; early ending allowed, but no debrief for an incomplete dialogue |
+| Debrief | `GET /api/demo/sessions/{sid}/debrief` | One review of the entire completed dialogue; 409 until every exchange is complete and ended |
 
 Example first request:
 
@@ -66,7 +66,7 @@ Example turn:
 {"expected_step": 1, "request_id": "turn_1_attempt", "text": "Tell me what feels different today."}
 ```
 
-**Input semantics:** every nonblank committed student turn consumes the next reply, regardless of meaning. The recommended sequence is supplied to the presenter, not the student session. Off-script text can create an incoherent conversation; do not present this as semantic responsiveness. The debrief changes off-script anchors to general reflection questions and never claims an unobserved error.
+**Input semantics:** every nonblank committed student turn consumes the next reply, regardless of meaning. The recommended sequence is supplied to the presenter, not the student session. Off-script text can create an incoherent conversation; do not present this as semantic responsiveness. The debrief uses general whole-dialogue reflection questions for off-script conversations and never claims an unobserved error.
 
 ## Typed frontend transport and timing
 
@@ -108,9 +108,9 @@ only once and place chart findings at their release turn. After edits, run
 `PYTHONPATH=backend python -m scripts.update_scripted_clinical_demo <file1.json> <file2.json> <file3.json>`
 from the repository root. Add `--check` for a validation preview. The importer
 generates internal citations, release references, timing, and changed case versions;
-new preparations use the result. The folder README covers partial imports and exports. Current review files use `clinical_script_review_v2`, explicitly set `debrief_delivery: "after_encounter"`, and use `evidence_turn` to cite completed exchanges. Original v1 files with `after_turn` still import; new exports use the updated labels.
+new preparations use the result. The folder README covers partial imports and exports. Current review files use `clinical_script_review_v3` and end with one `debrief` object: `delivery: "after_dialogue"` plus a `questions` list. Questions contain no per-turn references; older review formats must be converted to this whole-dialogue structure before import.
 
-`backend/app/data/scripted_clinical_demo_v1.json` contains the three complete authored snapshots. `ScriptFixture` in `backend/app/schemas/demo.py` validates contiguous steps, exact authored dialogue sources, chart release references, and debrief anchors. `PatientMetadata` and `MetadataExtraction` are the interchangeable metadata contracts.
+`backend/app/data/scripted_clinical_demo_v1.json` contains the three complete authored snapshots. `ScriptFixture` in `backend/app/schemas/demo.py` validates contiguous steps, exact authored dialogue sources, chart release references, and the whole-dialogue debrief structure. `PatientMetadata` and `MetadataExtraction` are the interchangeable metadata contracts.
 
 The deterministic structurer categorizes explicit text into exact source spans. It extracts a digit-based age and explicit sex term, and recognizes the selected fixture's name if present. It does not perform general name recognition, infer clinical facts, interpret negation into diagnoses, or reconcile the pasted description with the dialogue. Negated text remains verbatim. Unmatched text remains visible; demographics disagreements produce warnings. The canonical fixed fixture is returned alongside the extracted description, never silently replaced by it.
 
@@ -122,9 +122,9 @@ To use an actual model later, add a structuring adapter returning `MetadataExtra
 
 The debrief is a separate phase after the conversation has ended. During the encounter, responses contain patient dialogue and released chart findings only. Neither a chart release nor reaching the last scripted reply opens or returns debrief feedback.
 
-Call `POST /api/demo/sessions/{sid}/end` to close the conversation, then call `GET /api/demo/sessions/{sid}/debrief` and render that response outside the conversation transcript. The debrief read never ends an active encounter; it returns 409 for both active and ready-to-end sessions. Explicit early ending is allowed and reviews only exchanges that occurred. Repeated debrief reads are stable and do not advance dialogue.
+Call `POST /api/demo/sessions/{sid}/end` to close the conversation, then call `GET /api/demo/sessions/{sid}/debrief` and render that response outside the conversation transcript. The debrief read never ends an active encounter; it returns 409 for both active and ready-to-end sessions. An early ending does not release the debrief. Every scripted exchange must be completed before ending and reviewing the entire dialogue. Repeated debrief reads are stable and do not advance dialogue.
 
-Questions are linked to official seven-domain rubric IDs and the exact submitted student text and delivered patient reply at their anchor turn. `anchor_step` (runtime) and `evidence_turn` (review JSON) identify transcript evidence, not during-conversation feedback triggers. The debrief invites reflection rather than printing the final diagnosis or expected antibiotic. It is **scripted guided reflection**, not a validated PEARLS implementation, a conversational tutor, or an automated assessment of mistakes. Safety reasoning is reviewed retrospectively in the ended-session debrief. The chart retains its authored urgency flags during the encounter. N/A/numeric scoring belongs to the existing production scorer; this rehearsal assigns no score.
+The debrief contains questions linked to official seven-domain rubric IDs and includes the entire completed transcript once. There are no per-turn anchors or quoted-exchange fields on individual questions. The debrief invites reflection rather than printing the final diagnosis or expected antibiotic. It is **scripted guided reflection**, not a validated PEARLS implementation, a conversational tutor, or an automated assessment of mistakes. Safety reasoning is reviewed retrospectively in the ended-session debrief. The chart retains its authored urgency flags during the encounter. N/A/numeric scoring belongs to the existing production scorer; this rehearsal assigns no score.
 
 ## Reproduce the HTTP rehearsal
 
@@ -137,7 +137,7 @@ LLM_ENABLED=false PYTHONPATH=backend python -m scripts.run_scripted_clinical_dem
 
 Add `--scenario 1`, `2`, or `3` for one example. All cases make 39 requests and deliver 26 fixed replies. The report distinguishes actual handler timings from invented display waits and states zero model calls. It creates and cleans up an isolated SQLite database.
 
-Validation details and known baseline issues are recorded in `docs/validation/scripted_demo/validation.json`. The native Jupyter kernel transport is blocked in the development runtime; notebook cells were executed through IPython instead, including interactive suggestion/send/early-end callbacks. The post-encounter update verifies separate end/view controls, a blocked active debrief read, no coaching during turns, and reset of debrief access when preparing a new case. Post-encounter callback results are saved in `docs/validation/scripted_demo/post_encounter_debrief.json`. Rehearsal source code and a refreshed static HTML preview are supplied.
+Validation details and known baseline issues are recorded in `docs/validation/scripted_demo/validation.json`. The native Jupyter kernel transport is blocked in the development runtime; notebook cells were executed through IPython instead, including interactive suggestion/send/early-end callbacks. The post-encounter update verifies separate end/view controls, blocked active and incomplete-dialogue debrief reads, no coaching during turns, and reset of debrief access when preparing a new case. Post-encounter callback results are saved in `docs/validation/scripted_demo/post_encounter_debrief.json`. Rehearsal source code and a refreshed static HTML preview are supplied.
 
 ## Clinical sources
 

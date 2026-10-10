@@ -1486,6 +1486,12 @@
             "title": "Completed Steps",
             "type": "integer"
           },
+          "delivery": {
+            "const": "after_dialogue",
+            "default": "after_dialogue",
+            "title": "Delivery",
+            "type": "string"
+          },
           "follows_rehearsal_script": {
             "title": "Follows Rehearsal Script",
             "type": "boolean"
@@ -1525,11 +1531,19 @@
           "total_steps": {
             "title": "Total Steps",
             "type": "integer"
+          },
+          "transcript": {
+            "items": {
+              "$ref": "#/components/schemas/TranscriptTurn"
+            },
+            "title": "Transcript",
+            "type": "array"
           }
         },
         "required": [
           "session_id",
           "reflections",
+          "transcript",
           "completed_steps",
           "total_steps",
           "follows_rehearsal_script",
@@ -4627,10 +4641,6 @@
       "Reflection": {
         "additionalProperties": false,
         "properties": {
-          "anchor_step": {
-            "title": "Anchor Step",
-            "type": "integer"
-          },
           "domain_id": {
             "title": "Domain Id",
             "type": "integer"
@@ -4643,16 +4653,8 @@
             "title": "Id",
             "type": "string"
           },
-          "patient_quote": {
-            "title": "Patient Quote",
-            "type": "string"
-          },
           "question": {
             "title": "Question",
-            "type": "string"
-          },
-          "student_quote": {
-            "title": "Student Quote",
             "type": "string"
           }
         },
@@ -4660,10 +4662,7 @@
           "id",
           "domain_id",
           "domain_name",
-          "question",
-          "anchor_step",
-          "student_quote",
-          "patient_quote"
+          "question"
         ],
         "title": "Reflection",
         "type": "object"

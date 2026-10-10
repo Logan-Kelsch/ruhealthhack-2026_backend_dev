@@ -62,7 +62,7 @@ def test_moving_findings_and_adding_turn_updates_release_and_sources(files):
         data["dialogue"][3]["chart"] = data["dialogue"][2]["chart"]
         data["dialogue"][2]["chart"] = []
         data["dialogue"].append({"student": "Anything else?", "patient": "Thank you.", "chart": []})
-        data["debrief"][0]["evidence_turn"] = 9
+        data["debrief"]["questions"].append({"rubric_domain": "Professionalism, safety, and closure", "question": "Review the completed handover."})
     edit(reviews[2], modify)
     import_scripts([reviews[2]], fixture)
     case = ScriptFixture.model_validate_json(fixture.read_text()).cases[2]
@@ -71,14 +71,14 @@ def test_moving_findings_and_adding_turn_updates_release_and_sources(files):
     assert case.turns[3].release_chart_ids == ["cardiac.vitals", "cardiac.ecg"]
     assert all(c.release_step == 4 for c in case.chart)
     assert case.facts["3.reply.9"].text == "Thank you."
-    assert case.debrief[0].anchor_step == 9
+    assert case.debrief.questions[-1].question == "Review the completed handover."
 
 
 @pytest.mark.parametrize("mutation", [
     lambda d: d.update(typo="silently dropped?"),
-    lambda d: d["debrief"][0].update(evidence_turn=999),
-    lambda d: d.update(debrief_delivery="during_encounter"),
-    lambda d: d["debrief"][0].update(rubric_domain="Invented grading"),
+    lambda d: d["debrief"]["questions"][0].update(evidence_turn=999),
+    lambda d: d["debrief"].update(delivery="during_dialogue"),
+    lambda d: d["debrief"]["questions"][0].update(rubric_domain="Invented grading"),
     lambda d: d["dialogue"][0].update(patient="   "),
     lambda d: d["dialogue"][0].update(student="x" * 2001),
     lambda d: d["dialogue"][2]["chart"][0].update(urgent="false"),
@@ -129,28 +129,24 @@ def test_failed_atomic_replace_preserves_runtime_and_cleans_temp(files, monkeypa
     assert list(fixture.parent.glob(".runtime.json.*")) == []
 
 
-def test_legacy_review_files_still_import_and_export_as_post_encounter(files, tmp_path):
+def test_debrief_is_one_block_after_the_entire_dialogue(files):
     fixture, reviews = files
     for path in reviews:
         data = json.loads(path.read_text())
-        data['format'] = 'clinical_script_review_v1'
-        del data['debrief_delivery']
-        for question in data['debrief']:
-            question['after_turn'] = question.pop('evidence_turn')
-        path.write_text(json.dumps(data))
-    assert not import_scripts(reviews, fixture)['written']
-    exported = export_scripts(tmp_path / 'fresh', fixture)
-    for path in exported:
-        data = json.loads(path.read_text())
-        assert data['format'] == 'clinical_script_review_v2'
-        assert data['debrief_delivery'] == 'after_encounter'
-        assert all('evidence_turn' in q and 'after_turn' not in q for q in data['debrief'])
+        assert list(data)[-1] == 'debrief'
+        assert data['debrief']['delivery'] == 'after_dialogue'
+        assert set(data['debrief']) == {'delivery', 'questions'}
+        assert all(set(q) == {'rubric_domain', 'question'} for q in data['debrief']['questions'])
+    for case in ScriptFixture.model_validate_json(fixture.read_text()).cases:
+        assert case.debrief.delivery == 'after_dialogue'
+        assert all(set(q.model_dump()) == {'id', 'domain_id', 'question'} for q in case.debrief.questions)
 
 
-def test_both_evidence_field_names_are_rejected_without_writing(files):
+@pytest.mark.parametrize('field', ['after_turn', 'evidence_turn', 'anchor_step'])
+def test_per_turn_debrief_fields_are_rejected_without_writing(files, field):
     fixture, reviews = files
     before = fixture.read_bytes()
-    edit(reviews[0], lambda d: d['debrief'][0].update(after_turn=2))
+    edit(reviews[0], lambda d: d['debrief']['questions'][0].update({field: 2}))
     with pytest.raises(ValueError):
         import_scripts([reviews[0]], fixture)
     assert fixture.read_bytes() == before

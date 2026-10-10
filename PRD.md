@@ -869,5 +869,5 @@ An explicitly opt-in `/api/demo` workflow rehearses educator text categorization
 
 The debrief is delivered only after the conversation has ended. Conversation turns
 show patient replies and released chart findings without teaching feedback. The
-presenter ends the encounter, then opens a separate debrief; transcript anchors
-identify evidence rather than trigger feedback during conversation.
+presenter ends the encounter, then opens a separate debrief; the single debrief
+reviews the entire completed dialogue without per-turn references.

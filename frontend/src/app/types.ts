@@ -43,6 +43,35 @@ const SCREENS: ScreenId[] = [
 
 // Hash links like #s-encounter let a refresh keep the current screen.
 export function screenFromHash(hash: string): ScreenId | null {
-  const id = hash.replace(/^#/, "") as ScreenId;
+  const id = hash.replace(/^#/, "").split(/[?&]/)[0] as ScreenId;
   return SCREENS.includes(id) ? id : null;
+}
+
+export type CaseRoute = {
+  caseId?: string;
+  version?: number;
+};
+
+// The saved case and version stay in the query, so a refresh can open that draft again.
+export function caseRouteFromSearch(search: string): CaseRoute {
+  const params = new URLSearchParams(search.startsWith("?") ? search.slice(1) : search);
+  const caseId = params.get("case")?.trim() || undefined;
+  if (!caseId) return {};
+  const rawVersion = params.get("version");
+  if (rawVersion === null || rawVersion.trim() === "") return { caseId };
+  const version = Number(rawVersion);
+  // A missing or unreadable version still identifies the case. The API can return the latest.
+  if (!Number.isInteger(version) || version < 1) return { caseId };
+  return { caseId, version };
+}
+
+// A path URL, not a hash-only URL, so a screen change can clear a previous case query.
+export function hrefFor(screen: ScreenId, opts?: GoOpts): string {
+  const params = new URLSearchParams();
+  if (opts?.caseId) {
+    params.set("case", opts.caseId);
+    if (opts.version !== undefined) params.set("version", String(opts.version));
+  }
+  const query = params.toString();
+  return `/${query ? `?${query}` : ""}#${screen}`;
 }

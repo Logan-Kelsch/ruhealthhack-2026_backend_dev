@@ -12,8 +12,15 @@ from app import catalogs, services
 from app.db import get_session
 from app.integrations.bedrock import llm_available
 from app.integrations.nlm_tables import search_icd10
+from app.models import CaseRow
 from app.schemas.case import Case, ConsistencyFinding
-from app.schemas.http import StudioCaseSummary
+from app.schemas.http import (
+    IntakeGap,
+    LlmCallRecord,
+    StudioCaseDetail,
+    StudioCaseSummary,
+    StudioDraftResult,
+)
 from app.studio import consistency, drafting, intake, preview, publish, vhs_import
 from app.studio.autofill import autofill_labs, autofill_vitals
 
@@ -35,12 +42,43 @@ def _summary(row) -> StudioCaseSummary:
     )
 
 
-def _full(row) -> dict:
+def _saved_status(value: str) -> Literal["draft", "published", "archived"]:
+    """Use only a status the case contract names. Anything else is a bad saved row."""
+    if value == "draft" or value == "published" or value == "archived":
+        return value
+    raise HTTPException(500, "Saved case has an unknown status")
+
+
+def _detail(row: CaseRow) -> StudioCaseDetail:
+    """Build the case view from the saved row. Gaps come from the intake rules, not a new guess."""
     case = services.load_case(row)
-    return {"case": case.model_dump(mode="json"), "status": row.status, "gaps": intake.gaps(case), "blockers": publish.blockers(case)}
+    return StudioCaseDetail(
+        case=case,
+        status=_saved_status(row.status),
+        gaps=[IntakeGap.model_validate(gap) for gap in intake.gaps(case)],
+        blockers=publish.blockers(case),
+    )
+
+
+def _result(row: CaseRow, calls: list[dict]) -> StudioDraftResult:
+    """Case view plus the model calls for a create or intake response. Offline, that list is empty."""
+    detail = _detail(row)
+    return StudioDraftResult(
+        case=detail.case,
+        status=detail.status,
+        gaps=detail.gaps,
+        blockers=detail.blockers,
+        llm_calls=[LlmCallRecord.model_validate(call) for call in calls],
+    )
+
+
+def _full(row: CaseRow) -> dict:
+    """JSON for Studio routes that still return a plain object. Same fields as the case detail."""
+    return _detail(row).model_dump(mode="json")
 
 
 def _draft(db: Session, case_id: str) -> Case:
+    """Load the latest saved case so an edit starts from what was stored."""
     return services.load_case(services.get_case_row(db, case_id))
 
 
@@ -55,16 +93,18 @@ class NewDraft(BaseModel):
     faculty: str | None = None
 
 
-@router.post("/drafts", status_code=201)
-def new_draft(body: NewDraft, db: Session = Depends(get_session)) -> dict:
+@router.post("/drafts", status_code=201, response_model=StudioDraftResult)
+def new_draft(body: NewDraft, db: Session = Depends(get_session)) -> StudioDraftResult:
+    """Save one draft from the faculty description. The drafting service chooses the content."""
     case, calls = drafting.draft_case(body.description, body.faculty, llm_available())
     row = services.create_case(db, case)
-    return {**_full(row), "llm_calls": calls}
+    return _result(row, calls)
 
 
-@router.get("/cases/{case_id}")
-def get_case(case_id: str, version: int | None = None, db: Session = Depends(get_session)) -> dict:
-    return _full(services.get_case_row(db, case_id, version))
+@router.get("/cases/{case_id}", response_model=StudioCaseDetail)
+def get_case(case_id: str, version: int | None = None, db: Session = Depends(get_session)) -> StudioCaseDetail:
+    """Return one saved version. Reading the case does not create another one."""
+    return _detail(services.get_case_row(db, case_id, version))
 
 
 @router.put("/cases/{case_id}")
@@ -80,10 +120,11 @@ class IntakeAnswer(BaseModel):
     faculty: str | None = None
 
 
-@router.post("/cases/{case_id}/intake")
-def intake_answer(case_id: str, body: IntakeAnswer, db: Session = Depends(get_session)) -> dict:
+@router.post("/cases/{case_id}/intake", response_model=StudioDraftResult)
+def intake_answer(case_id: str, body: IntakeAnswer, db: Session = Depends(get_session)) -> StudioDraftResult:
+    """Apply one answer to its gap and save that same draft. Intake rules decide what changes."""
     case, calls = intake.answer(_draft(db, case_id), body.gap_id, body.text, body.faculty, llm_available())
-    return {**_full(services.save_draft(db, case)), "llm_calls": calls}
+    return _result(services.save_draft(db, case), calls)
 
 
 # Group name -> (case attribute, the field that identifies one item).

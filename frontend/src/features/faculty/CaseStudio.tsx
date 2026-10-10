@@ -1,15 +1,27 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import {
   ApiError,
   answerIntake,
   api,
+  autofillStudioCase,
   createDraft,
   loadStudioCase,
+  loadStudioVocab,
+  lookupDiagnosis,
+  saveStudioCase,
+  setItemApproval,
   type ApiClient,
+  type ApprovalGroup,
+  type CaseDocument,
+  type Icd10Match,
   type IntakeGap,
+  type ItemStatus,
   type StudioCaseDetail,
   type StudioDraftResult,
+  type StudioVocab,
 } from "../../api/client";
+import { factReferenceNotes, saveProblem } from "./caseDraft";
+import { CaseEditor, ObjectiveEditor, type SavePhase } from "./caseForm";
 import type { Go, StudioTab } from "../../app/types";
 import { Avatar, type Portrait } from "../../components/Avatar";
 import { BackLink, Badge, Card, CardHead, PrimaryButton, TabNav } from "../../components/ui";
@@ -33,7 +45,7 @@ type AnswerPhase =
   | { kind: "saving"; gapId: string }
   | { kind: "error"; gapId: string; message: string };
 
-// Patient Studio for a description and its guided questions. Other studio actions stay unavailable.
+// Patient Studio. Supported case content can be edited and approved. Files and the decision tree cannot.
 export function CaseStudio({
   go,
   tab,
@@ -54,6 +66,16 @@ export function CaseStudio({
   const [attempt, setAttempt] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [answerPhase, setAnswerPhase] = useState<AnswerPhase>({ kind: "idle" });
+  const [draft, setDraft] = useState<CaseDocument | null>(null);
+  const [dirty, setDirty] = useState(false);
+  const [savePhase, setSavePhase] = useState<SavePhase>({ kind: "idle" });
+  const [reviewMessage, setReviewMessage] = useState<string | null>(null);
+  const [factHold, setFactHold] = useState<string | null>(null);
+  const [notes, setNotes] = useState<string[]>([]);
+  const [vocab, setVocab] = useState<StudioVocab | null>(null);
+  const [vocabError, setVocabError] = useState<string | null>(null);
+  const [lookupResults, setLookupResults] = useState<Icd10Match[]>([]);
+  const [lookupMessage, setLookupMessage] = useState<string | null>(null);
 
   // Follow the shell when another screen opens Studio on a chosen tab.
   useEffect(() => {
@@ -76,6 +98,36 @@ export function CaseStudio({
       cancelled = true;
     };
   }, [caseId, version, client, attempt]);
+
+  // Copy the saved case into the editor only when the faculty member has no unsaved edits.
+  useEffect(() => {
+    if (load.kind !== "ready" || dirty) return;
+    setDraft(load.detail.case);
+  }, [load, dirty]);
+
+  // Topics, maneuvers, and panels come from the vocabulary route. A failure does not invent a list.
+  useEffect(() => {
+    if (!caseId) return;
+    let cancelled = false;
+    setVocab(null);
+    setVocabError(null);
+    loadStudioVocab(client)
+      .then((next) => {
+        if (cancelled) return;
+        // A 200 that is not the vocabulary must not be treated as a maneuver list.
+        if (!isStudioVocab(next)) {
+          setVocabError("The vocabulary could not be loaded.");
+          return;
+        }
+        setVocab(next);
+      })
+      .catch((error: unknown) => {
+        if (!cancelled) setVocabError(failureMessage(error, "The vocabulary could not be loaded."));
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [caseId, client]);
 
   const detail = load.kind === "ready" ? load.detail : null;
   const heading = detail?.case.profile.name ?? "New case";
@@ -107,6 +159,11 @@ export function CaseStudio({
       setAnswerPhase({ kind: "error", gapId: gap.id, message: "Write an answer before saving." });
       return;
     }
+    // Intake replaces the saved case. Unsaved edits have to be stored first or they would disappear.
+    if (dirty) {
+      setAnswerPhase({ kind: "error", gapId: gap.id, message: "Save these edits before answering intake." });
+      return;
+    }
     setAnswerPhase({ kind: "saving", gapId: gap.id });
     try {
       const result = await answerIntake(client, caseId, gap.id, text);
@@ -117,6 +174,8 @@ export function CaseStudio({
         return next;
       });
       setAnswerPhase({ kind: "idle" });
+      setDraft(result.case);
+      setDirty(false);
     } catch (error: unknown) {
       // Keep the previous case on screen. The answer stays in the box for an explicit retry.
       setAnswerPhase({
@@ -126,6 +185,162 @@ export function CaseStudio({
       });
     }
   }
+
+  // Keep the edited case locally. A later failed save still has this copy.
+  function edit(next: CaseDocument) {
+    setDraft(next);
+    setDirty(true);
+    setSavePhase({ kind: "idle" });
+  }
+
+  // Point the address bar at the case the server just stored, so a refresh opens that version.
+  function remember(next: StudioCaseDetail) {
+    setLoad({ kind: "ready", detail: next });
+    setDraft(next.case);
+    setDirty(false);
+    go("f-studio", { studioTab: current, caseId: next.case.case_id, version: next.case.version });
+  }
+
+  // Write the editor's case. Validation and request failures stay on the form.
+  async function saveEdits() {
+    if (!caseId || !draft) return;
+    const problem = saveProblem(draft);
+    if (problem) {
+      setSavePhase({ kind: "error", message: problem });
+      return;
+    }
+    setSavePhase({ kind: "saving" });
+    try {
+      const result = await saveStudioCase(client, caseId, draft);
+      setSavePhase({ kind: "saved" });
+      setFactHold(null);
+      setReviewMessage(null);
+      remember(result);
+    } catch (error: unknown) {
+      setSavePhase({ kind: "error", message: failureMessage(error, "The case could not be saved.") });
+    }
+  }
+
+  // Approval reads the saved case, so unsaved edits must be stored before it runs.
+  async function review(group: ApprovalGroup, key: string, status: ItemStatus) {
+    if (!caseId) return;
+    if (dirty) {
+      setReviewMessage("Save these edits before changing approval.");
+      return;
+    }
+    try {
+      const result = await setItemApproval(client, caseId, group, status, [key]);
+      setReviewMessage(null);
+      remember(result);
+    } catch (error: unknown) {
+      setReviewMessage(failureMessage(error, "The approval could not be saved."));
+    }
+  }
+
+  // Auto-fill also reads the saved case. Faculty overrides have to be saved before it proposes values.
+  async function propose(panels: string[], vitals: boolean) {
+    if (!caseId) return;
+    if (dirty) {
+      setReviewMessage("Save these edits before auto-fill so faculty entries are kept.");
+      return;
+    }
+    if (panels.length === 0 && !vitals) {
+      setReviewMessage("Choose a lab panel or vital signs before proposing values.");
+      return;
+    }
+    try {
+      const result = await autofillStudioCase(client, caseId, panels, vitals);
+      setNotes(result.notes);
+      setReviewMessage(null);
+      remember({ case: result.case, status: result.status, gaps: result.gaps, blockers: result.blockers });
+    } catch (error: unknown) {
+      // Drop any older notes so a failure does not still look like a proposal.
+      setNotes([]);
+      setReviewMessage(failureMessage(error, "Auto-fill could not be saved."));
+    }
+  }
+
+  // Show the lookup rows the API returned. A failure clears them instead of leaving a previous list.
+  async function searchDiagnosis(query: string) {
+    const trimmed = query.trim();
+    if (trimmed.length < 2) {
+      setLookupResults([]);
+      setLookupMessage("Type at least two letters to look up a diagnosis.");
+      return;
+    }
+    try {
+      const matches = await lookupDiagnosis(client, trimmed);
+      setLookupResults(matches);
+      setLookupMessage(matches.length === 0 ? "No matching diagnosis." : null);
+    } catch (error: unknown) {
+      setLookupResults([]);
+      setLookupMessage(failureMessage(error, "Diagnosis lookup failed."));
+    }
+  }
+
+  // Store the diagnosis the faculty member picked. The code is the one the lookup returned.
+  function useDiagnosis(match: Icd10Match) {
+    if (!draft) return;
+    const diagnoses = draft.diagnoses ?? [];
+    if (diagnoses.some((item) => (item.codes ?? []).some((code) => code.code === match.code))) {
+      setLookupMessage("That diagnosis is already on the case.");
+      return;
+    }
+    edit({
+      ...draft,
+      diagnoses: [
+        ...diagnoses,
+        {
+          name: match.display,
+          status: "draft",
+          codes: [{ system: "ICD-10-CM", code: match.code, display: match.display }],
+          source: { kind: "faculty", ref: "icd10 lookup", by: null },
+        },
+      ],
+    });
+    setLookupMessage(null);
+  }
+
+  // Show references and keep the fact when something else still names it.
+  function removeFact(factId: string) {
+    if (!draft) return;
+    const held = factReferenceNotes(draft, factId);
+    if (held.length > 0) {
+      setFactHold(held.join(" "));
+      return;
+    }
+    setFactHold(null);
+    edit({ ...draft, facts: (draft.facts ?? []).filter((fact) => fact.id !== factId) });
+  }
+
+  const editorProps = draft
+    ? {
+        caseDocument: draft,
+        vocab,
+        vocabError,
+        savePhase,
+        reviewMessage,
+        lookupResults,
+        lookupMessage,
+        factHold,
+        notes,
+        onChange: edit,
+        onSave: () => {
+          void saveEdits();
+        },
+        onApprove: (group: ApprovalGroup, key: string, status: ItemStatus) => {
+          void review(group, key, status);
+        },
+        onAutofill: (panels: string[], vitals: boolean) => {
+          void propose(panels, vitals);
+        },
+        onLookup: (query: string) => {
+          void searchDiagnosis(query);
+        },
+        onUseDiagnosis: useDiagnosis,
+        onRemoveFact: removeFact,
+      }
+    : null;
 
   return (
     <div className="mx-auto flex max-w-[1320px] flex-col gap-5 px-10 pt-7 pb-12">
@@ -170,6 +385,7 @@ export function CaseStudio({
         caseId ? (
           <LoadedDraft
             load={load}
+            editor={editorProps ? <CaseEditor {...editorProps} /> : null}
             answers={answers}
             answerPhase={answerPhase}
             onRetryLoad={() => setAttempt((value) => value + 1)}
@@ -187,6 +403,20 @@ export function CaseStudio({
               void submitDescription(event);
             }}
           />
+        )
+      ) : current === "objectives" ? (
+        editorProps ? (
+          <ObjectiveEditor
+            caseDocument={editorProps.caseDocument}
+            vocab={editorProps.vocab}
+            savePhase={editorProps.savePhase}
+            reviewMessage={editorProps.reviewMessage}
+            onChange={editorProps.onChange}
+            onSave={editorProps.onSave}
+            onApprove={editorProps.onApprove}
+          />
+        ) : (
+          <LoadStatus load={load} onRetry={() => setAttempt((value) => value + 1)} />
         )
       ) : (
         <Card>
@@ -239,9 +469,25 @@ function DescriptionForm({
   );
 }
 
-// The saved draft, its remaining questions, and the words the faculty member already entered.
+// Loading and load errors. The editor is not shown until a saved case is in hand.
+function LoadStatus({ load, onRetry }: { load: LoadPhase; onRetry: () => void }) {
+  if (load.kind === "error") {
+    return (
+      <div className="flex flex-col items-start gap-3">
+        <p role="alert" className="text-sm text-ink">
+          {load.message}
+        </p>
+        <PrimaryButton onClick={onRetry}>Try again</PrimaryButton>
+      </div>
+    );
+  }
+  return <p className="text-sm text-muted">Loading draft</p>;
+}
+
+// The saved draft's questions sit beside the editor. The editor is the case itself.
 function LoadedDraft({
   load,
+  editor,
   answers,
   answerPhase,
   onRetryLoad,
@@ -249,42 +495,22 @@ function LoadedDraft({
   onAnswer,
 }: {
   load: LoadPhase;
+  editor: ReactNode;
   answers: Record<string, string>;
   answerPhase: AnswerPhase;
   onRetryLoad: () => void;
   onAnswerChange: (gapId: string, text: string) => void;
   onAnswer: (event: FormEvent, gap: IntakeGap) => void;
 }) {
-  if (load.kind === "loading") {
-    return <p className="text-sm text-muted">Loading draft</p>;
-  }
-  if (load.kind === "error") {
-    return (
-      <div className="flex flex-col items-start gap-3">
-        <p role="alert" className="text-sm text-ink">
-          {load.message}
-        </p>
-        <PrimaryButton onClick={onRetryLoad}>Try again</PrimaryButton>
-      </div>
-    );
+  if (load.kind !== "ready" || !editor) {
+    return <LoadStatus load={load} onRetry={onRetryLoad} />;
   }
   const { detail } = load;
   const gaps = detail.gaps;
   const required = gaps.filter((gap) => gap.blocking).length;
   return (
     <div className="flex flex-wrap items-start gap-5">
-      <div className="min-w-0 flex-[1_1_560px]">
-        <Card>
-          <CardHead title="Case" aside={<span className="text-[12.5px] text-muted">Version {detail.case.version}</span>} />
-          <div className="flex flex-col gap-3 px-5 py-5 text-sm">
-            <p>{detail.case.description}</p>
-            <p>
-              {ageLabel(detail.case.profile.age)} · {sexLabel(detail.case.profile.sex)}
-            </p>
-            <FactList facts={detail.case.facts} />
-          </div>
-        </Card>
-      </div>
+      <div className="min-w-0 flex-[1_1_560px]">{editor}</div>
       <aside className="sticky top-5 max-w-[420px] min-w-[280px] flex-[1_1_280px] overflow-hidden rounded-2xl border border-line bg-card">
         <div className="border-b border-hair-2 px-[18px] py-4">
           <div className="text-[15px] font-semibold">Guided intake</div>
@@ -366,24 +592,6 @@ function GapForm({
   );
 }
 
-// Facts already stored on the case. An unsaved answer is not added here.
-function FactList({ facts }: { facts: StudioCaseDetail["case"]["facts"] }) {
-  const rows = facts ?? [];
-  if (rows.length === 0) return <p className="text-muted">No facts yet</p>;
-  return (
-    <ul className="flex flex-col gap-2">
-      {rows.map((fact) => (
-        <li key={fact.id}>
-          <span className="block font-medium">{fact.text}</span>
-          <span className="text-[12.5px] text-muted">
-            {factStatusLabel(fact.status)} · Source: {fact.source?.kind ?? "not recorded"}
-          </span>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
 // Intake returns the same case view as a load, plus model calls the screen does not show.
 function detailFromResult(result: StudioDraftResult): StudioCaseDetail {
   return {
@@ -392,6 +600,16 @@ function detailFromResult(result: StudioDraftResult): StudioCaseDetail {
     gaps: result.gaps,
     blockers: result.blockers,
   };
+}
+
+// The editor only offers a vocabulary that has the four lists. Anything else is a failed load.
+function isStudioVocab(value: StudioVocab): boolean {
+  return (
+    Array.isArray(value.topics) &&
+    Array.isArray(value.actions) &&
+    Array.isArray(value.maneuvers) &&
+    Array.isArray(value.lab_panels)
+  );
 }
 
 // Prefer the server message. A network failure still gets a sentence instead of a blank screen.
@@ -470,20 +688,6 @@ function gapKindLabel(kind: IntakeGap["kind"]): string {
       return "Auto-fill";
     default: {
       const unreachable: never = kind;
-      return unreachable;
-    }
-  }
-}
-
-// Draft and approved are both words. Color is not the only way to tell them apart.
-function factStatusLabel(status: "draft" | "approved"): string {
-  switch (status) {
-    case "draft":
-      return "Draft";
-    case "approved":
-      return "Approved";
-    default: {
-      const unreachable: never = status;
       return unreachable;
     }
   }

@@ -16,15 +16,22 @@ from app.integrations.nlm_tables import search_icd10
 from app.models import CaseRow
 from app.schemas.case import Case, ConsistencyFinding
 from app.schemas.http import (
+    AutofillAdded,
+    Icd10Match,
     IntakeGap,
     LlmCallRecord,
+    StudioAutofillResult,
     StudioCaseDetail,
     StudioCaseSummary,
     StudioDraftResult,
+    StudioVocab,
+    StudioVocabLabel,
+    StudioVocabManeuver,
     VhsImportResponse,
 )
 from app.studio import consistency, drafting, intake, preview, publish, vhs_import
 from app.studio.autofill import autofill_labs, autofill_vitals
+from app.studio.fact_refs import dropped_fact_errors
 
 router = APIRouter(prefix="/api/studio", tags=["studio"])
 
@@ -109,11 +116,23 @@ def get_case(case_id: str, version: int | None = None, db: Session = Depends(get
     return _detail(services.get_case_row(db, case_id, version))
 
 
-@router.put("/cases/{case_id}")
-def save_case(case_id: str, case: Case, db: Session = Depends(get_session)) -> dict:
+@router.put("/cases/{case_id}", response_model=StudioCaseDetail)
+def save_case(case_id: str, case: Case, db: Session = Depends(get_session)) -> StudioCaseDetail:
+    """Store faculty edits on the draft. The body is the same case a refresh loads."""
     if case.case_id != case_id:
         raise HTTPException(422, "case_id in the body does not match the URL")
-    return _full(services.save_draft(db, case))
+    # Compare with the saved case so a dropped fact cannot leave an objective or rule pointing at it.
+    current = _draft(db, case_id)
+    blocked = dropped_fact_errors(current, case)
+    if blocked:
+        raise HTTPException(
+            409,
+            {
+                "message": "A fact is still referenced. Remove those references before deleting it.",
+                "errors": [item.model_dump() for item in blocked],
+            },
+        )
+    return _detail(services.save_draft(db, case))
 
 
 class IntakeAnswer(BaseModel):
@@ -138,13 +157,27 @@ APPROVABLE = {
 
 
 class Approve(BaseModel):
-    group: str  # a key of APPROVABLE, or "branches"
+    """Which saved items change review state. keys limits the change to those ids."""
+
+    group: Literal[
+        "facts",
+        "vitals",
+        "labs",
+        "exam",
+        "artifacts",
+        "diagnoses",
+        "medications",
+        "allergies",
+        "objectives",
+        "branches",
+    ]
     keys: list[str] | None = None  # None approves the whole group
     status: Literal["approved", "draft"] = "approved"
 
 
-@router.post("/cases/{case_id}/approve")
-def approve(case_id: str, body: Approve, db: Session = Depends(get_session)) -> dict:
+@router.post("/cases/{case_id}/approve", response_model=StudioCaseDetail)
+def approve(case_id: str, body: Approve, db: Session = Depends(get_session)) -> StudioCaseDetail:
+    """Set review state on saved items. The returned case is what a refresh loads."""
     case = _draft(db, case_id)
     if body.group == "branches":
         items = [(b, b.id) for v in case.visits for b in v.branches]
@@ -157,7 +190,7 @@ def approve(case_id: str, body: Approve, db: Session = Depends(get_session)) -> 
     for item, key in items:
         if wanted is None or key in wanted:
             item.status = body.status
-    return _full(services.save_draft(db, case))
+    return _detail(services.save_draft(db, case))
 
 
 class Autofill(BaseModel):
@@ -165,9 +198,9 @@ class Autofill(BaseModel):
     vitals: bool = True
 
 
-@router.post("/cases/{case_id}/autofill")
-def autofill(case_id: str, body: Autofill, db: Session = Depends(get_session)) -> dict:
-    """Adds proposed values as drafts. Each value records where it came from."""
+@router.post("/cases/{case_id}/autofill", response_model=StudioAutofillResult)
+def autofill(case_id: str, body: Autofill, db: Session = Depends(get_session)) -> StudioAutofillResult:
+    """Add proposed values as drafts. Faculty-set labs and vitals are left as they were."""
     case = _draft(db, case_id)
     labs, notes = autofill_labs(case, body.panels)
     case.labs += labs
@@ -176,8 +209,15 @@ def autofill(case_id: str, body: Autofill, db: Session = Depends(get_session)) -
         added_vitals, vnotes = autofill_vitals(case)
         case.vitals += added_vitals
         notes += vnotes
-    full = _full(services.save_draft(db, case))
-    return {**full, "added": {"labs": [lab.id for lab in labs], "vitals": [v.key for v in added_vitals]}, "notes": notes}
+    detail = _detail(services.save_draft(db, case))
+    return StudioAutofillResult(
+        case=detail.case,
+        status=detail.status,
+        gaps=detail.gaps,
+        blockers=detail.blockers,
+        added=AutofillAdded(labs=[lab.id for lab in labs], vitals=[vital.key for vital in added_vitals]),
+        notes=notes,
+    )
 
 
 @router.get("/cases/{case_id}/consistency")
@@ -243,18 +283,25 @@ def import_vhs(db: Session = Depends(get_session)) -> VhsImportResponse:
     return VhsImportResponse(count=len(saved), cases=saved)
 
 
-@router.get("/lookup/icd10")
-def lookup_icd10(q: str) -> list[dict]:
-    return list(search_icd10(q.strip())) if len(q.strip()) >= 2 else []
+@router.get("/lookup/icd10", response_model=list[Icd10Match])
+def lookup_icd10(q: str) -> list[Icd10Match]:
+    """Diagnosis matches from the existing lookup. A one-character query is too broad to search."""
+    query = q.strip()
+    if len(query) < 2:
+        return []
+    return [Icd10Match.model_validate(row) for row in search_icd10(query)]
 
 
-@router.get("/vocab")
-def vocab() -> dict:
-    """Closed label sets the editor offers (topics, actions, exam maneuvers, lab panels)."""
+@router.get("/vocab", response_model=StudioVocab)
+def vocab() -> StudioVocab:
+    """Closed label sets the editor offers. Maneuver normals come from the exam catalog."""
     labs = catalogs.lab_catalog()["labs"]
-    return {
-        "topics": [{"id": k, "description": v.description} for k, v in catalogs.topics().items()],
-        "actions": [{"id": k, "description": v.description} for k, v in catalogs.actions().items()],
-        "maneuvers": [{"id": k, "label": v.get("label", k)} for k, v in catalogs.maneuvers().items()],
-        "lab_panels": sorted({lab["panel"] for lab in labs if lab.get("panel")}),
-    }
+    return StudioVocab(
+        topics=[StudioVocabLabel(id=key, description=label.description) for key, label in catalogs.topics().items()],
+        actions=[StudioVocabLabel(id=key, description=label.description) for key, label in catalogs.actions().items()],
+        maneuvers=[
+            StudioVocabManeuver(id=key, label=str(row.get("label", key)), normal=str(row.get("normal", "")))
+            for key, row in catalogs.maneuvers().items()
+        ],
+        lab_panels=sorted({lab["panel"] for lab in labs if lab.get("panel")}),
+    )

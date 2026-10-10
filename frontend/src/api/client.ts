@@ -6,8 +6,14 @@ export type ErrorItem = components["schemas"]["ErrorItem"];
 export type StudioCaseSummary = components["schemas"]["StudioCaseSummary"];
 export type StudioCaseDetail = components["schemas"]["StudioCaseDetail"];
 export type StudioDraftResult = components["schemas"]["StudioDraftResult"];
+export type StudioAutofillResult = components["schemas"]["StudioAutofillResult"];
+export type StudioVocab = components["schemas"]["StudioVocab"];
+export type Icd10Match = components["schemas"]["Icd10Match"];
 export type IntakeGap = components["schemas"]["IntakeGap"];
 export type VhsImportResponse = components["schemas"]["VhsImportResponse"];
+export type CaseDocument = components["schemas"]["Case"];
+export type ApprovalGroup = components["schemas"]["Approve"]["group"];
+export type ItemStatus = "draft" | "approved";
 export type PublicCase = components["schemas"]["PublicCase"];
 export type PublicEncounter = components["schemas"]["PublicEncounter"];
 export type PublicChartEntry = components["schemas"]["PublicChartEntry"];
@@ -98,6 +104,62 @@ export async function answerIntake(
   const result = await client.POST("/api/studio/cases/{case_id}/intake", {
     params: { path: { case_id: caseId } },
     body: { gap_id: gapId, text },
+  });
+  return unwrap(result.response.status, result.data, result.error);
+}
+
+// Replace the saved draft with the case the faculty member edited. The response is what a refresh loads.
+export async function saveStudioCase(
+  client: ApiClient,
+  caseId: string,
+  caseDocument: CaseDocument,
+): Promise<StudioCaseDetail> {
+  const result = await client.PUT("/api/studio/cases/{case_id}", {
+    params: { path: { case_id: caseId } },
+    body: caseDocument,
+  });
+  return unwrap(result.response.status, result.data, result.error);
+}
+
+// Change review state through the approval operation. keys names the items; the group says which list.
+export async function setItemApproval(
+  client: ApiClient,
+  caseId: string,
+  group: ApprovalGroup,
+  status: ItemStatus,
+  keys: string[],
+): Promise<StudioCaseDetail> {
+  const result = await client.POST("/api/studio/cases/{case_id}/approve", {
+    params: { path: { case_id: caseId } },
+    body: { group, status, keys },
+  });
+  return unwrap(result.response.status, result.data, result.error);
+}
+
+// Ask for proposed labs and vitals. The case comes back with those drafts and the notes that explain them.
+export async function autofillStudioCase(
+  client: ApiClient,
+  caseId: string,
+  panels: string[],
+  vitals: boolean,
+): Promise<StudioAutofillResult> {
+  const result = await client.POST("/api/studio/cases/{case_id}/autofill", {
+    params: { path: { case_id: caseId } },
+    body: { panels, vitals },
+  });
+  return unwrap(result.response.status, result.data, result.error);
+}
+
+// Closed lists for topics, actions, exam maneuvers, and lab panels.
+export async function loadStudioVocab(client: ApiClient): Promise<StudioVocab> {
+  const result = await client.GET("/api/studio/vocab");
+  return unwrap(result.response.status, result.data, result.error);
+}
+
+// Diagnosis matches from the existing lookup. The caller decides what to store.
+export async function lookupDiagnosis(client: ApiClient, query: string): Promise<Icd10Match[]> {
+  const result = await client.GET("/api/studio/lookup/icd10", {
+    params: { query: { q: query } },
   });
   return unwrap(result.response.status, result.data, result.error);
 }

@@ -17,7 +17,13 @@ from app.services import Conflict, NotFound
 # Routes that already return these statuses. The schema should name the same body the handler sends.
 SHARED_ERROR_RESPONSES = {
     ("/api/studio/cases/{case_id}", "get"): {404: "No saved case with that id."},
+    ("/api/studio/cases/{case_id}", "put"): {
+        404: "No saved case with that id.",
+        409: "A fact is still referenced.",
+    },
     ("/api/studio/cases/{case_id}/intake", "post"): {404: "No saved case with that id."},
+    ("/api/studio/cases/{case_id}/approve", "post"): {404: "No saved case with that id."},
+    ("/api/studio/cases/{case_id}/autofill", "post"): {404: "No saved case with that id."},
     ("/api/studio/cases/{case_id}/publish", "post"): {409: "The case is not ready to publish."},
     ("/api/studio/import/vhs", "post"): {500: "The sponsor sample set could not be imported."},
     ("/api/cases/{case_id}", "get"): {404: "No published case with that id."},
@@ -56,11 +62,18 @@ def from_validation(exc: RequestValidationError) -> ErrorResponse:
 
 
 def from_http_exception(exc: HTTPException) -> ErrorResponse:
-    """Read a string detail, or the publish payload that already carries a message and blockers."""
+    """Read a string detail, or a payload that already carries a message, errors, and blockers."""
     detail = exc.detail
     if isinstance(detail, dict) and "message" in detail:
         blockers = detail.get("blockers") or []
-        return ErrorResponse(message=str(detail["message"]), blockers=[str(item) for item in blockers])
+        raw_errors = detail.get("errors") or []
+        # Field errors stay structured so a screen can point at the fact that is still in use.
+        errors = [ErrorItem.model_validate(item) for item in raw_errors]
+        return ErrorResponse(
+            message=str(detail["message"]),
+            blockers=[str(item) for item in blockers],
+            errors=errors,
+        )
     return ErrorResponse(message=str(detail))
 
 

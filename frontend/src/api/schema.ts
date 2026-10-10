@@ -264,7 +264,10 @@ export interface paths {
          * @description Return one saved version. Reading the case does not create another one.
          */
         get: operations["get_case_api_studio_cases__case_id__get"];
-        /** Save Case */
+        /**
+         * Save Case
+         * @description Store faculty edits on the draft. The body is the same case a refresh loads.
+         */
         put: operations["save_case_api_studio_cases__case_id__put"];
         post?: never;
         delete?: never;
@@ -282,7 +285,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Approve */
+        /**
+         * Approve
+         * @description Set review state on saved items. The returned case is what a refresh loads.
+         */
         post: operations["approve_api_studio_cases__case_id__approve_post"];
         delete?: never;
         options?: never;
@@ -301,7 +307,7 @@ export interface paths {
         put?: never;
         /**
          * Autofill
-         * @description Adds proposed values as drafts. Each value records where it came from.
+         * @description Add proposed values as drafts. Faculty-set labs and vitals are left as they were.
          */
         post: operations["autofill_api_studio_cases__case_id__autofill_post"];
         delete?: never;
@@ -451,7 +457,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Lookup Icd10 */
+        /**
+         * Lookup Icd10
+         * @description Diagnosis matches from the existing lookup. A one-character query is too broad to search.
+         */
         get: operations["lookup_icd10_api_studio_lookup_icd10_get"];
         put?: never;
         post?: never;
@@ -470,7 +479,7 @@ export interface paths {
         };
         /**
          * Vocab
-         * @description Closed label sets the editor offers (topics, actions, exam maneuvers, lab panels).
+         * @description Closed label sets the editor offers. Maneuver normals come from the exam catalog.
          */
         get: operations["vocab_api_studio_vocab_get"];
         put?: never;
@@ -517,10 +526,16 @@ export interface components {
             /** Substance */
             substance: string;
         };
-        /** Approve */
+        /**
+         * Approve
+         * @description Which saved items change review state. keys limits the change to those ids.
+         */
         Approve: {
-            /** Group */
-            group: string;
+            /**
+             * Group
+             * @enum {string}
+             */
+            group: "facts" | "vitals" | "labs" | "exam" | "artifacts" | "diagnoses" | "medications" | "allergies" | "objectives" | "branches";
             /** Keys */
             keys?: string[] | null;
             /**
@@ -568,6 +583,16 @@ export interface components {
              * @default true
              */
             vitals: boolean;
+        };
+        /**
+         * AutofillAdded
+         * @description Lab ids and vital keys this auto-fill run proposed. Faculty entries are not listed.
+         */
+        AutofillAdded: {
+            /** Labs */
+            labs: string[];
+            /** Vitals */
+            vitals: string[];
         };
         /**
          * Belief
@@ -1190,6 +1215,16 @@ export interface components {
             /** Ok */
             ok: boolean;
         };
+        /**
+         * Icd10Match
+         * @description One diagnosis from the existing lookup. code and display are what faculty store.
+         */
+        Icd10Match: {
+            /** Code */
+            code: string;
+            /** Display */
+            display: string;
+        };
         /** IntakeAnswer */
         IntakeAnswer: {
             /** Faculty */
@@ -1781,6 +1816,25 @@ export interface components {
             visit_id?: string | null;
         };
         /**
+         * StudioAutofillResult
+         * @description The saved case after auto-fill, plus the notes and which values were proposed.
+         */
+        StudioAutofillResult: {
+            added: components["schemas"]["AutofillAdded"];
+            /** Blockers */
+            blockers: string[];
+            case: components["schemas"]["Case"];
+            /** Gaps */
+            gaps: components["schemas"]["IntakeGap"][];
+            /** Notes */
+            notes: string[];
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "draft" | "published" | "archived";
+        };
+        /**
          * StudioCaseDetail
          * @description A saved case in the authoritative case format, with its remaining gaps and blockers.
          */
@@ -1838,6 +1892,42 @@ export interface components {
              * @enum {string}
              */
             status: "draft" | "published" | "archived";
+        };
+        /**
+         * StudioVocab
+         * @description Closed lists for the studio. The values come from the vocab files and the lab catalog.
+         */
+        StudioVocab: {
+            /** Actions */
+            actions: components["schemas"]["StudioVocabLabel"][];
+            /** Lab Panels */
+            lab_panels: string[];
+            /** Maneuvers */
+            maneuvers: components["schemas"]["StudioVocabManeuver"][];
+            /** Topics */
+            topics: components["schemas"]["StudioVocabLabel"][];
+        };
+        /**
+         * StudioVocabLabel
+         * @description A topic or action the editor can offer. The id is what a fact or objective stores.
+         */
+        StudioVocabLabel: {
+            /** Description */
+            description: string;
+            /** Id */
+            id: string;
+        };
+        /**
+         * StudioVocabManeuver
+         * @description An exam maneuver. normal is the catalog sentence, not a finding invented for this patient.
+         */
+        StudioVocabManeuver: {
+            /** Id */
+            id: string;
+            /** Label */
+            label: string;
+            /** Normal */
+            normal: string;
         };
         /**
          * SupportedStatement
@@ -2666,9 +2756,25 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["StudioCaseDetail"];
+                };
+            };
+            /** @description No saved case with that id. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description A fact is still referenced. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description Validation error */
@@ -2703,9 +2809,16 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["StudioCaseDetail"];
+                };
+            };
+            /** @description No saved case with that id. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description Validation error */
@@ -2740,9 +2853,16 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["StudioAutofillResult"];
+                };
+            };
+            /** @description No saved case with that id. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description Validation error */
@@ -3025,9 +3145,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    }[];
+                    "application/json": components["schemas"]["Icd10Match"][];
                 };
             };
             /** @description Validation error */
@@ -3056,9 +3174,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["StudioVocab"];
                 };
             };
         };

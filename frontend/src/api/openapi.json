@@ -41,8 +41,21 @@
         "type": "object"
       },
       "Approve": {
+        "description": "Which saved items change review state. keys limits the change to those ids.",
         "properties": {
           "group": {
+            "enum": [
+              "facts",
+              "vitals",
+              "labs",
+              "exam",
+              "artifacts",
+              "diagnoses",
+              "medications",
+              "allergies",
+              "objectives",
+              "branches"
+            ],
             "title": "Group",
             "type": "string"
           },
@@ -185,6 +198,31 @@
           }
         },
         "title": "Autofill",
+        "type": "object"
+      },
+      "AutofillAdded": {
+        "description": "Lab ids and vital keys this auto-fill run proposed. Faculty entries are not listed.",
+        "properties": {
+          "labs": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Labs",
+            "type": "array"
+          },
+          "vitals": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Vitals",
+            "type": "array"
+          }
+        },
+        "required": [
+          "labs",
+          "vitals"
+        ],
+        "title": "AutofillAdded",
         "type": "object"
       },
       "Belief": {
@@ -1591,6 +1629,25 @@
           "ok"
         ],
         "title": "HealthResponse",
+        "type": "object"
+      },
+      "Icd10Match": {
+        "description": "One diagnosis from the existing lookup. code and display are what faculty store.",
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "display": {
+            "title": "Display",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "display"
+        ],
+        "title": "Icd10Match",
         "type": "object"
       },
       "IntakeAnswer": {
@@ -3093,6 +3150,57 @@
         "title": "StartEncounter",
         "type": "object"
       },
+      "StudioAutofillResult": {
+        "description": "The saved case after auto-fill, plus the notes and which values were proposed.",
+        "properties": {
+          "added": {
+            "$ref": "#/components/schemas/AutofillAdded"
+          },
+          "blockers": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Blockers",
+            "type": "array"
+          },
+          "case": {
+            "$ref": "#/components/schemas/Case"
+          },
+          "gaps": {
+            "items": {
+              "$ref": "#/components/schemas/IntakeGap"
+            },
+            "title": "Gaps",
+            "type": "array"
+          },
+          "notes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Notes",
+            "type": "array"
+          },
+          "status": {
+            "enum": [
+              "draft",
+              "published",
+              "archived"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "case",
+          "status",
+          "gaps",
+          "blockers",
+          "added",
+          "notes"
+        ],
+        "title": "StudioAutofillResult",
+        "type": "object"
+      },
       "StudioCaseDetail": {
         "description": "A saved case in the authoritative case format, with its remaining gaps and blockers.",
         "properties": {
@@ -3240,6 +3348,90 @@
           "llm_calls"
         ],
         "title": "StudioDraftResult",
+        "type": "object"
+      },
+      "StudioVocab": {
+        "description": "Closed lists for the studio. The values come from the vocab files and the lab catalog.",
+        "properties": {
+          "actions": {
+            "items": {
+              "$ref": "#/components/schemas/StudioVocabLabel"
+            },
+            "title": "Actions",
+            "type": "array"
+          },
+          "lab_panels": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Lab Panels",
+            "type": "array"
+          },
+          "maneuvers": {
+            "items": {
+              "$ref": "#/components/schemas/StudioVocabManeuver"
+            },
+            "title": "Maneuvers",
+            "type": "array"
+          },
+          "topics": {
+            "items": {
+              "$ref": "#/components/schemas/StudioVocabLabel"
+            },
+            "title": "Topics",
+            "type": "array"
+          }
+        },
+        "required": [
+          "topics",
+          "actions",
+          "maneuvers",
+          "lab_panels"
+        ],
+        "title": "StudioVocab",
+        "type": "object"
+      },
+      "StudioVocabLabel": {
+        "description": "A topic or action the editor can offer. The id is what a fact or objective stores.",
+        "properties": {
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "description"
+        ],
+        "title": "StudioVocabLabel",
+        "type": "object"
+      },
+      "StudioVocabManeuver": {
+        "description": "An exam maneuver. normal is the catalog sentence, not a finding invented for this patient.",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "normal": {
+            "title": "Normal",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "normal"
+        ],
+        "title": "StudioVocabManeuver",
         "type": "object"
       },
       "SupportedStatement": {
@@ -4628,6 +4820,7 @@
         ]
       },
       "put": {
+        "description": "Store faculty edits on the draft. The body is the same case a refresh loads.",
         "operationId": "save_case_api_studio_cases__case_id__put",
         "parameters": [
           {
@@ -4655,13 +4848,31 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Save Case Api Studio Cases  Case Id  Put",
-                  "type": "object"
+                  "$ref": "#/components/schemas/StudioCaseDetail"
                 }
               }
             },
             "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No saved case with that id."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "A fact is still referenced."
           },
           "422": {
             "content": {
@@ -4682,6 +4893,7 @@
     },
     "/api/studio/cases/{case_id}/approve": {
       "post": {
+        "description": "Set review state on saved items. The returned case is what a refresh loads.",
         "operationId": "approve_api_studio_cases__case_id__approve_post",
         "parameters": [
           {
@@ -4709,13 +4921,21 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Approve Api Studio Cases  Case Id  Approve Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/StudioCaseDetail"
                 }
               }
             },
             "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No saved case with that id."
           },
           "422": {
             "content": {
@@ -4736,7 +4956,7 @@
     },
     "/api/studio/cases/{case_id}/autofill": {
       "post": {
-        "description": "Adds proposed values as drafts. Each value records where it came from.",
+        "description": "Add proposed values as drafts. Faculty-set labs and vitals are left as they were.",
         "operationId": "autofill_api_studio_cases__case_id__autofill_post",
         "parameters": [
           {
@@ -4764,13 +4984,21 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Autofill Api Studio Cases  Case Id  Autofill Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/StudioAutofillResult"
                 }
               }
             },
             "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No saved case with that id."
           },
           "422": {
             "content": {
@@ -5138,6 +5366,7 @@
     },
     "/api/studio/lookup/icd10": {
       "get": {
+        "description": "Diagnosis matches from the existing lookup. A one-character query is too broad to search.",
         "operationId": "lookup_icd10_api_studio_lookup_icd10_get",
         "parameters": [
           {
@@ -5156,8 +5385,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "additionalProperties": true,
-                    "type": "object"
+                    "$ref": "#/components/schemas/Icd10Match"
                   },
                   "title": "Response Lookup Icd10 Api Studio Lookup Icd10 Get",
                   "type": "array"
@@ -5185,16 +5413,14 @@
     },
     "/api/studio/vocab": {
       "get": {
-        "description": "Closed label sets the editor offers (topics, actions, exam maneuvers, lab panels).",
+        "description": "Closed label sets the editor offers. Maneuver normals come from the exam catalog.",
         "operationId": "vocab_api_studio_vocab_get",
         "responses": {
           "200": {
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Vocab Api Studio Vocab Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/StudioVocab"
                 }
               }
             },

@@ -405,7 +405,8 @@ test("diagnosis lookup shows the API result and other lookups stay unavailable",
     await press(buttonNamed(view.host, "Files and sources"));
     expect(view.host.textContent).toContain("This part of the studio is not available yet.");
     await press(buttonNamed(view.host, "Decision tree"));
-    expect(view.host.textContent).toContain("This part of the studio is not available yet.");
+    expect(view.host.textContent).toContain("Add decision point");
+    expect(view.host.textContent).not.toContain("This part of the studio is not available yet.");
     await press(buttonNamed(view.host, "Patient"));
     await typeInto(byId(view.host, "diagnosis-query"), "sugar");
     await press(buttonNamed(view.host, "Look up diagnosis"));

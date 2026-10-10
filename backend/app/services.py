@@ -5,6 +5,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime, timezone
 
+from pydantic import ValidationError
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
@@ -13,9 +14,12 @@ from app.encounter.pipeline import run_turn
 from app.encounter.visit import resolve_visit
 from app.feedback.debrief import build_debrief
 from app.integrations.bedrock import llm_available
+from app.latency import assemble_sample
 from app.models import CaseRow, EncounterRow, TurnRow
 from app.schemas.case import Case
-from app.schemas.student import EncounterSummary, TurnResult
+from app.schemas.feedback import FeedbackOverrideRequest, FeedbackOverrides
+from app.schemas.latency import TurnTimingCapture, TurnTimingSample
+from app.schemas.student import EncounterList, EncounterSummary, TurnResult
 from app.student_view import _encounter_status, public_encounter, public_turn
 from app.studio import publish as publish_rules
 
@@ -141,11 +145,16 @@ def get_encounter(db: Session, enc_id: str) -> EncounterRow:
 
 
 def start_encounter(db: Session, *, case_id: str, version: int | None, visit_id: str | None, student_name: str, previous_encounter_id: str | None) -> EncounterRow:
+    """Open a visit. A follow-up uses the previous encounter's frozen case and selected outcome."""
     prior_branch = None
     if previous_encounter_id:
         prev = get_encounter(db, previous_encounter_id)
+        # A different case id would skip this student's path and open someone else's visit.
+        if case_id != prev.case_id:
+            raise Conflict("this encounter continues a different case")
         if prev.feedback is None:
             raise Conflict("finish the previous visit's debrief first")
+        # The published version can move on. This visit stays on the version the student already saw.
         case_row = get_case_row(db, prev.case_id, prev.case_version)
         case = load_case(case_row)
         ids = [v.id for v in case.visits]
@@ -162,6 +171,9 @@ def start_encounter(db: Session, *, case_id: str, version: int | None, visit_id:
         visit_id = visit_id or case.visits[0].id
         if case.visit(visit_id) is None:
             raise NotFound(f"visit {visit_id} not found in {case.case_id}")
+        # Visit 2 and later exist only as a continuation. Starting one here would skip the authored path.
+        if case.visits and visit_id != case.visits[0].id:
+            raise Conflict("this visit continues from a completed visit")
     resolved = resolve_visit(case, visit_id, prior_branch)
     state = engine.new_state(resolved)
     state["prior_branch_id"] = prior_branch.id if prior_branch else None
@@ -227,6 +239,39 @@ def add_utterance(
     )
 
 
+def _turn_row(db: Session, enc_id: str, turn: int) -> TurnRow:
+    """The saved turn for this encounter. A missing turn is not a new turn."""
+    enc = get_encounter(db, enc_id)
+    row = db.scalars(select(TurnRow).where(TurnRow.encounter_id == enc.id, TurnRow.idx == turn)).first()
+    if row is None:
+        raise NotFound(f"turn {turn} not found")
+    return row
+
+
+def record_timing(db: Session, enc_id: str, turn: int, capture: TurnTimingCapture) -> TurnTimingSample:
+    """Save one timing sample on the turn it describes. Pipeline durations stay as they were."""
+    row = _turn_row(db, enc_id, turn)
+    sample = assemble_sample(
+        encounter_id=row.encounter_id,
+        turn_id=row.idx,
+        capture=capture,
+        latency_ms=row.latency_ms or {},
+        verifier=row.verifier or {},
+    )
+    # Store the public sample. A later read returns this, not a recomputed clock.
+    row.timing_sample = sample.model_dump()
+    db.commit()
+    return sample
+
+
+def read_timing(db: Session, enc_id: str, turn: int) -> TurnTimingSample:
+    """Return the sample saved for this turn. No sample is not a row of zeros."""
+    row = _turn_row(db, enc_id, turn)
+    if not row.timing_sample:
+        raise NotFound(f"no timing sample for turn {turn}")
+    return TurnTimingSample.model_validate(row.timing_sample)
+
+
 def verified_speech(db: Session, enc_id: str, turn: int) -> tuple[str, list[str], str | None]:
     """The saved reply, the tags the engine chose, and the case voice.
 
@@ -289,31 +334,84 @@ def submit_documentation(db: Session, enc_id: str, fields: dict[str, str]) -> di
     return build_feedback(db, enc)
 
 
+def _saved_overrides(raw: dict | None) -> dict | None:
+    """Turn the stored override into the response shape. An empty column means faculty have not changed anything."""
+    if not raw:
+        return None
+    return FeedbackOverrides.model_validate(raw).model_dump()
+
+
 def get_feedback(db: Session, enc_id: str) -> dict:
     """Return the saved debrief. An active visit has none yet, and this does not create an encounter."""
     enc = get_encounter(db, enc_id)
     if enc.status == "active":
         raise Conflict("end the encounter first")
     fb = enc.feedback or build_feedback(db, enc)
-    return {**fb, "overrides": enc.feedback_overrides or {}}
+    # The generated debrief stays intact. Faculty changes are a sibling field.
+    return {**fb, "overrides": _saved_overrides(enc.feedback_overrides)}
 
 
-def override_feedback(db: Session, enc_id: str, overrides: dict) -> dict:
+def override_feedback(db: Session, enc_id: str, body: FeedbackOverrideRequest) -> dict:
+    """Store a score or comment next to the generated debrief, then return both."""
     enc = get_encounter(db, enc_id)
-    enc.feedback_overrides = {**(enc.feedback_overrides or {}), **overrides, "updated_at": _now().isoformat()}
+    if enc.status == "active":
+        raise Conflict("end the encounter first")
+    if not enc.feedback:
+        # Ended visits are scored on first read. The override is not itself a score.
+        build_feedback(db, enc)
+        enc = get_encounter(db, enc_id)
+    current = FeedbackOverrides.model_validate(enc.feedback_overrides) if enc.feedback_overrides else None
+    # A later change replaces only the domain or comment it names. Earlier faculty changes stay.
+    scores = {item.domain: item for item in (current.scores if current else [])}
+    for item in body.scores:
+        scores[item.domain] = item
+    comments = {(item.domain, item.field): item for item in (current.comments if current else [])}
+    for item in body.comments:
+        comments[(item.domain, item.field)] = item
+    saved = FeedbackOverrides(
+        scores=list(scores.values()),
+        comments=list(comments.values()),
+        updated_at=_now().isoformat(),
+    )
+    enc.feedback_overrides = saved.model_dump()
+    # The generated feedback column is not written here.
     db.commit()
-    return enc.feedback_overrides
+    return get_feedback(db, enc_id)
 
 
-def list_encounters(db: Session, case_id: str | None = None) -> list[EncounterSummary]:
-    """Saved encounters for one case, or every case when no id is given. Hidden state stays off the row."""
-    q = select(EncounterRow).order_by(EncounterRow.started_at.desc())
+def _summary_names(enc: EncounterRow) -> tuple[str, str, str]:
+    """Patient, title, and visit label from the saved snapshot. A bad snapshot still leaves the ids on the row."""
+    try:
+        case = Case.model_validate(enc.visit_doc)
+    except ValidationError:
+        return "", "", ""
+    visit = case.visit(enc.visit_id)
+    return case.profile.name, case.title, visit.label if visit else ""
+
+
+def list_encounters(
+    db: Session,
+    case_id: str | None = None,
+    student_name: str | None = None,
+    limit: int = 200,
+) -> EncounterList:
+    """Saved encounters for one case, one student, or every saved visit. Hidden state stays off the row."""
+    clauses = []
     if case_id:
-        q = q.where(EncounterRow.case_id == case_id)
+        clauses.append(EncounterRow.case_id == case_id)
+    if student_name is not None:
+        clauses.append(EncounterRow.student_name == student_name)
+    count_query = select(func.count()).select_from(EncounterRow)
+    rows = select(EncounterRow).order_by(EncounterRow.started_at.desc())
+    for clause in clauses:
+        count_query = count_query.where(clause)
+        rows = rows.where(clause)
+    total = int(db.scalar(count_query) or 0)
     out: list[EncounterSummary] = []
-    for enc in db.scalars(q.limit(200)):
+    for enc in db.scalars(rows.limit(limit)):
         rubric = (enc.feedback or {}).get("rubric") or {}
-        total = rubric.get("total")
+        rubric_total = rubric.get("total")
+        patient_name, case_title, visit_label = _summary_names(enc)
         out.append(
             EncounterSummary(
                 encounter_id=enc.id,
@@ -322,9 +420,12 @@ def list_encounters(db: Session, case_id: str | None = None) -> list[EncounterSu
                 student_name=enc.student_name,
                 status=_encounter_status(enc.status),
                 started_at=enc.started_at,
-                rubric_total=total if isinstance(total, int) else None,
+                rubric_total=rubric_total if isinstance(rubric_total, int) else None,
                 review_flag=bool(rubric.get("review_flag", False)),
                 previous_encounter_id=enc.previous_encounter_id,
+                patient_name=patient_name,
+                case_title=case_title,
+                visit_label=visit_label,
             )
         )
-    return out
+    return EncounterList(encounters=out, total=total, limit=limit)

@@ -73,7 +73,7 @@ export interface paths {
         };
         /**
          * List Encounters
-         * @description Saved encounters. The list does not include the transcript or hidden engine state.
+         * @description Saved encounters. total counts rows past the limit so a short page is not the whole history.
          */
         get: operations["list_encounters_api_encounters_get"];
         put?: never;
@@ -167,7 +167,7 @@ export interface paths {
         head?: never;
         /**
          * Override Feedback
-         * @description Faculty overrides (score changes, review notes). Kept beside the generated feedback, never merged into it.
+         * @description Save a faculty score or comment beside the generated debrief. The generated scores stay as they were.
          */
         patch: operations["override_feedback_api_encounters__enc_id__feedback_patch"];
         trace?: never;
@@ -186,6 +186,30 @@ export interface paths {
          * @description Stream the saved verified reply for one turn. Client text is not spoken.
          */
         post: operations["speak_turn_api_encounters__enc_id__turns__turn__speech_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/encounters/{enc_id}/turns/{turn}/timings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Turn Timing
+         * @description The timing sample stored for this turn. A turn with no sample is not filled with zeros.
+         */
+        get: operations["get_turn_timing_api_encounters__enc_id__turns__turn__timings_get"];
+        put?: never;
+        /**
+         * Record Turn Timing
+         * @description Save client timings for one saved turn. This does not run the pipeline again.
+         */
+        post: operations["record_turn_timing_api_encounters__enc_id__turns__turn__timings_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -561,7 +585,7 @@ export interface components {
              * Group
              * @enum {string}
              */
-            group: "facts" | "vitals" | "labs" | "exam" | "artifacts" | "diagnoses" | "medications" | "allergies" | "objectives" | "branches";
+            group: "facts" | "vitals" | "labs" | "exam" | "artifacts" | "diagnoses" | "medications" | "allergies" | "objectives" | "branches" | "visit_changes";
             /** Keys */
             keys?: string[] | null;
             /**
@@ -662,9 +686,11 @@ export interface components {
         };
         /**
          * BranchSummary
-         * @description Which authored outcome was taken. Later-visit fact changes are not part of this view.
+         * @description One faculty-written outcome. Later-visit fact changes and likelihood tags are not on it.
          */
         BranchSummary: {
+            /** Evidence */
+            evidence?: components["schemas"]["EvidenceQuote"][];
             /** Id */
             id: string;
             /** Label */
@@ -818,6 +844,24 @@ export interface components {
             system: "ICD-10-CM" | "LOINC" | "RxNorm" | "SNOMED-CT";
         };
         /**
+         * CommentOverride
+         * @description A faculty comment on one domain field. The generated comment stays on the rubric.
+         */
+        CommentOverride: {
+            /**
+             * Domain
+             * @enum {string}
+             */
+            domain: "opening_and_purpose" | "rapport_respect_empathy" | "information_gathering" | "listening_and_response_to_cues" | "explanation_and_shared_decisions" | "clinical_reasoning_and_synthesis" | "professionalism_safety_closure";
+            /**
+             * Field
+             * @enum {string}
+             */
+            field: "strength_demonstrated" | "important_gap_or_missed_opportunity" | "safety_or_accuracy_concern";
+            /** Text */
+            text: string;
+        };
+        /**
          * CommunicationMetrics
          * @description Counts from the tagged turns. A ratio stays null when there were no questions to count.
          */
@@ -894,9 +938,11 @@ export interface components {
         };
         /**
          * DecisionPathView
-         * @description The outcome id for this visit. Follow-up selection is a separate screen.
+         * @description The outcome this visit selected, the other authored outcomes, and the evidence for both.
          */
         DecisionPathView: {
+            /** Decisions */
+            decisions?: components["schemas"]["PublicDecision"][];
             /** Ghosts */
             ghosts?: components["schemas"]["BranchSummary"][];
             /** Needs Faculty Review */
@@ -909,10 +955,7 @@ export interface components {
          * DecisionPoint
          * @description A yes/no condition checked at the end of a visit (PRD L-03).
          *
-         *     predicate grammar (JSON):
-         *       {"topic": id} | {"action": id} | {"maneuver": id} | {"order": panel}
-         *       {"fact_disclosed": fact_id} | {"any": [p, ...]} | {"all": [p, ...]} | {"not": p}
-         *       {"before": [p_first, p_second]}  # p_first happened in an earlier turn than p_second
+         *     The predicate is one supported operator, not a free-text rule.
          */
         DecisionPoint: {
             /**
@@ -929,10 +972,7 @@ export interface components {
             id: string;
             /** Label */
             label: string;
-            /** Predicate */
-            predicate: {
-                [key: string]: unknown;
-            };
+            predicate: components["schemas"]["Predicate"];
             /** Rubric Domain */
             rubric_domain?: string | null;
         };
@@ -1060,14 +1100,36 @@ export interface components {
             strength_demonstrated: string;
         };
         /**
+         * EncounterList
+         * @description Saved encounters. total counts every match, including rows past limit.
+         */
+        EncounterList: {
+            /** Encounters */
+            encounters: components["schemas"]["EncounterSummary"][];
+            /** Limit */
+            limit: number;
+            /** Total */
+            total: number;
+        };
+        /**
          * EncounterSummary
          * @description One saved encounter in a list. The transcript stays on the encounter view.
          */
         EncounterSummary: {
             /** Case Id */
             case_id: string;
+            /**
+             * Case Title
+             * @default
+             */
+            case_title: string;
             /** Encounter Id */
             encounter_id: string;
+            /**
+             * Patient Name
+             * @default
+             */
+            patient_name: string;
             /** Previous Encounter Id */
             previous_encounter_id?: string | null;
             /**
@@ -1088,6 +1150,11 @@ export interface components {
             student_name: string;
             /** Visit Id */
             visit_id: string;
+            /**
+             * Visit Label
+             * @default
+             */
+            visit_label: string;
         };
         /**
          * ErrorItem
@@ -1193,6 +1260,48 @@ export interface components {
             value?: number | string | null;
         };
         /**
+         * FactPatch
+         * @description Fields a later visit may replace on a fact that already exists.
+         *
+         *     Any other key is not a change. This does not add a new clinical fact.
+         */
+        FactPatch: {
+            /** Say */
+            say?: string | null;
+            /** Status */
+            status?: ("draft" | "approved") | null;
+            /** Text */
+            text?: string | null;
+            /** Tier */
+            tier?: ("initial" | "discoverable" | "reluctant" | "hidden") | null;
+            /** Unit */
+            unit?: string | null;
+            /** Value */
+            value?: number | string | null;
+        };
+        /**
+         * FeedbackOverrideRequest
+         * @description The only body a faculty override accepts: scores, comments, or both.
+         */
+        FeedbackOverrideRequest: {
+            /** Comments */
+            comments?: components["schemas"]["CommentOverride"][];
+            /** Scores */
+            scores?: components["schemas"]["ScoreOverride"][];
+        };
+        /**
+         * FeedbackOverrides
+         * @description Saved faculty changes. They sit beside the generated debrief.
+         */
+        FeedbackOverrides: {
+            /** Comments */
+            comments?: components["schemas"]["CommentOverride"][];
+            /** Scores */
+            scores?: components["schemas"]["ScoreOverride"][];
+            /** Updated At */
+            updated_at: string;
+        };
+        /**
          * FeedbackResponse
          * @description The saved debrief: rubric, evidence, trust, the note check, and the counts behind them.
          */
@@ -1213,6 +1322,7 @@ export interface components {
             /** Llm Calls */
             llm_calls?: components["schemas"]["LlmCallRecord"][];
             metrics: components["schemas"]["CommunicationMetrics"];
+            overrides?: components["schemas"]["FeedbackOverrides"] | null;
             rubric: components["schemas"]["RubricResult"];
             /** Safety */
             safety?: components["schemas"]["SafetyItem"][];
@@ -1471,6 +1581,34 @@ export interface components {
             traits?: {
                 [key: string]: number;
             };
+        };
+        /**
+         * Predicate
+         * @description One supported yes/no check. Exactly one operator is set.
+         *
+         *     A sentence, or a second key beside an operator, is not a predicate. The
+         *     evaluator reads these same keys and does not infer a rule from other text.
+         */
+        Predicate: {
+            /** Action */
+            action?: string | null;
+            /** All */
+            all?: components["schemas"]["Predicate"][] | null;
+            /** Any */
+            any?: components["schemas"]["Predicate"][] | null;
+            /** Before */
+            before?: components["schemas"]["Predicate"][] | null;
+            /** Fact Disclosed */
+            fact_disclosed?: string | null;
+            /** Maneuver */
+            maneuver?: string | null;
+            not?: components["schemas"]["Predicate"] | null;
+            /** Open Question */
+            open_question?: true | null;
+            /** Order */
+            order?: string | null;
+            /** Topic */
+            topic?: string | null;
         };
         /** Preview */
         Preview: {
@@ -1754,6 +1892,28 @@ export interface components {
             voice_id?: string | null;
         };
         /**
+         * PublicDecision
+         * @description A yes/no result the student can read. The predicate that produced it stays on the case.
+         */
+        PublicDecision: {
+            /** Evidence */
+            evidence?: components["schemas"]["EvidenceQuote"][];
+            /**
+             * Feedback
+             * @default
+             */
+            feedback: string;
+            /** Id */
+            id: string;
+            /** Label */
+            label: string;
+            /**
+             * Result
+             * @enum {string}
+             */
+            result: "yes" | "no" | "unclear";
+        };
+        /**
          * PublicDoorwayVital
          * @description A vital shown before the visit starts, with the source faculty recorded.
          */
@@ -1929,6 +2089,22 @@ export interface components {
             patient_words: string;
             /** Text */
             text: string;
+        };
+        /**
+         * ScoreOverride
+         * @description A faculty score for one official domain. It does not replace the generated score.
+         */
+        ScoreOverride: {
+            /**
+             * Domain
+             * @enum {string}
+             */
+            domain: "opening_and_purpose" | "rapport_respect_empathy" | "information_gathering" | "listening_and_response_to_cues" | "explanation_and_shared_decisions" | "clinical_reasoning_and_synthesis" | "professionalism_safety_closure";
+            /**
+             * Score
+             * @enum {unknown}
+             */
+            score: 1 | 2 | 3 | 4 | "N/A";
         };
         /**
          * ScribeToken
@@ -2203,6 +2379,74 @@ export interface components {
             /** Turn */
             turn: number;
         };
+        /**
+         * TurnTimingCapture
+         * @description Offsets in milliseconds from the committed utterance. Omit a mark that was not observed.
+         */
+        TurnTimingCapture: {
+            /** Error */
+            error?: string | null;
+            /** First Audio Bytes Ms */
+            first_audio_bytes_ms?: number | null;
+            /** First Playback Ms */
+            first_playback_ms?: number | null;
+            /**
+             * Origin
+             * @enum {string}
+             */
+            origin: "live" | "fixture";
+            /** Speech Path */
+            speech_path?: ("vendor" | "browser" | "none") | null;
+            /** Speech Request Ms */
+            speech_request_ms?: number | null;
+            /** Verified Reply Arrival Ms */
+            verified_reply_arrival_ms?: number | null;
+        };
+        /**
+         * TurnTimingSample
+         * @description The saved sample. pipeline_ms is the existing per-step breakdown, unchanged.
+         */
+        TurnTimingSample: {
+            /** Encounter Id */
+            encounter_id: string;
+            /** Error */
+            error?: string | null;
+            /**
+             * Fallback
+             * @default false
+             */
+            fallback: boolean;
+            /** Fallback Kinds */
+            fallback_kinds?: ("template" | "browser_voice")[];
+            /** First Audio Bytes Ms */
+            first_audio_bytes_ms?: number | null;
+            /** First Playback Ms */
+            first_playback_ms?: number | null;
+            /**
+             * Origin
+             * @enum {string}
+             */
+            origin: "live" | "fixture";
+            /** Pipeline Ms */
+            pipeline_ms?: {
+                [key: string]: number;
+            };
+            /**
+             * Retries
+             * @default 0
+             */
+            retries: number;
+            /** Speech Path */
+            speech_path?: ("vendor" | "browser" | "none") | null;
+            /** Speech Request Ms */
+            speech_request_ms?: number | null;
+            /** Turn Id */
+            turn_id: number;
+            /** Unavailable */
+            unavailable?: string[];
+            /** Verified Reply Arrival Ms */
+            verified_reply_arrival_ms?: number | null;
+        };
         /** Unlock */
         Unlock: {
             /** Min Trust */
@@ -2288,9 +2532,7 @@ export interface components {
             remove_facts?: string[];
             /** Update Facts */
             update_facts?: {
-                [key: string]: {
-                    [key: string]: unknown;
-                };
+                [key: string]: components["schemas"]["FactPatch"];
             };
             /** Vitals */
             vitals?: components["schemas"]["Vital"][];
@@ -2424,6 +2666,8 @@ export interface operations {
         parameters: {
             query?: {
                 case_id?: string | null;
+                student_name?: string | null;
+                limit?: number;
             };
             header?: never;
             path?: never;
@@ -2437,7 +2681,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["EncounterSummary"][];
+                    "application/json": components["schemas"]["EncounterList"];
                 };
             };
             /** @description Validation error */
@@ -2686,9 +2930,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": {
-                    [key: string]: unknown;
-                };
+                "application/json": components["schemas"]["FeedbackOverrideRequest"];
             };
         };
         responses: {
@@ -2698,9 +2940,25 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["FeedbackResponse"];
+                };
+            };
+            /** @description No saved encounter with that id. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description End the encounter before changing feedback. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description Validation error */
@@ -2771,6 +3029,92 @@ export interface operations {
             };
             /** @description The speech service failed or returned no audio. */
             503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_turn_timing_api_encounters__enc_id__turns__turn__timings_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                enc_id: string;
+                turn: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TurnTimingSample"];
+                };
+            };
+            /** @description No saved encounter, turn, or timing sample with that id. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    record_turn_timing_api_encounters__enc_id__turns__turn__timings_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                enc_id: string;
+                turn: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TurnTimingCapture"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TurnTimingSample"];
+                };
+            };
+            /** @description No saved encounter or turn with that id. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation error */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };

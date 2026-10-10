@@ -206,6 +206,16 @@ async function renderDebrief(client: ApiClient, go: Go = () => undefined, curren
   return container;
 }
 
+function buttonNamed(host: HTMLElement, name: string): HTMLButtonElement | undefined {
+  return [...host.querySelectorAll("button")].find((button) => button.textContent?.includes(name));
+}
+
+async function click(element: Element) {
+  await act(async () => {
+    element.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+  });
+}
+
 async function settle() {
   await act(async () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -275,6 +285,88 @@ test("a failed feedback read stays visible and keeps the saved note", async () =
   expect(container.textContent).not.toContain("Eats breakfast daily");
   expect(container.textContent).not.toContain("1 / 4");
   expect(seen.calls.some((call) => call.method === "POST")).toBe(false);
+});
+
+test("the debrief shows the taken path, the other authored outcomes, and whether a next visit exists", async () => {
+  const quote = "Do you take anything over the counter for pain?";
+  const withPaths = {
+    ...feedback,
+    decision_path: {
+      visit_id: "v1",
+      needs_faculty_review: ["Found the ibuprofen use and explained the risk"],
+      decisions: [
+        {
+          id: "dp_nsaid",
+          label: "Found the ibuprofen use and explained the risk",
+          result: "unclear" as const,
+          feedback: "You found that Walter takes ibuprofen and explained why it is risky with heart failure and kidney disease.",
+          evidence: [{ turn: 1, quote }],
+        },
+      ],
+      taken: {
+        id: "b_improved",
+        label: "Stopped ibuprofen and changed dinner-club orders",
+        summary:
+          "He switched to Tylenol for his back and orders the plain version at the dinner club. Blood pressure and swelling are better.",
+        evidence: [{ turn: 1, quote }],
+      },
+      ghosts: [
+        {
+          id: "b_partial",
+          label: "Stopped ibuprofen but same restaurant food",
+          summary: "He stopped the ibuprofen, but dinner-club meals are the same. Swelling is about the same.",
+          evidence: [],
+        },
+        {
+          id: "b_nsaid_missed",
+          label: "Ibuprofen missed: hospitalized",
+          summary:
+            "Nobody caught the ibuprofen. Two weeks later he was hospitalized with fluid in his lungs and worse kidney function.",
+          evidence: [],
+        },
+      ],
+    },
+  };
+  const seen = installFetch((url, method) => {
+    if (method === "GET" && url.endsWith("/api/encounters/enc_1")) return jsonResponse(200, encounter);
+    if (method === "GET" && url.endsWith("/feedback")) return jsonResponse(200, withPaths);
+    return jsonResponse(404, { message: "not found", errors: [], blockers: [] });
+  });
+  const visits: string[] = [];
+  const container = await renderDebrief(seen.client, (screen) => {
+    visits.push(screen);
+  });
+  await settle();
+
+  expect(container.textContent).toContain("Stopped ibuprofen and changed dinner-club orders");
+  expect(container.textContent).toContain("Blood pressure and swelling are better.");
+  expect(container.textContent).toContain("Stopped ibuprofen but same restaurant food");
+  expect(container.textContent).toContain("Swelling is about the same.");
+  expect(container.textContent).toContain("Ibuprofen missed: hospitalized");
+  expect(container.textContent).toContain("worse kidney function.");
+  expect(container.textContent).toContain("Found the ibuprofen use and explained the risk");
+  expect(container.textContent).toContain(`Turn 1: ${quote}`);
+  expect(container.textContent).toContain("Unclear");
+  expect(container.textContent?.toLowerCase()).not.toContain("probability");
+  expect(container.textContent).not.toContain("I switched to Tylenol like you said");
+  expect(seen.calls.some((call) => call.url.includes("/api/studio"))).toBe(false);
+
+  const next = buttonNamed(container, "Continue to the next visit");
+  expect(next).toBeTruthy();
+  await click(next!);
+  expect(visits).toEqual(["s-between"]);
+
+  const closed = installFetch((url, method) => {
+    if (method === "GET" && url.endsWith("/api/encounters/enc_1")) {
+      return jsonResponse(200, { ...encounter, has_next_visit: false, visit_id: "v2", visit_label: "Follow-up" });
+    }
+    if (method === "GET" && url.endsWith("/feedback")) return jsonResponse(200, withPaths);
+    return jsonResponse(404, { message: "not found", errors: [], blockers: [] });
+  });
+  const lastVisit = await renderDebrief(closed.client);
+  await settle();
+  expect(lastVisit.textContent).toContain("No further visit is available.");
+  expect(buttonNamed(lastVisit, "Continue to the next visit")).toBeUndefined();
 });
 
 test("the debrief keeps the encounter id and does not open one when the id is missing", async () => {

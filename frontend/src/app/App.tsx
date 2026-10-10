@@ -6,6 +6,7 @@ import { ModeTransitionProvider } from "../components/ModeTransition";
 import { Shell } from "../components/Shell";
 import { Welcome } from "../features/welcome/Welcome";
 import { FacultyHome } from "../features/faculty/FacultyHome";
+import { FacultyReview } from "../features/faculty/FacultyReview";
 import { CaseLibrary } from "../features/faculty/CaseLibrary";
 import { ImportPatients } from "../features/faculty/ImportPatients";
 import { CaseStudio } from "../features/faculty/CaseStudio";
@@ -94,7 +95,9 @@ function renderScreen(
     case "welcome":
       return <Welcome go={go} />;
     case "f-home":
-      return <FacultyHome go={go} />;
+      return <FacultyHome go={go} client={client} />;
+    case "f-review":
+      return <FacultyReview go={go} encounterId={route.encounterId} client={client} />;
     case "f-cases":
       return <CaseLibrary go={go} client={client} />;
     case "f-import":
@@ -112,7 +115,7 @@ function renderScreen(
     case "s-debrief":
       return <Debrief go={go} route={route} client={client} />;
     case "s-between":
-      return <BetweenVisits go={go} />;
+      return <BetweenVisits go={go} route={route} client={client} />;
     default: {
       const unreachable: never = screen;
       return unreachable;

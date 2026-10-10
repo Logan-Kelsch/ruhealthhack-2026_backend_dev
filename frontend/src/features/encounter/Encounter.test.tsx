@@ -197,7 +197,12 @@ async function renderEncounter(
   client: ApiClient,
   scribe: FakeScribe,
   stopOwnedAudio: () => void = () => {},
-  speech?: { playback: SpeechPlayback; browser: BrowserVoice },
+  speech?: {
+    playback: SpeechPlayback;
+    browser: BrowserVoice;
+    now?: () => number;
+    timingOrigin?: "live" | "fixture";
+  },
 ) {
   const container = document.createElement("div");
   document.body.appendChild(container);
@@ -212,6 +217,8 @@ async function renderEncounter(
         stopOwnedAudio={stopOwnedAudio}
         playSpeech={speech?.playback}
         browserVoice={speech?.browser}
+        now={speech?.now}
+        timingOrigin={speech?.timingOrigin}
       />,
     );
   });
@@ -611,12 +618,15 @@ class HoldingPlayback implements SpeechPlayback {
   });
 
   // Reads one chunk, then waits. Stop resolves the wait and cancels the source.
-  play = async (source: SpeechSource) => {
+  // The hook runs after the chunk is read, which is when playback can start.
+  play = async (source: SpeechSource, hooks?: { onFirstPlayback?: () => void }) => {
     this.plays += 1;
     this.source = source;
-    if (this.fail) throw new Error("audio element failed");
     this.first = await source.read();
+    // A failure after the chunk arrives is not playback, and it is not a missing byte.
+    if (this.fail) throw new Error("audio element failed");
     this.started = true;
+    hooks?.onFirstPlayback?.();
     await this.gate;
   };
 
@@ -979,4 +989,132 @@ test("leaving during a delayed chunk stops playback and releases the stream", as
   expect(playbackAgain.stopped).toBe(true);
   expect(again.cancelled).toBe(true);
   expect(secondScribe.stopped).toBe(true);
+});
+
+function timingCalls(calls: Call[]) {
+  return calls.filter((call) => call.method === "POST" && call.url.includes("/timings"));
+}
+
+// Returns the next fixture timestamp. The expected offsets below are written out, not recomputed.
+function fixtureClock(stamps: number[]) {
+  let index = 0;
+  return () => stamps[Math.min(index++, stamps.length - 1)] ?? stamps[stamps.length - 1] ?? 0;
+}
+
+test("a committed turn reports reply, speech, first bytes, and playback as different times", async () => {
+  const audio = delayedAudio();
+  const playback = new HoldingPlayback();
+  const browser = new FakeBrowser();
+  const seen = installFetch((url, method, body) => {
+    if (method === "GET" && url.endsWith("/api/encounters/enc_1")) return jsonResponse(200, savedEncounter);
+    if (method === "GET" && url.endsWith("/api/config")) return jsonResponse(200, speakingConfig);
+    if (method === "POST" && url.endsWith("/api/stt/token")) return jsonResponse(200, { token: "sutkn_test" });
+    if (method === "POST" && url.endsWith("/utterances")) return jsonResponse(200, ibuprofenTurn);
+    if (method === "POST" && url.includes("/speech")) {
+      expect(body).toBeNull();
+      return audio.response;
+    }
+    if (method === "POST" && url.includes("/timings")) return jsonResponse(200, {});
+    return jsonResponse(500, { message: `unexpected ${method} ${url}`, errors: [], blockers: [] });
+  });
+  const scribe = new FakeScribe();
+  await renderEncounter(seen.client, scribe, () => undefined, {
+    playback,
+    browser,
+    now: fixtureClock([1000, 1400, 1500, 1620, 1700]),
+    timingOrigin: "fixture",
+  });
+  await click(buttonNamed(document.body, "Connect microphone"));
+  await settle();
+  await act(async () => {
+    scribe.emit(committedPain());
+  });
+  await waitUntil(() => playback.started);
+  await waitUntil(() => timingCalls(seen.calls).length === 1);
+
+  const timing = timingCalls(seen.calls)[0]?.body as Record<string, unknown>;
+  expect(timingCalls(seen.calls)[0]?.url).toContain("/encounters/enc_1/turns/1/timings");
+  expect(timing.verified_reply_arrival_ms).toBe(400);
+  expect(timing.speech_request_ms).toBe(500);
+  expect(timing.first_audio_bytes_ms).toBe(620);
+  expect(timing.first_playback_ms).toBe(700);
+  expect(timing.origin).toBe("fixture");
+  expect(timing.speech_path).toBe("vendor");
+  expect(timing.error).toBeNull();
+  playback.stop();
+});
+
+test("browser fallback records playback without pretending audio bytes arrived", async () => {
+  const playback = new HoldingPlayback();
+  const browser = new FakeBrowser();
+  const seen = installFetch((url, method) => {
+    if (method === "GET" && url.endsWith("/api/encounters/enc_1")) return jsonResponse(200, savedEncounter);
+    if (method === "GET" && url.endsWith("/api/config")) return jsonResponse(200, voiceConfig);
+    if (method === "POST" && url.endsWith("/api/stt/token")) return jsonResponse(200, { token: "sutkn_test" });
+    if (method === "POST" && url.endsWith("/utterances")) return jsonResponse(200, ibuprofenTurn);
+    if (method === "POST" && url.includes("/timings")) return jsonResponse(200, {});
+    return jsonResponse(500, { message: `unexpected ${method} ${url}`, errors: [], blockers: [] });
+  });
+  const scribe = new FakeScribe();
+  await renderEncounter(seen.client, scribe, () => undefined, {
+    playback,
+    browser,
+    now: fixtureClock([1000, 1400, 1550]),
+    timingOrigin: "fixture",
+  });
+  await click(buttonNamed(document.body, "Connect microphone"));
+  await settle();
+  await act(async () => {
+    scribe.emit(committedPain());
+  });
+  await waitUntil(() => browser.spoken.length === 1);
+  await waitUntil(() => timingCalls(seen.calls).length === 1);
+
+  expect(speechCalls(seen.calls)).toHaveLength(0);
+  const timing = timingCalls(seen.calls)[0]?.body as Record<string, unknown>;
+  expect(timing.verified_reply_arrival_ms).toBe(400);
+  expect(timing.speech_request_ms).toBeNull();
+  expect(timing.first_audio_bytes_ms).toBeNull();
+  expect(timing.first_playback_ms).toBe(550);
+  expect(timing.speech_path).toBe("browser");
+  expect(timing.origin).toBe("fixture");
+  expect(timing.error).toBeNull();
+});
+
+test("a playback failure keeps the first audio bytes and leaves playback missing", async () => {
+  const audio = delayedAudio();
+  const playback = new HoldingPlayback();
+  playback.fail = true;
+  const browser = new FakeBrowser();
+  const seen = installFetch((url, method) => {
+    if (method === "GET" && url.endsWith("/api/encounters/enc_1")) return jsonResponse(200, savedEncounter);
+    if (method === "GET" && url.endsWith("/api/config")) return jsonResponse(200, speakingConfig);
+    if (method === "POST" && url.endsWith("/api/stt/token")) return jsonResponse(200, { token: "sutkn_test" });
+    if (method === "POST" && url.endsWith("/utterances")) return jsonResponse(200, ibuprofenTurn);
+    if (method === "POST" && url.includes("/speech")) return audio.response;
+    if (method === "POST" && url.includes("/timings")) return jsonResponse(200, {});
+    return jsonResponse(500, { message: `unexpected ${method} ${url}`, errors: [], blockers: [] });
+  });
+  const scribe = new FakeScribe();
+  const container = await renderEncounter(seen.client, scribe, () => undefined, {
+    playback,
+    browser,
+    now: fixtureClock([1000, 1400, 1500, 1620]),
+    timingOrigin: "fixture",
+  });
+  await click(buttonNamed(container, "Connect microphone"));
+  await settle();
+  await act(async () => {
+    scribe.emit(committedPain());
+  });
+  await waitUntil(() => timingCalls(seen.calls).length === 1);
+
+  const timing = timingCalls(seen.calls)[0]?.body as Record<string, unknown>;
+  expect(timing.verified_reply_arrival_ms).toBe(400);
+  expect(timing.speech_request_ms).toBe(500);
+  expect(timing.first_audio_bytes_ms).toBe(620);
+  expect(timing.first_playback_ms).toBeNull();
+  expect(timing.speech_path).toBe("vendor");
+  expect(timing.error).toBe("The reply could not be played. The caption is still shown.");
+  expect(container.textContent).toContain("I take ibuprofen for my back.");
 });

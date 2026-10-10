@@ -6,8 +6,8 @@ export type Role = "faculty" | "student";
 type Play = (role: Role, swap: () => void) => void;
 
 const COPY: Record<Role, { title: string; line: string }> = {
-  faculty: { title: "Faculty", line: "Build patients, assign cases, see where your class struggles." },
-  student: { title: "Student", line: "Talk with your patient, then see what you found and missed." },
+  faculty: { title: "Educator", line: "Build a patient in minutes, then see where your learners get stuck." },
+  student: { title: "Learner", line: "Talk to your patient out loud, then see what you caught and missed." },
 };
 
 const ModeContext = createContext<Play | null>(null);

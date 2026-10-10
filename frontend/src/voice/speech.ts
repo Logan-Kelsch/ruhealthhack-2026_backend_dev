@@ -8,9 +8,14 @@ export type SpeechSource = {
   cancel: () => void;
 };
 
+export type PlaybackHooks = {
+  // Fires when the player starts. That is later than the first bytes being read.
+  onFirstPlayback?: () => void;
+};
+
 export type SpeechPlayback = {
   // Start as soon as a chunk can be played. Do not wait for the rest of the stream.
-  play: (source: SpeechSource) => Promise<void>;
+  play: (source: SpeechSource, hooks?: PlaybackHooks) => Promise<void>;
   stop: () => void;
   // Milliseconds of audio still left, only when the browser actually knows.
   remainingMs: () => number | undefined;
@@ -39,6 +44,25 @@ export function verifiedAudioSource(body: ReadableStream<Uint8Array>, controller
       }
       // Cancelling the reader tells the server the rest of the audio is not needed.
       void reader.cancel().catch(() => undefined);
+    },
+  };
+}
+
+// Notes the first audio bytes without treating that read as playback.
+export function observeFirstAudioByte(source: SpeechSource, onFirstByte: () => void): SpeechSource {
+  let seen = false;
+  return {
+    async read() {
+      const chunk = await source.read();
+      // An empty chunk is not audio yet. Wait for bytes the player can use.
+      if (chunk && chunk.byteLength > 0 && !seen) {
+        seen = true;
+        onFirstByte();
+      }
+      return chunk;
+    },
+    cancel() {
+      source.cancel();
     },
   };
 }
@@ -74,7 +98,7 @@ export function createMpegPlayback(provided?: HTMLAudioElement): SpeechPlayback 
   }
 
   return {
-    async play(source: SpeechSource) {
+    async play(source: SpeechSource, hooks?: PlaybackHooks) {
       stopped = false;
       current = source;
       const Media = globalThis.MediaSource;
@@ -102,6 +126,8 @@ export function createMpegPlayback(provided?: HTMLAudioElement): SpeechPlayback 
           started = true;
           // The first chunk is enough to start. Later chunks append while it plays.
           await player.play();
+          // Playback is this start, not the earlier read that delivered the bytes.
+          hooks?.onFirstPlayback?.();
         }
       }
       if (!stopped && media.readyState === "open") media.endOfStream();

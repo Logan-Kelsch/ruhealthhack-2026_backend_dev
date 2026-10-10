@@ -3,7 +3,7 @@ import type { Go } from "../../app/types";
 import { useModeSwitch, type Role } from "../../components/ModeTransition";
 import { Wordmark } from "../../components/ui";
 
-// Role picker. Teaching opens the faculty home; learning opens the student home.
+// Role picker. Educators come first: they build the cases learners practice on.
 export function Welcome({ go }: { go: Go }) {
   const switchMode = useModeSwitch();
 
@@ -21,20 +21,23 @@ export function Welcome({ go }: { go: Go }) {
       <div className="relative flex min-h-full flex-col items-center justify-center gap-12 px-8 py-12 text-center text-ink">
         <div className="flex flex-col items-center gap-4">
           <Wordmark size={Math.round(Math.min(148, Math.max(80, window.innerWidth * 0.085)))} />
-          <div className="font-serif text-[clamp(22px,2.5vw,38px)] tracking-[-0.4px] text-ink">
-            Practice patient conversations out loud.
+          <div className="font-serif text-[clamp(26px,2.8vw,44px)] leading-tight tracking-[-0.6px] text-ink">
+            Real conversations with patients who aren’t.
+          </div>
+          <div className="max-w-[560px] font-sans text-[clamp(15px,1.2vw,18px)] leading-snug text-ink-soft">
+            Learners talk with a virtual patient by voice. Educators decide every fact it can say, and every score points back to the words that earned it.
           </div>
         </div>
         <div className="grid w-full max-w-[960px] justify-center gap-[clamp(20px,3vw,48px)] [grid-template-columns:repeat(auto-fit,minmax(280px,450px))]">
           <RoleCard
-            title="I teach"
-            body="Build patients, assign cases, see where your class struggles."
+            title="Educator"
+            body="Build a patient in minutes, then see where your learners get stuck."
             icon={<TeachIcon />}
             onClick={pick("faculty")}
           />
           <RoleCard
-            title="I’m a student"
-            body="Talk with your patient, then see what you found and missed."
+            title="Learner"
+            body="Talk to your patient out loud, then see what you caught and missed."
             icon={<LearnIcon />}
             onClick={pick("student")}
           />

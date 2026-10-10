@@ -54,7 +54,8 @@
               "medications",
               "allergies",
               "objectives",
-              "branches"
+              "branches",
+              "visit_changes"
             ],
             "title": "Group",
             "type": "string"
@@ -316,8 +317,15 @@
         "type": "object"
       },
       "BranchSummary": {
-        "description": "Which authored outcome was taken. Later-visit fact changes are not part of this view.",
+        "description": "One faculty-written outcome. Later-visit fact changes and likelihood tags are not on it.",
         "properties": {
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/EvidenceQuote"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
           "id": {
             "title": "Id",
             "type": "string"
@@ -647,6 +655,47 @@
         "title": "Code",
         "type": "object"
       },
+      "CommentOverride": {
+        "additionalProperties": false,
+        "description": "A faculty comment on one domain field. The generated comment stays on the rubric.",
+        "properties": {
+          "domain": {
+            "enum": [
+              "opening_and_purpose",
+              "rapport_respect_empathy",
+              "information_gathering",
+              "listening_and_response_to_cues",
+              "explanation_and_shared_decisions",
+              "clinical_reasoning_and_synthesis",
+              "professionalism_safety_closure"
+            ],
+            "title": "Domain",
+            "type": "string"
+          },
+          "field": {
+            "enum": [
+              "strength_demonstrated",
+              "important_gap_or_missed_opportunity",
+              "safety_or_accuracy_concern"
+            ],
+            "title": "Field",
+            "type": "string"
+          },
+          "text": {
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "domain",
+          "field",
+          "text"
+        ],
+        "title": "CommentOverride",
+        "type": "object"
+      },
       "CommunicationMetrics": {
         "description": "Counts from the tagged turns. A ratio stays null when there were no questions to count.",
         "properties": {
@@ -833,8 +882,15 @@
         "type": "object"
       },
       "DecisionPathView": {
-        "description": "The outcome id for this visit. Follow-up selection is a separate screen.",
+        "description": "The outcome this visit selected, the other authored outcomes, and the evidence for both.",
         "properties": {
+          "decisions": {
+            "items": {
+              "$ref": "#/components/schemas/PublicDecision"
+            },
+            "title": "Decisions",
+            "type": "array"
+          },
           "ghosts": {
             "items": {
               "$ref": "#/components/schemas/BranchSummary"
@@ -871,7 +927,7 @@
         "type": "object"
       },
       "DecisionPoint": {
-        "description": "A yes/no condition checked at the end of a visit (PRD L-03).\n\npredicate grammar (JSON):\n  {\"topic\": id} | {\"action\": id} | {\"maneuver\": id} | {\"order\": panel}\n  {\"fact_disclosed\": fact_id} | {\"any\": [p, ...]} | {\"all\": [p, ...]} | {\"not\": p}\n  {\"before\": [p_first, p_second]}  # p_first happened in an earlier turn than p_second",
+        "description": "A yes/no condition checked at the end of a visit (PRD L-03).\n\nThe predicate is one supported operator, not a free-text rule.",
         "properties": {
           "affects": {
             "default": "patient",
@@ -913,9 +969,7 @@
             "type": "string"
           },
           "predicate": {
-            "additionalProperties": true,
-            "title": "Predicate",
-            "type": "object"
+            "$ref": "#/components/schemas/Predicate"
           },
           "rubric_domain": {
             "anyOf": [
@@ -1183,6 +1237,33 @@
         "title": "DomainScore",
         "type": "object"
       },
+      "EncounterList": {
+        "description": "Saved encounters. total counts every match, including rows past limit.",
+        "properties": {
+          "encounters": {
+            "items": {
+              "$ref": "#/components/schemas/EncounterSummary"
+            },
+            "title": "Encounters",
+            "type": "array"
+          },
+          "limit": {
+            "title": "Limit",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "encounters",
+          "total",
+          "limit"
+        ],
+        "title": "EncounterList",
+        "type": "object"
+      },
       "EncounterSummary": {
         "description": "One saved encounter in a list. The transcript stays on the encounter view.",
         "properties": {
@@ -1190,8 +1271,18 @@
             "title": "Case Id",
             "type": "string"
           },
+          "case_title": {
+            "default": "",
+            "title": "Case Title",
+            "type": "string"
+          },
           "encounter_id": {
             "title": "Encounter Id",
+            "type": "string"
+          },
+          "patient_name": {
+            "default": "",
+            "title": "Patient Name",
             "type": "string"
           },
           "previous_encounter_id": {
@@ -1248,6 +1339,11 @@
           },
           "visit_id": {
             "title": "Visit Id",
+            "type": "string"
+          },
+          "visit_label": {
+            "default": "",
+            "title": "Visit Label",
             "type": "string"
           }
         },
@@ -1507,6 +1603,144 @@
         "title": "Fact",
         "type": "object"
       },
+      "FactPatch": {
+        "additionalProperties": false,
+        "description": "Fields a later visit may replace on a fact that already exists.\n\nAny other key is not a change. This does not add a new clinical fact.",
+        "properties": {
+          "say": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Say"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "enum": [
+                  "draft",
+                  "approved"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          },
+          "tier": {
+            "anyOf": [
+              {
+                "enum": [
+                  "initial",
+                  "discoverable",
+                  "reluctant",
+                  "hidden"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tier"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "title": "FactPatch",
+        "type": "object"
+      },
+      "FeedbackOverrideRequest": {
+        "additionalProperties": false,
+        "description": "The only body a faculty override accepts: scores, comments, or both.",
+        "properties": {
+          "comments": {
+            "items": {
+              "$ref": "#/components/schemas/CommentOverride"
+            },
+            "title": "Comments",
+            "type": "array"
+          },
+          "scores": {
+            "items": {
+              "$ref": "#/components/schemas/ScoreOverride"
+            },
+            "title": "Scores",
+            "type": "array"
+          }
+        },
+        "title": "FeedbackOverrideRequest",
+        "type": "object"
+      },
+      "FeedbackOverrides": {
+        "additionalProperties": false,
+        "description": "Saved faculty changes. They sit beside the generated debrief.",
+        "properties": {
+          "comments": {
+            "items": {
+              "$ref": "#/components/schemas/CommentOverride"
+            },
+            "title": "Comments",
+            "type": "array"
+          },
+          "scores": {
+            "items": {
+              "$ref": "#/components/schemas/ScoreOverride"
+            },
+            "title": "Scores",
+            "type": "array"
+          },
+          "updated_at": {
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "updated_at"
+        ],
+        "title": "FeedbackOverrides",
+        "type": "object"
+      },
       "FeedbackResponse": {
         "description": "The saved debrief: rubric, evidence, trust, the note check, and the counts behind them.",
         "properties": {
@@ -1555,6 +1789,16 @@
           },
           "metrics": {
             "$ref": "#/components/schemas/CommunicationMetrics"
+          },
+          "overrides": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FeedbackOverrides"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "rubric": {
             "$ref": "#/components/schemas/RubricResult"
@@ -2203,6 +2447,137 @@
           }
         },
         "title": "Personality",
+        "type": "object"
+      },
+      "Predicate": {
+        "additionalProperties": false,
+        "description": "One supported yes/no check. Exactly one operator is set.\n\nA sentence, or a second key beside an operator, is not a predicate. The\nevaluator reads these same keys and does not infer a rule from other text.",
+        "properties": {
+          "action": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Action"
+          },
+          "all": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Predicate"
+                },
+                "minItems": 1,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "All"
+          },
+          "any": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Predicate"
+                },
+                "minItems": 1,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Any"
+          },
+          "before": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Predicate"
+                },
+                "maxItems": 2,
+                "minItems": 2,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Before"
+          },
+          "fact_disclosed": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fact Disclosed"
+          },
+          "maneuver": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Maneuver"
+          },
+          "not": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Predicate"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "open_question": {
+            "anyOf": [
+              {
+                "const": true,
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Open Question"
+          },
+          "order": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Order"
+          },
+          "topic": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Topic"
+          }
+        },
+        "title": "Predicate",
         "type": "object"
       },
       "Preview": {
@@ -2872,6 +3247,47 @@
         "title": "PublicConfig",
         "type": "object"
       },
+      "PublicDecision": {
+        "description": "A yes/no result the student can read. The predicate that produced it stays on the case.",
+        "properties": {
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/EvidenceQuote"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "feedback": {
+            "default": "",
+            "title": "Feedback",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "result": {
+            "enum": [
+              "yes",
+              "no",
+              "unclear"
+            ],
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "result"
+        ],
+        "title": "PublicDecision",
+        "type": "object"
+      },
       "PublicDoorwayVital": {
         "description": "A vital shown before the visit starts, with the source faculty recorded.",
         "properties": {
@@ -3329,6 +3745,41 @@
           "discovered"
         ],
         "title": "SafetyItem",
+        "type": "object"
+      },
+      "ScoreOverride": {
+        "additionalProperties": false,
+        "description": "A faculty score for one official domain. It does not replace the generated score.",
+        "properties": {
+          "domain": {
+            "enum": [
+              "opening_and_purpose",
+              "rapport_respect_empathy",
+              "information_gathering",
+              "listening_and_response_to_cues",
+              "explanation_and_shared_decisions",
+              "clinical_reasoning_and_synthesis",
+              "professionalism_safety_closure"
+            ],
+            "title": "Domain",
+            "type": "string"
+          },
+          "score": {
+            "enum": [
+              1,
+              2,
+              3,
+              4,
+              "N/A"
+            ],
+            "title": "Score"
+          }
+        },
+        "required": [
+          "domain",
+          "score"
+        ],
+        "title": "ScoreOverride",
         "type": "object"
       },
       "ScribeToken": {
@@ -4001,6 +4452,229 @@
         "title": "TurnResult",
         "type": "object"
       },
+      "TurnTimingCapture": {
+        "description": "Offsets in milliseconds from the committed utterance. Omit a mark that was not observed.",
+        "properties": {
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "first_audio_bytes_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Audio Bytes Ms"
+          },
+          "first_playback_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Playback Ms"
+          },
+          "origin": {
+            "enum": [
+              "live",
+              "fixture"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "speech_path": {
+            "anyOf": [
+              {
+                "enum": [
+                  "vendor",
+                  "browser",
+                  "none"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speech Path"
+          },
+          "speech_request_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speech Request Ms"
+          },
+          "verified_reply_arrival_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verified Reply Arrival Ms"
+          }
+        },
+        "required": [
+          "origin"
+        ],
+        "title": "TurnTimingCapture",
+        "type": "object"
+      },
+      "TurnTimingSample": {
+        "description": "The saved sample. pipeline_ms is the existing per-step breakdown, unchanged.",
+        "properties": {
+          "encounter_id": {
+            "title": "Encounter Id",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "fallback": {
+            "default": false,
+            "title": "Fallback",
+            "type": "boolean"
+          },
+          "fallback_kinds": {
+            "items": {
+              "enum": [
+                "template",
+                "browser_voice"
+              ],
+              "type": "string"
+            },
+            "title": "Fallback Kinds",
+            "type": "array"
+          },
+          "first_audio_bytes_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Audio Bytes Ms"
+          },
+          "first_playback_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Playback Ms"
+          },
+          "origin": {
+            "enum": [
+              "live",
+              "fixture"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "pipeline_ms": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Pipeline Ms",
+            "type": "object"
+          },
+          "retries": {
+            "default": 0,
+            "title": "Retries",
+            "type": "integer"
+          },
+          "speech_path": {
+            "anyOf": [
+              {
+                "enum": [
+                  "vendor",
+                  "browser",
+                  "none"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speech Path"
+          },
+          "speech_request_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speech Request Ms"
+          },
+          "turn_id": {
+            "title": "Turn Id",
+            "type": "integer"
+          },
+          "unavailable": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Unavailable",
+            "type": "array"
+          },
+          "verified_reply_arrival_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verified Reply Arrival Ms"
+          }
+        },
+        "required": [
+          "encounter_id",
+          "turn_id",
+          "origin"
+        ],
+        "title": "TurnTimingSample",
+        "type": "object"
+      },
       "Unlock": {
         "properties": {
           "min_trust": {
@@ -4160,6 +4834,7 @@
           },
           "day": {
             "default": 0,
+            "minimum": 0.0,
             "title": "Day",
             "type": "integer"
           },
@@ -4260,8 +4935,7 @@
           },
           "update_facts": {
             "additionalProperties": {
-              "additionalProperties": true,
-              "type": "object"
+              "$ref": "#/components/schemas/FactPatch"
             },
             "title": "Update Facts",
             "type": "object"
@@ -4481,7 +5155,7 @@
     },
     "/api/encounters": {
       "get": {
-        "description": "Saved encounters. The list does not include the transcript or hidden engine state.",
+        "description": "Saved encounters. total counts rows past the limit so a short page is not the whole history.",
         "operationId": "list_encounters_api_encounters_get",
         "parameters": [
           {
@@ -4499,6 +5173,34 @@
               ],
               "title": "Case Id"
             }
+          },
+          {
+            "in": "query",
+            "name": "student_name",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Student Name"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 200,
+              "maximum": 200,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
           }
         ],
         "responses": {
@@ -4506,11 +5208,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/EncounterSummary"
-                  },
-                  "title": "Response List Encounters Api Encounters Get",
-                  "type": "array"
+                  "$ref": "#/components/schemas/EncounterList"
                 }
               }
             },
@@ -4825,7 +5523,7 @@
         ]
       },
       "patch": {
-        "description": "Faculty overrides (score changes, review notes). Kept beside the generated feedback, never merged into it.",
+        "description": "Save a faculty score or comment beside the generated debrief. The generated scores stay as they were.",
         "operationId": "override_feedback_api_encounters__enc_id__feedback_patch",
         "parameters": [
           {
@@ -4842,9 +5540,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "additionalProperties": true,
-                "title": "Overrides",
-                "type": "object"
+                "$ref": "#/components/schemas/FeedbackOverrideRequest"
               }
             }
           },
@@ -4855,13 +5551,31 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Override Feedback Api Encounters  Enc Id  Feedback Patch",
-                  "type": "object"
+                  "$ref": "#/components/schemas/FeedbackResponse"
                 }
               }
             },
             "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No saved encounter with that id."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "End the encounter before changing feedback."
           },
           "422": {
             "content": {
@@ -4961,6 +5675,138 @@
           }
         },
         "summary": "Speak Turn",
+        "tags": [
+          "encounters"
+        ]
+      }
+    },
+    "/api/encounters/{enc_id}/turns/{turn}/timings": {
+      "get": {
+        "description": "The timing sample stored for this turn. A turn with no sample is not filled with zeros.",
+        "operationId": "get_turn_timing_api_encounters__enc_id__turns__turn__timings_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "enc_id",
+            "required": true,
+            "schema": {
+              "title": "Enc Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "turn",
+            "required": true,
+            "schema": {
+              "title": "Turn",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TurnTimingSample"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No saved encounter, turn, or timing sample with that id."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Get Turn Timing",
+        "tags": [
+          "encounters"
+        ]
+      },
+      "post": {
+        "description": "Save client timings for one saved turn. This does not run the pipeline again.",
+        "operationId": "record_turn_timing_api_encounters__enc_id__turns__turn__timings_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "enc_id",
+            "required": true,
+            "schema": {
+              "title": "Enc Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "turn",
+            "required": true,
+            "schema": {
+              "title": "Turn",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TurnTimingCapture"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TurnTimingSample"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No saved encounter or turn with that id."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          }
+        },
+        "summary": "Record Turn Timing",
         "tags": [
           "encounters"
         ]

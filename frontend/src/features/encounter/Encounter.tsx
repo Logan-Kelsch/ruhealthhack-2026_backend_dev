@@ -10,6 +10,7 @@ import { connectElevenLabsScribe } from "../../voice/scribeLive";
 import {
   createBrowserVoice,
   createMpegPlayback,
+  observeFirstAudioByte,
   verifiedAudioSource,
   type BrowserVoice,
   type SpeechPlayback,
@@ -36,6 +37,8 @@ export function Encounter({
   stopOwnedAudio = stopPageAudio,
   playSpeech,
   browserVoice,
+  now = monotonicNow,
+  timingOrigin = "live",
   go,
 }: {
   route: StudentRoute;
@@ -44,6 +47,9 @@ export function Encounter({
   stopOwnedAudio?: () => void;
   playSpeech?: SpeechPlayback;
   browserVoice?: BrowserVoice;
+  // Tests pass a fixture clock. The visit itself uses a monotonic clock.
+  now?: () => number;
+  timingOrigin?: "live" | "fixture";
   go?: Go;
 }) {
   const [attempt, setAttempt] = useState(0);
@@ -102,6 +108,8 @@ export function Encounter({
       stopOwnedAudio={stopOwnedAudio}
       playback={playback}
       browserVoice={spoken}
+      now={now}
+      timingOrigin={timingOrigin}
       go={go}
     />
   );
@@ -115,6 +123,8 @@ function EncounterLive({
   stopOwnedAudio,
   playback,
   browserVoice,
+  now,
+  timingOrigin,
   go,
 }: {
   initial: PublicEncounter;
@@ -123,6 +133,8 @@ function EncounterLive({
   stopOwnedAudio: () => void;
   playback: SpeechPlayback;
   browserVoice: BrowserVoice;
+  now: () => number;
+  timingOrigin: "live" | "fixture";
   go?: Go;
 }) {
   const [view, setView] = useState(initial);
@@ -143,6 +155,8 @@ function EncounterLive({
   const speechActiveRef = useRef(false);
   const bargeMsRef = useRef<number | undefined>(undefined);
   const abortRef = useRef<AbortController | null>(null);
+  // Commit time for each saved turn, so later speech marks use the same clock.
+  const timingRef = useRef(new Map<number, { committedAt: number; verifiedReplyArrivalMs: number }>());
   const encounterId = view.encounter_id;
 
   // Drops queued replies and the stream that is playing. Leaving is not an interruption.
@@ -266,6 +280,8 @@ function EncounterLive({
   // Sends one committed turn. The queue calls this only after the previous turn has a result.
   async function submitCommitted(event: Extract<ScribeEvent, { type: "committed" }>) {
     if (closedRef.current) return;
+    // Stamp before the request so reply arrival includes the wait, not only the handling after it.
+    const committedAt = now();
     try {
       const result = await client.POST("/api/encounters/{enc_id}/utterances", {
         params: { path: { enc_id: encounterId } },
@@ -280,6 +296,10 @@ function EncounterLive({
         setBanner(asApiError(result.response.status, result.error).message);
         return;
       }
+      timingRef.current.set(result.data.turn, {
+        committedAt,
+        verifiedReplyArrivalMs: Math.round(now() - committedAt),
+      });
       applyTurn(result.data, event.text);
     } catch {
       // No response means we cannot tell whether the turn was saved. Do not send it again.
@@ -367,14 +387,71 @@ function EncounterLive({
     stopSpeech();
   }
 
+  // Milliseconds since this turn was committed. No saved commit means the mark stays missing.
+  function sinceCommit(turn: number): number | null {
+    const pending = timingRef.current.get(turn);
+    if (!pending) return null;
+    return Math.round(now() - pending.committedAt);
+  }
+
+  // Stores the client clock for one turn. A failed post leaves the sample missing.
+  async function reportTiming(
+    turn: number,
+    marks: {
+      speechRequestMs: number | null;
+      firstAudioBytesMs: number | null;
+      firstPlaybackMs: number | null;
+      speechPath: "vendor" | "browser" | "none";
+      error: string | null;
+    },
+  ) {
+    const pending = timingRef.current.get(turn);
+    if (!pending) return;
+    try {
+      await client.POST("/api/encounters/{enc_id}/turns/{turn}/timings", {
+        params: { path: { enc_id: encounterId, turn } },
+        body: {
+          verified_reply_arrival_ms: pending.verifiedReplyArrivalMs,
+          speech_request_ms: marks.speechRequestMs,
+          first_audio_bytes_ms: marks.firstAudioBytesMs,
+          first_playback_ms: marks.firstPlaybackMs,
+          origin: timingOrigin,
+          speech_path: marks.speechPath,
+          error: marks.error,
+        },
+      });
+    } catch {
+      // The caption and the reply are already saved. Losing the timing row does not change them.
+    }
+  }
+
   // Speaks one verified reply. The caption is already on screen before this runs.
   async function playVerified(turn: number, text: string) {
     if (closedRef.current) return;
+    const marks = {
+      speechRequestMs: null as number | null,
+      firstAudioBytesMs: null as number | null,
+      firstPlaybackMs: null as number | null,
+      speechPath: "none" as "vendor" | "browser" | "none",
+      error: null as string | null,
+    };
+    let reported = false;
+    // One sample per turn. The first moment we know the outcome is enough.
+    async function send() {
+      if (reported) return;
+      reported = true;
+      await reportTiming(turn, marks);
+    }
     if (!ttsRef.current) {
       browserVoice.speak(text);
       setVoiceLabel("Browser voice");
+      marks.speechPath = "browser";
+      marks.firstPlaybackMs = sinceCommit(turn);
+      await send();
       return;
     }
+    marks.speechPath = "vendor";
+    marks.speechRequestMs = sinceCommit(turn);
     const controller = new AbortController();
     abortRef.current = controller;
     setVoiceLabel(null);
@@ -384,20 +461,42 @@ function EncounterLive({
         parseAs: "stream",
         signal: controller.signal,
       });
-      if (controller.signal.aborted || closedRef.current) return;
+      if (controller.signal.aborted || closedRef.current) {
+        await send();
+        return;
+      }
       if (result.response?.status === 204) {
         browserVoice.speak(text);
         setVoiceLabel("Browser voice");
+        // No vendor bytes arrived. Playback is the browser voice, if it started.
+        marks.speechPath = "browser";
+        marks.firstPlaybackMs = sinceCommit(turn);
+        await send();
         return;
       }
       if (!result.response?.ok || !result.data) {
-        setBanner(asApiError(result.response?.status ?? 0, result.error).message);
+        marks.error = asApiError(result.response?.status ?? 0, result.error).message;
+        setBanner(marks.error);
+        await send();
         return;
       }
-      await playback.play(verifiedAudioSource(result.data, controller));
+      const source = observeFirstAudioByte(verifiedAudioSource(result.data, controller), () => {
+        if (marks.firstAudioBytesMs === null) marks.firstAudioBytesMs = sinceCommit(turn);
+      });
+      await playback.play(source, {
+        onFirstPlayback() {
+          if (marks.firstPlaybackMs === null) marks.firstPlaybackMs = sinceCommit(turn);
+          // Report at the start. Waiting for the sentence to finish would hide the playback time.
+          void send();
+        },
+      });
+      await send();
     } catch {
-      if (controller.signal.aborted || closedRef.current) return;
-      setBanner("The reply could not be played. The caption is still shown.");
+      if (!(controller.signal.aborted || closedRef.current)) {
+        marks.error = "The reply could not be played. The caption is still shown.";
+        setBanner(marks.error);
+      }
+      await send();
     }
   }
 
@@ -618,6 +717,12 @@ function mergeChart(current: PublicChartEntry[], incoming: PublicChartEntry[]): 
     else next.push(item);
   }
   return next;
+}
+
+// A monotonic clock when the browser has one, so a timing mark is not a wall-clock jump.
+function monotonicNow(): number {
+  if (typeof performance !== "undefined" && typeof performance.now === "function") return performance.now();
+  return Date.now();
 }
 
 // Shows the saved start or end time. The clock is the saved time, not a running timer.

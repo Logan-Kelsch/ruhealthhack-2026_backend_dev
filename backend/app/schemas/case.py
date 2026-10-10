@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 Tier = Literal["initial", "discoverable", "reluctant", "hidden"]
 ItemStatus = Literal["draft", "approved"]
@@ -199,18 +199,88 @@ class Briefing(BaseModel):
     show_doorway_vitals: bool = True
 
 
+class Predicate(BaseModel):
+    """One supported yes/no check. Exactly one operator is set.
+
+    A sentence, or a second key beside an operator, is not a predicate. The
+    evaluator reads these same keys and does not infer a rule from other text.
+    """
+
+    # One schema name for requests and responses. The operators are the same either way.
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+        serialize_by_alias=True,
+        json_schema_mode_override="validation",
+    )
+
+    topic: str | None = None
+    action: str | None = None
+    maneuver: str | None = None
+    order: str | None = None
+    fact_disclosed: str | None = None
+    open_question: Literal[True] | None = None
+    any: list[Predicate] | None = Field(default=None, min_length=1)
+    all: list[Predicate] | None = Field(default=None, min_length=1)
+    # "not" is the stored key. The field name cannot be the keyword.
+    not_: Predicate | None = Field(default=None, alias="not")
+    before: list[Predicate] | None = Field(default=None, min_length=2, max_length=2)
+
+    @model_validator(mode="after")
+    def one_operator(self) -> Predicate:
+        """Two operators would be ambiguous. The evaluator would not treat them as one yes/no."""
+        chosen = [
+            name
+            for name in (
+                "topic",
+                "action",
+                "maneuver",
+                "order",
+                "fact_disclosed",
+                "open_question",
+                "any",
+                "all",
+                "not_",
+                "before",
+            )
+            if getattr(self, name) is not None
+        ]
+        if len(chosen) != 1:
+            raise ValueError(
+                "A decision point uses exactly one of topic, action, maneuver, order, fact, any, all, not, or before."
+            )
+        return self
+
+
+# The nested operators refer to this class. Rebuild so those lists resolve.
+Predicate.model_rebuild()
+
+
+class FactPatch(BaseModel):
+    """Fields a later visit may replace on a fact that already exists.
+
+    Any other key is not a change. This does not add a new clinical fact.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    text: str | None = None
+    say: str | None = None
+    value: float | str | None = None
+    unit: str | None = None
+    tier: Tier | None = None
+    status: ItemStatus | None = None
+
+
 class DecisionPoint(BaseModel):
     """A yes/no condition checked at the end of a visit (PRD L-03).
 
-    predicate grammar (JSON):
-      {"topic": id} | {"action": id} | {"maneuver": id} | {"order": panel}
-      {"fact_disclosed": fact_id} | {"any": [p, ...]} | {"all": [p, ...]} | {"not": p}
-      {"before": [p_first, p_second]}  # p_first happened in an earlier turn than p_second
+    The predicate is one supported operator, not a free-text rule.
     """
 
     id: str
     label: str
-    predicate: dict[str, Any]
+    predicate: Predicate
     affects: Literal["patient", "score"] = "patient"
     rubric_domain: str | None = None
     feedback_if_yes: str | None = None
@@ -219,7 +289,7 @@ class DecisionPoint(BaseModel):
 
 class VisitChanges(BaseModel):
     add_facts: list[Fact] = Field(default_factory=list)
-    update_facts: dict[str, dict[str, Any]] = Field(default_factory=dict)
+    update_facts: dict[str, FactPatch] = Field(default_factory=dict)
     remove_facts: list[str] = Field(default_factory=list)
     vitals: list[Vital] = Field(default_factory=list)  # replaces by key
     labs: list[LabResult] = Field(default_factory=list)  # replaces by key
@@ -247,7 +317,7 @@ class Branch(BaseModel):
 class Visit(BaseModel):
     id: str
     label: str
-    day: int = 0
+    day: int = Field(default=0, ge=0)
     changes: VisitChanges = Field(default_factory=VisitChanges)
     decision_points: list[DecisionPoint] = Field(default_factory=list)
     branches: list[Branch] = Field(default_factory=list)  # first match wins; applied to the next visit

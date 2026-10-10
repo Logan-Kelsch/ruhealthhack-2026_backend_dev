@@ -6,11 +6,27 @@ The encounter recovery view does not use these models.
 
 from typing import Literal, Self
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from app.schemas.http import LlmCallRecord
 
 ScoreValue = Literal[1, 2, 3, 4, "N/A"]
+# Keys from the official SHP rubric. A faculty score may only name one of these.
+RubricDomainKey = Literal[
+    "opening_and_purpose",
+    "rapport_respect_empathy",
+    "information_gathering",
+    "listening_and_response_to_cues",
+    "explanation_and_shared_decisions",
+    "clinical_reasoning_and_synthesis",
+    "professionalism_safety_closure",
+]
+# The three comments already stored on a generated domain score.
+CommentField = Literal[
+    "strength_demonstrated",
+    "important_gap_or_missed_opportunity",
+    "safety_or_accuracy_concern",
+]
 
 
 class EvidenceQuote(BaseModel):
@@ -173,19 +189,32 @@ class DocumentationCheck(BaseModel):
 
 
 class BranchSummary(BaseModel):
-    """Which authored outcome was taken. Later-visit fact changes are not part of this view."""
+    """One faculty-written outcome. Later-visit fact changes and likelihood tags are not on it."""
 
     id: str
     label: str
     summary: str = ""
+    # Transcript spans for the decision points that define this outcome.
+    evidence: list[EvidenceQuote] = Field(default_factory=list)
+
+
+class PublicDecision(BaseModel):
+    """A yes/no result the student can read. The predicate that produced it stays on the case."""
+
+    id: str
+    label: str
+    result: Literal["yes", "no", "unclear"]
+    evidence: list[EvidenceQuote] = Field(default_factory=list)
+    feedback: str = ""
 
 
 class DecisionPathView(BaseModel):
-    """The outcome id for this visit. Follow-up selection is a separate screen."""
+    """The outcome this visit selected, the other authored outcomes, and the evidence for both."""
 
     visit_id: str
     taken: BranchSummary | None = None
     ghosts: list[BranchSummary] = Field(default_factory=list)
+    decisions: list[PublicDecision] = Field(default_factory=list)
     needs_faculty_review: list[str] = Field(default_factory=list)
 
 
@@ -196,6 +225,51 @@ class DebriefTurn(BaseModel):
     student: str
     patient: str
     mode: Literal["template", "llm"] = "template"
+
+
+class ScoreOverride(BaseModel):
+    """A faculty score for one official domain. It does not replace the generated score."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    domain: RubricDomainKey
+    score: ScoreValue
+
+
+class CommentOverride(BaseModel):
+    """A faculty comment on one domain field. The generated comment stays on the rubric."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    domain: RubricDomainKey
+    field: CommentField
+    text: str = Field(min_length=1, max_length=2000)
+
+
+class FeedbackOverrideRequest(BaseModel):
+    """The only body a faculty override accepts: scores, comments, or both."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    scores: list[ScoreOverride] = Field(default_factory=list)
+    comments: list[CommentOverride] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def needs_a_change(self) -> Self:
+        """An empty body is not a faculty change, so it must not look saved."""
+        if not self.scores and not self.comments:
+            raise ValueError("Add a score or a comment")
+        return self
+
+
+class FeedbackOverrides(BaseModel):
+    """Saved faculty changes. They sit beside the generated debrief."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    scores: list[ScoreOverride] = Field(default_factory=list)
+    comments: list[CommentOverride] = Field(default_factory=list)
+    updated_at: str
 
 
 class FeedbackResponse(BaseModel):
@@ -213,6 +287,8 @@ class FeedbackResponse(BaseModel):
     llm_calls: list[LlmCallRecord] = Field(default_factory=list)
     fallback_used: bool = False
     generated_at: str
+    # None until faculty save a score or comment. The rubric above stays the generated result.
+    overrides: FeedbackOverrides | None = None
 
     @model_validator(mode="after")
     def numeric_scores_cite_a_span(self) -> Self:

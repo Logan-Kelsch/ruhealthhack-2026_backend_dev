@@ -35,6 +35,7 @@ const STUDENT_NAV: NavDef[] = [
 function sectionFor(screen: ScreenId): RailKey | undefined {
   const map: Partial<Record<ScreenId, RailKey>> = {
     "f-home": "home",
+    "f-review": "home",
     "f-cases": "cases",
     "f-import": "cases",
     "f-studio": "cases",
@@ -86,7 +87,7 @@ export function Shell({ screen, go, children }: ShellProps) {
           <span className="flex size-8 items-center justify-center rounded-full bg-indigo-soft text-[12px] font-bold text-indigo">{user.initials}</span>
           <span className="hidden leading-tight sm:block">
             <span className="block font-semibold text-ink">{user.name}</span>
-            <span className="block text-[12px]">{role === "faculty" ? `Faculty · ${user.role}` : user.role}</span>
+            <span className="block text-[12px]">{role === "faculty" ? `Educator · ${user.role}` : user.role}</span>
           </span>
         </div>
       </header>
@@ -119,11 +120,11 @@ export function Shell({ screen, go, children }: ShellProps) {
           type="button"
           onClick={swap}
           className="group flex flex-col items-center gap-1.5 rounded-[14px] px-1.5 py-2 hover:bg-indigo-soft/60"
-          aria-label={role === "faculty" ? "Switch to student mode" : "Switch to faculty mode"}
+          aria-label={role === "faculty" ? "Switch to learner mode" : "Switch to educator mode"}
         >
           <DawnDisc size={34} className="transition-transform duration-500 group-hover:rotate-[24deg] group-hover:scale-110" />
           <span className="font-sans text-[11px] leading-tight font-semibold text-ink-soft">
-            {role === "faculty" ? "Student" : "Faculty"}
+            {role === "faculty" ? "Learner" : "Educator"}
             <br />
             view
           </span>

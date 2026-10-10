@@ -1,0 +1,98 @@
+{
+  "manifest_version": 1,
+  "purpose": "Inventory and provenance for the supplied TwinVerse data used by the Rounds prototype.",
+  "sources": [
+    {
+      "id": "faculty_patient_seed_csv",
+      "path": "backend/app/data/source_fixtures/faculty-provided-sample-patient-details.csv",
+      "format": "csv",
+      "kind": "patient_profile_seed",
+      "origin": "Event-provided faculty sample",
+      "license": "Provided for the hackathon; confirm terms before reuse outside the event.",
+      "expected_records": 8,
+      "training_role": ["case_schema", "profile_comparison"],
+      "not_ground_truth_for": ["clinical_decisions", "student_performance", "learning_gain"]
+    },
+    {
+      "id": "vhs_virtual_patient_profiles",
+      "path": "backend/app/data/vhs/virtual-patient-profiles-sample.json",
+      "format": "concatenated_json_objects",
+      "kind": "synthetic_virtual_patient_profiles",
+      "origin": "joeljames270/virtual-patient-profiles-sample on Hugging Face; supplied by the event",
+      "license": "CC BY 4.0 per repository project context; preserve attribution.",
+      "expected_records": 8,
+      "training_role": ["profile_import", "disclosure_schema", "objective_schema"],
+      "not_ground_truth_for": ["clinical_decisions", "student_performance", "learning_gain"]
+    },
+    {
+      "id": "shp_encounter_rubric",
+      "path": "backend/app/data/rubric_shp_v1.json",
+      "format": "json",
+      "kind": "faculty_rubric",
+      "origin": "Rutgers SHP event-provided Patient Encounter Performance Rubric",
+      "license": "Provided for the hackathon; confirm terms before reuse outside the event.",
+      "expected_records": 7,
+      "training_role": ["rubric_schema", "assessment_targets"],
+      "not_ground_truth_for": ["labeled_student_transcripts", "learning_gain"]
+    },
+    {
+      "id": "pediatric_aural_rehabilitation_rubric",
+      "path": "backend/app/data/source_fixtures/pediatric_treatment_rubric.docx",
+      "format": "docx_rubric",
+      "kind": "specialty_skill_rubric",
+      "origin": "Rutgers SHP Speech-Language Pathology pediatric treatment simulation rubric, event-provided",
+      "license": "Provided for the hackathon; confirm terms before reuse outside the event.",
+      "expected_records": 4,
+      "training_role": ["specialty_assessment_targets"],
+      "not_ground_truth_for": ["labeled_student_transcripts", "learning_gain"],
+      "review_note": "No associated case, audiogram, or Speech Banana asset was provided in the local source set."
+    },
+    {
+      "id": "sample_clinician_personas",
+      "path": "backend/app/data/source_fixtures",
+      "glob": "sample_clinician-*.json",
+      "format": "json_profile",
+      "kind": "clinician_role_personas",
+      "origin": "Event-provided sample clinician profiles for the Connected Care challenge",
+      "license": "Provided for the hackathon; confirm terms before reuse outside the event.",
+      "expected_records": 5,
+      "training_role": ["role_schema", "communication_scenario_design"],
+      "not_ground_truth_for": ["student_performance", "clinical_decisions", "learning_gain"]
+    },
+    {
+      "id": "golden_cases",
+      "path": "cases",
+      "format": "case_directory",
+      "kind": "faculty_authored_or_adapted_scenarios",
+      "origin": "Project case fixtures; Walter Greene is adapted from the event-provided VHS profile.",
+      "license": "Project-authored or event-provided scenario material; review attribution before reuse.",
+      "expected_records": 3,
+      "training_role": ["case_schema", "environment_test_scenarios"],
+      "not_ground_truth_for": ["student_performance", "learning_gain"]
+    },
+    {
+      "id": "patient_doctor_dialogue_link",
+      "path": null,
+      "url": "https://huggingface.co/datasets/Postzeun/Patient-Doctor",
+      "format": "external_text_dialogues",
+      "kind": "dialogue_corpus",
+      "origin": "External dataset link in supplied materials",
+      "license": "Not established in the supplied materials; verify upstream before reuse.",
+      "status": "external_not_cached",
+      "training_role": ["candidate_language_examples", "candidate_action_annotation"],
+      "not_ground_truth_for": ["student_performance", "learning_gain"]
+    },
+    {
+      "id": "pathology_results_link",
+      "path": null,
+      "url": "https://www.kaggle.com/datasets/pareshbadnore/diagnostic-pathology-test-results",
+      "format": "external_tabular_data",
+      "kind": "laboratory_pattern_dataset",
+      "origin": "External dataset link in supplied materials",
+      "license": "Verify dataset license and provenance upstream before reuse.",
+      "status": "external_not_cached",
+      "training_role": ["candidate_lab_exercise_generation", "dataset_label_reproduction"],
+      "not_ground_truth_for": ["student_performance", "learning_gain", "clinical_validation"]
+    }
+  ]
+}

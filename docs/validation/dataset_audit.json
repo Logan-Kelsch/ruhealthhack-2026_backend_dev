@@ -1,0 +1,335 @@
+{
+  "audit_version": 1,
+  "stage": "Notebook 01 — dataset audit and provenance",
+  "scope": "Structural and provenance audit; not a clinical validation or learning-outcome study.",
+  "gate": "PASS",
+  "advance_to": "Notebook 02 — action-data preparation",
+  "checks": {
+    "all_required_local_sources_present": true,
+    "expected_record_counts_match": true,
+    "patient_seed_csv_valid": true,
+    "vhs_profile_structure_valid": true,
+    "vhs_profiles_normalize_to_case_schema": true,
+    "rubric_schema_valid": true,
+    "clinical_review_completed": false,
+    "student_outcome_data_available": false
+  },
+  "source_count": 8,
+  "sources": [
+    {
+      "id": "faculty_patient_seed_csv",
+      "format": "csv",
+      "kind": "patient_profile_seed",
+      "origin": "Event-provided faculty sample",
+      "license": "Provided for the hackathon; confirm terms before reuse outside the event.",
+      "expected_records": 8,
+      "training_role": [
+        "case_schema",
+        "profile_comparison"
+      ],
+      "not_ground_truth_for": [
+        "clinical_decisions",
+        "student_performance",
+        "learning_gain"
+      ],
+      "path": "backend/app/data/source_fixtures/faculty-provided-sample-patient-details.csv",
+      "sha256": "ea802c9ac4dcd522c10ba2fcbb90fe248cfc0a0879f91876659ab76b209d43c8",
+      "local_status": "present",
+      "columns": [
+        "patient-uuid",
+        "patient-name",
+        "age",
+        "background",
+        "gender",
+        "notes",
+        "patient-img",
+        "personality",
+        "race/ethinicity",
+        "summary"
+      ],
+      "record_count": 8,
+      "missing_cells": 0,
+      "unique_names": 8,
+      "unique_ids": 8,
+      "age_parse_failures": 0,
+      "patient_names": [
+        "Vladko Bareche",
+        "Wyatt Nelson",
+        "Walter Greene",
+        "Marcus Ramirez",
+        "Omar Sinclair",
+        "Nisha Patel",
+        "Yvette Armstrong",
+        "Dominic Rivera"
+      ],
+      "patient_ages": {
+        "vladko bareche": "31",
+        "wyatt nelson": "18",
+        "walter greene": "72",
+        "marcus ramirez": "59",
+        "omar sinclair": "45",
+        "nisha patel": "29",
+        "yvette armstrong": "64",
+        "dominic rivera": "22"
+      }
+    },
+    {
+      "id": "vhs_virtual_patient_profiles",
+      "format": "concatenated_json_objects",
+      "kind": "synthetic_virtual_patient_profiles",
+      "origin": "joeljames270/virtual-patient-profiles-sample on Hugging Face; supplied by the event",
+      "license": "CC BY 4.0 per repository project context; preserve attribution.",
+      "expected_records": 8,
+      "training_role": [
+        "profile_import",
+        "disclosure_schema",
+        "objective_schema"
+      ],
+      "not_ground_truth_for": [
+        "clinical_decisions",
+        "student_performance",
+        "learning_gain"
+      ],
+      "path": "backend/app/data/vhs/virtual-patient-profiles-sample.json",
+      "sha256": "62791934a610d681b50f1846d6891e5eb3c1969ff47b03ccbbc6982a076651ad",
+      "local_status": "present",
+      "record_count": 8,
+      "serialization": "adjacent JSON objects; not a JSON array or JSONL",
+      "patient_names": [
+        "Dominic Rivera",
+        "Yvette Armstrong",
+        "Nisha Patel",
+        "Omar Sinclair",
+        "Marcus Ramirez",
+        "Walter Greene",
+        "Wyatt Nelson",
+        "Vladko Bareche"
+      ],
+      "patient_ages": {
+        "dominic rivera": "22",
+        "yvette armstrong": "64",
+        "nisha patel": "29",
+        "omar sinclair": "45",
+        "marcus ramirez": "59",
+        "walter greene": "72",
+        "wyatt nelson": "18",
+        "vladko bareche": "31"
+      },
+      "schema_key_sets": {
+        "complete": 8
+      },
+      "learning_opportunity_count": 48,
+      "disclosure_fact_count_by_tier": {
+        "initial": 39,
+        "discoverable": 39,
+        "reluctant": 24,
+        "hidden": 30
+      },
+      "normalized_case_count": 8,
+      "normalized_fact_count": 534,
+      "normalized_lab_count": 51,
+      "normalized_objective_count": 48,
+      "normalized_facts_with_source": 534
+    },
+    {
+      "id": "shp_encounter_rubric",
+      "format": "json",
+      "kind": "faculty_rubric",
+      "origin": "Rutgers SHP event-provided Patient Encounter Performance Rubric",
+      "license": "Provided for the hackathon; confirm terms before reuse outside the event.",
+      "expected_records": 7,
+      "training_role": [
+        "rubric_schema",
+        "assessment_targets"
+      ],
+      "not_ground_truth_for": [
+        "labeled_student_transcripts",
+        "learning_gain"
+      ],
+      "path": "backend/app/data/rubric_shp_v1.json",
+      "sha256": "4c337aab9891b5c8f224e7efeaf4214013847a000b19c7ebec5101e68c58fce7",
+      "local_status": "present",
+      "record_count": 7,
+      "domain_keys": [
+        "opening_and_purpose",
+        "rapport_respect_empathy",
+        "information_gathering",
+        "listening_and_response_to_cues",
+        "explanation_and_shared_decisions",
+        "clinical_reasoning_and_synthesis",
+        "professionalism_safety_closure"
+      ],
+      "allowed_scores": [
+        4,
+        3,
+        2,
+        1,
+        "N/A"
+      ],
+      "review_trigger_domain_ids": [
+        6,
+        7
+      ],
+      "max_total": 28
+    },
+    {
+      "id": "pediatric_aural_rehabilitation_rubric",
+      "format": "docx_rubric",
+      "kind": "specialty_skill_rubric",
+      "origin": "Rutgers SHP Speech-Language Pathology pediatric treatment simulation rubric, event-provided",
+      "license": "Provided for the hackathon; confirm terms before reuse outside the event.",
+      "expected_records": 4,
+      "training_role": [
+        "specialty_assessment_targets"
+      ],
+      "not_ground_truth_for": [
+        "labeled_student_transcripts",
+        "learning_gain"
+      ],
+      "review_note": "No associated case, audiogram, or Speech Banana asset was provided in the local source set.",
+      "path": "backend/app/data/source_fixtures/pediatric_treatment_rubric.docx",
+      "sha256": "a53ea4edb249dd365de916b31c0d0ae6953049b81403db63f5772eb0334dc05b",
+      "local_status": "present",
+      "record_count": 4,
+      "point_values": [
+        10,
+        30,
+        30,
+        30
+      ],
+      "total_points": 100
+    },
+    {
+      "id": "sample_clinician_personas",
+      "glob": "sample_clinician-*.json",
+      "format": "json_profile",
+      "kind": "clinician_role_personas",
+      "origin": "Event-provided sample clinician profiles for the Connected Care challenge",
+      "license": "Provided for the hackathon; confirm terms before reuse outside the event.",
+      "expected_records": 5,
+      "training_role": [
+        "role_schema",
+        "communication_scenario_design"
+      ],
+      "not_ground_truth_for": [
+        "student_performance",
+        "clinical_decisions",
+        "learning_gain"
+      ],
+      "path": "backend/app/data/source_fixtures",
+      "sha256": "1d837e8ad093bd708c0a5296793e6a1ebaad95cedbac69892233989692d6b682",
+      "local_status": "present",
+      "record_count": 5,
+      "files": [
+        "sample_clinician-brian_lee.json",
+        "sample_clinician-david_bennet.json",
+        "sample_clinician-nasir_mahmoud.json",
+        "sample_clinician-priya_narang.json",
+        "sample_clinician-tasha_dunbar.json"
+      ],
+      "required_sections_present": 5,
+      "learning_opportunity_count": 15,
+      "clinician_names": [
+        "Brian Lee",
+        "David Bennet",
+        "Nasir Mahmoud",
+        "Priya Narang",
+        "Tasha Dunbar"
+      ]
+    },
+    {
+      "id": "golden_cases",
+      "format": "case_directory",
+      "kind": "faculty_authored_or_adapted_scenarios",
+      "origin": "Project case fixtures; Walter Greene is adapted from the event-provided VHS profile.",
+      "license": "Project-authored or event-provided scenario material; review attribution before reuse.",
+      "expected_records": 3,
+      "training_role": [
+        "case_schema",
+        "environment_test_scenarios"
+      ],
+      "not_ground_truth_for": [
+        "student_performance",
+        "learning_gain"
+      ],
+      "path": "cases",
+      "sha256": "179e869f66b7ada3e31d7463800cf547f5b4604c930c4403d24ce008a2c200a3",
+      "local_status": "present",
+      "record_count": 3,
+      "files": [
+        "alina_reyes.json",
+        "eli_brooks.json",
+        "walter_greene.json"
+      ],
+      "case_ids": [
+        "alina_reyes",
+        "eli_brooks",
+        "walter_greene"
+      ],
+      "case_statuses": {
+        "published": 3
+      },
+      "fact_count": 86
+    },
+    {
+      "id": "patient_doctor_dialogue_link",
+      "url": "https://huggingface.co/datasets/Postzeun/Patient-Doctor",
+      "format": "external_text_dialogues",
+      "kind": "dialogue_corpus",
+      "origin": "External dataset link in supplied materials",
+      "license": "Not established in the supplied materials; verify upstream before reuse.",
+      "status": "external_not_cached",
+      "training_role": [
+        "candidate_language_examples",
+        "candidate_action_annotation"
+      ],
+      "not_ground_truth_for": [
+        "student_performance",
+        "learning_gain"
+      ],
+      "local_status": "external_not_cached",
+      "record_count": null
+    },
+    {
+      "id": "pathology_results_link",
+      "url": "https://www.kaggle.com/datasets/pareshbadnore/diagnostic-pathology-test-results",
+      "format": "external_tabular_data",
+      "kind": "laboratory_pattern_dataset",
+      "origin": "External dataset link in supplied materials",
+      "license": "Verify dataset license and provenance upstream before reuse.",
+      "status": "external_not_cached",
+      "training_role": [
+        "candidate_lab_exercise_generation",
+        "dataset_label_reproduction"
+      ],
+      "not_ground_truth_for": [
+        "student_performance",
+        "learning_gain",
+        "clinical_validation"
+      ],
+      "local_status": "external_not_cached",
+      "record_count": null
+    }
+  ],
+  "cross_source_comparison": {
+    "matching_name_count": 8,
+    "csv_only_count": 0,
+    "vhs_only_count": 0,
+    "age_conflict_count": 0,
+    "age_conflict_names": []
+  },
+  "errors": [],
+  "warnings": [
+    "The holistic rubric has no subcriterion weights; do not infer a leaf-level score decomposition.",
+    "No associated case, audiogram, or Speech Banana asset was provided in the local source set.",
+    "External source not cached or structurally audited: patient_doctor_dialogue_link",
+    "External source not cached or structurally audited: pathology_results_link",
+    "No labeled student transcripts or measured learning outcomes are present in these sources.",
+    "Clinical content and version conflicts require faculty review before cases are published."
+  ],
+  "next_stage_constraints": [
+    "External dialogue contents and redistribution terms are not present in the repository; acquire or replace them before supervised dialogue-model training.",
+    "Use source profiles and rubric descriptors as schema and scenario material, not as student labels.",
+    "Keep faculty review as the publication gate for clinical facts and conflicting profile versions."
+  ]
+}

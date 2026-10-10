@@ -87,6 +87,55 @@ class VhsImportResponse(BaseModel):
     cases: list[StudioCaseSummary]
 
 
+class AutofillAdded(BaseModel):
+    """Lab ids and vital keys this auto-fill run proposed. Faculty entries are not listed."""
+
+    labs: list[str]
+    vitals: list[str]
+
+
+class StudioAutofillResult(BaseModel):
+    """The saved case after auto-fill, plus the notes and which values were proposed."""
+
+    case: Case
+    status: Literal["draft", "published", "archived"]
+    gaps: list[IntakeGap]
+    blockers: list[str]
+    added: AutofillAdded
+    notes: list[str]
+
+
+class Icd10Match(BaseModel):
+    """One diagnosis from the existing lookup. code and display are what faculty store."""
+
+    code: str
+    display: str
+
+
+class StudioVocabLabel(BaseModel):
+    """A topic or action the editor can offer. The id is what a fact or objective stores."""
+
+    id: str
+    description: str
+
+
+class StudioVocabManeuver(BaseModel):
+    """An exam maneuver. normal is the catalog sentence, not a finding invented for this patient."""
+
+    id: str
+    label: str
+    normal: str
+
+
+class StudioVocab(BaseModel):
+    """Closed lists for the studio. The values come from the vocab files and the lab catalog."""
+
+    topics: list[StudioVocabLabel]
+    actions: list[StudioVocabLabel]
+    maneuvers: list[StudioVocabManeuver]
+    lab_panels: list[str]
+
+
 class ErrorItem(BaseModel):
     """One validation problem. loc is the same path FastAPI already reported, such as ["body", "description"]."""
 

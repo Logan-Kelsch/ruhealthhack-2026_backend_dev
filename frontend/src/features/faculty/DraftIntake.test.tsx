@@ -343,6 +343,7 @@ test("refresh loads the saved draft and does not create another case", async () 
     expect(container.textContent).toContain("Version 4");
     expect(seen.calls.map((call) => `${call.method} ${call.url}`)).toEqual([
       "GET http://studio.test/api/studio/cases/case_jordan_hale?version=4",
+      "GET http://studio.test/api/studio/vocab",
     ]);
     expect(window.location.search).toBe("?case=case_jordan_hale&version=4");
   } finally {

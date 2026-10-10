@@ -1,0 +1,44 @@
+{
+  "feature_ids": ["V-03", "P-01", "F-01", "F-03", "F-05", "L-03", "L-04"],
+  "base_commit": "035baf4f94e87e5b9f7d92d7961f5e6b63abf97c",
+  "mode": "offline development checks; no new human labels or learner outcomes",
+  "full_suite_initial": {
+    "command": "LLM_ENABLED=false PYTHONPATH=backend python -m pytest -q backend/tests backend_kelsch/tests",
+    "passed": 162,
+    "failed": 1,
+    "elapsed_seconds": 528.09,
+    "failure": "test_baseline_and_logged_llm_comparison: scikit-learn missing in the fresh validation environment"
+  },
+  "dependency_resolution": {
+    "action": "Installed the existing optional notebook/training dependency scikit-learn; no project dependency or code workaround added",
+    "targeted_recheck_passed": 1,
+    "elapsed_seconds": 5.82
+  },
+  "final_new_stage_tests": {
+    "command": "LLM_ENABLED=false PYTHONPATH=backend python -m pytest -q backend_kelsch/tests/test_next_review.py",
+    "passed": 12,
+    "elapsed_seconds": 3.61,
+    "coverage": ["blinding and deduplication", "action/claim/domain round trips", "pending review preservation", "exact original adjudication evidence", "frozen prediction substitution rejection", "changed source rejection", "unsupported claim diagnostic", "ambiguous span omission"]
+  },
+  "combined_coverage": {
+    "existing_tests_passed_across_suite_and_dependency_recheck": 153,
+    "current_new_stage_tests_passed": 12,
+    "unique_tests_with_passing_results": 165,
+    "existing_http_api_tests_passed": 7,
+    "single_final_full_suite_rerun": false
+  },
+  "prepared_handoff": {
+    "action_tasks": 23,
+    "claim_tasks": 41,
+    "domain_tasks": 42,
+    "authored_encounters": 6,
+    "independent_slots": 2,
+    "reviewer_script_syntax_checks": 6,
+    "native_browser_interaction": "NOT RUN",
+    "new_human_reviews_imported": 0,
+    "source_lock": "53f921ea2d47b14fd587a177ea510139322eebf3fc210f38ad37dec9c7a89b68"
+  },
+  "live_bedrock": "NOT RUN",
+  "integrated_voice": "NOT RUN",
+  "observed_learner_mcpt": "NOT EVALUABLE"
+}

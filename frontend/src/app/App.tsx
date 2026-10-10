@@ -5,6 +5,7 @@ import { caseRouteFromSearch, hrefFor, parseHash, routeForScreen, writeHash } fr
 import { Shell } from "../components/Shell";
 import { Welcome } from "../features/welcome/Welcome";
 import { FacultyHome } from "../features/faculty/FacultyHome";
+import { FacultyReview } from "../features/faculty/FacultyReview";
 import { CaseLibrary } from "../features/faculty/CaseLibrary";
 import { ImportPatients } from "../features/faculty/ImportPatients";
 import { CaseStudio } from "../features/faculty/CaseStudio";
@@ -86,7 +87,9 @@ function renderScreen(
     case "welcome":
       return <Welcome go={go} />;
     case "f-home":
-      return <FacultyHome go={go} />;
+      return <FacultyHome go={go} client={client} />;
+    case "f-review":
+      return <FacultyReview go={go} encounterId={route.encounterId} client={client} />;
     case "f-cases":
       return <CaseLibrary go={go} client={client} />;
     case "f-import":

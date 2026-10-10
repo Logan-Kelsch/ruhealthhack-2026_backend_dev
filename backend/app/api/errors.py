@@ -52,6 +52,10 @@ SHARED_ERROR_RESPONSES = {
         404: "No saved encounter with that id.",
         409: "End the encounter before requesting feedback.",
     },
+    ("/api/encounters/{enc_id}/feedback", "patch"): {
+        404: "No saved encounter with that id.",
+        409: "End the encounter before changing feedback.",
+    },
     ("/api/stt/token", "post"): {
         409: "Speech transcription is not configured.",
         503: "The transcription service did not provide a token.",

@@ -655,6 +655,47 @@
         "title": "Code",
         "type": "object"
       },
+      "CommentOverride": {
+        "additionalProperties": false,
+        "description": "A faculty comment on one domain field. The generated comment stays on the rubric.",
+        "properties": {
+          "domain": {
+            "enum": [
+              "opening_and_purpose",
+              "rapport_respect_empathy",
+              "information_gathering",
+              "listening_and_response_to_cues",
+              "explanation_and_shared_decisions",
+              "clinical_reasoning_and_synthesis",
+              "professionalism_safety_closure"
+            ],
+            "title": "Domain",
+            "type": "string"
+          },
+          "field": {
+            "enum": [
+              "strength_demonstrated",
+              "important_gap_or_missed_opportunity",
+              "safety_or_accuracy_concern"
+            ],
+            "title": "Field",
+            "type": "string"
+          },
+          "text": {
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "domain",
+          "field",
+          "text"
+        ],
+        "title": "CommentOverride",
+        "type": "object"
+      },
       "CommunicationMetrics": {
         "description": "Counts from the tagged turns. A ratio stays null when there were no questions to count.",
         "properties": {
@@ -1196,6 +1237,33 @@
         "title": "DomainScore",
         "type": "object"
       },
+      "EncounterList": {
+        "description": "Saved encounters. total counts every match, including rows past limit.",
+        "properties": {
+          "encounters": {
+            "items": {
+              "$ref": "#/components/schemas/EncounterSummary"
+            },
+            "title": "Encounters",
+            "type": "array"
+          },
+          "limit": {
+            "title": "Limit",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "encounters",
+          "total",
+          "limit"
+        ],
+        "title": "EncounterList",
+        "type": "object"
+      },
       "EncounterSummary": {
         "description": "One saved encounter in a list. The transcript stays on the encounter view.",
         "properties": {
@@ -1203,8 +1271,18 @@
             "title": "Case Id",
             "type": "string"
           },
+          "case_title": {
+            "default": "",
+            "title": "Case Title",
+            "type": "string"
+          },
           "encounter_id": {
             "title": "Encounter Id",
+            "type": "string"
+          },
+          "patient_name": {
+            "default": "",
+            "title": "Patient Name",
             "type": "string"
           },
           "previous_encounter_id": {
@@ -1261,6 +1339,11 @@
           },
           "visit_id": {
             "title": "Visit Id",
+            "type": "string"
+          },
+          "visit_label": {
+            "default": "",
+            "title": "Visit Label",
             "type": "string"
           }
         },
@@ -1607,6 +1690,57 @@
         "title": "FactPatch",
         "type": "object"
       },
+      "FeedbackOverrideRequest": {
+        "additionalProperties": false,
+        "description": "The only body a faculty override accepts: scores, comments, or both.",
+        "properties": {
+          "comments": {
+            "items": {
+              "$ref": "#/components/schemas/CommentOverride"
+            },
+            "title": "Comments",
+            "type": "array"
+          },
+          "scores": {
+            "items": {
+              "$ref": "#/components/schemas/ScoreOverride"
+            },
+            "title": "Scores",
+            "type": "array"
+          }
+        },
+        "title": "FeedbackOverrideRequest",
+        "type": "object"
+      },
+      "FeedbackOverrides": {
+        "additionalProperties": false,
+        "description": "Saved faculty changes. They sit beside the generated debrief.",
+        "properties": {
+          "comments": {
+            "items": {
+              "$ref": "#/components/schemas/CommentOverride"
+            },
+            "title": "Comments",
+            "type": "array"
+          },
+          "scores": {
+            "items": {
+              "$ref": "#/components/schemas/ScoreOverride"
+            },
+            "title": "Scores",
+            "type": "array"
+          },
+          "updated_at": {
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "updated_at"
+        ],
+        "title": "FeedbackOverrides",
+        "type": "object"
+      },
       "FeedbackResponse": {
         "description": "The saved debrief: rubric, evidence, trust, the note check, and the counts behind them.",
         "properties": {
@@ -1655,6 +1789,16 @@
           },
           "metrics": {
             "$ref": "#/components/schemas/CommunicationMetrics"
+          },
+          "overrides": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FeedbackOverrides"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "rubric": {
             "$ref": "#/components/schemas/RubricResult"
@@ -3603,6 +3747,41 @@
         "title": "SafetyItem",
         "type": "object"
       },
+      "ScoreOverride": {
+        "additionalProperties": false,
+        "description": "A faculty score for one official domain. It does not replace the generated score.",
+        "properties": {
+          "domain": {
+            "enum": [
+              "opening_and_purpose",
+              "rapport_respect_empathy",
+              "information_gathering",
+              "listening_and_response_to_cues",
+              "explanation_and_shared_decisions",
+              "clinical_reasoning_and_synthesis",
+              "professionalism_safety_closure"
+            ],
+            "title": "Domain",
+            "type": "string"
+          },
+          "score": {
+            "enum": [
+              1,
+              2,
+              3,
+              4,
+              "N/A"
+            ],
+            "title": "Score"
+          }
+        },
+        "required": [
+          "domain",
+          "score"
+        ],
+        "title": "ScoreOverride",
+        "type": "object"
+      },
       "ScribeToken": {
         "description": "One single-use Scribe token. It expires at the provider and is not the API key.",
         "properties": {
@@ -4976,7 +5155,7 @@
     },
     "/api/encounters": {
       "get": {
-        "description": "Saved encounters. The list does not include the transcript or hidden engine state.",
+        "description": "Saved encounters. total counts rows past the limit so a short page is not the whole history.",
         "operationId": "list_encounters_api_encounters_get",
         "parameters": [
           {
@@ -4994,6 +5173,34 @@
               ],
               "title": "Case Id"
             }
+          },
+          {
+            "in": "query",
+            "name": "student_name",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Student Name"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 200,
+              "maximum": 200,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
           }
         ],
         "responses": {
@@ -5001,11 +5208,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/EncounterSummary"
-                  },
-                  "title": "Response List Encounters Api Encounters Get",
-                  "type": "array"
+                  "$ref": "#/components/schemas/EncounterList"
                 }
               }
             },
@@ -5320,7 +5523,7 @@
         ]
       },
       "patch": {
-        "description": "Faculty overrides (score changes, review notes). Kept beside the generated feedback, never merged into it.",
+        "description": "Save a faculty score or comment beside the generated debrief. The generated scores stay as they were.",
         "operationId": "override_feedback_api_encounters__enc_id__feedback_patch",
         "parameters": [
           {
@@ -5337,9 +5540,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "additionalProperties": true,
-                "title": "Overrides",
-                "type": "object"
+                "$ref": "#/components/schemas/FeedbackOverrideRequest"
               }
             }
           },
@@ -5350,13 +5551,31 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Override Feedback Api Encounters  Enc Id  Feedback Patch",
-                  "type": "object"
+                  "$ref": "#/components/schemas/FeedbackResponse"
                 }
               }
             },
             "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No saved encounter with that id."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "End the encounter before changing feedback."
           },
           "422": {
             "content": {

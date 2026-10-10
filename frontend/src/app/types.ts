@@ -5,6 +5,7 @@ export type ScreenId =
   | "f-cases"
   | "f-import"
   | "f-studio"
+  | "f-review"
   | "s-home"
   | "s-brief"
   | "s-mic"
@@ -51,6 +52,7 @@ const SCREENS: ScreenId[] = [
   "f-cases",
   "f-import",
   "f-studio",
+  "f-review",
   "s-home",
   "s-brief",
   "s-mic",
@@ -94,8 +96,14 @@ export function screenFromHash(hash: string): ScreenId | null {
   return parseHash(hash).screen;
 }
 
-// Student screens keep the case in the URL. Other screens do not carry an encounter forward.
+// Student screens keep the case in the URL. Faculty review keeps only the encounter it opened.
 export function routeForScreen(screen: ScreenId, current: StudentRoute, opts?: GoOpts): StudentRoute {
+  if (screen === "f-review") {
+    return {
+      ...emptyStudentRoute,
+      encounterId: opts?.encounterId ?? current.encounterId,
+    };
+  }
   if (!screen.startsWith("s-") || screen === "s-home") {
     return emptyStudentRoute;
   }

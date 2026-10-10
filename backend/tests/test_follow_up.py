@@ -113,21 +113,21 @@ def test_two_prior_paths_apply_the_authored_follow_up(tmp_path, load_golden):
     assert WITHHELD_SAY not in str(missed)
 
     # A refresh reads the same follow-up. It does not start another visit.
-    before = {row["encounter_id"] for row in client.get("/api/encounters").json()}
+    before = {row["encounter_id"] for row in client.get("/api/encounters").json()["encounters"]}
     again = client.get(f"/api/encounters/{improved['encounter_id']}")
     assert again.status_code == 200
     assert again.json()["encounter_id"] == improved["encounter_id"]
     assert again.json()["previous_encounter_id"] == improved_id
     assert again.json()["case_version"] == 1
     assert next(item for item in again.json()["chart"] if item["ref"] == "bp")["value"].startswith("142/86")
-    assert {row["encounter_id"] for row in client.get("/api/encounters").json()} == before
+    assert {row["encounter_id"] for row in client.get("/api/encounters").json()["encounters"]} == before
 
 
 def _ids(client: TestClient) -> set[str]:
     """Encounter ids that exist. A rejected continuation must not add one."""
     listed = client.get("/api/encounters")
     assert listed.status_code == 200
-    return {row["encounter_id"] for row in listed.json()}
+    return {row["encounter_id"] for row in listed.json()["encounters"]}
 
 
 def test_debrief_paths_are_public_and_a_bad_continuation_is_rejected(tmp_path, load_golden):

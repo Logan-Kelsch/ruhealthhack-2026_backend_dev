@@ -73,7 +73,7 @@ export interface paths {
         };
         /**
          * List Encounters
-         * @description Saved encounters. The list does not include the transcript or hidden engine state.
+         * @description Saved encounters. total counts rows past the limit so a short page is not the whole history.
          */
         get: operations["list_encounters_api_encounters_get"];
         put?: never;
@@ -167,7 +167,7 @@ export interface paths {
         head?: never;
         /**
          * Override Feedback
-         * @description Faculty overrides (score changes, review notes). Kept beside the generated feedback, never merged into it.
+         * @description Save a faculty score or comment beside the generated debrief. The generated scores stay as they were.
          */
         patch: operations["override_feedback_api_encounters__enc_id__feedback_patch"];
         trace?: never;
@@ -844,6 +844,24 @@ export interface components {
             system: "ICD-10-CM" | "LOINC" | "RxNorm" | "SNOMED-CT";
         };
         /**
+         * CommentOverride
+         * @description A faculty comment on one domain field. The generated comment stays on the rubric.
+         */
+        CommentOverride: {
+            /**
+             * Domain
+             * @enum {string}
+             */
+            domain: "opening_and_purpose" | "rapport_respect_empathy" | "information_gathering" | "listening_and_response_to_cues" | "explanation_and_shared_decisions" | "clinical_reasoning_and_synthesis" | "professionalism_safety_closure";
+            /**
+             * Field
+             * @enum {string}
+             */
+            field: "strength_demonstrated" | "important_gap_or_missed_opportunity" | "safety_or_accuracy_concern";
+            /** Text */
+            text: string;
+        };
+        /**
          * CommunicationMetrics
          * @description Counts from the tagged turns. A ratio stays null when there were no questions to count.
          */
@@ -1082,14 +1100,36 @@ export interface components {
             strength_demonstrated: string;
         };
         /**
+         * EncounterList
+         * @description Saved encounters. total counts every match, including rows past limit.
+         */
+        EncounterList: {
+            /** Encounters */
+            encounters: components["schemas"]["EncounterSummary"][];
+            /** Limit */
+            limit: number;
+            /** Total */
+            total: number;
+        };
+        /**
          * EncounterSummary
          * @description One saved encounter in a list. The transcript stays on the encounter view.
          */
         EncounterSummary: {
             /** Case Id */
             case_id: string;
+            /**
+             * Case Title
+             * @default
+             */
+            case_title: string;
             /** Encounter Id */
             encounter_id: string;
+            /**
+             * Patient Name
+             * @default
+             */
+            patient_name: string;
             /** Previous Encounter Id */
             previous_encounter_id?: string | null;
             /**
@@ -1110,6 +1150,11 @@ export interface components {
             student_name: string;
             /** Visit Id */
             visit_id: string;
+            /**
+             * Visit Label
+             * @default
+             */
+            visit_label: string;
         };
         /**
          * ErrorItem
@@ -1235,6 +1280,28 @@ export interface components {
             value?: number | string | null;
         };
         /**
+         * FeedbackOverrideRequest
+         * @description The only body a faculty override accepts: scores, comments, or both.
+         */
+        FeedbackOverrideRequest: {
+            /** Comments */
+            comments?: components["schemas"]["CommentOverride"][];
+            /** Scores */
+            scores?: components["schemas"]["ScoreOverride"][];
+        };
+        /**
+         * FeedbackOverrides
+         * @description Saved faculty changes. They sit beside the generated debrief.
+         */
+        FeedbackOverrides: {
+            /** Comments */
+            comments?: components["schemas"]["CommentOverride"][];
+            /** Scores */
+            scores?: components["schemas"]["ScoreOverride"][];
+            /** Updated At */
+            updated_at: string;
+        };
+        /**
          * FeedbackResponse
          * @description The saved debrief: rubric, evidence, trust, the note check, and the counts behind them.
          */
@@ -1255,6 +1322,7 @@ export interface components {
             /** Llm Calls */
             llm_calls?: components["schemas"]["LlmCallRecord"][];
             metrics: components["schemas"]["CommunicationMetrics"];
+            overrides?: components["schemas"]["FeedbackOverrides"] | null;
             rubric: components["schemas"]["RubricResult"];
             /** Safety */
             safety?: components["schemas"]["SafetyItem"][];
@@ -2023,6 +2091,22 @@ export interface components {
             text: string;
         };
         /**
+         * ScoreOverride
+         * @description A faculty score for one official domain. It does not replace the generated score.
+         */
+        ScoreOverride: {
+            /**
+             * Domain
+             * @enum {string}
+             */
+            domain: "opening_and_purpose" | "rapport_respect_empathy" | "information_gathering" | "listening_and_response_to_cues" | "explanation_and_shared_decisions" | "clinical_reasoning_and_synthesis" | "professionalism_safety_closure";
+            /**
+             * Score
+             * @enum {unknown}
+             */
+            score: 1 | 2 | 3 | 4 | "N/A";
+        };
+        /**
          * ScribeToken
          * @description One single-use Scribe token. It expires at the provider and is not the API key.
          */
@@ -2582,6 +2666,8 @@ export interface operations {
         parameters: {
             query?: {
                 case_id?: string | null;
+                student_name?: string | null;
+                limit?: number;
             };
             header?: never;
             path?: never;
@@ -2595,7 +2681,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["EncounterSummary"][];
+                    "application/json": components["schemas"]["EncounterList"];
                 };
             };
             /** @description Validation error */
@@ -2844,9 +2930,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": {
-                    [key: string]: unknown;
-                };
+                "application/json": components["schemas"]["FeedbackOverrideRequest"];
             };
         };
         responses: {
@@ -2856,9 +2940,25 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["FeedbackResponse"];
+                };
+            };
+            /** @description No saved encounter with that id. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description End the encounter before changing feedback. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description Validation error */

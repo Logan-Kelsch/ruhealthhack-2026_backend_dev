@@ -200,7 +200,7 @@ def test_recovery_returns_the_same_encounter(client):
     _assert_student_safe(recovered)
 
     listed = client.get("/api/encounters", params={"case_id": "walter_greene"}).json()
-    row = next(item for item in listed if item["encounter_id"] == encounter_id)
+    row = next(item for item in listed["encounters"] if item["encounter_id"] == encounter_id)
     assert row["status"] == "active"
     assert row["visit_id"] == "v1"
     assert row["student_name"] == "Sam"
@@ -248,7 +248,7 @@ def test_recovery_returns_the_same_encounter(client):
     paths = app.openapi()["paths"]
     assert paths["/api/encounters"]["post"]["responses"]["201"]["content"]["application/json"]["schema"]["$ref"] == "#/components/schemas/PublicEncounter"
     assert paths["/api/encounters/{enc_id}"]["get"]["responses"]["200"]["content"]["application/json"]["schema"]["$ref"] == "#/components/schemas/PublicEncounter"
-    assert paths["/api/encounters"]["get"]["responses"]["200"]["content"]["application/json"]["schema"]["items"]["$ref"] == "#/components/schemas/EncounterSummary"
+    assert paths["/api/encounters"]["get"]["responses"]["200"]["content"]["application/json"]["schema"]["$ref"] == "#/components/schemas/EncounterList"
     assert paths["/api/encounters/{enc_id}/utterances"]["post"]["responses"]["200"]["content"]["application/json"]["schema"]["$ref"] == "#/components/schemas/TurnResult"
     encounter_schema = app.openapi()["components"]["schemas"]["PublicEncounter"]
     assert {"transcript", "last_turn", "started_at", "ended_at", "previous_encounter_id"} <= set(encounter_schema["properties"])

@@ -5,6 +5,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime, timezone
 
+from pydantic import ValidationError
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
@@ -16,8 +17,9 @@ from app.integrations.bedrock import llm_available
 from app.latency import assemble_sample
 from app.models import CaseRow, EncounterRow, TurnRow
 from app.schemas.case import Case
+from app.schemas.feedback import FeedbackOverrideRequest, FeedbackOverrides
 from app.schemas.latency import TurnTimingCapture, TurnTimingSample
-from app.schemas.student import EncounterSummary, TurnResult
+from app.schemas.student import EncounterList, EncounterSummary, TurnResult
 from app.student_view import _encounter_status, public_encounter, public_turn
 from app.studio import publish as publish_rules
 
@@ -332,31 +334,84 @@ def submit_documentation(db: Session, enc_id: str, fields: dict[str, str]) -> di
     return build_feedback(db, enc)
 
 
+def _saved_overrides(raw: dict | None) -> dict | None:
+    """Turn the stored override into the response shape. An empty column means faculty have not changed anything."""
+    if not raw:
+        return None
+    return FeedbackOverrides.model_validate(raw).model_dump()
+
+
 def get_feedback(db: Session, enc_id: str) -> dict:
     """Return the saved debrief. An active visit has none yet, and this does not create an encounter."""
     enc = get_encounter(db, enc_id)
     if enc.status == "active":
         raise Conflict("end the encounter first")
     fb = enc.feedback or build_feedback(db, enc)
-    return {**fb, "overrides": enc.feedback_overrides or {}}
+    # The generated debrief stays intact. Faculty changes are a sibling field.
+    return {**fb, "overrides": _saved_overrides(enc.feedback_overrides)}
 
 
-def override_feedback(db: Session, enc_id: str, overrides: dict) -> dict:
+def override_feedback(db: Session, enc_id: str, body: FeedbackOverrideRequest) -> dict:
+    """Store a score or comment next to the generated debrief, then return both."""
     enc = get_encounter(db, enc_id)
-    enc.feedback_overrides = {**(enc.feedback_overrides or {}), **overrides, "updated_at": _now().isoformat()}
+    if enc.status == "active":
+        raise Conflict("end the encounter first")
+    if not enc.feedback:
+        # Ended visits are scored on first read. The override is not itself a score.
+        build_feedback(db, enc)
+        enc = get_encounter(db, enc_id)
+    current = FeedbackOverrides.model_validate(enc.feedback_overrides) if enc.feedback_overrides else None
+    # A later change replaces only the domain or comment it names. Earlier faculty changes stay.
+    scores = {item.domain: item for item in (current.scores if current else [])}
+    for item in body.scores:
+        scores[item.domain] = item
+    comments = {(item.domain, item.field): item for item in (current.comments if current else [])}
+    for item in body.comments:
+        comments[(item.domain, item.field)] = item
+    saved = FeedbackOverrides(
+        scores=list(scores.values()),
+        comments=list(comments.values()),
+        updated_at=_now().isoformat(),
+    )
+    enc.feedback_overrides = saved.model_dump()
+    # The generated feedback column is not written here.
     db.commit()
-    return enc.feedback_overrides
+    return get_feedback(db, enc_id)
 
 
-def list_encounters(db: Session, case_id: str | None = None) -> list[EncounterSummary]:
-    """Saved encounters for one case, or every case when no id is given. Hidden state stays off the row."""
-    q = select(EncounterRow).order_by(EncounterRow.started_at.desc())
+def _summary_names(enc: EncounterRow) -> tuple[str, str, str]:
+    """Patient, title, and visit label from the saved snapshot. A bad snapshot still leaves the ids on the row."""
+    try:
+        case = Case.model_validate(enc.visit_doc)
+    except ValidationError:
+        return "", "", ""
+    visit = case.visit(enc.visit_id)
+    return case.profile.name, case.title, visit.label if visit else ""
+
+
+def list_encounters(
+    db: Session,
+    case_id: str | None = None,
+    student_name: str | None = None,
+    limit: int = 200,
+) -> EncounterList:
+    """Saved encounters for one case, one student, or every saved visit. Hidden state stays off the row."""
+    clauses = []
     if case_id:
-        q = q.where(EncounterRow.case_id == case_id)
+        clauses.append(EncounterRow.case_id == case_id)
+    if student_name is not None:
+        clauses.append(EncounterRow.student_name == student_name)
+    count_query = select(func.count()).select_from(EncounterRow)
+    rows = select(EncounterRow).order_by(EncounterRow.started_at.desc())
+    for clause in clauses:
+        count_query = count_query.where(clause)
+        rows = rows.where(clause)
+    total = int(db.scalar(count_query) or 0)
     out: list[EncounterSummary] = []
-    for enc in db.scalars(q.limit(200)):
+    for enc in db.scalars(rows.limit(limit)):
         rubric = (enc.feedback or {}).get("rubric") or {}
-        total = rubric.get("total")
+        rubric_total = rubric.get("total")
+        patient_name, case_title, visit_label = _summary_names(enc)
         out.append(
             EncounterSummary(
                 encounter_id=enc.id,
@@ -365,9 +420,12 @@ def list_encounters(db: Session, case_id: str | None = None) -> list[EncounterSu
                 student_name=enc.student_name,
                 status=_encounter_status(enc.status),
                 started_at=enc.started_at,
-                rubric_total=total if isinstance(total, int) else None,
+                rubric_total=rubric_total if isinstance(rubric_total, int) else None,
                 review_flag=bool(rubric.get("review_flag", False)),
                 previous_encounter_id=enc.previous_encounter_id,
+                patient_name=patient_name,
+                case_title=case_title,
+                visit_label=visit_label,
             )
         )
-    return out
+    return EncounterList(encounters=out, total=total, limit=limit)

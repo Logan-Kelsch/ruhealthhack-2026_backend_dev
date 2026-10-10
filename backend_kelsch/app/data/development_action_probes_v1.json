@@ -1,0 +1,16 @@
+{
+  "version": "development_action_probes_v1",
+  "source_kind": "authored_engineering_fixture",
+  "generation": "Hand-authored hypothetical student utterances and expected action tags from the closed action vocabulary. Not clinical recommendations, independent annotations, training data, or learner observations.",
+  "vocabulary_source": "backend/app/vocab/actions.yaml",
+  "probes": [
+    {"id": "antibiotic_positive", "case_id": "eli_brooks", "text": "I will prescribe an antibiotic.", "expected_actions": ["prescribe_antibiotic", "start_medication"]},
+    {"id": "antibiotic_negative", "case_id": "eli_brooks", "text": "I will not prescribe an antibiotic.", "expected_actions": []},
+    {"id": "medication_positive", "case_id": "alina_reyes", "text": "I will start you on a new medication.", "expected_actions": ["start_medication"]},
+    {"id": "medication_negative", "case_id": "alina_reyes", "text": "I will not start you on a new medication.", "expected_actions": []},
+    {"id": "safety_positive", "case_id": "eli_brooks", "text": "Come back if things get worse.", "expected_actions": ["safety_netting"]},
+    {"id": "safety_negative", "case_id": "eli_brooks", "text": "I have not explained any warning signs yet.", "expected_actions": []},
+    {"id": "uncertain_medication", "case_id": "alina_reyes", "text": "I'm not sure what to do about medication.", "expected_actions": []},
+    {"id": "neutral", "case_id": "walter_greene", "text": "What worries you most?", "expected_actions": []}
+  ]
+}

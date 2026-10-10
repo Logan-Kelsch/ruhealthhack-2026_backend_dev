@@ -673,7 +673,7 @@ Suggested by JJ and accepted, with additions. Details are in `PRD.md` section 10
 - **Frontend:** TypeScript, React (Vite), Tailwind CSS, reusable components (shadcn/ui), React Flow (tree), Recharts (charts), optionally React Three Fiber (3D figure).
 - **Database:** local Postgres (Docker Compose), moving to **AWS RDS** by changing `DATABASE_URL`.
 - **Config** from `.env`. The code is modular and not over-engineered.
-- **AI:** AWS Bedrock (Claude models) via boto3. A Claude test call through Bedrock succeeded in us-east-1. Model IDs are configured, not hard-coded.
+- **AI:** AWS Bedrock (Claude models; optional Nova Micro for the fast tier) via boto3. A Claude test call through Bedrock succeeded in us-east-1. Model IDs are configured, not hard-coded. Nova Micro is a speed-focused candidate; run the golden-case audit before using it in a demo.
 
 ### Voice and avatar
 - **Iteration 1** (no video), always-on voice:

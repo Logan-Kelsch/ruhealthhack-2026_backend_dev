@@ -49,6 +49,8 @@ Resources:
         why: >-
           Everything the application calls in AWS, in one place. Attached to both the instance
           role and the shared laptop user, so laptops can do exactly what the deployed app can.
+          Bedrock permits Claude and Nova Micro; cross-region profiles also need permission
+          for their destination foundation models.
         must:
           - Application services only. Never add IAM, EC2, or wildcard actions; the laptop key sits in a shared .env.
     Properties:
@@ -62,6 +64,7 @@ Resources:
             Resource:
               # Cross-region inference profiles route to foundation models in other regions.
               - !Sub "arn:${AWS::Partition}:bedrock:*::foundation-model/anthropic.*"
+              - !Sub "arn:${AWS::Partition}:bedrock:*::foundation-model/amazon.nova-micro-v1:0"
               - !Sub "arn:${AWS::Partition}:bedrock:*:${AWS::AccountId}:inference-profile/*"
           - Sid: MediaObjects
             Effect: Allow

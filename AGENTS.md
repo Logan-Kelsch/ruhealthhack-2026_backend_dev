@@ -62,7 +62,7 @@ Working product name is **Rounds** (may change); keep writing `[Product name]` i
 - **Backend:** Python 3.12, FastAPI, Pydantic v2, SQLAlchemy 2, Alembic, boto3, pytest.
 - **Frontend:** React + TypeScript (Vite), Tailwind, shadcn/ui, React Flow, Recharts.
 - **Database:** Postgres (Docker locally, RDS in the cloud).
-- **AI:** AWS Bedrock (Claude).
+- **AI:** AWS Bedrock (Claude; optional Nova Micro for the fast tier).
 - **Voice:** ElevenLabs (Scribe v2 Realtime STT, Eleven v4 / v4 Turbo TTS).
 - **Avatar:** Tavus (iteration 2).
 

@@ -97,6 +97,19 @@ def deterministic_checks(
     return problems
 
 
+def _valid_response(data: object) -> bool:
+    return (
+        isinstance(data, dict)
+        and isinstance(data.get("unsupported"), list)
+        and all(
+            isinstance(item, dict)
+            and all(isinstance(item.get(key), str) and bool(item[key].strip())
+                    for key in ("sentence", "new_claim", "reason"))
+            for item in data["unsupported"]
+        )
+    )
+
+
 def judge(case: Case, reply: str, allowed: list[str], previously_disclosed: list[str], student_said: str = "") -> tuple[list[str], LLMCall]:
     facts = [case.fact(i) for i in list(dict.fromkeys(allowed + previously_disclosed))]
     facts_payload = [{"id": f.id, "say": fact_line(f), "chart_truth": f.text} for f in facts if f is not None]
@@ -108,11 +121,12 @@ def judge(case: Case, reply: str, allowed: list[str], previously_disclosed: list
         f"REPLY TO CHECK:\n{json.dumps(reply)}"
     )
     try:
-        data, call = complete_json(purpose="verify", prompt_name="verifier", user=user, max_tokens=500)
+        data, call = complete_json(purpose="verify", prompt_name="verifier", user=user,
+                                  max_tokens=500, response_validator=_valid_response)
     except LLMUnavailable as exc:
         failed = last_failed_call("verify")
         raise LLMUnavailable(failed.error if failed else "verifier failed", call=failed or exc.call) from None
-    if not isinstance(data, dict) or not isinstance(data.get("unsupported"), list):
+    if not _valid_response(data):
         return ["unreadable judge output"], call
     problems = []
     for u in data.get("unsupported", []):

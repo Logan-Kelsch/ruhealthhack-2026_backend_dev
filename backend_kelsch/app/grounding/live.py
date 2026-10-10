@@ -176,7 +176,7 @@ def evaluate(*, mode: str = "offline", pricing_path: Path | None = None) -> tupl
         row["latency_ms"] = int((perf_counter() - t0) * 1000)
         challenge_counts.update(result["counts"])
         call = row["llm_judge"]["call"]
-        row["llm_calls"] = [call] if call else []
+        row["llm_calls"] = row["llm_judge"].get("calls", [call] if call else [])
         all_calls.extend(row["llm_calls"])
         row["semantic_status"] = "mechanically_blocked" if row["deterministic_blocked"] else (
             "unchecked_semantic" if row["llm_judge"]["status"] != "EVALUATED" else

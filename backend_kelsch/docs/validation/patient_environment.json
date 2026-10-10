@@ -11,7 +11,7 @@
       "sha256": "624f4713b587550865b5a6a378de6f3c678b13454ee3c0af26a5ffe7d5728c98"
     },
     "PRD.md \u00a79.1, \u00a79.3, \u00a79.4, V-01/V-02/V-04",
-    "docs/validation/action_data.json"
+    "backend_kelsch/docs/validation/action_data.json"
   ],
   "checks": {
     "premature_disclosure": {

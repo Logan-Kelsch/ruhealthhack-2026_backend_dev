@@ -4,7 +4,7 @@
   "sources": [
     {
       "id": "faculty_patient_seed_csv",
-      "path": "backend/app/data/source_fixtures/faculty-provided-sample-patient-details.csv",
+      "path": "backend_kelsch/app/data/source_fixtures/faculty-provided-sample-patient-details.csv",
       "format": "csv",
       "kind": "patient_profile_seed",
       "origin": "Event-provided faculty sample",
@@ -37,7 +37,7 @@
     },
     {
       "id": "pediatric_aural_rehabilitation_rubric",
-      "path": "backend/app/data/source_fixtures/pediatric_treatment_rubric.docx",
+      "path": "backend_kelsch/app/data/source_fixtures/pediatric_treatment_rubric.docx",
       "format": "docx_rubric",
       "kind": "specialty_skill_rubric",
       "origin": "Rutgers SHP Speech-Language Pathology pediatric treatment simulation rubric, event-provided",
@@ -49,7 +49,7 @@
     },
     {
       "id": "sample_clinician_personas",
-      "path": "backend/app/data/source_fixtures",
+      "path": "backend_kelsch/app/data/source_fixtures",
       "glob": "sample_clinician-*.json",
       "format": "json_profile",
       "kind": "clinician_role_personas",

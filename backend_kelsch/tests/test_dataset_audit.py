@@ -1,7 +1,7 @@
 """Meaningful integrity checks for the supplied-data audit gate."""
 from pathlib import Path
 
-from scripts.audit_datasets import build_report, load_json_objects
+from backend_kelsch.scripts.audit_datasets import build_report, load_json_objects
 
 ROOT = Path(__file__).resolve().parents[2]
 

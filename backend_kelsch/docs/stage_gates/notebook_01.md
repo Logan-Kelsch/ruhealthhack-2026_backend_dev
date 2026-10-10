@@ -23,14 +23,14 @@ Record which supplied sources are present, how they are structured, how they rel
 
 ## Commands
 
-From `backend/`:
+From the repository root with the existing backend on `PYTHONPATH`:
 
 ```bash
-python -m scripts.audit_datasets
-python -m pytest tests/test_dataset_audit.py -q
+LLM_ENABLED=false PYTHONPATH=backend python -m backend_kelsch.scripts.audit_datasets
+LLM_ENABLED=false PYTHONPATH=backend python -m pytest backend_kelsch/tests/test_dataset_audit.py -q
 ```
 
-For the explanatory notebook, install `backend/requirements-notebooks.txt`, then open and run `notebooks/01_dataset_audit.ipynb` from the repository root.
+For the explanatory notebook, install `backend_kelsch/requirements-notebooks.txt`, then open and run `backend_kelsch/notebooks/01_dataset_audit.ipynb` from the repository root.
 
 ## Advancement
 

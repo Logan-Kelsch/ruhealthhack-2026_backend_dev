@@ -1,6 +1,6 @@
 # Notebook 02: action-data preparation (P-01, F-01, F-03)
 
-Run from `backend`: `python -m scripts.prepare_action_data`.
+Run from the repository root: `LLM_ENABLED=false PYTHONPATH=backend python -m backend_kelsch.scripts.prepare_action_data`.
 Install `requirements-notebooks.txt` to execute the notebook and optional baseline.
 The production intent classifier, case schema, API and vocabularies are unchanged.
 Research labels live in `action_annotation_vocab.json`; student action IDs mirror the

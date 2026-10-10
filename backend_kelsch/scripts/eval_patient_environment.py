@@ -1,6 +1,6 @@
 """Run deterministic, authored probes; no external dialogue or model calls.
 
-From the repository root: LLM_ENABLED=false PYTHONPATH=backend python -m scripts.eval_patient_environment
+From the repository root: LLM_ENABLED=false PYTHONPATH=backend python -m backend_kelsch.scripts.eval_patient_environment
 """
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ import json
 from pathlib import Path
 
 from app.encounter.verifier import deterministic_checks
-from app.patient_environment.runner import (
+from backend_kelsch.app.patient_environment.runner import (
     PRESET_OFFSETS, case_source, fact_for_role, fingerprint, replay, run_script,
     tagged_turn, with_probe_preset,
 )
@@ -94,7 +94,7 @@ def evaluate() -> dict:
     counts = {p: len(t["final_state"]["disclosed"]) for p, t in traces.items()}
     passed = sum(c["status"] == "PASS" for c in checks.values())
     return {"stage": "Notebook 03", "method": "authored deterministic probes; no trained extractor",
-        "sources": [source, alina_source, "PRD.md §9.1, §9.3, §9.4, V-01/V-02/V-04", "docs/validation/action_data.json"],
+        "sources": [source, alina_source, "PRD.md §9.1, §9.3, §9.4, V-01/V-02/V-04", "backend_kelsch/docs/validation/action_data.json"],
         "checks": checks, "passed": passed, "total": len(checks),
         "discovery_counts_by_probe_preset": counts,
         "gates": {

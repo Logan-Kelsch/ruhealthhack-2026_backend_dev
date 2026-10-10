@@ -1,5 +1,6 @@
 {
-  "format": "clinical_script_review_v1",
+  "format": "clinical_script_review_v2",
+  "debrief_delivery": "after_encounter",
   "scenario_id": 1,
   "title": "Fever and respiratory symptoms",
   "patient": {
@@ -16,7 +17,9 @@
   "learner_role": "medical student under supervision",
   "teaching_notes": [
     "Use the fixed suggested sequence for a coherent rehearsal.",
-    "This is an authored demonstration, not a diagnosis or grading engine."
+    "This is an authored demonstration, not a diagnosis or grading engine.",
+    "Complete or explicitly end the student-patient conversation before opening the separate debrief.",
+    "The debrief reviews completed transcript evidence. evidence_turn identifies an exchange to review; it never triggers feedback during the conversation."
   ],
   "sources": [
     {
@@ -87,7 +90,7 @@
         {
           "id": "pneumonia.testing",
           "label": "Specimens",
-          "text": "Urine antigen and lower respiratory specimen requested; results pending. No positive result is assumed.",
+          "text": "Urine antigen and lower respiratory specimen requested; results pending.",
           "source": "https://www.cdc.gov/legionella/hcp/clinical-guidance/index.html",
           "urgent": false
         }
@@ -106,19 +109,19 @@
   ],
   "debrief": [
     {
-      "after_turn": 4,
+      "evidence_turn": 4,
       "rubric_domain": "Information gathering",
-      "question": "What information from the travel history would you carry into your assessment, and what still needs confirmation?"
+      "question": "Looking back at the completed encounter, which details influenced your assessment, and which parts of your explanation remained uncertain?"
     },
     {
-      "after_turn": 6,
+      "evidence_turn": 6,
       "rubric_domain": "Clinical reasoning and synthesis",
-      "question": "Which findings affect the urgency of your plan, independent of the eventual cause?"
+      "question": "When reviewing the examination findings, what influenced how quickly you sought help, and what would you prioritize in a similar encounter?"
     },
     {
-      "after_turn": 9,
+      "evidence_turn": 9,
       "rubric_domain": "Explanation and shared decisions",
-      "question": "How would you explain why a treatment is being considered without presenting an unconfirmed cause as certain?"
+      "question": "Review your treatment discussion. How clearly did you separate known findings from working explanations, and what wording would you improve next time?"
     }
   ]
 }

@@ -1,5 +1,6 @@
 {
-  "format": "clinical_script_review_v1",
+  "format": "clinical_script_review_v2",
+  "debrief_delivery": "after_encounter",
   "scenario_id": 3,
   "title": "Nausea, fatigue, and chest unease",
   "patient": {
@@ -17,7 +18,9 @@
   "learner_role": "medical student under supervision",
   "teaching_notes": [
     "Use the fixed suggested sequence for a coherent rehearsal.",
-    "This is an authored demonstration, not a diagnosis or grading engine."
+    "This is an authored demonstration, not a diagnosis or grading engine.",
+    "Complete or explicitly end the student-patient conversation before opening the separate debrief.",
+    "The debrief reviews completed transcript evidence. evidence_turn identifies an exchange to review; it never triggers feedback during the conversation."
   ],
   "sources": [
     {
@@ -47,7 +50,7 @@
         {
           "id": "cardiac.vitals",
           "label": "Vital signs",
-          "text": "Blood pressure 132/84 mmHg; heart rate 96/min; respiratory rate 22/min; oxygen saturation 97% on room air. Authored snapshot, not a reassurance of cardiac safety.",
+          "text": "Blood pressure 132/84 mmHg; heart rate 96/min; respiratory rate 22/min; oxygen saturation 97% on room air.",
           "source": "Authored example values",
           "urgent": false
         },
@@ -88,24 +91,24 @@
   ],
   "debrief": [
     {
-      "after_turn": 1,
+      "evidence_turn": 1,
       "rubric_domain": "Clinical reasoning and synthesis",
-      "question": "What alternative explanations deserve attention before accepting the patient initial explanation?"
+      "question": "After reviewing the completed encounter, how did the patient's initial explanation influence your thinking, and what other possibilities would you keep open next time?"
     },
     {
-      "after_turn": 3,
+      "evidence_turn": 3,
       "rubric_domain": "Information gathering",
-      "question": "Which parts of the history justified early testing rather than a longer interview first?"
+      "question": "Reflect on the timing of your initial assessment. Which information made prompt testing worth prioritizing over a longer interview?"
     },
     {
-      "after_turn": 5,
+      "evidence_turn": 5,
       "rubric_domain": "Clinical reasoning and synthesis",
-      "question": "What evidence changed the urgency of your plan, and how would you communicate it in a handover?"
+      "question": "Looking back, which findings changed your plan, and how clearly did your handover communicate the urgency?"
     },
     {
-      "after_turn": 6,
+      "evidence_turn": 6,
       "rubric_domain": "Rapport, respect, and empathy",
-      "question": "How can you acknowledge fear while avoiding premature reassurance?"
+      "question": "Review your response to the patient's fear. How did your words acknowledge it without promising an outcome, and what would you refine next time?"
     }
   ]
 }

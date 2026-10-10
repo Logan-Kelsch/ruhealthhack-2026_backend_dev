@@ -108,7 +108,7 @@ only once and place chart findings at their release turn. After edits, run
 `PYTHONPATH=backend python -m scripts.update_scripted_clinical_demo <file1.json> <file2.json> <file3.json>`
 from the repository root. Add `--check` for a validation preview. The importer
 generates internal citations, release references, timing, and changed case versions;
-new preparations use the result. The folder README covers partial imports and exports.
+new preparations use the result. The folder README covers partial imports and exports. Current review files use `clinical_script_review_v2`, explicitly set `debrief_delivery: "after_encounter"`, and use `evidence_turn` to cite completed exchanges. Original v1 files with `after_turn` still import; new exports use the updated labels.
 
 `backend/app/data/scripted_clinical_demo_v1.json` contains the three complete authored snapshots. `ScriptFixture` in `backend/app/schemas/demo.py` validates contiguous steps, exact authored dialogue sources, chart release references, and debrief anchors. `PatientMetadata` and `MetadataExtraction` are the interchangeable metadata contracts.
 
@@ -124,7 +124,7 @@ The debrief is a separate phase after the conversation has ended. During the enc
 
 Call `POST /api/demo/sessions/{sid}/end` to close the conversation, then call `GET /api/demo/sessions/{sid}/debrief` and render that response outside the conversation transcript. The debrief read never ends an active encounter; it returns 409 for both active and ready-to-end sessions. Explicit early ending is allowed and reviews only exchanges that occurred. Repeated debrief reads are stable and do not advance dialogue.
 
-Questions are linked to official seven-domain rubric IDs and the exact submitted student text and delivered patient reply at their anchor turn. `anchor_step` (runtime) and `after_turn` (review JSON) identify transcript evidence, not during-conversation feedback triggers. The debrief invites reflection rather than printing the final diagnosis or expected antibiotic. It is **scripted guided reflection**, not a validated PEARLS implementation, a conversational tutor, or an automated assessment of mistakes. Safety reasoning is reviewed retrospectively in the ended-session debrief. The chart retains its authored urgency flags during the encounter. N/A/numeric scoring belongs to the existing production scorer; this rehearsal assigns no score.
+Questions are linked to official seven-domain rubric IDs and the exact submitted student text and delivered patient reply at their anchor turn. `anchor_step` (runtime) and `evidence_turn` (review JSON) identify transcript evidence, not during-conversation feedback triggers. The debrief invites reflection rather than printing the final diagnosis or expected antibiotic. It is **scripted guided reflection**, not a validated PEARLS implementation, a conversational tutor, or an automated assessment of mistakes. Safety reasoning is reviewed retrospectively in the ended-session debrief. The chart retains its authored urgency flags during the encounter. N/A/numeric scoring belongs to the existing production scorer; this rehearsal assigns no score.
 
 ## Reproduce the HTTP rehearsal
 

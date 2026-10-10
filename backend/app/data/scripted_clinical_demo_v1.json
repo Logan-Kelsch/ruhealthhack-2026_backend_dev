@@ -4,7 +4,7 @@
     {
       "schema_version": "scripted_clinical_demo_v1",
       "scenario_id": 1,
-      "fixture_version": 1,
+      "fixture_version": 2,
       "title": "Fever and respiratory symptoms",
       "clinical_review_status": "pending",
       "provenance": "authored_synthetic_script",
@@ -24,7 +24,9 @@
         "learner_role": "medical student under supervision",
         "teaching_notes": [
           "Use the fixed suggested sequence for a coherent rehearsal.",
-          "This is an authored demonstration, not a diagnosis or grading engine."
+          "This is an authored demonstration, not a diagnosis or grading engine.",
+          "Complete or explicitly end the student-patient conversation before opening the separate debrief.",
+          "The debrief reviews completed transcript evidence. evidence_turn identifies an exchange to review; it never triggers feedback during the conversation."
         ],
         "sources": [
           {
@@ -190,30 +192,30 @@
       "chart": [
         {
           "id": "pneumonia.vitals",
-          "release_step": 6,
           "label": "Vital signs",
           "text": "Temperature 39.1 C; heart rate 108/min; respiratory rate 26/min; blood pressure 116/72 mmHg; oxygen saturation 91% on room air. Right-sided crackles.",
           "source": "Authored example values; CDC symptom context: https://www.cdc.gov/legionella/hcp/clinical-signs/index.html",
           "provenance": "authored_synthetic_finding",
-          "urgent": true
+          "urgent": true,
+          "release_step": 6
         },
         {
           "id": "pneumonia.imaging",
-          "release_step": 7,
           "label": "Chest radiograph",
           "text": "Right lower-lobe air-space opacity, consistent with pneumonia; imaging does not identify the pathogen.",
           "source": "https://www.cdc.gov/legionella/hcp/clinical-guidance/index.html",
           "provenance": "authored_synthetic_finding",
-          "urgent": false
+          "urgent": false,
+          "release_step": 7
         },
         {
           "id": "pneumonia.testing",
-          "release_step": 8,
           "label": "Specimens",
-          "text": "Urine antigen and lower respiratory specimen requested; results pending. No positive result is assumed.",
+          "text": "Urine antigen and lower respiratory specimen requested; results pending.",
           "source": "https://www.cdc.gov/legionella/hcp/clinical-guidance/index.html",
           "provenance": "authored_synthetic_finding",
-          "urgent": false
+          "urgent": false,
+          "release_step": 8
         }
       ],
       "debrief": [
@@ -221,26 +223,26 @@
           "id": "1.reflection.1",
           "domain_id": 3,
           "anchor_step": 4,
-          "question": "What information from the travel history would you carry into your assessment, and what still needs confirmation?"
+          "question": "Looking back at the completed encounter, which details influenced your assessment, and which parts of your explanation remained uncertain?"
         },
         {
           "id": "1.reflection.2",
           "domain_id": 6,
           "anchor_step": 6,
-          "question": "Which findings affect the urgency of your plan, independent of the eventual cause?"
+          "question": "When reviewing the examination findings, what influenced how quickly you sought help, and what would you prioritize in a similar encounter?"
         },
         {
           "id": "1.reflection.3",
           "domain_id": 5,
           "anchor_step": 9,
-          "question": "How would you explain why a treatment is being considered without presenting an unconfirmed cause as certain?"
+          "question": "Review your treatment discussion. How clearly did you separate known findings from working explanations, and what wording would you improve next time?"
         }
       ]
     },
     {
       "schema_version": "scripted_clinical_demo_v1",
       "scenario_id": 2,
-      "fixture_version": 1,
+      "fixture_version": 2,
       "title": "Tobacco use and readiness to change",
       "clinical_review_status": "pending",
       "provenance": "authored_synthetic_script",
@@ -261,7 +263,9 @@
         "learner_role": "medical student under supervision",
         "teaching_notes": [
           "Use the fixed suggested sequence for a coherent rehearsal.",
-          "This is an authored demonstration, not a diagnosis or grading engine."
+          "This is an authored demonstration, not a diagnosis or grading engine.",
+          "Complete or explicitly end the student-patient conversation before opening the separate debrief.",
+          "The debrief reviews completed transcript evidence. evidence_turn identifies an exchange to review; it never triggers feedback during the conversation."
         ],
         "sources": [
           {
@@ -391,12 +395,12 @@
       "chart": [
         {
           "id": "tobacco.readiness",
-          "release_step": 3,
           "label": "Patient-stated readiness",
-          "text": "The patient explicitly declines cessation at this visit. Readiness is not inferred from agreement to receive information.",
+          "text": "Patient states: \"I do not want to change.\"",
           "source": "https://www.dph.ncdhhs.gov/programs/chronic-disease-and-injury/tobacco-prevention-and-control/quitlinenc/providers/treatment/motivational-interviewing",
           "provenance": "authored_synthetic_finding",
-          "urgent": false
+          "urgent": false,
+          "release_step": 3
         }
       ],
       "debrief": [
@@ -404,32 +408,32 @@
           "id": "2.reflection.1",
           "domain_id": 2,
           "anchor_step": 4,
-          "question": "Compare the patient response before and after the quit-date question. What changed in the conversation?"
+          "question": "Looking back at the patient's response to the quit-date question, how did your wording affect the conversation, and what would you adjust in a future encounter?"
         },
         {
           "id": "2.reflection.2",
           "domain_id": 4,
           "anchor_step": 6,
-          "question": "Which of the patient priorities could you reflect back without treating them as a commitment to change?"
+          "question": "Review the priorities the patient described. How well did your response reflect what mattered to him without assuming a decision to change?"
         },
         {
           "id": "2.reflection.3",
           "domain_id": 5,
           "anchor_step": 7,
-          "question": "How would you distinguish permission to receive information from willingness to start treatment?"
+          "question": "Looking back at the permission discussion, what did the patient actually agree to, and how would you check that understanding in a future visit?"
         },
         {
           "id": "2.reflection.4",
           "domain_id": 7,
           "anchor_step": 8,
-          "question": "What would a useful closing plan look like if the patient still declines change?"
+          "question": "At the end of the encounter, how well did your closing plan fit the willingness the patient expressed throughout the conversation?"
         }
       ]
     },
     {
       "schema_version": "scripted_clinical_demo_v1",
       "scenario_id": 3,
-      "fixture_version": 1,
+      "fixture_version": 2,
       "title": "Nausea, fatigue, and chest unease",
       "clinical_review_status": "pending",
       "provenance": "authored_synthetic_script",
@@ -450,7 +454,9 @@
         "learner_role": "medical student under supervision",
         "teaching_notes": [
           "Use the fixed suggested sequence for a coherent rehearsal.",
-          "This is an authored demonstration, not a diagnosis or grading engine."
+          "This is an authored demonstration, not a diagnosis or grading engine.",
+          "Complete or explicitly end the student-patient conversation before opening the separate debrief.",
+          "The debrief reviews completed transcript evidence. evidence_turn identifies an exchange to review; it never triggers feedback during the conversation."
         ],
         "sources": [
           {
@@ -585,21 +591,21 @@
       "chart": [
         {
           "id": "cardiac.vitals",
-          "release_step": 3,
           "label": "Vital signs",
-          "text": "Blood pressure 132/84 mmHg; heart rate 96/min; respiratory rate 22/min; oxygen saturation 97% on room air. Authored snapshot, not a reassurance of cardiac safety.",
+          "text": "Blood pressure 132/84 mmHg; heart rate 96/min; respiratory rate 22/min; oxygen saturation 97% on room air.",
           "source": "Authored example values",
           "provenance": "authored_synthetic_finding",
-          "urgent": false
+          "urgent": false,
+          "release_step": 3
         },
         {
           "id": "cardiac.ecg",
-          "release_step": 3,
           "label": "12-lead ECG",
           "text": "Sinus rhythm. ST elevation of 2 mm in II, III, and aVF, with reciprocal ST depression in I and aVL. Synthetic teaching report; no real patient tracing.",
           "source": "https://www.jacc.org/doi/10.1016/j.jacc.2024.11.009",
           "provenance": "authored_synthetic_finding",
-          "urgent": true
+          "urgent": true,
+          "release_step": 3
         }
       ],
       "debrief": [
@@ -607,25 +613,25 @@
           "id": "3.reflection.1",
           "domain_id": 6,
           "anchor_step": 1,
-          "question": "What alternative explanations deserve attention before accepting the patient initial explanation?"
+          "question": "After reviewing the completed encounter, how did the patient's initial explanation influence your thinking, and what other possibilities would you keep open next time?"
         },
         {
           "id": "3.reflection.2",
           "domain_id": 3,
           "anchor_step": 3,
-          "question": "Which parts of the history justified early testing rather than a longer interview first?"
+          "question": "Reflect on the timing of your initial assessment. Which information made prompt testing worth prioritizing over a longer interview?"
         },
         {
           "id": "3.reflection.3",
           "domain_id": 6,
           "anchor_step": 5,
-          "question": "What evidence changed the urgency of your plan, and how would you communicate it in a handover?"
+          "question": "Looking back, which findings changed your plan, and how clearly did your handover communicate the urgency?"
         },
         {
           "id": "3.reflection.4",
           "domain_id": 2,
           "anchor_step": 6,
-          "question": "How can you acknowledge fear while avoiding premature reassurance?"
+          "question": "Review your response to the patient's fear. How did your words acknowledge it without promising an outcome, and what would you refine next time?"
         }
       ]
     }

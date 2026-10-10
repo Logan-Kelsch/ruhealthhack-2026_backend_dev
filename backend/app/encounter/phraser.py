@@ -72,7 +72,8 @@ def template_reply(
     parts: list[str] = []
     cited: list[str] = []
     if res.is_repeat:
-        parts.append("I already told you that.")
+        # The disclosure ledger records availability, not which facts were spoken.
+        # Restating a fact is safe; asserting it was already said needs dialogue evidence.
         rep = case.fact(res.repeat_fact_ids[0]) if res.repeat_fact_ids else None
         if rep is not None:
             parts.append(fact_line(rep))
@@ -122,7 +123,7 @@ def phrase(
 
     situation = []
     if res.is_repeat:
-        situation.append("The student asked something you already answered. Show mild annoyance in character ('I already told you...') and repeat the answer briefly.")
+        situation.append("Previously available facts match this question. You may restate them briefly. Only claim you already told the student something when the recent patient dialogue explicitly contains it.")
     if res.deflect:
         situation.append("The student asked about something you are not ready to talk about. Deflect or change the subject in character. Do not reveal anything.")
     if res.exam_only:
@@ -134,7 +135,7 @@ def phrase(
     user = (
         f"PERSONA\n{_persona_block(case, res.mood)}\n\n"
         f"NEW FACTS YOU MAY SAY NOW (cite their ids):\n{facts_json(allowed)}\n\n"
-        f"FACTS YOU ALREADY SAID (may refer back, cite ids if you restate):\n{facts_json(earlier)}\n\n"
+        f"PREVIOUSLY AVAILABLE FACTS (may restate with citations; availability does not prove they were spoken):\n{facts_json(earlier)}\n\n"
         f"SITUATION: {' '.join(situation) or 'Answer the student using the new facts.'}\n\n"
         f"RECENT CONVERSATION:\n{convo or '(start of visit)'}\n\n"
         f"STUDENT JUST SAID: {json.dumps(utterance)}"

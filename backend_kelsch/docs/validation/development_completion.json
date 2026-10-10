@@ -1,0 +1,381 @@
+{
+  "version": "development_completion_v1",
+  "mode": "development_only",
+  "implementation_sha256": {
+    "backend_kelsch/app/study/development_reference.py": "0c13b48acf94af23632c2833d6755645474c2ad5ecfd69a6284b6f5515d3b65b",
+    "backend_kelsch/app/study/development_evaluation.py": "3b544261a988ddc0f4a91c82bd6bf7b5f936ecbcb765469aff269fa6eb6944fb",
+    "backend_kelsch/app/study/permutation.py": "78e9c5e0ab5c8a79af75200d2453ada9e854ba80f7c28de4d4f0b32e4f6d0b11",
+    "backend_kelsch/scripts/eval_development.py": "2d15a02fe9c0976daf15a463a836ee8b2a028ee956e336a48a4d5783c99e1480",
+    "backend/app/encounter/phraser.py": "c7c0705bed3f0936f2234f1acb757e7f6f2938c9b59903a27f5d9b957e4ab664",
+    "backend/app/encounter/classifier.py": "d71489535686d5f056e774dcbd2b82df4c28acde7251289e826d89c037053d27",
+    "backend/app/prompts/phraser.md": "3df976b0cfd1930be5ca575c9571324f9db345a118a2722dbc4eb446a0922975"
+  },
+  "review_reference": null,
+  "mechanics": {
+    "scope": "AUTHORED MECHANICS ONLY",
+    "case_source_hashes": {
+      "alina_reyes": "624f4713b587550865b5a6a378de6f3c678b13454ee3c0af26a5ffe7d5728c98",
+      "eli_brooks": "59c5c783e1baea71271f0fc49d96be907f5bbbbceea490ec0d8136dc18527c0b",
+      "walter_greene": "af9b64eded4aae898af7f47714aa95883d87bc9f2f7fa4c3b73866c73225b7bf"
+    },
+    "difficulty": {
+      "runs": 27,
+      "clinical_content_unchanged": true,
+      "nonincreasing_discoveries": true,
+      "straightforward_minus_difficult_mean": 0.4444444444444444,
+      "status": "PASS",
+      "clinical_calibration": "NOT EVALUABLE",
+      "learner_effect": "NOT EVALUABLE",
+      "discovery_counts": [
+        {
+          "case_id": "walter_greene",
+          "authored_level": "novice",
+          "straightforward": 4,
+          "typical": 4,
+          "difficult": 4
+        },
+        {
+          "case_id": "walter_greene",
+          "authored_level": "competent",
+          "straightforward": 8,
+          "typical": 7,
+          "difficult": 7
+        },
+        {
+          "case_id": "walter_greene",
+          "authored_level": "expert",
+          "straightforward": 12,
+          "typical": 10,
+          "difficult": 9
+        },
+        {
+          "case_id": "alina_reyes",
+          "authored_level": "novice",
+          "straightforward": 1,
+          "typical": 1,
+          "difficult": 1
+        },
+        {
+          "case_id": "alina_reyes",
+          "authored_level": "competent",
+          "straightforward": 4,
+          "typical": 4,
+          "difficult": 4
+        },
+        {
+          "case_id": "alina_reyes",
+          "authored_level": "expert",
+          "straightforward": 4,
+          "typical": 4,
+          "difficult": 4
+        },
+        {
+          "case_id": "eli_brooks",
+          "authored_level": "novice",
+          "straightforward": 2,
+          "typical": 2,
+          "difficult": 2
+        },
+        {
+          "case_id": "eli_brooks",
+          "authored_level": "competent",
+          "straightforward": 4,
+          "typical": 4,
+          "difficult": 4
+        },
+        {
+          "case_id": "eli_brooks",
+          "authored_level": "expert",
+          "straightforward": 4,
+          "typical": 4,
+          "difficult": 4
+        }
+      ]
+    },
+    "engine": {
+      "replays": 27,
+      "replay_matches": 27,
+      "turns": 189,
+      "template_replies": 189,
+      "cited_facts": 142,
+      "disclosures": 122,
+      "guarded_disclosures": 23,
+      "guarded_withheld": 42,
+      "invariant_violations": 0
+    },
+    "feedback_and_progression": {
+      "gates": {
+        "evidence_linkage_and_replay": "PASS",
+        "faculty_feedback_accuracy": "NOT EVALUABLE",
+        "faculty_rubric_scoring": "NOT EVALUABLE",
+        "trained_action_extraction": "NOT EVALUABLE",
+        "clinical_disclosure_accuracy": "NOT EVALUABLE",
+        "semantic_grounding": "NOT EVALUABLE",
+        "difficulty_calibration": "NOT EVALUABLE",
+        "student_learning": "NOT EVALUABLE"
+      },
+      "counts": {
+        "claims": 41,
+        "evidence_refs": 45,
+        "branches_replayed": 4,
+        "branches_with_next_visit": 4,
+        "uncertain_branches": 2,
+        "safety_flags": 5,
+        "document_discrepancies": 11,
+        "cases": 3,
+        "authored_scenarios": 6,
+        "branch_replay_denominator": 4,
+        "evidence_audit_denominator": 45
+      },
+      "na_probe": {
+        "domain_id": 6,
+        "observed": "N/A",
+        "expected": "N/A",
+        "fixture": "empty hypothetical signals",
+        "faculty_score": null
+      }
+    },
+    "status": "PASS"
+  },
+  "domain_reference_agreement": null,
+  "critical_action_fixture_probes": {
+    "scope": "Hand-authored hypothetical student utterances and expected action tags from the closed action vocabulary. Not clinical recommendations, independent annotations, training data, or learner observations.",
+    "fixture_sha256": "2c857550d803c4796e263b7045c171a26376a9eaf66f5bb91a4f489a8113f5f0",
+    "vocabulary_sha256": "1c60b27a6d947e7df2d5e648e1b6a9b6a8e736e05c966042ee7df1a4dd552497",
+    "keyword_classifier": {
+      "units": 8,
+      "macro_f1_over_observed_labels": 1.0,
+      "per_label": {
+        "prescribe_antibiotic": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "tn": 7,
+          "denominator": 8,
+          "precision": {
+            "estimate": 1.0,
+            "lower": 0.20654931437723745,
+            "upper": 1.0,
+            "success": 1,
+            "denominator": 1,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "recall": {
+            "estimate": 1.0,
+            "lower": 0.20654931437723745,
+            "upper": 1.0,
+            "success": 1,
+            "denominator": 1,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "agreement": {
+            "estimate": 1.0,
+            "lower": 0.6755924351161198,
+            "upper": 1.0,
+            "success": 8,
+            "denominator": 8,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+        },
+        "safety_netting": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "tn": 7,
+          "denominator": 8,
+          "precision": {
+            "estimate": 1.0,
+            "lower": 0.20654931437723745,
+            "upper": 1.0,
+            "success": 1,
+            "denominator": 1,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "recall": {
+            "estimate": 1.0,
+            "lower": 0.20654931437723745,
+            "upper": 1.0,
+            "success": 1,
+            "denominator": 1,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "agreement": {
+            "estimate": 1.0,
+            "lower": 0.6755924351161198,
+            "upper": 1.0,
+            "success": 8,
+            "denominator": 8,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+        },
+        "start_medication": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 0,
+          "tn": 6,
+          "denominator": 8,
+          "precision": {
+            "estimate": 1.0,
+            "lower": 0.34238022750665303,
+            "upper": 1.0,
+            "success": 2,
+            "denominator": 2,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "recall": {
+            "estimate": 1.0,
+            "lower": 0.34238022750665303,
+            "upper": 1.0,
+            "success": 2,
+            "denominator": 2,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "agreement": {
+            "estimate": 1.0,
+            "lower": 0.6755924351161198,
+            "upper": 1.0,
+            "success": 8,
+            "denominator": 8,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+        }
+      },
+      "critical_recall": {
+        "safety_netting": {
+          "positive_support": 1,
+          "recall": {
+            "estimate": 1.0,
+            "lower": 0.20654931437723745,
+            "upper": 1.0,
+            "success": 1,
+            "denominator": 1,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "adequacy": "NOT EVALUABLE"
+        },
+        "prescribe_antibiotic": {
+          "positive_support": 1,
+          "recall": {
+            "estimate": 1.0,
+            "lower": 0.20654931437723745,
+            "upper": 1.0,
+            "success": 1,
+            "denominator": 1,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "adequacy": "NOT EVALUABLE"
+        },
+        "start_medication": {
+          "positive_support": 2,
+          "recall": {
+            "estimate": 1.0,
+            "lower": 0.34238022750665303,
+            "upper": 1.0,
+            "success": 2,
+            "denominator": 2,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "adequacy": "NOT EVALUABLE"
+        }
+      }
+    },
+    "failure_examples": [],
+    "development_regression": "PASS",
+    "trained_or_held_out_accuracy": "NOT EVALUABLE",
+    "followup": "Explicit negation is covered only by narrow keyword guards. Broader uncertainty and contextual intent still need reviewed held-out data; do not train on these eight probes."
+  },
+  "live_reference_comparison": null,
+  "prediction_reference_comparison": null,
+  "human_gates": {
+    "semantic_grounding": "NOT EVALUABLE",
+    "clinical_case_approval": "NOT EVALUABLE",
+    "clinical_disclosure_accuracy": "NOT EVALUABLE",
+    "trained_action_extraction": "NOT EVALUABLE",
+    "faculty_feedback_accuracy": "NOT EVALUABLE",
+    "faculty_rubric_agreement": "NOT EVALUABLE",
+    "difficulty_calibration": "NOT EVALUABLE",
+    "approval_and_consent": "NOT EVALUABLE",
+    "student_learning": "NOT EVALUABLE"
+  },
+  "remaining_input": [
+    "Qualified independent reviews and case/disclosure approval",
+    "Reviewed action labels on whole-case/family held-out data; sufficient critical positives",
+    "Double-rated feedback claims and rubric domains",
+    "Approved full difficulty presets and actual learner observations",
+    "Integrated voice latency and configured pricing",
+    "Authorized consented learner study and frozen analysis plan"
+  ],
+  "development_gates": {
+    "reference_transport": "NOT EVALUABLE",
+    "mechanical_regression": "PASS",
+    "critical_action_fixture_regression": "PASS",
+    "provisional_delivered_support": "NOT EVALUABLE",
+    "candidate_judge_comparison": "NOT EVALUABLE"
+  },
+  "synthetic_mcpt": {
+    "scope": "SYNTHETIC MECHANICS ONLY",
+    "student_learning": "NOT EVALUABLE",
+    "implementation_sha256": "78e9c5e0ab5c8a79af75200d2453ada9e854ba80f7c28de4d4f0b32e4f6d0b11",
+    "plan": {
+      "version": "development_mcpt_v1",
+      "population": "synthetic fixtures only; observed intake requires the separate authorization workflow",
+      "design": "unstratified parallel assignment; fixed assigned arms feedback and standard",
+      "outcome": "mean followup-minus-baseline change over common scored domains 1\u20137 per learner",
+      "repeated_encounters": "average each scored domain within phase before common-domain change",
+      "missingness": "retain roster counts, report incomplete learners by arm, do not impute N/A",
+      "statistic": "mean learner change in feedback minus mean learner change in standard",
+      "tail": "absolute statistic at least as extreme as observed; ties included",
+      "draws": 4999,
+      "bootstrap_draws": 1999,
+      "seed": 42,
+      "p_value": "(extreme + 1) / (draws + 1)",
+      "effect_interval": "within-arm learner bootstrap percentile 95%; descriptive on small samples",
+      "multiple_testing": "one primary statistic; secondary outcomes require a separate prespecified correction",
+      "method_reference": "https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.permutation_test.html"
+    },
+    "plan_sha256": "3800dbbc111ed49dcb580da278853348f1915fa09af5d8fbb657803382a772f2",
+    "input_sha256": "84da83e453b164cde7d68e0dbf59b96896033ace70f833efe6d70c9dee04548f",
+    "roster_by_arm": {
+      "feedback": 4,
+      "standard": 4
+    },
+    "scored_by_arm": {
+      "feedback": 4,
+      "standard": 4
+    },
+    "missing_by_arm": {
+      "feedback": {},
+      "standard": {}
+    },
+    "encounters": 18,
+    "analysis_unit": "learner",
+    "missingness_interpretation": "assigned-arm available-case analysis; no claim of complete intention-to-treat inference",
+    "status": "EVALUATED",
+    "statistics": {
+      "effect": 1,
+      "effect_ci95": [
+        1,
+        1
+      ],
+      "p_value": 0.0294,
+      "extreme_draws": 146,
+      "draws": 4999,
+      "monte_carlo_tail_ci95": {
+        "estimate": 0.029205841168233646,
+        "lower": 0.024887430591718503,
+        "upper": 0.034247255417386414,
+        "success": 146,
+        "denominator": 4999,
+        "method": "Wilson 95%; descriptive, treats units as independent"
+      },
+      "bootstrap_draws": 1999,
+      "seed": 42,
+      "tail": "two-sided absolute mean difference",
+      "analysis_unit": "learner"
+    }
+  },
+  "report_sha256": "953b407026096382afebbbde7f5d6818d0a91e3fb4016617e1057fff4c3c98c6"
+}

@@ -100,19 +100,31 @@ def detect_jargon(utterance: str) -> list[JargonHit]:
     return hits
 
 
+def _negated_critical_action(utterance: str, start: int, action_id: str) -> bool:
+    """Suppress explicit refusals in the keyword fallback, not inferred clinical intent."""
+    if action_id not in {"prescribe_antibiotic", "start_medication", "safety_netting"}:
+        return False
+    prefix = re.split(r"[.;!?\n]|\b(?:but|however|and)\b", utterance[:start], flags=re.IGNORECASE)[-1]
+    if re.search(r"\b(?:not|never|won't|wouldn't|don't|doesn't|didn't|can't|cannot|shouldn't)\s+(?:(?:going|planning|able|ready|want|intend|plan)\s+to\s+)?$", prefix, re.IGNORECASE):
+        return True
+    return action_id == "safety_netting" and bool(re.search(
+        r"\b(?:not|never)\s+(?:explained|discussed|provided|given)\s+(?:(?:any|the|these)\s+)?$", prefix, re.IGNORECASE))
+
+
 def keyword_classify(utterance: str, case: Case) -> Intent:
-    def match_labels(labels: dict[str, catalogs.Label]) -> list[Hit]:
+    def match_labels(labels: dict[str, catalogs.Label], *, action: bool = False) -> list[Hit]:
         hits = []
         for label in labels.values():
             for pat in label.patterns():
-                m = pat.search(utterance)
-                if m:
+                m = next((m for m in pat.finditer(utterance)
+                          if not action or not _negated_critical_action(utterance, m.start(), label.id)), None)
+                if m is not None:
                     hits.append(Hit(id=label.id, span=_sentence_of(utterance, m.start()), confidence="low"))
                     break
         return hits
 
     topics = match_labels(case_topics(case))
-    actions = match_labels(case_actions(case))
+    actions = match_labels(case_actions(case), action=True)
     maneuvers: list[Hit] = []
     if EXAM_VERB_RE.search(utterance):
         for m_id, m in catalogs.maneuvers().items():

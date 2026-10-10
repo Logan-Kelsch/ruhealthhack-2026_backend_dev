@@ -1,0 +1,23 @@
+{
+  "command": "LLM_ENABLED=false PYTHONPATH=backend python -m pytest -q backend/tests backend_kelsch/tests",
+  "status": "PASS",
+  "passed": 153,
+  "http_api_tests": {
+    "status": "PASS",
+    "passed": 7,
+    "source": "backend/tests/test_api.py; included in full suite"
+  },
+  "notebook09": {
+    "plain_python_code_cells": 3,
+    "status": "PASS",
+    "native_kernel": "BLOCKED: TCP and IPC socket binding denied by execution runtime"
+  },
+  "bedrock_post_change": "NOT RUN; no fresh live credentials or paid calls used",
+  "portable_reference": {
+    "status": "PASS",
+    "resolved": 90,
+    "unresolved": 0,
+    "original_submissions_preserved": true
+  },
+  "python_version": "3.12.14"
+}

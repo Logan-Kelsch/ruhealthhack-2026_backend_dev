@@ -317,8 +317,15 @@
         "type": "object"
       },
       "BranchSummary": {
-        "description": "Which authored outcome was taken. Later-visit fact changes are not part of this view.",
+        "description": "One faculty-written outcome. Later-visit fact changes and likelihood tags are not on it.",
         "properties": {
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/EvidenceQuote"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
           "id": {
             "title": "Id",
             "type": "string"
@@ -834,8 +841,15 @@
         "type": "object"
       },
       "DecisionPathView": {
-        "description": "The outcome id for this visit. Follow-up selection is a separate screen.",
+        "description": "The outcome this visit selected, the other authored outcomes, and the evidence for both.",
         "properties": {
+          "decisions": {
+            "items": {
+              "$ref": "#/components/schemas/PublicDecision"
+            },
+            "title": "Decisions",
+            "type": "array"
+          },
           "ghosts": {
             "items": {
               "$ref": "#/components/schemas/BranchSummary"
@@ -3087,6 +3101,47 @@
           "include_timestamps"
         ],
         "title": "PublicConfig",
+        "type": "object"
+      },
+      "PublicDecision": {
+        "description": "A yes/no result the student can read. The predicate that produced it stays on the case.",
+        "properties": {
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/EvidenceQuote"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "feedback": {
+            "default": "",
+            "title": "Feedback",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "result": {
+            "enum": [
+              "yes",
+              "no",
+              "unclear"
+            ],
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "result"
+        ],
+        "title": "PublicDecision",
         "type": "object"
       },
       "PublicDoorwayVital": {

@@ -141,11 +141,16 @@ def get_encounter(db: Session, enc_id: str) -> EncounterRow:
 
 
 def start_encounter(db: Session, *, case_id: str, version: int | None, visit_id: str | None, student_name: str, previous_encounter_id: str | None) -> EncounterRow:
+    """Open a visit. A follow-up uses the previous encounter's frozen case and selected outcome."""
     prior_branch = None
     if previous_encounter_id:
         prev = get_encounter(db, previous_encounter_id)
+        # A different case id would skip this student's path and open someone else's visit.
+        if case_id != prev.case_id:
+            raise Conflict("this encounter continues a different case")
         if prev.feedback is None:
             raise Conflict("finish the previous visit's debrief first")
+        # The published version can move on. This visit stays on the version the student already saw.
         case_row = get_case_row(db, prev.case_id, prev.case_version)
         case = load_case(case_row)
         ids = [v.id for v in case.visits]
@@ -162,6 +167,9 @@ def start_encounter(db: Session, *, case_id: str, version: int | None, visit_id:
         visit_id = visit_id or case.visits[0].id
         if case.visit(visit_id) is None:
             raise NotFound(f"visit {visit_id} not found in {case.case_id}")
+        # Visit 2 and later exist only as a continuation. Starting one here would skip the authored path.
+        if case.visits and visit_id != case.visits[0].id:
+            raise Conflict("this visit continues from a completed visit")
     resolved = resolve_visit(case, visit_id, prior_branch)
     state = engine.new_state(resolved)
     state["prior_branch_id"] = prior_branch.id if prior_branch else None

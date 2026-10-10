@@ -78,6 +78,22 @@ export function Debrief({ go, route, client = api }: { go: Go; route: StudentRou
       {feedbackError ? <p className="text-sm text-ink">{feedbackError}</p> : null}
       {saved ? <SavedNote saved={saved} /> : null}
       {feedback ? <FeedbackBody feedback={feedback} /> : null}
+      {encounter?.has_next_visit ? (
+        <PrimaryButton
+          size="lg"
+          onClick={() =>
+            go("s-between", {
+              caseId: encounter.case_id,
+              version: encounter.case_version,
+              visitId: encounter.visit_id,
+              encounterId: encounter.encounter_id,
+            })
+          }
+        >
+          Continue to the next visit
+        </PrimaryButton>
+      ) : null}
+      {encounter && !encounter.has_next_visit ? <p className="text-sm text-ink">No further visit is available.</p> : null}
       {!loading && (encounterError || feedbackError) ? (
         <button type="button" onClick={() => setAttempt((value) => value + 1)} className="h-10 w-fit rounded-[10px] border border-line-2 px-4 text-sm font-medium">
           Retry
@@ -134,6 +150,7 @@ function FeedbackBody({ feedback }: { feedback: FeedbackResponse }) {
       <MetricList feedback={feedback} />
       <TrustList feedback={feedback} />
       <DocumentationCheck feedback={feedback} />
+      <PathList feedback={feedback} />
       {(feedback.communication_notes ?? []).length > 0 ? (
         <NoteList title="Communication notes" items={feedback.communication_notes ?? []} empty="" />
       ) : null}
@@ -323,6 +340,71 @@ function DocumentationCheck({ feedback }: { feedback: FeedbackResponse }) {
       ) : null}
     </section>
   );
+}
+
+// The outcome the visit selected, and the other outcomes faculty wrote. No likelihood is shown.
+function PathList({ feedback }: { feedback: FeedbackResponse }) {
+  const path = feedback.decision_path;
+  const taken = path.taken;
+  const ghosts = path.ghosts ?? [];
+  return (
+    <section aria-label="What happened next" className="rounded-2xl border border-line bg-card px-5 py-4">
+      <h2 className="text-[15px] font-semibold">What happened next</h2>
+      {taken ? (
+        <div className="mt-3">
+          <h3 className="text-sm font-semibold">Path taken</h3>
+          <p className="mt-1 text-[15px]">{taken.label}</p>
+          {taken.summary ? <p className="mt-1 text-[15px] leading-snug">{taken.summary}</p> : null}
+          <EvidenceLines evidence={taken.evidence ?? []} />
+        </div>
+      ) : (
+        <p className="mt-2 text-sm text-muted">No outcome was selected.</p>
+      )}
+      <h3 className="mt-4 text-sm font-semibold">Other authored outcomes</h3>
+      {ghosts.length === 0 ? <p className="mt-1 text-sm text-muted">No other outcomes were authored.</p> : null}
+      {ghosts.map((ghost) => (
+        <div key={ghost.id} className="mt-3 border-t border-hair pt-3">
+          <p className="text-[15px]">{ghost.label}</p>
+          {ghost.summary ? <p className="mt-1 text-[15px] leading-snug">{ghost.summary}</p> : null}
+          <EvidenceLines evidence={ghost.evidence ?? []} />
+        </div>
+      ))}
+      {(path.decisions ?? []).map((decision) => (
+        <div key={decision.id} className="mt-3">
+          <p className="text-[15px]">
+            {decision.label}. {decisionResult(decision.result)}
+          </p>
+          <EvidenceLines evidence={decision.evidence ?? []} />
+          {decision.feedback ? <p className="mt-1 text-sm leading-snug">{decision.feedback}</p> : null}
+        </div>
+      ))}
+      {(path.needs_faculty_review ?? []).length > 0 ? (
+        <p className="mt-3 text-sm font-semibold">Needs faculty review. {(path.needs_faculty_review ?? []).join(". ")}</p>
+      ) : null}
+    </section>
+  );
+}
+
+// Quotes that selected a path. An outcome with no quoted turn still shows its summary.
+function EvidenceLines({ evidence }: { evidence: { turn: number; quote: string }[] }) {
+  return (
+    <>
+      {evidence.map((span) => (
+        <p key={`${span.turn}-${span.quote}`} className="mt-1 text-sm text-ink-soft">
+          Turn {span.turn}: {span.quote}
+        </p>
+      ))}
+    </>
+  );
+}
+
+// The three results the debrief is allowed to show. A new result has to be named here.
+function decisionResult(result: "yes" | "no" | "unclear"): string {
+  if (result === "yes") return "Yes";
+  if (result === "no") return "No";
+  if (result === "unclear") return "Unclear";
+  const unreachable: never = result;
+  return unreachable;
 }
 
 // The transcript the scores cite. Captions stay visible with the feedback.

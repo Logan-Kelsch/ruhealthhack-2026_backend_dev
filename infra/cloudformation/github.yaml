@@ -27,6 +27,13 @@ Parameters:
     Type: String
     AllowedPattern: '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$'
     Description: owner/name of the GitHub repository allowed to deploy.
+  GitHubOidcSubjectPrefix:
+    Type: String
+    Default: ""
+    AllowedPattern: '^$|^repo:[A-Za-z0-9_.-]+(@[0-9]+)?/[A-Za-z0-9_.-]+(@[0-9]+)?$'
+    Description: >-
+      Repository OIDC subject prefix from GitHub, including immutable IDs when enabled.
+      Empty uses the legacy repo:owner/name format. bootstrap-github.sh resolves this value.
   DeployBranch:
     Type: String
     Default: main
@@ -40,6 +47,7 @@ Parameters:
 
 Conditions:
   CreateOidcProvider: !Equals [!Ref ExistingOidcProviderArn, ""]
+  HasGitHubOidcSubjectPrefix: !Not [!Equals [!Ref GitHubOidcSubjectPrefix, ""]]
 
 Resources:
   GitHubOidcProvider:
@@ -53,7 +61,11 @@ Resources:
     Type: AWS::IAM::Role
     Metadata:
       com.aws.cloudformation.Context:
-        why: Assumed by GitHub Actions through aws-actions/configure-aws-credentials.
+        why: >-
+          Assumed by GitHub Actions through aws-actions/configure-aws-credentials. The exact
+          subject prefix follows the repository's OIDC settings, including immutable IDs.
+        must:
+          - Match the exact repository subject and deploy branch; never use a subject wildcard.
     Properties:
       Description: !Sub "GitHub Actions deploys for ${GitHubRepo}@${DeployBranch}"
       MaxSessionDuration: 3600
@@ -67,7 +79,10 @@ Resources:
             Condition:
               StringEquals:
                 "token.actions.githubusercontent.com:aud": sts.amazonaws.com
-                "token.actions.githubusercontent.com:sub": !Sub "repo:${GitHubRepo}:ref:refs/heads/${DeployBranch}"
+                "token.actions.githubusercontent.com:sub": !If
+                  - HasGitHubOidcSubjectPrefix
+                  - !Sub "${GitHubOidcSubjectPrefix}:ref:refs/heads/${DeployBranch}"
+                  - !Sub "repo:${GitHubRepo}:ref:refs/heads/${DeployBranch}"
       Policies:
         - PolicyName: deploy
           PolicyDocument:

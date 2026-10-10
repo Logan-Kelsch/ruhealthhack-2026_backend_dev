@@ -1,0 +1,59 @@
+# Clinical terms a patient with low or medium health literacy would not say.
+# Used two ways:
+#  1. Verifier lint: patient replies containing these terms are regenerated, unless the
+#     term appears in an approved fact's `say` text (the patient learned the word).
+#  2. Jargon detection in student speech (unexplained jargon trust event).
+# `lay` is a suggested plain-language alternative.
+version: 1
+terms:
+  - {term: hypertension, lay: high blood pressure}
+  - {term: hyperlipidemia, lay: high cholesterol}
+  - {term: dyslipidemia, lay: cholesterol problem}
+  - {term: hyperglycemia, lay: high blood sugar}
+  - {term: hypoglycemia, lay: low blood sugar}
+  - {term: myocardial infarction, lay: heart attack}
+  - {term: edema, lay: swelling}
+  - {term: dyspnea, lay: trouble breathing}
+  - {term: orthopnea, lay: trouble breathing lying flat}
+  - {term: nocturia, lay: getting up at night to pee}
+  - {term: polyuria, lay: peeing a lot}
+  - {term: polydipsia, lay: always thirsty}
+  - {term: ejection fraction, lay: how well the heart pumps}
+  - {term: hfref, lay: weak heart pump}
+  - {term: renal, lay: kidney}
+  - {term: nephropathy, lay: kidney damage}
+  - {term: creatinine, lay: kidney test}
+  - {term: egfr, lay: kidney function number}
+  - {term: hba1c, lay: three-month sugar test}
+  - {term: a1c, lay: three-month sugar test}
+  - {term: sodium restriction, lay: cutting back on salt}
+  - {term: nsaid, lay: pain reliever like Advil}
+  - {term: nonsteroidal, lay: pain reliever like Advil}
+  - {term: adherence, lay: taking your medicine}
+  - {term: compliance, lay: taking your medicine}
+  - {term: etiology, lay: cause}
+  - {term: prognosis, lay: what to expect}
+  - {term: comorbidit, lay: other health problems}
+  - {term: anhedonia, lay: losing interest in things}
+  - {term: suicidal ideation, lay: thoughts of hurting yourself}
+  - {term: hypomania, lay: a high-energy spell}
+  - {term: psychomotor, lay: moving or thinking slower}
+  - {term: ssri, lay: antidepressant}
+  - {term: selective serotonin, lay: antidepressant}
+  - {term: tardive dyskinesia, lay: movements you can't control}
+  - {term: metabolic syndrome, lay: weight, sugar and cholesterol changes}
+  - {term: pharyngitis, lay: sore throat}
+  - {term: viral etiology, lay: caused by a virus}
+  - {term: upper respiratory infection, lay: a cold}
+  - {term: rhinorrhea, lay: runny nose}
+  - {term: antimicrobial resistance, lay: germs that antibiotics can't kill}
+  - {term: afebrile, lay: no fever}
+  - {term: febrile, lay: has a fever}
+  - {term: tachycardia, lay: fast heart rate}
+  - {term: bradycardia, lay: slow heart rate}
+  - {term: bilateral, lay: on both sides}
+  - {term: auscultation, lay: listening with the stethoscope}
+  - {term: palpation, lay: feeling with the hands}
+  - {term: contraindicated, lay: not safe to take}
+  - {term: titrate, lay: adjust the dose}
+  - {term: pes statement, lay: nutrition diagnosis}

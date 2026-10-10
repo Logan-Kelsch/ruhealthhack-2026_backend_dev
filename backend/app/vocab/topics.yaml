@@ -1,0 +1,204 @@
+# Closed list of interview topics the intent classifier may output.
+# Cases add their own topics in case.topics; facts unlock by topic id.
+# `keywords` are regular expressions used only by the offline keyword classifier
+# (the fallback when Bedrock is unavailable). The LLM classifier uses `description`.
+# `sensitive: true` topics feed the "blunt question before rapport" trust rule.
+version: 1
+topics:
+  - id: greeting_introduction
+    description: Student greets the patient or introduces themself and their role
+    keywords: ['\b(hi|hello|good (morning|afternoon|evening))\b', "\\bmy name is\\b", "\\bi'?m (a|the|your) ", "\\bi am (a|the|your) "]
+  - id: purpose_agenda
+    description: Student explains the purpose of the visit, sets an agenda, or says what will happen today
+    keywords: ['\btoday (we|i)\b', '\bplan (is|for today)\b', '\bwhat we.?ll (do|cover|talk)\b', '\bpurpose\b', '\bagenda\b']
+  - id: chief_complaint
+    description: Asks why the patient came in, what brings them in, or how they can help today
+    keywords: ['what brings you', 'why are you here', 'how can i help', 'what.?s (going on|been going on)', 'reason for (your )?visit', 'what can i do for you', "how are you (doing|feeling)", "what happened"]
+  - id: patient_expectations
+    description: Asks what the patient hopes to get from the visit or what they expect
+    keywords: ['hoping (for|to)', 'expect', 'what would you like', 'what do you want (from|out of)', 'looking for today']
+  - id: anything_else
+    description: Asks if there is anything else, anything more, or invites the patient to continue
+    keywords: ['anything else', 'tell me more', 'go on', 'what else', 'is there more']
+  - id: hpi_onset
+    description: When the main problem started
+    keywords: ['when did (it|this|that|the)', 'how long ago', 'start(ed)?\b', 'began', 'first notice']
+  - id: hpi_duration
+    description: How long the problem or symptom lasts or has lasted
+    keywords: ['how long', 'duration', 'for how many (days|weeks|months)']
+  - id: hpi_character
+    description: What the symptom feels like or its quality
+    keywords: ['what does it feel like', 'describe (the|it)', 'sharp|dull|burning|aching']
+  - id: hpi_location
+    description: Where the symptom is or whether it spreads (radiation)
+    keywords: ['where (is|does) (it|the)', 'location', 'spread', 'radiat']
+  - id: hpi_severity
+    description: How bad the symptom is, including 0-10 ratings
+    keywords: ['how bad', 'scale of', 'severity', 'out of 10', 'how severe']
+  - id: hpi_timing
+    description: Pattern or timing of symptoms, constant versus comes and goes, time of day
+    keywords: ['come and go', 'constant', 'time of day', 'at night', 'in the morning', 'how often']
+  - id: hpi_modifying
+    description: What makes the symptom better or worse, what the patient has tried
+    keywords: ['better or worse', 'makes it (better|worse)', 'what have you tried', 'helps', 'relieve']
+  - id: hpi_associated
+    description: Other symptoms that came with the main problem
+    keywords: ['any other symptoms', 'along with', 'associated', 'anything else going on with']
+  - id: medical_history
+    description: Past or ongoing medical conditions and diagnoses
+    keywords: ['medical (history|conditions|problems)', 'health (problems|conditions)', 'diagnos', 'any (other )?conditions', 'chronic']
+  - id: surgical_history
+    description: Past surgeries or procedures
+    keywords: ['surger', 'operation', 'procedure']
+  - id: hospitalizations
+    description: Past hospital stays or emergency visits
+    keywords: ['hospital', 'admitted', 'emergency room', '\ber\b', 'urgent care']
+  - id: medication_list
+    description: What prescription medications the patient takes, doses and schedule
+    keywords: ['medication', 'medicine', 'meds\b', 'pills', 'prescri', 'what do you take']
+  - id: medication_adherence
+    description: Whether the patient takes medications as prescribed, misses doses, side effects or problems with them
+    keywords: ['miss(ed)? (a )?dose', 'forget', 'skip', 'side effect', 'take (them|it) (every|as)', 'how often do you take', 'trouble (taking|with your)']
+  - id: otc_medications
+    description: Over-the-counter medicines, painkillers, supplements, vitamins, herbal or home remedies
+    keywords: ['over.the.counter', '\botc\b', 'supplement', 'vitamin', 'herbal', 'advil', 'tylenol', 'ibuprofen', 'aspirin', 'pain (killer|reliever|medicine)', 'anything for (the )?pain', 'home remed', 'natural remed']
+  - id: allergies
+    description: Allergies to medications, foods or other things and the reaction
+    keywords: ['allerg', 'reaction to']
+  - id: family_history
+    description: Medical conditions in the patient's family
+    keywords: ['family (history|members)', 'run in (your|the) family', 'parents|mother|father|siblings']
+  - id: family_psych_history
+    description: Mental health conditions in the family such as bipolar disorder, depression or suicide
+    keywords: ['family.*(bipolar|depress|mental|psychiatric|suicide)', '(bipolar|mental illness).*family']
+  - id: social_living
+    description: Where and with whom the patient lives, home situation
+    keywords: ['live (alone|with)', 'who do you live', 'home situation', 'where do you live', 'living situation']
+  - id: social_support
+    description: Family, friends, or others who help or support the patient
+    keywords: ['support', 'help you', 'family nearby', 'friends', 'anyone (who|to) help', 'rely on']
+  - id: occupation
+    description: Work, school, or what the patient does or did for a living
+    keywords: ['\bwork\b', '\bjob\b', 'for a living', 'occupation', 'retired', 'school', 'college', 'class(es)?\b']
+  - id: finances_access
+    description: Money, insurance, cost of food or medication, transportation, access to care or groceries
+    keywords: ['afford', 'cost', 'money', 'insurance', 'expensive', 'transportation', 'get to the (store|grocery)', 'budget']
+  - id: alcohol
+    description: Alcohol use
+    keywords: ['alcohol', 'drink(s|ing)? (alcohol|beer|wine)', 'beer', 'wine', 'liquor']
+    sensitive: false
+  - id: tobacco
+    description: Smoking, vaping or tobacco use
+    keywords: ['smok', 'cigar', 'tobacco', 'vape|vaping']
+  - id: drugs
+    description: Recreational or illicit drug use, cannabis
+    keywords: ['drug use', 'recreational', 'marijuana|weed|cannabis', 'cocaine', 'street drugs', 'use any drugs']
+    sensitive: true
+  - id: diet_general
+    description: What the patient usually eats, typical day of eating, meal pattern
+    keywords: ['typical day', 'what do you (usually )?eat', 'meals?\b', 'diet\b', 'food']
+  - id: diet_breakfast
+    description: Breakfast habits
+    keywords: ['breakfast', 'in the morning.*eat']
+  - id: diet_eating_out
+    description: Eating at restaurants, fast food, take-out, social meals
+    keywords: ['eat out', 'restaurant', 'fast food', 'take.?out', 'dinner club', 'dine out']
+  - id: diet_beverages
+    description: What the patient drinks during the day, water, soda, juice, sweet tea, coffee
+    keywords: ['what do you (usually )?drink', 'drink (during|throughout) the day', 'soda', 'water', 'juice', 'sweet tea', 'coffee', 'beverage', 'fluids']
+  - id: diet_sodium
+    description: Salt intake, salty or canned foods
+    keywords: ['salt', 'sodium', 'canned', 'salty']
+  - id: cooking_shopping
+    description: Who cooks, grocery shopping, preparing food
+    keywords: ['cook', 'grocer', 'shopping', 'prepare (food|meals)']
+  - id: physical_activity
+    description: Exercise and daily activity level
+    keywords: ['exercise', 'physical activity', 'walk', 'active', 'gym']
+  - id: sleep
+    description: Sleep quality, amount, waking at night
+    keywords: ['sleep', 'insomnia', 'wake up at night', 'rest(ed)?\b', 'tired']
+  - id: mood
+    description: Mood, feeling down, depressed, sad, anxious, interest or pleasure in activities
+    keywords: ['mood', 'feeling (down|sad|depressed|low)', 'depress', 'anxious|anxiety', 'enjoy', 'interest in', 'how have you been feeling']
+  - id: stress
+    description: Stress and coping
+    keywords: ['stress', 'cope|coping', 'overwhelm']
+  - id: psychiatric_history
+    description: Past mental health diagnoses, treatment, therapy or psychiatric hospital stays
+    keywords: ['mental health', 'therap(y|ist)', 'counsel(l)?or', 'psychiatr', 'antidepressant']
+  - id: mania_history
+    description: Past periods of elevated or irritable mood, decreased need for sleep, racing thoughts, impulsive spending, unusual energy (screening for bipolar disorder)
+    keywords: ['manic|mania|hypomani', 'bipolar', "didn.?t need (much )?sleep", 'racing thoughts', 'extra energy', 'unusually (happy|energetic)', 'on top of the world', 'spending spree']
+  - id: suicidal_ideation
+    description: Thoughts of death, self-harm or suicide, safety
+    keywords: ['suicid', 'kill (yourself|myself)', 'hurt(ing)? yourself', 'harm(ing)? yourself', 'end(ing)? (your|my|their|her|his) (own )?life', 'thoughts of (dying|death|ending)', 'better off dead', 'not (being )?alive', 'wish you were dead']
+    sensitive: true
+  - id: homicidal_ideation
+    description: Thoughts of harming others
+    keywords: ['hurt(ing)? (anyone|someone|others)', 'harm(ing)? (others|someone)']
+    sensitive: true
+  - id: sexual_history
+    description: Sexual activity, partners, contraception
+    keywords: ['sexual', 'sexually active', 'partners?\b', 'contracept', 'birth control']
+    sensitive: true
+  - id: beliefs_understanding
+    description: What the patient understands or believes about their condition, treatment or diet
+    keywords: ['what do you (know|understand|think) about', 'your understanding', 'what does .* mean to you', 'what have you been told']
+  - id: goals
+    description: The patient's own goals or what matters most to them
+    keywords: ['goal', 'what matters', 'most important to you', 'want to be able to']
+  - id: fears_worries
+    description: Worries, fears or concerns the patient has
+    keywords: ['worr', 'afraid', 'scared', 'fear', 'concern(ed|s)?\b']
+  - id: readiness_to_change
+    description: How ready, willing, important or confident the patient feels about making a change
+    keywords: ['ready to', 'how important', 'how confident', 'scale of 1 to 10', 'willing to', 'change']
+  - id: hobbies_personal
+    description: Personal life, hobbies, pets, friends, things the patient enjoys
+    keywords: ['hobb', 'for fun', 'pet\b', 'dog', 'cat\b', 'weekend', 'enjoy doing']
+  - id: weight_change
+    description: Recent weight gain or loss
+    keywords: ['weight', 'lost (any )?weight', 'gained']
+  - id: ros_general
+    description: General symptoms such as fever, chills, fatigue, appetite
+    keywords: ['fever', 'chills', 'fatigue', 'appetite', 'night sweats']
+  - id: ros_cardiac
+    description: Chest pain, palpitations, swelling of legs, shortness of breath with exertion or lying flat
+    keywords: ['chest pain', 'palpitation', 'heart racing', 'swelling', 'swollen', 'short(ness)? of breath', 'breathless', 'lying flat', 'pillows']
+  - id: ros_respiratory
+    description: Cough, breathing problems, wheeze
+    keywords: ['cough', 'wheez', 'breathing', 'phlegm|sputum']
+  - id: ros_gi
+    description: Nausea, vomiting, stomach pain, bowel changes
+    keywords: ['nause', 'vomit', 'stomach', 'bowel', 'diarrh', 'constipat', 'belly']
+  - id: ros_gu
+    description: Urination, frequency, night-time urination, thirst
+    keywords: ['urinat', 'pee', 'bathroom at night', 'thirst', 'nocturia']
+  - id: ros_neuro
+    description: Headache, dizziness, numbness, weakness, concentration
+    keywords: ['headache', 'dizz', 'numb', 'tingl', 'weakness', 'concentrat', 'focus']
+  - id: ros_msk
+    description: Joint, muscle or back pain and stiffness
+    keywords: ['joint', 'back pain', 'muscle', 'stiff', 'arthritis']
+  - id: ros_ent
+    description: Sore throat, ear pain, runny nose, congestion
+    keywords: ['throat', 'ear(s)?\b', 'runny nose', 'congest', 'sneez', 'stuffy']
+  - id: ros_skin
+    description: Rash or skin changes
+    keywords: ['rash', 'skin', 'itch']
+  - id: child_intake
+    description: For a child patient, eating, drinking, wet diapers or urination, activity and behavior
+    keywords: ['eating and drinking', 'drinking (fluids|enough)', 'playing', 'acting (like )?himself|herself', 'wet diapers']
+  - id: sick_contacts
+    description: Whether others around the patient are sick, daycare or school exposures
+    keywords: ['anyone (else )?sick', 'sick contacts', 'daycare', 'others at (home|school)']
+  - id: prior_antibiotics
+    description: Past antibiotic use and how infections were treated before
+    keywords: ['antibiotic', 'amoxicillin', 'previous infections', 'treated before']
+  - id: testing_done
+    description: Tests or results the patient already had elsewhere
+    keywords: ['test(s|ed)?\b', 'swab', 'results', 'lab work', 'blood work']
+  - id: vaccination
+    description: Vaccination history
+    keywords: ['vaccin', 'shots', 'immuniz', 'flu shot']

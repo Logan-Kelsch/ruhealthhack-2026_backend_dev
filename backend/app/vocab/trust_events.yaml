@@ -1,0 +1,32 @@
+# Trust changes only through these events. Every event must quote a transcript span,
+# or it is not counted. Rules are implemented in app/encounter/trust.py.
+# TODO(clinical-review): Ahmad and Logan to refine deltas.
+version: 1
+events:
+  - id: introduced_self
+    delta: 1
+    description: Introduced self and role within the first three turns
+  - id: followed_personal_cue
+    delta: 1
+    description: Followed up on something personal the patient raised (a rapport cue)
+  - id: empathic_response
+    delta: 1
+    description: Reflected or validated the patient's feelings or perspective
+  - id: asked_permission
+    delta: 1
+    description: Asked permission before giving advice or raising a topic
+  - id: blunt_sensitive_question
+    delta: -1
+    description: Asked a sensitive question before any rapport, with no preface. Never applied to suicide screening.
+  - id: unexplained_jargon
+    delta: -1
+    description: Used clinical jargon without explaining it
+  - id: lectured_or_judged
+    delta: -1
+    description: Lectured, warned without permission, or judged the patient
+  - id: ignored_cue
+    delta: -1
+    description: Did not acknowledge a personal cue the patient raised within two turns
+  - id: interrupted
+    delta: -1
+    description: Started speaking while the patient was still talking (voice timing only)

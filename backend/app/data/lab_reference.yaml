@@ -1,0 +1,65 @@
+# Curated lab catalog used for auto-fill, the lab lookup and order matching.
+# Reference intervals are typical adult intervals (conventional US units). They vary by
+# laboratory and method; every auto-filled value is labelled with `ref_source` below.
+# NHANES age/sex distributions are planned (PRD S-04) and not in this version.
+# TODO(clinical-review): confirm intervals and LOINC codes before any external claim.
+version: 1
+ref_source: "Typical adult reference interval (varies by lab); see docs/credits.md"
+panels:
+  bmp: {label: Basic metabolic panel (BMP), keywords: ['bmp', 'basic metabolic', 'chem(istry)? ?(7|panel)', 'electrolytes', 'kidney (function|labs)']}
+  cbc: {label: Complete blood count (CBC), keywords: ['\bcbc\b', 'complete blood count', 'blood count', 'hemoglobin']}
+  lipid: {label: Lipid panel, keywords: ['lipid', 'cholesterol']}
+  a1c: {label: Hemoglobin A1c, keywords: ['a1c', 'hemoglobin a ?1 ?c', 'three.month sugar']}
+  glucose: {label: Glucose, keywords: ['glucose', 'blood sugar', 'finger ?stick']}
+  mg_phos: {label: Magnesium and phosphorus, keywords: ['magnesium', 'phosph']}
+  troponin: {label: Troponin, keywords: ['troponin', 'cardiac enzymes']}
+  thyroid: {label: Thyroid stimulating hormone (TSH), keywords: ['\btsh\b', 'thyroid']}
+  liver: {label: Liver panel, keywords: ['liver (panel|function|enzymes)', '\balt\b', '\bast\b']}
+  strep: {label: Rapid strep test, keywords: ['strep', 'rapid antigen', 'throat swab']}
+  phq9: {label: PHQ-9 depression questionnaire, keywords: ['phq', 'depression (screen|questionnaire)']}
+labs:
+  - {key: na, name: Sodium, loinc: "2951-2", panel: bmp, unit: mmol/L, low: 135, high: 145, decimals: 0}
+  - {key: k, name: Potassium, loinc: "2823-3", panel: bmp, unit: mmol/L, low: 3.5, high: 5.0, decimals: 1}
+  - {key: cl, name: Chloride, loinc: "2075-0", panel: bmp, unit: mmol/L, low: 98, high: 106, decimals: 0}
+  - {key: hco3, name: Bicarbonate (total CO2), loinc: "2028-9", panel: bmp, unit: mmol/L, low: 22, high: 29, decimals: 0}
+  - {key: bun, name: Blood urea nitrogen (BUN), loinc: "3094-0", panel: bmp, unit: mg/dL, low: 7, high: 20, decimals: 0}
+  - {key: cr, name: Creatinine, loinc: "2160-0", panel: bmp, unit: mg/dL, low: 0.74, high: 1.35, low_f: 0.59, high_f: 1.04, decimals: 2}
+  - {key: glu, name: Glucose (fasting), loinc: "2345-7", panel: bmp, unit: mg/dL, low: 70, high: 99, decimals: 0}
+  - {key: ca, name: Calcium, loinc: "17861-6", panel: bmp, unit: mg/dL, low: 8.6, high: 10.3, decimals: 1}
+  - {key: egfr, name: eGFR (CKD-EPI 2021), loinc: "98979-8", panel: bmp, unit: mL/min/1.73m2, low: 60, high: 140, decimals: 0, computed: true}
+  - {key: anion_gap, name: Anion gap, loinc: "33037-3", panel: bmp, unit: mmol/L, low: 3, high: 12, decimals: 0, computed: true}
+  - {key: wbc, name: White blood cells (WBC), loinc: "6690-2", panel: cbc, unit: 10^3/uL, low: 4.5, high: 11.0, decimals: 1}
+  - {key: hgb, name: Hemoglobin, loinc: "718-7", panel: cbc, unit: g/dL, low: 13.5, high: 17.5, low_f: 12.0, high_f: 15.5, decimals: 1}
+  - {key: hct, name: Hematocrit, loinc: "4544-3", panel: cbc, unit: "%", low: 41, high: 50, low_f: 36, high_f: 44, decimals: 0}
+  - {key: plt, name: Platelets, loinc: "777-3", panel: cbc, unit: 10^3/uL, low: 150, high: 450, decimals: 0}
+  - {key: mcv, name: Mean corpuscular volume (MCV), loinc: "787-2", panel: cbc, unit: fL, low: 80, high: 100, decimals: 0}
+  - {key: chol, name: Total cholesterol, loinc: "2093-3", panel: lipid, unit: mg/dL, low: 125, high: 199, decimals: 0}
+  - {key: ldl, name: LDL cholesterol, loinc: "13457-7", panel: lipid, unit: mg/dL, low: 50, high: 99, decimals: 0}
+  - {key: hdl, name: HDL cholesterol, loinc: "2085-9", panel: lipid, unit: mg/dL, low: 40, high: 80, low_f: 50, high_f: 90, decimals: 0}
+  - {key: tg, name: Triglycerides, loinc: "2571-8", panel: lipid, unit: mg/dL, low: 50, high: 149, decimals: 0}
+  - {key: a1c, name: Hemoglobin A1c, loinc: "4548-4", panel: a1c, unit: "%", low: 4.0, high: 5.6, decimals: 1}
+  - {key: mg, name: Magnesium, loinc: "19123-9", panel: mg_phos, unit: mg/dL, low: 1.7, high: 2.2, decimals: 1}
+  - {key: phos, name: Phosphorus, loinc: "2777-1", panel: mg_phos, unit: mg/dL, low: 2.5, high: 4.5, decimals: 1}
+  - {key: trop_i, name: Troponin I (cardiac), loinc: "10839-9", panel: troponin, unit: ng/mL, low: 0.0, high: 0.04, decimals: 2}
+  - {key: tsh, name: Thyroid stimulating hormone (TSH), loinc: "3016-3", panel: thyroid, unit: mIU/L, low: 0.4, high: 4.0, decimals: 2}
+  - {key: alt, name: Alanine aminotransferase (ALT), loinc: "1742-6", panel: liver, unit: U/L, low: 7, high: 56, decimals: 0}
+  - {key: ast, name: Aspartate aminotransferase (AST), loinc: "1920-8", panel: liver, unit: U/L, low: 10, high: 40, decimals: 0}
+  - {key: strep_rapid, name: Rapid strep antigen (throat), loinc: "78012-2", panel: strep, unit: "", qualitative: true, normal_text: Negative}
+  - {key: phq9, name: PHQ-9 total score, loinc: "44261-6", panel: phq9, unit: points, low: 0, high: 4, decimals: 0}
+vitals:
+  # Adult resting ranges; child ranges are approximate for ages 6-12.
+  # TODO(clinical-review): pediatric bands.
+  adult:
+    sbp: {low: 110, high: 129, unit: mmHg}
+    dbp: {low: 68, high: 79, unit: mmHg}
+    hr: {low: 62, high: 90, unit: bpm}
+    rr: {low: 12, high: 18, unit: breaths/min}
+    temp_c: {low: 36.5, high: 37.2, unit: "°C", decimals: 1}
+    spo2: {low: 96, high: 99, unit: "%"}
+  child_6_12:
+    sbp: {low: 95, high: 110, unit: mmHg}
+    dbp: {low: 55, high: 70, unit: mmHg}
+    hr: {low: 75, high: 110, unit: bpm}
+    rr: {low: 18, high: 24, unit: breaths/min}
+    temp_c: {low: 36.5, high: 37.2, unit: "°C", decimals: 1}
+    spo2: {low: 97, high: 100, unit: "%"}

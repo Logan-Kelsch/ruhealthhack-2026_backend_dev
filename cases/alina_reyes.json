@@ -1,0 +1,1510 @@
+{
+  "case_id": "alina_reyes",
+  "version": 1,
+  "status": "published",
+  "title": "Alina Reyes: low mood, and what the questionnaire hides",
+  "description": "21-year-old college junior with six weeks of depressed mood. A past hypomanic week and a family history of bipolar disorder are only found if the student asks. Passive suicidal thoughts come out once she trusts the student.",
+  "seed": 21,
+  "profile": {
+    "name": "Alina Reyes",
+    "age": 21,
+    "sex": "female",
+    "pronouns": "she/her",
+    "occupation": "College student (biology)",
+    "summary": "Original golden case written by the team. TODO(clinical-review)",
+    "personality": {
+      "summary": "Quiet, polite, tired. Answers briefly at first and minimizes. Opens up when the student is warm and unhurried.",
+      "communication_style": "Short answers, trails off, apologizes for 'wasting your time'.",
+      "traits": {
+        "irritability": 0.1,
+        "verbosity": 0.3,
+        "humor": 0.2,
+        "openness": 0.4
+      },
+      "health_literacy": "high",
+      "mood": "flat and tired",
+      "example_lines": [
+        "I don't know. It's probably nothing.",
+        "Sorry, I'm bad at explaining."
+      ]
+    }
+  },
+  "briefing": {
+    "setting": "Student health center, primary care",
+    "reason_for_visit": "Feeling down for several weeks",
+    "goal": "Assess her low mood, screen for safety, and agree on a plan.",
+    "student_role": "Medical student (third year), primary care clerkship",
+    "show_doorway_vitals": true
+  },
+  "facts": [
+    {
+      "id": "f_cc",
+      "category": "presenting",
+      "text": "Has felt down and unmotivated for about six weeks.",
+      "say": "I've just felt really down. Like, six weeks maybe? Nothing feels worth doing.",
+      "tier": "initial",
+      "unlock": {
+        "topics": [
+          "chief_complaint",
+          "hpi_onset",
+          "hpi_duration",
+          "mood"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_roommate_push",
+      "category": "presenting",
+      "text": "Her roommates pushed her to make the appointment.",
+      "say": "Honestly, my roommates kind of made me come.",
+      "tier": "initial",
+      "unlock": {
+        "topics": [
+          "chief_complaint",
+          "patient_expectations"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_anhedonia",
+      "category": "psych",
+      "text": "Lost interest in running and her a cappella group, which she used to love.",
+      "say": "I used to love running, and I sing in an a cappella group. I just stopped going.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "mood",
+          "physical_activity"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_dog_cue",
+      "category": "personal",
+      "text": "Misses her dog Biscuit, who lives with her parents.",
+      "say": "I miss my dog, Biscuit. He's at my parents' place.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "hobbies_personal",
+          "social_support"
+        ],
+        "requires_facts": []
+      },
+      "cue": true,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_sleep",
+      "category": "psych",
+      "text": "Sleeps 10 to 11 hours and still feels tired.",
+      "say": "I sleep like ten, eleven hours and I'm still exhausted.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "sleep",
+          "ros_general"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_appetite",
+      "category": "psych",
+      "text": "Poor appetite; skips meals; has lost about 8 pounds.",
+      "say": "I'm not really hungry. I've lost like eight pounds.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "ros_general",
+          "diet_general",
+          "weight_change"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_concentration",
+      "category": "psych",
+      "text": "Trouble concentrating (reads the same page five times); falling behind in classes.",
+      "say": "I can't focus. I read the same page five times.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "ros_neuro",
+          "stress"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_guilt",
+      "category": "psych",
+      "text": "Feels guilty and like a failure about her grades.",
+      "say": "I feel like I'm letting everyone down. My parents are paying for all this.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "mood",
+          "stress"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_school",
+      "category": "social",
+      "text": "College junior majoring in biology; grades dropped this semester.",
+      "say": "I'm a junior, bio major. My grades tanked this semester.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "occupation",
+          "stress"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_living",
+      "category": "social",
+      "text": "Lives off campus with two roommates.",
+      "say": "I live with two roommates, off campus.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "social_living",
+          "social_support"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_mom_calls",
+      "category": "social",
+      "text": "Talks to her mom every Sunday but has not told her how she feels.",
+      "say": "I talk to my mom every Sunday. I haven't told her any of this.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "social_support",
+          "family_history"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_alcohol",
+      "category": "social",
+      "text": "Has 2 to 3 drinks on weekends.",
+      "say": "Like two or three drinks on weekends. Not a lot.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "alcohol"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_drugs",
+      "category": "social",
+      "text": "Does not use drugs.",
+      "say": "No, nothing like that.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "drugs"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_tobacco",
+      "category": "social",
+      "text": "Does not smoke or vape.",
+      "say": "I don't smoke or vape.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "tobacco"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_meds_none",
+      "category": "medication",
+      "text": "Takes only a daily multivitamin and a birth control pill.",
+      "say": "Just a multivitamin. And birth control.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "medication_list",
+          "otc_medications"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_nkda",
+      "category": "allergy",
+      "text": "No known drug allergies.",
+      "say": "No allergies.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "allergies"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_psych_hx_none",
+      "category": "psych",
+      "text": "Has never had mental health treatment.",
+      "say": "I've never seen a therapist or anything.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "psychiatric_history"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_medical_hx",
+      "category": "history",
+      "text": "No medical problems.",
+      "say": "I'm healthy otherwise.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "medical_history"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_sexual",
+      "category": "history",
+      "text": "Has a boyfriend; uses the pill and condoms.",
+      "say": "I have a boyfriend. We use condoms, and I'm on the pill.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "sexual_history"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_family_bipolar",
+      "category": "family",
+      "text": "Her uncle (her mother's brother) has bipolar disorder and has been hospitalized for it.",
+      "say": "My uncle, my mom's brother, has bipolar. He's been in the hospital for it.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "family_psych_history",
+          "family_history"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_hypomania_hx",
+      "category": "psych",
+      "text": "Last spring she had about a week of sleeping only 3 to 4 hours a night, feeling unstoppable and spending $900 on things she did not need.",
+      "say": "Actually, last spring there was this week where I barely slept, like three or four hours, and I felt amazing. I spent like nine hundred dollars on stuff I didn't need.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "mania_history"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": true,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_passive_si",
+      "category": "psych",
+      "text": "Sometimes thinks it would be easier not to wake up.",
+      "say": "Sometimes I think it'd be easier if I just... didn't wake up.",
+      "tier": "reluctant",
+      "unlock": {
+        "topics": [
+          "suicidal_ideation"
+        ],
+        "min_trust": 1,
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": true,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_no_plan",
+      "category": "psych",
+      "text": "No plan or intent to act; no past attempts; no guns at home.",
+      "say": "No, I'd never actually do anything. I don't have a plan. There's no guns or anything.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "suicidal_ideation"
+        ],
+        "requires_facts": [
+          "f_passive_si"
+        ]
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_hi_none",
+      "category": "psych",
+      "text": "No thoughts of hurting anyone else.",
+      "say": "No. Never.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "homicidal_ideation"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_goal",
+      "category": "goal",
+      "text": "Wants to feel like herself again and not fail out of school.",
+      "say": "I just want to feel like me again. And not fail out.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "goals",
+          "patient_expectations"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_fear_meds",
+      "category": "fear",
+      "text": "Worried that medicine will change her personality.",
+      "say": "I don't want some pill that turns me into a zombie.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "fears_worries",
+          "beliefs_understanding"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    }
+  ],
+  "vitals": [
+    {
+      "key": "bp",
+      "label": "Blood pressure",
+      "value": "112/70",
+      "unit": "mmHg",
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "key": "hr",
+      "label": "Heart rate",
+      "value": "72",
+      "unit": "bpm",
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "key": "rr",
+      "label": "Breathing rate",
+      "value": "14",
+      "unit": "breaths/min",
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "key": "temp_c",
+      "label": "Temperature",
+      "value": "36.8",
+      "unit": "°C",
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "key": "spo2",
+      "label": "Oxygen saturation",
+      "value": "99",
+      "unit": "%",
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "key": "weight",
+      "label": "Weight",
+      "value": "128",
+      "unit": "lb",
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "key": "height",
+      "label": "Height",
+      "value": "65",
+      "unit": "in",
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    }
+  ],
+  "labs": [
+    {
+      "id": "lab_tsh",
+      "key": "tsh",
+      "name": "Thyroid stimulating hormone (TSH)",
+      "loinc": "3016-3",
+      "panel": "thyroid",
+      "value": 1.8,
+      "unit": "mIU/L",
+      "ref_low": 0.4,
+      "ref_high": 4.0,
+      "ref_source": "Typical adult reference interval (varies by lab); see docs/credits.md",
+      "release": {
+        "on": "order",
+        "topics": []
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "lab_hgb",
+      "key": "hgb",
+      "name": "Hemoglobin",
+      "loinc": "718-7",
+      "panel": "cbc",
+      "value": 13.1,
+      "unit": "g/dL",
+      "ref_low": 12.0,
+      "ref_high": 15.5,
+      "ref_source": "Typical adult reference interval (varies by lab); see docs/credits.md",
+      "release": {
+        "on": "order",
+        "topics": []
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "lab_wbc",
+      "key": "wbc",
+      "name": "White blood cells (WBC)",
+      "loinc": "6690-2",
+      "panel": "cbc",
+      "value": 6.4,
+      "unit": "10^3/uL",
+      "ref_low": 4.5,
+      "ref_high": 11.0,
+      "ref_source": "Typical adult reference interval (varies by lab); see docs/credits.md",
+      "release": {
+        "on": "order",
+        "topics": []
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "lab_plt",
+      "key": "plt",
+      "name": "Platelets",
+      "loinc": "777-3",
+      "panel": "cbc",
+      "value": 250.0,
+      "unit": "10^3/uL",
+      "ref_low": 150.0,
+      "ref_high": 450.0,
+      "ref_source": "Typical adult reference interval (varies by lab); see docs/credits.md",
+      "release": {
+        "on": "order",
+        "topics": []
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "lab_hct",
+      "key": "hct",
+      "name": "Hematocrit",
+      "loinc": "4544-3",
+      "panel": "cbc",
+      "value": 39.0,
+      "unit": "%",
+      "ref_low": 36.0,
+      "ref_high": 44.0,
+      "ref_source": "Typical adult reference interval (varies by lab); see docs/credits.md",
+      "release": {
+        "on": "order",
+        "topics": []
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "lab_mcv",
+      "key": "mcv",
+      "name": "Mean corpuscular volume (MCV)",
+      "loinc": "787-2",
+      "panel": "cbc",
+      "value": 88.0,
+      "unit": "fL",
+      "ref_low": 80.0,
+      "ref_high": 100.0,
+      "ref_source": "Typical adult reference interval (varies by lab); see docs/credits.md",
+      "release": {
+        "on": "order",
+        "topics": []
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    }
+  ],
+  "exam": [
+    {
+      "maneuver": "mental_status_affect",
+      "finding": "Flat affect, slowed speech, linear thought process. No psychosis.",
+      "abnormal": true,
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "phq9",
+      "kind": "questionnaire",
+      "title": "PHQ-9 (filled in the waiting room)",
+      "body": "PHQ-9 total score 16 (moderately severe). Item 9, about thoughts of being better off dead or hurting yourself, was left blank.",
+      "release": {
+        "on": "visit_start",
+        "topics": []
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    }
+  ],
+  "diagnoses": [],
+  "medications": [],
+  "allergies": [],
+  "objectives": [
+    {
+      "id": "obj_depression",
+      "text": "Take a depression history (mood, interest, sleep, appetite, focus, guilt).",
+      "expected_discoveries": [
+        "f_anhedonia",
+        "f_sleep",
+        "f_appetite",
+        "f_concentration",
+        "f_guilt"
+      ],
+      "expected_actions": [],
+      "rubric_domains": [
+        "information_gathering"
+      ],
+      "status": "approved"
+    },
+    {
+      "id": "obj_bipolar",
+      "text": "Screen for past mania or hypomania and family history before starting treatment.",
+      "expected_discoveries": [
+        "f_hypomania_hx",
+        "f_family_bipolar"
+      ],
+      "expected_actions": [],
+      "rubric_domains": [
+        "clinical_reasoning_and_synthesis"
+      ],
+      "status": "approved"
+    },
+    {
+      "id": "obj_safety",
+      "text": "Ask directly about suicidal thoughts and make a safety plan.",
+      "expected_discoveries": [
+        "f_passive_si",
+        "f_no_plan"
+      ],
+      "expected_actions": [
+        "safety_plan"
+      ],
+      "rubric_domains": [
+        "professionalism_safety_closure"
+      ],
+      "status": "approved"
+    },
+    {
+      "id": "obj_plan",
+      "text": "Agree on a treatment plan and explain side effects.",
+      "expected_discoveries": [
+        "f_fear_meds",
+        "f_goal"
+      ],
+      "expected_actions": [
+        "plan_next_steps"
+      ],
+      "rubric_domains": [
+        "explanation_and_shared_decisions"
+      ],
+      "status": "approved"
+    }
+  ],
+  "topics": [],
+  "actions": [
+    {
+      "id": "start_ssri",
+      "description": "Proposes starting an SSRI antidepressant such as sertraline, fluoxetine or escitalopram",
+      "keywords": [
+        "sertraline|zoloft|fluoxetine|prozac|escitalopram|lexapro|\\bssri",
+        "start (you on )?an antidepressant"
+      ]
+    },
+    {
+      "id": "start_antipsychotic",
+      "description": "Proposes a second-generation antipsychotic or mood stabilizer, such as aripiprazole (Abilify)",
+      "keywords": [
+        "aripiprazole|abilify|quetiapine|seroquel|lurasidone|latuda|mood stabili[sz]er|lithium|lamotrigine"
+      ]
+    },
+    {
+      "id": "counsel_ssri_side_effects",
+      "description": "Explains SSRI side effects (stomach upset, sleep changes, sexual side effects, the black-box warning about suicidal thoughts in young people)",
+      "keywords": [
+        "side effects?.{0,60}(stomach|nausea|sleep|sexual)",
+        "black.?box",
+        "(first|few) weeks.{0,40}(worse|thoughts)"
+      ]
+    },
+    {
+      "id": "counsel_antipsychotic_side_effects",
+      "description": "Explains antipsychotic side effects: movement problems such as tardive dyskinesia or restlessness, and weight, blood sugar and cholesterol changes (metabolic syndrome)",
+      "keywords": [
+        "tardive|involuntary movement|restless(ness)?|akathisia",
+        "metabolic|weight gain|(blood sugar|cholesterol|a1c).{0,20}(check|monitor)"
+      ]
+    },
+    {
+      "id": "safety_plan",
+      "description": "Makes a safety plan: who to call, crisis line 988, removing means, when to seek help",
+      "keywords": [
+        "safety plan",
+        "\\b988\\b|crisis line",
+        "who (would|could) you (call|reach out to|talk to)",
+        "if (you|those thoughts) (ever )?(get|feel|come back|get worse)"
+      ]
+    },
+    {
+      "id": "refer_psychiatry",
+      "description": "Refers to psychiatry or mental health services",
+      "keywords": [
+        "psychiatr(y|ist)",
+        "refer(ral)?.{0,20}(mental health|counsel|therap)"
+      ]
+    }
+  ],
+  "rubric_id": "shp_patient_encounter_v1",
+  "documentation_template": "SOAP",
+  "trust": {
+    "start": 0,
+    "thresholds": {
+      "reluctant": 2,
+      "hidden": 4
+    }
+  },
+  "difficulty": {
+    "preset": "typical",
+    "params": {}
+  },
+  "visits": [
+    {
+      "id": "v1",
+      "label": "First visit",
+      "day": 0,
+      "changes": {
+        "add_facts": [],
+        "update_facts": {},
+        "remove_facts": [],
+        "vitals": [],
+        "labs": [],
+        "exam": [],
+        "artifacts": []
+      },
+      "decision_points": [
+        {
+          "id": "dp_bipolar_screen",
+          "label": "Screened for past mania or hypomania before treatment",
+          "predicate": {
+            "any": [
+              {
+                "topic": "mania_history"
+              },
+              {
+                "fact_disclosed": "f_hypomania_hx"
+              }
+            ]
+          },
+          "affects": "patient",
+          "rubric_domain": "clinical_reasoning_and_synthesis",
+          "feedback_if_yes": "You asked about past periods of high energy and little sleep. That changed her treatment.",
+          "feedback_if_no": "Before starting an antidepressant, ask about past times of very high energy, little need for sleep or impulsive spending. An SSRI alone can trigger mania in bipolar disorder."
+        },
+        {
+          "id": "dp_si_screen",
+          "label": "Asked directly about suicidal thoughts",
+          "predicate": {
+            "topic": "suicidal_ideation"
+          },
+          "affects": "score",
+          "rubric_domain": "professionalism_safety_closure",
+          "feedback_if_yes": "You asked directly about suicidal thoughts. With item 9 of the PHQ-9 left blank, that was essential.",
+          "feedback_if_no": "Item 9 of the PHQ-9 was left blank. Ask directly about suicidal thoughts. Asking does not plant the idea."
+        },
+        {
+          "id": "dp_family_psych",
+          "label": "Asked about mental illness in the family",
+          "predicate": {
+            "any": [
+              {
+                "topic": "family_psych_history"
+              },
+              {
+                "fact_disclosed": "f_family_bipolar"
+              }
+            ]
+          },
+          "affects": "score",
+          "rubric_domain": "information_gathering",
+          "feedback_if_no": "Ask about mental illness in the family. Her uncle has bipolar disorder."
+        },
+        {
+          "id": "dp_side_effects",
+          "label": "Explained side effects of any medicine proposed",
+          "predicate": {
+            "any": [
+              {
+                "action": "counsel_ssri_side_effects"
+              },
+              {
+                "action": "counsel_antipsychotic_side_effects"
+              }
+            ]
+          },
+          "affects": "score",
+          "rubric_domain": "explanation_and_shared_decisions"
+        }
+      ],
+      "branches": [
+        {
+          "id": "b_bipolar_managed",
+          "label": "Hypomania found: antipsychotic instead of SSRI alone",
+          "when": {
+            "dp_bipolar_screen": true
+          },
+          "after_branches": [],
+          "summary": "Her past hypomanic week was found. Psychiatry started aripiprazole (Abilify) instead of an SSRI alone, with counselling on tardive dyskinesia and metabolic side effects.",
+          "changes": {
+            "add_facts": [
+              {
+                "id": "f_v2_better",
+                "category": "presenting",
+                "text": "Feels somewhat better; sleeping more normally; went back to a cappella practice.",
+                "say": "I'm doing a bit better. Sleeping normal-ish. I went back to a cappella.",
+                "tier": "initial",
+                "unlock": {
+                  "topics": [
+                    "chief_complaint",
+                    "mood",
+                    "sleep"
+                  ],
+                  "requires_facts": []
+                },
+                "cue": false,
+                "safety": false,
+                "codes": [],
+                "source": {
+                  "kind": "faculty"
+                },
+                "status": "approved"
+              },
+              {
+                "id": "f_v2_restless",
+                "category": "medication",
+                "text": "Feels a little restless on the new medicine.",
+                "say": "I feel kind of jittery sometimes, like I can't sit still.",
+                "tier": "discoverable",
+                "unlock": {
+                  "topics": [
+                    "medication_adherence",
+                    "ros_neuro"
+                  ],
+                  "requires_facts": []
+                },
+                "cue": false,
+                "safety": false,
+                "codes": [],
+                "source": {
+                  "kind": "faculty"
+                },
+                "status": "approved"
+              },
+              {
+                "id": "f_v2_weight",
+                "category": "ros",
+                "text": "Has gained 4 pounds since starting the medicine.",
+                "say": "I've gained like four pounds.",
+                "tier": "discoverable",
+                "unlock": {
+                  "topics": [
+                    "weight_change",
+                    "medication_adherence"
+                  ],
+                  "requires_facts": []
+                },
+                "cue": false,
+                "safety": false,
+                "codes": [],
+                "source": {
+                  "kind": "faculty"
+                },
+                "status": "approved"
+              },
+              {
+                "id": "f_v2_si_none",
+                "category": "psych",
+                "text": "No longer has thoughts of not waking up.",
+                "say": "No, I haven't had those thoughts in a while.",
+                "tier": "discoverable",
+                "unlock": {
+                  "topics": [
+                    "suicidal_ideation"
+                  ],
+                  "requires_facts": []
+                },
+                "cue": false,
+                "safety": false,
+                "codes": [],
+                "source": {
+                  "kind": "faculty"
+                },
+                "status": "approved"
+              }
+            ],
+            "update_facts": {},
+            "remove_facts": [],
+            "vitals": [],
+            "labs": [
+              {
+                "id": "lab_glu",
+                "key": "glu",
+                "name": "Glucose (fasting)",
+                "loinc": "2345-7",
+                "panel": "bmp",
+                "value": 88.0,
+                "unit": "mg/dL",
+                "ref_low": 70.0,
+                "ref_high": 99.0,
+                "ref_source": "Typical adult reference interval (varies by lab); see docs/credits.md",
+                "release": {
+                  "on": "order",
+                  "topics": []
+                },
+                "source": {
+                  "kind": "faculty"
+                },
+                "status": "approved"
+              },
+              {
+                "id": "lab_a1c",
+                "key": "a1c",
+                "name": "Hemoglobin A1c",
+                "loinc": "4548-4",
+                "panel": "a1c",
+                "value": 5.1,
+                "unit": "%",
+                "ref_low": 4.0,
+                "ref_high": 5.6,
+                "ref_source": "Typical adult reference interval (varies by lab); see docs/credits.md",
+                "release": {
+                  "on": "order",
+                  "topics": []
+                },
+                "source": {
+                  "kind": "faculty"
+                },
+                "status": "approved"
+              },
+              {
+                "id": "lab_ldl",
+                "key": "ldl",
+                "name": "LDL cholesterol",
+                "loinc": "13457-7",
+                "panel": "lipid",
+                "value": 92.0,
+                "unit": "mg/dL",
+                "ref_low": 50.0,
+                "ref_high": 99.0,
+                "ref_source": "Typical adult reference interval (varies by lab); see docs/credits.md",
+                "release": {
+                  "on": "order",
+                  "topics": []
+                },
+                "source": {
+                  "kind": "faculty"
+                },
+                "status": "approved"
+              }
+            ],
+            "exam": [],
+            "artifacts": [
+              {
+                "id": "phq9",
+                "kind": "questionnaire",
+                "title": "PHQ-9 (today)",
+                "body": "PHQ-9 total score 9 (mild). Improved from 16. Item 9 scored 0.",
+                "release": {
+                  "on": "visit_start",
+                  "topics": []
+                },
+                "source": {
+                  "kind": "faculty"
+                },
+                "status": "approved"
+              }
+            ],
+            "medications": [
+              {
+                "name": "Aripiprazole (Abilify)",
+                "dose": "5 mg",
+                "frequency": "once daily",
+                "purpose": "Bipolar depression",
+                "codes": [],
+                "release": {
+                  "on": "visit_start",
+                  "topics": []
+                },
+                "source": {
+                  "kind": "faculty"
+                },
+                "status": "approved"
+              }
+            ],
+            "mood": "a little brighter"
+          },
+          "status": "approved"
+        },
+        {
+          "id": "b_ssri_trap",
+          "label": "No mania screen: SSRI alone",
+          "when": {
+            "dp_bipolar_screen": false
+          },
+          "after_branches": [],
+          "summary": "No one asked about mania, so she was started on sertraline alone. At follow-up she says she feels great and her PHQ-9 looks much better, but she is becoming hypomanic.",
+          "changes": {
+            "add_facts": [
+              {
+                "id": "f_v2_great",
+                "category": "presenting",
+                "text": "Says she feels amazing, better than ever.",
+                "say": "Honestly? I feel amazing. Like, better than ever.",
+                "tier": "initial",
+                "unlock": {
+                  "topics": [
+                    "chief_complaint",
+                    "mood"
+                  ],
+                  "requires_facts": []
+                },
+                "cue": false,
+                "safety": false,
+                "codes": [],
+                "source": {
+                  "kind": "faculty"
+                },
+                "status": "approved"
+              },
+              {
+                "id": "f_v2_little_sleep",
+                "category": "psych",
+                "text": "Sleeps about 4 hours a night and does not feel tired.",
+                "say": "I only need like four hours of sleep now. I'm not even tired.",
+                "tier": "discoverable",
+                "unlock": {
+                  "topics": [
+                    "sleep",
+                    "mania_history"
+                  ],
+                  "requires_facts": []
+                },
+                "cue": false,
+                "safety": true,
+                "codes": [],
+                "source": {
+                  "kind": "faculty"
+                },
+                "status": "approved"
+              },
+              {
+                "id": "f_v2_spending",
+                "category": "psych",
+                "text": "Maxed out a credit card on a last-minute trip.",
+                "say": "I kind of maxed out my card on a trip. It was spontaneous.",
+                "tier": "discoverable",
+                "unlock": {
+                  "topics": [
+                    "finances_access",
+                    "mania_history"
+                  ],
+                  "requires_facts": []
+                },
+                "cue": false,
+                "safety": false,
+                "codes": [],
+                "source": {
+                  "kind": "faculty"
+                },
+                "status": "approved"
+              },
+              {
+                "id": "f_v2_racing",
+                "category": "psych",
+                "text": "Her thoughts feel like they are racing.",
+                "say": "My brain is going a mile a minute. So many ideas.",
+                "tier": "discoverable",
+                "unlock": {
+                  "topics": [
+                    "mania_history",
+                    "stress"
+                  ],
+                  "requires_facts": []
+                },
+                "cue": false,
+                "safety": false,
+                "codes": [],
+                "source": {
+                  "kind": "faculty"
+                },
+                "status": "approved"
+              },
+              {
+                "id": "f_v2_roommates",
+                "category": "social",
+                "text": "Her roommates say she is 'not herself' and talks too fast.",
+                "say": "My roommates keep saying I'm not myself. They're being dramatic.",
+                "tier": "reluctant",
+                "unlock": {
+                  "topics": [
+                    "social_support",
+                    "social_living"
+                  ],
+                  "requires_facts": []
+                },
+                "cue": false,
+                "safety": false,
+                "codes": [],
+                "source": {
+                  "kind": "faculty"
+                },
+                "status": "approved"
+              }
+            ],
+            "update_facts": {},
+            "remove_facts": [],
+            "vitals": [],
+            "labs": [],
+            "exam": [],
+            "artifacts": [
+              {
+                "id": "phq9",
+                "kind": "questionnaire",
+                "title": "PHQ-9 (today)",
+                "body": "PHQ-9 total score 5 (minimal). Improved from 16. Item 9 scored 0.",
+                "release": {
+                  "on": "visit_start",
+                  "topics": []
+                },
+                "source": {
+                  "kind": "faculty"
+                },
+                "status": "approved"
+              }
+            ],
+            "medications": [
+              {
+                "name": "Sertraline (Zoloft)",
+                "dose": "50 mg",
+                "frequency": "once daily",
+                "purpose": "Depression",
+                "codes": [],
+                "release": {
+                  "on": "visit_start",
+                  "topics": []
+                },
+                "source": {
+                  "kind": "faculty"
+                },
+                "status": "approved"
+              }
+            ],
+            "mood": "energetic, talkative, fast speech"
+          },
+          "status": "approved"
+        }
+      ]
+    },
+    {
+      "id": "v2",
+      "label": "Follow-up, 6 weeks later",
+      "day": 42,
+      "changes": {
+        "add_facts": [],
+        "update_facts": {},
+        "remove_facts": [],
+        "vitals": [],
+        "labs": [],
+        "exam": [],
+        "artifacts": [],
+        "briefing": {
+          "setting": "",
+          "reason_for_visit": "Six-week follow-up on new medicine",
+          "goal": "Check how the medicine is working, side effects and safety, and adjust the plan.",
+          "student_role": "",
+          "show_doorway_vitals": true
+        }
+      },
+      "decision_points": [
+        {
+          "id": "dp_v2_mania_check",
+          "label": "Checked for mania symptoms at follow-up",
+          "predicate": {
+            "any": [
+              {
+                "topic": "mania_history"
+              },
+              {
+                "fact_disclosed": "f_v2_little_sleep"
+              }
+            ]
+          },
+          "affects": "patient",
+          "rubric_domain": "clinical_reasoning_and_synthesis",
+          "feedback_if_yes": "You looked past the better PHQ-9 score and checked for mania.",
+          "feedback_if_no": "A big jump in mood on an antidepressant can be mania, not recovery. Ask about sleep, energy, spending and racing thoughts."
+        },
+        {
+          "id": "dp_v2_si_recheck",
+          "label": "Asked about suicidal thoughts again",
+          "predicate": {
+            "topic": "suicidal_ideation"
+          },
+          "affects": "score",
+          "rubric_domain": "professionalism_safety_closure"
+        },
+        {
+          "id": "dp_v2_side_effects",
+          "label": "Counselled on side effects of her medicine",
+          "predicate": {
+            "any": [
+              {
+                "action": "counsel_antipsychotic_side_effects"
+              },
+              {
+                "action": "counsel_ssri_side_effects"
+              }
+            ]
+          },
+          "affects": "score",
+          "rubric_domain": "explanation_and_shared_decisions",
+          "feedback_if_no": "On aripiprazole, explain and check for movement problems such as tardive dyskinesia and restlessness, and for weight, blood sugar and cholesterol changes."
+        }
+      ],
+      "branches": [
+        {
+          "id": "b_v2_caught",
+          "label": "Mania recognized",
+          "when": {
+            "dp_v2_mania_check": true
+          },
+          "after_branches": [
+            "b_ssri_trap"
+          ],
+          "summary": "You recognized hypomania. Sertraline was stopped, psychiatry saw her within days and started a mood stabilizer.",
+          "changes": {
+            "add_facts": [],
+            "update_facts": {},
+            "remove_facts": [],
+            "vitals": [],
+            "labs": [],
+            "exam": [],
+            "artifacts": []
+          },
+          "status": "approved"
+        },
+        {
+          "id": "b_v2_hospitalized",
+          "label": "Mania missed: psychiatric hospital",
+          "when": {
+            "dp_v2_mania_check": false
+          },
+          "after_branches": [
+            "b_ssri_trap"
+          ],
+          "summary": "Two weeks later her roommates reported erratic behavior and that she had been staying up all night. She was admitted to a psychiatric hospital.",
+          "changes": {
+            "add_facts": [],
+            "update_facts": {},
+            "remove_facts": [],
+            "vitals": [],
+            "labs": [],
+            "exam": [],
+            "artifacts": []
+          },
+          "status": "approved"
+        },
+        {
+          "id": "b_v2_stable",
+          "label": "Stable on treatment",
+          "when": {},
+          "after_branches": [
+            "b_bipolar_managed"
+          ],
+          "summary": "She continues aripiprazole with regular checks of weight, blood sugar, cholesterol and movement.",
+          "changes": {
+            "add_facts": [],
+            "update_facts": {},
+            "remove_facts": [],
+            "vitals": [],
+            "labs": [],
+            "exam": [],
+            "artifacts": []
+          },
+          "status": "approved"
+        }
+      ]
+    }
+  ],
+  "consistency_findings": [],
+  "credits": [
+    {
+      "what": "Case content",
+      "source": "Original synthetic case written by the team; TODO(clinical-review)"
+    }
+  ],
+  "created_by": "Team (golden case) TODO(clinical-review)",
+  "golden": true
+}

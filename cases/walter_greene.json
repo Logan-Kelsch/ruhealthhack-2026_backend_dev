@@ -1,0 +1,2035 @@
+{
+  "case_id": "walter_greene",
+  "version": 1,
+  "status": "published",
+  "title": "Walter Greene: diabetes, heart failure and a dinner club",
+  "description": "72-year-old retired janitor with uncontrolled type 2 diabetes, heart failure, hypertension and CKD stage 3, sent for medical nutrition therapy. Grumpy and sarcastic at first; opens up when he feels respected. Hidden safety issue: he takes ibuprofen for back pain.",
+  "seed": 72,
+  "profile": {
+    "name": "Walter Greene",
+    "age": 72,
+    "sex": "male",
+    "pronouns": "he/him",
+    "portrait": "walter_greene.jpg",
+    "occupation": "Retired janitor",
+    "summary": "Adapted from the event-provided VHS profile. Values corrected where the profile contradicted itself (see consistency findings on the imported version).",
+    "personality": {
+      "summary": "Cynical and sarcastic; masks fear with humor and grumpiness. Hates being pitied or treated like a child. Talks a lot once engaged.",
+      "communication_style": "Short and snappy at first, teases students about looking young. Warms up and jokes when listened to.",
+      "traits": {
+        "irritability": 0.7,
+        "verbosity": 0.8,
+        "humor": 0.7,
+        "openness": 0.3
+      },
+      "health_literacy": "low",
+      "mood": "grumpy",
+      "example_lines": [
+        "You look like a kid.",
+        "Healthy eating's for rich folks.",
+        "Fine. What do you want to know?"
+      ]
+    }
+  },
+  "briefing": {
+    "setting": "Outpatient nutrition clinic",
+    "reason_for_visit": "Referral for medical nutrition therapy: diabetes, heart failure and kidney disease",
+    "goal": "Take a nutrition-focused history, find what gets in the way of his eating and medicines, and agree on one or two realistic changes.",
+    "student_role": "Dietetics student (supervised practice)",
+    "show_doorway_vitals": true
+  },
+  "facts": [
+    {
+      "id": "f_complains_pills",
+      "category": "presenting",
+      "text": "Complains right away that all his pills make him feel dumb and nauseous.",
+      "say": "I take all these pills and they make me feel dumb and sick to my stomach.",
+      "tier": "initial",
+      "unlock": {
+        "topics": [
+          "chief_complaint",
+          "medication_list"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_doctor_sent",
+      "category": "presenting",
+      "text": "Came because his doctor sent him; does not like being sent to the clinic for diet stuff.",
+      "say": "My doctor sent me. I don't see what a diet talk is gonna do.",
+      "tier": "initial",
+      "unlock": {
+        "topics": [
+          "chief_complaint",
+          "patient_expectations"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_student_young",
+      "category": "small_talk",
+      "text": "Jokes that the student looks young.",
+      "say": "You look like a kid. Do I need to fill out a form for this diet thing?",
+      "tier": "initial",
+      "unlock": {
+        "topics": [
+          "greeting_introduction"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_dinner_club",
+      "category": "diet",
+      "text": "Eats out twice a week with his dinner club friends at a local chain restaurant; the food is fried and salty.",
+      "say": "Twice a week I go out with my dinner club. Old friends. The food's fried and salty, the good stuff.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "diet_eating_out",
+          "social_support",
+          "hobbies_personal",
+          "diet_general"
+        ],
+        "requires_facts": []
+      },
+      "cue": true,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_special_orders",
+      "category": "diet",
+      "text": "Orders the 'special' versions of menu items, which are higher in sodium.",
+      "say": "I always get the specials. Extra gravy, the works.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "diet_eating_out",
+          "diet_sodium"
+        ],
+        "requires_facts": [
+          "f_dinner_club"
+        ]
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_ibuprofen",
+      "category": "medication",
+      "text": "Takes ibuprofen (Advil) 400 mg for back pain 2 to 3 times a week; does not know it can harm his heart and kidneys.",
+      "say": "Advil for my back. Two, three times a week. It's just Advil.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "otc_medications",
+          "hpi_modifying",
+          "ros_msk"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": true,
+      "chart_section": "Patient-reported medicines",
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_hf_dm_same",
+      "category": "history",
+      "text": "Thinks his heart failure and diabetes are the same thing, his 'sick thing'.",
+      "say": "The sugar and the heart thing, it's all the same. My sick thing.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "beliefs_understanding",
+          "medical_history"
+        ],
+        "requires_facts": []
+      },
+      "belief": {
+        "text": "Believes heart failure and diabetes are one illness."
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_soda",
+      "category": "diet",
+      "text": "Drinks soda with every meal and avoids water; likes sweet tea and fruit punch.",
+      "say": "Soda with every meal. Sweet tea. Water's got no taste.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "diet_beverages"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_skips_breakfast",
+      "category": "diet",
+      "text": "Skips breakfast, eats his biggest meal at lunch around noon and snacks in the evening.",
+      "say": "I skip breakfast. Big lunch around noon, then I snack at night.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "diet_breakfast",
+          "diet_general"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_canned_food",
+      "category": "diet",
+      "text": "Has no one to cook for him; relies on canned soups, instant mac and cheese and leftovers.",
+      "say": "Nobody cooks for me. Canned soup, the box mac and cheese, leftovers.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "cooking_shopping",
+          "diet_general",
+          "social_living"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_salty_comfort",
+      "category": "diet",
+      "text": "Loves salty food and is skeptical of a low-sodium diet; canned soup is his comfort food.",
+      "say": "Low salt? Then what's the point of eating. Soup's my comfort food.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "diet_sodium",
+          "beliefs_understanding"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_food_comfort_belief",
+      "category": "diet",
+      "text": "Believes healthy eating is for the young, healthy and rich; food is about comfort and joy.",
+      "say": "Healthy eating's for young folks with money. Food's supposed to make you feel good.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "beliefs_understanding",
+          "readiness_to_change"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_grocery_trouble",
+      "category": "social",
+      "text": "Has trouble getting up in the morning and getting to the grocery store.",
+      "say": "Mornings are rough. Getting to the store is a whole production.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "cooking_shopping",
+          "finances_access"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_sister_guilt",
+      "category": "social",
+      "text": "His sister lives across the country; he feels guilty that he is not taking care of himself and does not want to bother her.",
+      "say": "My sister's across the country. She worries, and I'm not exactly taking care of myself. I don't want to bother her.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "social_support",
+          "family_history"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_lives_alone",
+      "category": "social",
+      "text": "Widowed; lives alone in a two-bedroom apartment.",
+      "say": "It's just me in the apartment since my wife passed.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "social_living"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_online_friends",
+      "category": "social",
+      "text": "Talks with a group of retired friends online; no in-person support at home.",
+      "say": "Got some retired buddies I talk to on Facebook.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "social_support",
+          "hobbies_personal"
+        ],
+        "requires_facts": []
+      },
+      "cue": true,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_retired_janitor",
+      "category": "social",
+      "text": "Retired janitor.",
+      "say": "Retired. Janitor, my whole working life.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "occupation"
+        ],
+        "requires_facts": []
+      },
+      "cue": true,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_metformin_nausea",
+      "category": "medication",
+      "text": "Skips metformin some days because it makes him nauseous and sometimes vomit.",
+      "say": "That metformin makes me throw up. Some days I just skip it.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "medication_adherence",
+          "ros_gi",
+          "medication_list"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_lisinopril_belief",
+      "category": "medication",
+      "text": "Takes lisinopril every morning; believes it is only for blood pressure.",
+      "say": "Lisinopril every morning. That one's for my pressure.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "medication_list",
+          "beliefs_understanding"
+        ],
+        "requires_facts": []
+      },
+      "belief": {
+        "text": "Thinks lisinopril is only for blood pressure (it also treats his heart failure and protects his kidneys)."
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_eplerenone_forgets",
+      "category": "medication",
+      "text": "Sometimes forgets eplerenone; worries it will drop his blood pressure and make him faint.",
+      "say": "The water pill, I forget that one sometimes. Scared it'll make me pass out.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "medication_adherence",
+          "medication_list"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_dizzy",
+      "category": "medication",
+      "text": "His medicines give him stomach upset and dizziness.",
+      "say": "The pills make me dizzy and mess with my stomach.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "medication_adherence",
+          "ros_neuro"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_melatonin",
+      "category": "medication",
+      "text": "Takes melatonin 5 mg at night.",
+      "say": "Melatonin at night, for sleep.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "otc_medications",
+          "sleep"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_allergies",
+      "category": "allergy",
+      "text": "Allergic to penicillin (hives), shellfish (anaphylaxis) and sulfa.",
+      "say": "Penicillin gives me hives. Shellfish closes up my throat. And sulfa.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "allergies"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_beer",
+      "category": "social",
+      "text": "Drinks 1 to 2 small cups of beer at night while watching TV.",
+      "say": "A small beer or two in front of the TV.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "alcohol"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_never_smoked",
+      "category": "social",
+      "text": "Has never smoked.",
+      "say": "Never smoked. Not once.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "tobacco"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_nocturia",
+      "category": "ros",
+      "text": "Wakes up several times a night to urinate, which ruins his sleep.",
+      "say": "I'm up all night going to the bathroom. Can't get any sleep.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "sleep",
+          "ros_gu"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_thirst",
+      "category": "ros",
+      "text": "Is very thirsty all the time.",
+      "say": "I'm thirsty all the time.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "ros_gu",
+          "diet_beverages",
+          "hpi_associated"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_fatigue_sob",
+      "category": "ros",
+      "text": "Tired and short of breath with very little effort; sits most of the day.",
+      "say": "I get winded walking to the kitchen. Tired all the time.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "ros_general",
+          "ros_cardiac",
+          "ros_respiratory",
+          "physical_activity"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_leg_swelling",
+      "category": "ros",
+      "text": "Has swelling in both ankles.",
+      "say": "My ankles swell up, both of them.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "ros_cardiac"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_joint_stiffness",
+      "category": "ros",
+      "text": "Has sore, stiff joints.",
+      "say": "My joints are stiff and sore.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "ros_msk"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_weight_loss",
+      "category": "ros",
+      "text": "Has lost weight without trying and is scared of losing muscle.",
+      "say": "I'm losing weight and I'm not even trying. Scares me. I'm getting weak.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "weight_change",
+          "fears_worries"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_active_before",
+      "category": "personal",
+      "text": "Used to be very active and is frustrated that he cannot do much now.",
+      "say": "I used to be on my feet all day. Now look at me.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "physical_activity"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_frequent_hospital",
+      "category": "history",
+      "text": "Is admitted to the hospital often for his heart.",
+      "say": "I'm in that hospital so much they know me by name.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "hospitalizations"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_doctors_money",
+      "category": "history",
+      "text": "Thinks doctors keep him in the hospital to make money.",
+      "say": "They keep me in there so they can bill me.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "beliefs_understanding",
+          "hospitalizations"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_cabg",
+      "category": "history",
+      "text": "Had heart bypass surgery (CABG) 5 years ago.",
+      "say": "Had bypass surgery on my heart, five years back.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "surgical_history",
+          "medical_history"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_diabetes_15y",
+      "category": "history",
+      "text": "Has had type 2 diabetes for 15 years.",
+      "say": "Diabetes, fifteen years now.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "medical_history"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_fixed_income",
+      "category": "social",
+      "text": "His fixed income makes fresh food and medicines expensive.",
+      "say": "I'm on a fixed income. Fresh food costs money. So do the pills.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "finances_access"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_goal_hospital",
+      "category": "goal",
+      "text": "Wants to stay out of the hospital and keep his independence.",
+      "say": "I want to stay out of that hospital. And keep doing for myself.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "goals",
+          "patient_expectations"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_goal_connection",
+      "category": "goal",
+      "text": "Wants someone to explain exactly how his diabetes and heart failure are connected.",
+      "say": "If somebody would just explain how the sugar and the heart go together.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "goals",
+          "beliefs_understanding"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_dont_die_couch",
+      "category": "goal",
+      "text": "Says he knows he should eat better but 'who cares', yet he does not want to die on the couch.",
+      "say": "I know, I know, eat better. Who cares. But I don't want to die on the couch either.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "readiness_to_change",
+          "fears_worries"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_failed_family",
+      "category": "personal",
+      "text": "Feels he failed his kids and his late wife; afraid he is a 'bad' person because he does not follow the diet.",
+      "say": "I wasn't the husband I should've been. Wasn't there for my kids. Now I can't even follow a diet.",
+      "tier": "reluctant",
+      "unlock": {
+        "topics": [
+          "mood",
+          "fears_worries",
+          "social_support"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_scared_future",
+      "category": "fear",
+      "text": "Is scared about his future and his health.",
+      "say": "Truth is, I'm scared. What happens to me when I can't do for myself?",
+      "tier": "hidden",
+      "unlock": {
+        "topics": [
+          "fears_worries",
+          "goals",
+          "mood"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_unused_savings",
+      "category": "social",
+      "text": "Has money in his checking account that he does not use because he is afraid of wasting it.",
+      "say": "I've got some money put away. I don't touch it. Scared I'll need it.",
+      "tier": "hidden",
+      "unlock": {
+        "topics": [
+          "finances_access"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    }
+  ],
+  "vitals": [
+    {
+      "key": "bp",
+      "label": "Blood pressure",
+      "value": "158/92",
+      "unit": "mmHg",
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "key": "hr",
+      "label": "Heart rate",
+      "value": "78",
+      "unit": "bpm",
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "key": "rr",
+      "label": "Breathing rate",
+      "value": "18",
+      "unit": "breaths/min",
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "key": "temp_c",
+      "label": "Temperature",
+      "value": "37.0",
+      "unit": "°C",
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "key": "spo2",
+      "label": "Oxygen saturation",
+      "value": "96",
+      "unit": "%",
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "key": "weight",
+      "label": "Weight",
+      "value": "198",
+      "unit": "lb",
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "key": "height",
+      "label": "Height",
+      "value": "68",
+      "unit": "in",
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "key": "bmi",
+      "label": "Body mass index (BMI)",
+      "value": "30.1",
+      "unit": "kg/m2",
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    }
+  ],
+  "labs": [
+    {
+      "id": "lab_a1c",
+      "key": "a1c",
+      "name": "Hemoglobin A1c",
+      "loinc": "4548-4",
+      "panel": "a1c",
+      "value": 8.7,
+      "unit": "%",
+      "ref_low": 4.0,
+      "ref_high": 5.6,
+      "ref_source": "Typical adult reference interval (varies by lab); see docs/credits.md",
+      "collected": "2 weeks ago",
+      "release": {
+        "on": "visit_start",
+        "topics": []
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "lab_glu",
+      "key": "glu",
+      "name": "Glucose (fasting)",
+      "loinc": "2345-7",
+      "panel": "bmp",
+      "value": 165.0,
+      "unit": "mg/dL",
+      "ref_low": 70.0,
+      "ref_high": 99.0,
+      "ref_source": "Typical adult reference interval (varies by lab); see docs/credits.md",
+      "collected": "2 weeks ago",
+      "release": {
+        "on": "visit_start",
+        "topics": []
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "lab_bun",
+      "key": "bun",
+      "name": "Blood urea nitrogen (BUN)",
+      "loinc": "3094-0",
+      "panel": "bmp",
+      "value": 28.0,
+      "unit": "mg/dL",
+      "ref_low": 7.0,
+      "ref_high": 20.0,
+      "ref_source": "Typical adult reference interval (varies by lab); see docs/credits.md",
+      "collected": "2 weeks ago",
+      "release": {
+        "on": "visit_start",
+        "topics": []
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "lab_cr",
+      "key": "cr",
+      "name": "Creatinine",
+      "loinc": "2160-0",
+      "panel": "bmp",
+      "value": 1.6,
+      "unit": "mg/dL",
+      "ref_low": 0.74,
+      "ref_high": 1.35,
+      "ref_source": "Typical adult reference interval (varies by lab); see docs/credits.md",
+      "collected": "2 weeks ago",
+      "release": {
+        "on": "visit_start",
+        "topics": []
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "lab_egfr",
+      "key": "egfr",
+      "name": "eGFR (CKD-EPI 2021)",
+      "loinc": "98979-8",
+      "panel": "bmp",
+      "value": 45.0,
+      "unit": "mL/min/1.73m2",
+      "ref_low": 60.0,
+      "ref_high": 140.0,
+      "ref_source": "Typical adult reference interval (varies by lab); see docs/credits.md",
+      "collected": "2 weeks ago",
+      "release": {
+        "on": "visit_start",
+        "topics": []
+      },
+      "source": {
+        "kind": "computed",
+        "ref": "CKD-EPI 2021 from creatinine 1.6, age 72, male"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "lab_na",
+      "key": "na",
+      "name": "Sodium",
+      "loinc": "2951-2",
+      "panel": "bmp",
+      "value": 136.0,
+      "unit": "mmol/L",
+      "ref_low": 135.0,
+      "ref_high": 145.0,
+      "ref_source": "Typical adult reference interval (varies by lab); see docs/credits.md",
+      "collected": "2 weeks ago",
+      "release": {
+        "on": "visit_start",
+        "topics": []
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "lab_k",
+      "key": "k",
+      "name": "Potassium",
+      "loinc": "2823-3",
+      "panel": "bmp",
+      "value": 4.1,
+      "unit": "mmol/L",
+      "ref_low": 3.5,
+      "ref_high": 5.0,
+      "ref_source": "Typical adult reference interval (varies by lab); see docs/credits.md",
+      "collected": "2 weeks ago",
+      "release": {
+        "on": "visit_start",
+        "topics": []
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "lab_ldl",
+      "key": "ldl",
+      "name": "LDL cholesterol",
+      "loinc": "13457-7",
+      "panel": "lipid",
+      "value": 125.0,
+      "unit": "mg/dL",
+      "ref_low": 50.0,
+      "ref_high": 99.0,
+      "ref_source": "Typical adult reference interval (varies by lab); see docs/credits.md",
+      "collected": "2 weeks ago",
+      "release": {
+        "on": "visit_start",
+        "topics": []
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    }
+  ],
+  "exam": [
+    {
+      "maneuver": "cardiac_auscultation",
+      "finding": "Soft murmur heard at the apex.",
+      "abnormal": true,
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "maneuver": "lung_auscultation",
+      "finding": "Fine crackles at both lung bases.",
+      "abnormal": true,
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "maneuver": "edema_check",
+      "finding": "2+ pitting edema in both ankles and shins.",
+      "abnormal": true,
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "maneuver": "oropharynx_inspection",
+      "finding": "Mild gum disease (gingivitis); otherwise normal.",
+      "abnormal": true,
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "referral",
+      "kind": "referral",
+      "title": "Referral from primary care",
+      "body": "Medical nutrition therapy referral. 72-year-old man with uncontrolled type 2 diabetes (A1C 8.7%), heart failure with reduced ejection fraction (EF 40%), hypertension, chronic kidney disease stage 3 and coronary artery disease after bypass surgery. Frequent admissions for heart failure. Please assess diet, sodium and fluid habits and support medicine adherence.",
+      "release": {
+        "on": "visit_start",
+        "topics": []
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    }
+  ],
+  "diagnoses": [
+    {
+      "name": "Type 2 diabetes, uncontrolled",
+      "codes": [
+        {
+          "system": "ICD-10-CM",
+          "code": "E11.65",
+          "display": "Type 2 diabetes mellitus with hyperglycemia"
+        }
+      ],
+      "release": {
+        "on": "visit_start",
+        "topics": []
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "name": "Heart failure with reduced ejection fraction (EF 40%)",
+      "codes": [
+        {
+          "system": "ICD-10-CM",
+          "code": "I50.22",
+          "display": "Chronic systolic (congestive) heart failure"
+        }
+      ],
+      "release": {
+        "on": "visit_start",
+        "topics": []
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "name": "Hypertension",
+      "codes": [
+        {
+          "system": "ICD-10-CM",
+          "code": "I10",
+          "display": "Essential (primary) hypertension"
+        }
+      ],
+      "release": {
+        "on": "visit_start",
+        "topics": []
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "name": "Chronic kidney disease, stage 3",
+      "codes": [
+        {
+          "system": "ICD-10-CM",
+          "code": "N18.30",
+          "display": "Chronic kidney disease, stage 3 unspecified"
+        }
+      ],
+      "release": {
+        "on": "visit_start",
+        "topics": []
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "name": "Coronary artery disease, after bypass surgery (CABG)",
+      "codes": [
+        {
+          "system": "ICD-10-CM",
+          "code": "I25.10",
+          "display": "Atherosclerotic heart disease of native coronary artery without angina pectoris"
+        }
+      ],
+      "release": {
+        "on": "visit_start",
+        "topics": []
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    }
+  ],
+  "medications": [
+    {
+      "name": "Metformin",
+      "dose": "500 mg",
+      "frequency": "twice daily with meals",
+      "purpose": "Type 2 diabetes",
+      "codes": [],
+      "release": {
+        "on": "visit_start",
+        "topics": []
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "name": "Lisinopril",
+      "dose": "20 mg",
+      "frequency": "once daily in the morning",
+      "purpose": "Blood pressure and heart failure",
+      "codes": [],
+      "release": {
+        "on": "visit_start",
+        "topics": []
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "name": "Eplerenone (Inspra)",
+      "dose": "25 mg",
+      "frequency": "once daily",
+      "purpose": "Heart failure",
+      "codes": [],
+      "release": {
+        "on": "visit_start",
+        "topics": []
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    }
+  ],
+  "allergies": [
+    {
+      "substance": "Penicillin",
+      "reaction": "hives",
+      "release": {
+        "on": "visit_start",
+        "topics": []
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "substance": "Shellfish",
+      "reaction": "anaphylaxis",
+      "release": {
+        "on": "visit_start",
+        "topics": []
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "substance": "Sulfa",
+      "release": {
+        "on": "visit_start",
+        "topics": []
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    }
+  ],
+  "objectives": [
+    {
+      "id": "obj_ncp",
+      "text": "Apply the Nutrition Care Process: find his eating pattern, beliefs and barriers.",
+      "expected_discoveries": [
+        "f_dinner_club",
+        "f_soda",
+        "f_skips_breakfast",
+        "f_canned_food",
+        "f_hf_dm_same",
+        "f_salty_comfort"
+      ],
+      "expected_actions": [],
+      "rubric_domains": [
+        "information_gathering"
+      ],
+      "status": "approved"
+    },
+    {
+      "id": "obj_meds",
+      "text": "Connect his medicines to nutrition care, including over-the-counter pain relievers.",
+      "expected_discoveries": [
+        "f_ibuprofen",
+        "f_metformin_nausea",
+        "f_eplerenone_forgets",
+        "f_lisinopril_belief"
+      ],
+      "expected_actions": [
+        "counsel_nsaid_risk"
+      ],
+      "rubric_domains": [
+        "clinical_reasoning_and_synthesis"
+      ],
+      "status": "approved"
+    },
+    {
+      "id": "obj_mi",
+      "text": "Use motivational interviewing to explore what matters to him and how ready he is.",
+      "expected_discoveries": [
+        "f_dont_die_couch",
+        "f_goal_hospital",
+        "f_scared_future"
+      ],
+      "expected_actions": [
+        "summarize"
+      ],
+      "rubric_domains": [
+        "listening_and_response_to_cues"
+      ],
+      "status": "approved"
+    },
+    {
+      "id": "obj_barriers",
+      "text": "Identify social and money barriers.",
+      "expected_discoveries": [
+        "f_fixed_income",
+        "f_sister_guilt",
+        "f_lives_alone",
+        "f_grocery_trouble",
+        "f_unused_savings"
+      ],
+      "expected_actions": [],
+      "rubric_domains": [
+        "information_gathering"
+      ],
+      "status": "approved"
+    },
+    {
+      "id": "obj_pes",
+      "text": "Write a PES statement supported by what you found.",
+      "expected_discoveries": [
+        "f_special_orders",
+        "f_salty_comfort",
+        "f_soda"
+      ],
+      "expected_actions": [
+        "counsel_sodium"
+      ],
+      "rubric_domains": [
+        "clinical_reasoning_and_synthesis"
+      ],
+      "status": "approved"
+    },
+    {
+      "id": "obj_resources",
+      "text": "Consider team and community resources.",
+      "expected_discoveries": [
+        "f_frequent_hospital",
+        "f_online_friends"
+      ],
+      "expected_actions": [
+        "plan_next_steps"
+      ],
+      "rubric_domains": [
+        "professionalism_safety_closure"
+      ],
+      "status": "approved"
+    }
+  ],
+  "topics": [],
+  "actions": [
+    {
+      "id": "counsel_nsaid_risk",
+      "description": "Explains that ibuprofen, Advil or other NSAIDs can worsen heart failure, raise blood pressure or hurt the kidneys, or suggests asking the doctor about a safer pain option",
+      "keywords": [
+        "(ibuprofen|advil|motrin|nsaid).{0,60}(kidney|heart|blood pressure|fluid|swell|avoid|stop|not safe|hard on|bad for)",
+        "(kidney|heart).{0,40}(ibuprofen|advil|nsaid)",
+        "(tylenol|acetaminophen) instead"
+      ]
+    },
+    {
+      "id": "counsel_sodium",
+      "description": "Discusses lowering salt or sodium, for example at the dinner club or with canned soup",
+      "keywords": [
+        "(less|lower|cut( back)?( on)?|reduce|watch) (the |your )?(salt|sodium)",
+        "low.?sodium",
+        "(salt|sodium).{0,40}(heart|swell|fluid|blood pressure|water)"
+      ]
+    },
+    {
+      "id": "counsel_beverages",
+      "description": "Discusses swapping soda or sweet tea for water or unsweetened drinks",
+      "keywords": [
+        "(instead of|swap|switch|replace).{0,30}(soda|sweet tea)",
+        "(diet|zero).{0,10}soda",
+        "sparkling water",
+        "unsweetened"
+      ]
+    }
+  ],
+  "rubric_id": "shp_patient_encounter_v1",
+  "documentation_template": "PES",
+  "trust": {
+    "start": 0,
+    "thresholds": {
+      "reluctant": 2,
+      "hidden": 4
+    }
+  },
+  "difficulty": {
+    "preset": "typical",
+    "params": {}
+  },
+  "visits": [
+    {
+      "id": "v1",
+      "label": "First visit",
+      "day": 0,
+      "changes": {
+        "add_facts": [],
+        "update_facts": {},
+        "remove_facts": [],
+        "vitals": [],
+        "labs": [],
+        "exam": [],
+        "artifacts": []
+      },
+      "decision_points": [
+        {
+          "id": "dp_nsaid",
+          "label": "Found the ibuprofen use and explained the risk",
+          "predicate": {
+            "all": [
+              {
+                "fact_disclosed": "f_ibuprofen"
+              },
+              {
+                "action": "counsel_nsaid_risk"
+              }
+            ]
+          },
+          "affects": "patient",
+          "rubric_domain": "clinical_reasoning_and_synthesis",
+          "feedback_if_yes": "You found that Walter takes ibuprofen and explained why it is risky with heart failure and kidney disease.",
+          "feedback_if_no": "Walter takes ibuprofen for back pain. With heart failure and kidney disease that is a safety issue. Ask about over-the-counter pain medicine, then explain the risk in plain words."
+        },
+        {
+          "id": "dp_sodium_plan",
+          "label": "Agreed on a salt plan that fits his dinner club",
+          "predicate": {
+            "all": [
+              {
+                "fact_disclosed": "f_dinner_club"
+              },
+              {
+                "action": "counsel_sodium"
+              }
+            ]
+          },
+          "affects": "patient",
+          "rubric_domain": "explanation_and_shared_decisions",
+          "feedback_if_yes": "You tied the salt advice to his real life: the dinner club.",
+          "feedback_if_no": "Walter eats out twice a week. Advice that ignores the dinner club is unlikely to stick."
+        },
+        {
+          "id": "dp_teachback",
+          "label": "Checked his understanding (teach-back)",
+          "predicate": {
+            "action": "check_understanding"
+          },
+          "affects": "score",
+          "rubric_domain": "explanation_and_shared_decisions",
+          "feedback_if_no": "Ask Walter to say the plan back in his own words."
+        }
+      ],
+      "branches": [
+        {
+          "id": "b_improved",
+          "label": "Stopped ibuprofen and changed dinner-club orders",
+          "when": {
+            "dp_nsaid": true,
+            "dp_sodium_plan": true
+          },
+          "after_branches": [],
+          "summary": "He switched to Tylenol for his back and orders the plain version at the dinner club. Blood pressure and swelling are better.",
+          "changes": {
+            "add_facts": [
+              {
+                "id": "f_v2_better",
+                "category": "presenting",
+                "text": "Switched to Tylenol for his back and asks for the plain version at the diner.",
+                "say": "I switched to Tylenol like you said. And I get the plain chicken at the diner now. Not bad.",
+                "tier": "initial",
+                "unlock": {
+                  "topics": [
+                    "chief_complaint",
+                    "otc_medications",
+                    "diet_eating_out"
+                  ],
+                  "requires_facts": []
+                },
+                "cue": false,
+                "safety": false,
+                "codes": [],
+                "source": {
+                  "kind": "faculty"
+                },
+                "status": "approved"
+              },
+              {
+                "id": "f_v2_swelling_down",
+                "category": "ros",
+                "text": "His ankle swelling is better.",
+                "say": "Ankles aren't as puffy.",
+                "tier": "discoverable",
+                "unlock": {
+                  "topics": [
+                    "ros_cardiac"
+                  ],
+                  "requires_facts": []
+                },
+                "cue": false,
+                "safety": false,
+                "codes": [],
+                "source": {
+                  "kind": "faculty"
+                },
+                "status": "approved"
+              }
+            ],
+            "update_facts": {},
+            "remove_facts": [],
+            "vitals": [
+              {
+                "key": "bp",
+                "label": "Blood pressure",
+                "value": "142/86",
+                "unit": "mmHg",
+                "source": {
+                  "kind": "faculty"
+                },
+                "status": "approved"
+              },
+              {
+                "key": "weight",
+                "label": "Weight",
+                "value": "194",
+                "unit": "lb",
+                "source": {
+                  "kind": "faculty"
+                },
+                "status": "approved"
+              }
+            ],
+            "labs": [],
+            "exam": [
+              {
+                "maneuver": "edema_check",
+                "finding": "1+ pitting edema at both ankles.",
+                "abnormal": true,
+                "source": {
+                  "kind": "faculty"
+                },
+                "status": "approved"
+              }
+            ],
+            "artifacts": [],
+            "mood": "warmer, joking"
+          },
+          "status": "approved"
+        },
+        {
+          "id": "b_partial",
+          "label": "Stopped ibuprofen but same restaurant food",
+          "when": {
+            "dp_nsaid": true
+          },
+          "after_branches": [],
+          "summary": "He stopped the ibuprofen, but dinner-club meals are the same. Swelling is about the same.",
+          "changes": {
+            "add_facts": [
+              {
+                "id": "f_v2_partial",
+                "category": "presenting",
+                "text": "Stopped the Advil, but still eats the same at the dinner club.",
+                "say": "I quit the Advil. The diner, well, that's the diner.",
+                "tier": "initial",
+                "unlock": {
+                  "topics": [
+                    "chief_complaint",
+                    "otc_medications",
+                    "diet_eating_out"
+                  ],
+                  "requires_facts": []
+                },
+                "cue": false,
+                "safety": false,
+                "codes": [],
+                "source": {
+                  "kind": "faculty"
+                },
+                "status": "approved"
+              }
+            ],
+            "update_facts": {},
+            "remove_facts": [],
+            "vitals": [
+              {
+                "key": "bp",
+                "label": "Blood pressure",
+                "value": "152/90",
+                "unit": "mmHg",
+                "source": {
+                  "kind": "faculty"
+                },
+                "status": "approved"
+              },
+              {
+                "key": "weight",
+                "label": "Weight",
+                "value": "199",
+                "unit": "lb",
+                "source": {
+                  "kind": "faculty"
+                },
+                "status": "approved"
+              }
+            ],
+            "labs": [],
+            "exam": [],
+            "artifacts": []
+          },
+          "status": "approved"
+        },
+        {
+          "id": "b_nsaid_missed",
+          "label": "Ibuprofen missed: hospitalized",
+          "when": {
+            "dp_nsaid": false
+          },
+          "after_branches": [],
+          "summary": "Nobody caught the ibuprofen. Two weeks later he was hospitalized with fluid in his lungs and worse kidney function.",
+          "changes": {
+            "add_facts": [
+              {
+                "id": "f_v2_hospital",
+                "category": "presenting",
+                "text": "Was in the hospital for 4 days with fluid in his lungs.",
+                "say": "Back in the hospital. Four days. Fluid in my lungs again.",
+                "tier": "initial",
+                "unlock": {
+                  "topics": [
+                    "chief_complaint",
+                    "hospitalizations"
+                  ],
+                  "requires_facts": []
+                },
+                "cue": false,
+                "safety": false,
+                "codes": [],
+                "source": {
+                  "kind": "faculty"
+                },
+                "status": "approved"
+              },
+              {
+                "id": "f_v2_still_advil",
+                "category": "medication",
+                "text": "Still takes Advil for his back.",
+                "say": "Still taking the Advil. My back doesn't care about my heart.",
+                "tier": "discoverable",
+                "unlock": {
+                  "topics": [
+                    "otc_medications"
+                  ],
+                  "requires_facts": []
+                },
+                "cue": false,
+                "safety": true,
+                "codes": [],
+                "source": {
+                  "kind": "faculty"
+                },
+                "status": "approved"
+              }
+            ],
+            "update_facts": {},
+            "remove_facts": [],
+            "vitals": [
+              {
+                "key": "bp",
+                "label": "Blood pressure",
+                "value": "162/94",
+                "unit": "mmHg",
+                "source": {
+                  "kind": "faculty"
+                },
+                "status": "approved"
+              },
+              {
+                "key": "weight",
+                "label": "Weight",
+                "value": "204",
+                "unit": "lb",
+                "source": {
+                  "kind": "faculty"
+                },
+                "status": "approved"
+              }
+            ],
+            "labs": [
+              {
+                "id": "lab_cr",
+                "key": "cr",
+                "name": "Creatinine",
+                "loinc": "2160-0",
+                "panel": "bmp",
+                "value": 1.9,
+                "unit": "mg/dL",
+                "ref_low": 0.74,
+                "ref_high": 1.35,
+                "ref_source": "Typical adult reference interval (varies by lab); see docs/credits.md",
+                "collected": "at discharge",
+                "release": {
+                  "on": "visit_start",
+                  "topics": []
+                },
+                "source": {
+                  "kind": "faculty"
+                },
+                "status": "approved"
+              },
+              {
+                "id": "lab_egfr",
+                "key": "egfr",
+                "name": "eGFR (CKD-EPI 2021)",
+                "loinc": "98979-8",
+                "panel": "bmp",
+                "value": 37.0,
+                "unit": "mL/min/1.73m2",
+                "ref_low": 60.0,
+                "ref_high": 140.0,
+                "ref_source": "Typical adult reference interval (varies by lab); see docs/credits.md",
+                "collected": "at discharge",
+                "release": {
+                  "on": "visit_start",
+                  "topics": []
+                },
+                "source": {
+                  "kind": "faculty"
+                },
+                "status": "approved"
+              },
+              {
+                "id": "lab_bun",
+                "key": "bun",
+                "name": "Blood urea nitrogen (BUN)",
+                "loinc": "3094-0",
+                "panel": "bmp",
+                "value": 34.0,
+                "unit": "mg/dL",
+                "ref_low": 7.0,
+                "ref_high": 20.0,
+                "ref_source": "Typical adult reference interval (varies by lab); see docs/credits.md",
+                "collected": "at discharge",
+                "release": {
+                  "on": "visit_start",
+                  "topics": []
+                },
+                "source": {
+                  "kind": "faculty"
+                },
+                "status": "approved"
+              }
+            ],
+            "exam": [
+              {
+                "maneuver": "edema_check",
+                "finding": "3+ pitting edema up to both knees.",
+                "abnormal": true,
+                "source": {
+                  "kind": "faculty"
+                },
+                "status": "approved"
+              }
+            ],
+            "artifacts": [
+              {
+                "id": "discharge",
+                "kind": "prior_note",
+                "title": "Hospital discharge summary",
+                "body": "Admitted 4 days for acute on chronic heart failure with fluid overload and acute kidney injury. Home medicines reviewed. Ibuprofen use noted.",
+                "release": {
+                  "on": "visit_start",
+                  "topics": []
+                },
+                "source": {
+                  "kind": "faculty"
+                },
+                "status": "approved"
+              }
+            ],
+            "mood": "tired and discouraged"
+          },
+          "status": "approved"
+        }
+      ]
+    },
+    {
+      "id": "v2",
+      "label": "Follow-up, 3 months later",
+      "day": 90,
+      "changes": {
+        "add_facts": [],
+        "update_facts": {},
+        "remove_facts": [],
+        "vitals": [],
+        "labs": [],
+        "exam": [],
+        "artifacts": [],
+        "briefing": {
+          "setting": "",
+          "reason_for_visit": "Three-month nutrition follow-up",
+          "goal": "Review what changed since the first visit and adjust the plan.",
+          "student_role": "",
+          "show_doorway_vitals": true
+        }
+      },
+      "decision_points": [
+        {
+          "id": "dp_v2_nsaid",
+          "label": "Asked about pain medicine again",
+          "predicate": {
+            "any": [
+              {
+                "topic": "otc_medications"
+              },
+              {
+                "action": "counsel_nsaid_risk"
+              }
+            ]
+          },
+          "affects": "patient",
+          "rubric_domain": "clinical_reasoning_and_synthesis"
+        },
+        {
+          "id": "dp_v2_plan",
+          "label": "Agreed on next steps",
+          "predicate": {
+            "action": "plan_next_steps"
+          },
+          "affects": "score",
+          "rubric_domain": "professionalism_safety_closure"
+        }
+      ],
+      "branches": []
+    }
+  ],
+  "consistency_findings": [],
+  "credits": [
+    {
+      "what": "Patient profile (adapted)",
+      "source": "Rutgers Virtual Health Simulation sample profiles (event-provided)"
+    },
+    {
+      "what": "Portrait",
+      "source": "Event-provided VHS profile image, cropped"
+    }
+  ],
+  "created_by": "Team (golden case) TODO(clinical-review)",
+  "golden": true
+}

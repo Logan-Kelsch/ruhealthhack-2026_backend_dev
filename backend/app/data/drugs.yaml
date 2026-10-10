@@ -1,0 +1,205 @@
+# Small local drug list for the consistency check (unknown drug names) and simple
+# drug/condition rules. Not a full formulary; RxNorm lookup is planned (PRD S-08).
+# brands maps brand name -> generic. classes groups generics for allergy/safety rules.
+# TODO(clinical-review): Ahmad to confirm safety rules in app/studio/consistency.py.
+version: 1
+generics:
+  - metformin
+  - glipizide
+  - glyburide
+  - glimepiride
+  - sitagliptin
+  - empagliflozin
+  - dapagliflozin
+  - canagliflozin
+  - semaglutide
+  - liraglutide
+  - dulaglutide
+  - tirzepatide
+  - insulin glargine
+  - insulin lispro
+  - insulin aspart
+  - insulin detemir
+  - nph insulin
+  - insulin
+  - pioglitazone
+  - lisinopril
+  - enalapril
+  - ramipril
+  - benazepril
+  - losartan
+  - valsartan
+  - irbesartan
+  - olmesartan
+  - sacubitril/valsartan
+  - amlodipine
+  - nifedipine
+  - diltiazem
+  - verapamil
+  - hydrochlorothiazide
+  - chlorthalidone
+  - furosemide
+  - bumetanide
+  - torsemide
+  - spironolactone
+  - eplerenone
+  - metoprolol
+  - metoprolol succinate
+  - metoprolol tartrate
+  - carvedilol
+  - bisoprolol
+  - atenolol
+  - propranolol
+  - hydralazine
+  - isosorbide mononitrate
+  - nitroglycerin
+  - digoxin
+  - atorvastatin
+  - rosuvastatin
+  - simvastatin
+  - pravastatin
+  - ezetimibe
+  - aspirin
+  - clopidogrel
+  - warfarin
+  - apixaban
+  - rivaroxaban
+  - ibuprofen
+  - naproxen
+  - meloxicam
+  - celecoxib
+  - diclofenac
+  - acetaminophen
+  - tramadol
+  - oxycodone
+  - gabapentin
+  - pregabalin
+  - sertraline
+  - fluoxetine
+  - escitalopram
+  - citalopram
+  - paroxetine
+  - bupropion
+  - venlafaxine
+  - duloxetine
+  - mirtazapine
+  - trazodone
+  - aripiprazole
+  - quetiapine
+  - olanzapine
+  - risperidone
+  - lurasidone
+  - lithium
+  - lamotrigine
+  - valproate
+  - divalproex
+  - lorazepam
+  - alprazolam
+  - clonazepam
+  - zolpidem
+  - melatonin
+  - levothyroxine
+  - omeprazole
+  - pantoprazole
+  - famotidine
+  - ondansetron
+  - albuterol
+  - fluticasone
+  - montelukast
+  - cetirizine
+  - loratadine
+  - diphenhydramine
+  - amoxicillin
+  - amoxicillin/clavulanate
+  - penicillin
+  - ampicillin
+  - cephalexin
+  - azithromycin
+  - doxycycline
+  - ciprofloxacin
+  - sulfamethoxazole/trimethoprim
+  - nitrofurantoin
+  - prednisone
+  - allopurinol
+  - colchicine
+  - tamsulosin
+  - finasteride
+  - sildenafil
+  - vitamin d
+  - calcium carbonate
+  - multivitamin
+  - fish oil
+  - elderberry
+  - honey
+brands:
+  glucophage: metformin
+  januvia: sitagliptin
+  jardiance: empagliflozin
+  farxiga: dapagliflozin
+  ozempic: semaglutide
+  wegovy: semaglutide
+  victoza: liraglutide
+  trulicity: dulaglutide
+  mounjaro: tirzepatide
+  lantus: insulin glargine
+  humalog: insulin lispro
+  novolog: insulin aspart
+  zestril: lisinopril
+  prinivil: lisinopril
+  cozaar: losartan
+  diovan: valsartan
+  entresto: sacubitril/valsartan
+  norvasc: amlodipine
+  lasix: furosemide
+  aldactone: spironolactone
+  inspra: eplerenone
+  lopressor: metoprolol tartrate
+  toprol xl: metoprolol succinate
+  coreg: carvedilol
+  lipitor: atorvastatin
+  crestor: rosuvastatin
+  zocor: simvastatin
+  plavix: clopidogrel
+  coumadin: warfarin
+  eliquis: apixaban
+  xarelto: rivaroxaban
+  advil: ibuprofen
+  motrin: ibuprofen
+  aleve: naproxen
+  celebrex: celecoxib
+  tylenol: acetaminophen
+  neurontin: gabapentin
+  zoloft: sertraline
+  prozac: fluoxetine
+  lexapro: escitalopram
+  celexa: citalopram
+  paxil: paroxetine
+  wellbutrin: bupropion
+  effexor: venlafaxine
+  cymbalta: duloxetine
+  abilify: aripiprazole
+  seroquel: quetiapine
+  zyprexa: olanzapine
+  risperdal: risperidone
+  lamictal: lamotrigine
+  depakote: divalproex
+  ativan: lorazepam
+  xanax: alprazolam
+  ambien: zolpidem
+  synthroid: levothyroxine
+  prilosec: omeprazole
+  zofran: ondansetron
+  zyrtec: cetirizine
+  claritin: loratadine
+  benadryl: diphenhydramine
+  augmentin: amoxicillin/clavulanate
+  keflex: cephalexin
+  zithromax: azithromycin
+  bactrim: sulfamethoxazole/trimethoprim
+classes:
+  nsaid: [ibuprofen, naproxen, meloxicam, celecoxib, diclofenac, aspirin]
+  penicillin: [penicillin, amoxicillin, amoxicillin/clavulanate, ampicillin]
+  sulfa: [sulfamethoxazole/trimethoprim]
+  ssri: [sertraline, fluoxetine, escitalopram, citalopram, paroxetine]
+  antibiotic: [amoxicillin, amoxicillin/clavulanate, penicillin, ampicillin, cephalexin, azithromycin, doxycycline, ciprofloxacin, sulfamethoxazole/trimethoprim, nitrofurantoin]
+  second_gen_antipsychotic: [aripiprazole, quetiapine, olanzapine, risperidone, lurasidone]

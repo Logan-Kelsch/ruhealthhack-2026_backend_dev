@@ -1,0 +1,29 @@
+# Documentation templates the student fills after an encounter (PRD E-13, F-06).
+templates:
+  SOAP:
+    label: SOAP note (Subjective, Objective, Assessment, Plan)
+    fields:
+      - {id: subjective, label: Subjective, hint: What the patient told you}
+      - {id: objective, label: Objective, hint: Exam findings, vitals and results you saw}
+      - {id: assessment, label: Assessment, hint: Your clinical impression}
+      - {id: plan, label: Plan, hint: Next steps, counselling and follow-up}
+  SBAR:
+    label: SBAR handoff (Situation, Background, Assessment, Recommendation)
+    fields:
+      - {id: situation, label: Situation, hint: What is happening now}
+      - {id: background, label: Background, hint: Relevant history}
+      - {id: assessment, label: Assessment, hint: What you think is going on}
+      - {id: recommendation, label: Recommendation, hint: What should happen next}
+  PES:
+    label: PES statement (Problem, Etiology, Signs and symptoms)
+    fields:
+      - {id: problem, label: Problem, hint: The nutrition diagnosis}
+      - {id: etiology, label: Etiology, hint: "Related to: the cause"}
+      - {id: signs, label: Signs and symptoms, hint: "As evidenced by: what you found"}
+  ADIME:
+    label: ADIME note (Assessment, Diagnosis, Intervention, Monitoring and Evaluation)
+    fields:
+      - {id: assessment, label: Assessment, hint: Food and nutrition history, measurements, labs}
+      - {id: diagnosis, label: Diagnosis, hint: PES statement}
+      - {id: intervention, label: Intervention, hint: Education, counselling, goals}
+      - {id: monitoring, label: Monitoring and evaluation, hint: What you will track and when}

@@ -1,0 +1,757 @@
+{
+  "case_id": "eli_brooks",
+  "version": 1,
+  "status": "published",
+  "title": "Eli Brooks: a cold, and a parent who wants antibiotics",
+  "description": "6-year-old with 3 days of cough, runny nose and sore throat. Urgent care did a negative rapid strep test yesterday. His mother wants antibiotics. The good outcome is education and no antibiotics.",
+  "seed": 6,
+  "profile": {
+    "name": "Eli Brooks",
+    "age": 6,
+    "sex": "male",
+    "pronouns": "he/him",
+    "occupation": "First grader",
+    "summary": "Original golden case written by the team; built to show live case creation. TODO(clinical-review)",
+    "speaker": "Tamara Brooks, Eli's mother",
+    "personality": {
+      "summary": "Tired, worried working parent. Polite but firm about wanting antibiotics. Softens when her worry is acknowledged.",
+      "communication_style": "Speaks for Eli. Pushes back once, then listens if the student explains without talking down to her.",
+      "traits": {
+        "irritability": 0.5,
+        "verbosity": 0.6,
+        "humor": 0.2,
+        "openness": 0.5
+      },
+      "health_literacy": "medium",
+      "mood": "worried and impatient",
+      "example_lines": [
+        "I just want him better.",
+        "Urgent care didn't give us anything either."
+      ]
+    }
+  },
+  "briefing": {
+    "setting": "Pediatric primary care, same-day sick visit",
+    "reason_for_visit": "Cough and sore throat for 3 days; mother asking for antibiotics",
+    "goal": "Assess Eli, address his mother's request, and agree on a plan she can live with.",
+    "student_role": "Physician assistant student (second year)",
+    "show_doorway_vitals": true
+  },
+  "facts": [
+    {
+      "id": "f_cc",
+      "category": "presenting",
+      "text": "Eli has had a cough, runny nose and sore throat for 3 days.",
+      "say": "He's had this cough and runny nose, and his throat hurts. Three days now.",
+      "tier": "initial",
+      "unlock": {
+        "topics": [
+          "chief_complaint",
+          "hpi_onset",
+          "hpi_duration"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_belief_abx",
+      "category": "presenting",
+      "text": "Mother wants antibiotics; believes they always clear it up faster.",
+      "say": "I really think he needs antibiotics. That always clears it right up.",
+      "tier": "initial",
+      "unlock": {
+        "topics": [
+          "patient_expectations",
+          "chief_complaint",
+          "beliefs_understanding"
+        ],
+        "requires_facts": []
+      },
+      "belief": {
+        "text": "Believes antibiotics treat colds."
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_urgent_care",
+      "category": "history",
+      "text": "Went to urgent care yesterday; a nurse practitioner did a rapid strep test, which was negative, and sent them home without antibiotics.",
+      "say": "We went to urgent care yesterday. The nurse practitioner did the strep test, said it was negative, and sent us home with nothing.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "hospitalizations",
+          "testing_done",
+          "prior_antibiotics"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_fever",
+      "category": "ros",
+      "text": "Had a fever up to 100.4 °F on the first day; none since.",
+      "say": "He had a little fever the first day, 100.4. Nothing since.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "ros_general",
+          "hpi_associated"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_eating",
+      "category": "ros",
+      "text": "Eating a bit less but drinking well, peeing normally and still playing.",
+      "say": "He's eating less, but he's drinking fine and he's still running around.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "child_intake",
+          "diet_general"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_cough_char",
+      "category": "ros",
+      "text": "Wet cough, worse at night; no trouble breathing and no wheezing.",
+      "say": "It's a wet cough, worse at night. He's not wheezing or struggling to breathe.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "ros_respiratory",
+          "hpi_character",
+          "hpi_timing"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_sick_contacts",
+      "category": "history",
+      "text": "Several kids in his first-grade class have colds.",
+      "say": "Half his class has a cold right now.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "sick_contacts"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_ear",
+      "category": "ros",
+      "text": "No ear pain and no pulling at his ears.",
+      "say": "He hasn't said anything about his ears.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "ros_ent"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_past_abx",
+      "category": "history",
+      "text": "Got amoxicillin twice last year for colds, and the mother believes it worked.",
+      "say": "Last year he got amoxicillin twice and it worked every time.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "prior_antibiotics"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_meds",
+      "category": "medication",
+      "text": "Giving children's Motrin (ibuprofen) for discomfort and elderberry syrup.",
+      "say": "I give him children's Motrin, and elderberry syrup.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "medication_list",
+          "otc_medications",
+          "hpi_modifying"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_tried_cam",
+      "category": "medication",
+      "text": "Read online that elderberry and vitamin C cure colds.",
+      "say": "I read that elderberry and vitamin C knock it right out.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "beliefs_understanding",
+          "otc_medications"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_nkda",
+      "category": "allergy",
+      "text": "No known drug allergies.",
+      "say": "No allergies.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "allergies"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_vaccines",
+      "category": "history",
+      "text": "Vaccines are up to date, including a flu shot this fall.",
+      "say": "He's up to date on his shots. Got his flu shot too.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "vaccination"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_history",
+      "category": "history",
+      "text": "Healthy; no asthma; never hospitalized.",
+      "say": "He's healthy. No asthma, nothing like that.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "medical_history"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_home",
+      "category": "social",
+      "text": "Lives with his mother and his older sister; nobody smokes at home.",
+      "say": "It's me, Eli and his big sister. Nobody smokes.",
+      "tier": "discoverable",
+      "unlock": {
+        "topics": [
+          "social_living",
+          "tobacco"
+        ],
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_work_stress",
+      "category": "social",
+      "text": "Mother has missed 2 work shifts caring for him and worries about losing more.",
+      "say": "I've missed two shifts already. I can't keep missing work.",
+      "tier": "reluctant",
+      "unlock": {
+        "topics": [
+          "occupation",
+          "stress",
+          "finances_access"
+        ],
+        "min_trust": 1,
+        "requires_facts": []
+      },
+      "cue": true,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "id": "f_worry_pneumonia",
+      "category": "fear",
+      "text": "Worries the cough will turn into pneumonia, like her nephew had.",
+      "say": "My nephew got pneumonia from a cold. I'm scared that's where this is going.",
+      "tier": "reluctant",
+      "unlock": {
+        "topics": [
+          "fears_worries"
+        ],
+        "min_trust": 1,
+        "requires_facts": []
+      },
+      "cue": false,
+      "safety": false,
+      "codes": [],
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    }
+  ],
+  "vitals": [
+    {
+      "key": "temp_c",
+      "label": "Temperature",
+      "value": "37.2",
+      "unit": "°C",
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "key": "hr",
+      "label": "Heart rate",
+      "value": "96",
+      "unit": "bpm",
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "key": "rr",
+      "label": "Breathing rate",
+      "value": "20",
+      "unit": "breaths/min",
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "key": "spo2",
+      "label": "Oxygen saturation",
+      "value": "99",
+      "unit": "%",
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "key": "weight",
+      "label": "Weight",
+      "value": "46",
+      "unit": "lb",
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    }
+  ],
+  "labs": [
+    {
+      "id": "lab_strep_rapid",
+      "key": "strep_rapid",
+      "name": "Rapid strep antigen (throat)",
+      "loinc": "78012-2",
+      "panel": "strep",
+      "value": "Negative",
+      "unit": "",
+      "ref_source": "Typical adult reference interval (varies by lab); see docs/credits.md",
+      "collected": "yesterday, at urgent care",
+      "release": {
+        "on": "fact",
+        "topics": [],
+        "fact_id": "f_urgent_care"
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    }
+  ],
+  "exam": [
+    {
+      "maneuver": "oropharynx_inspection",
+      "finding": "Mild redness of the throat without exudate; tonsils normal size.",
+      "abnormal": true,
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "maneuver": "nose_inspection",
+      "finding": "Clear nasal discharge; swollen nasal lining.",
+      "abnormal": true,
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    },
+    {
+      "maneuver": "neck_lymph_nodes",
+      "finding": "Small, soft, non-tender lymph nodes in the front of the neck.",
+      "abnormal": true,
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "urgent_care_note",
+      "kind": "prior_note",
+      "title": "Urgent care note (yesterday)",
+      "body": "6-year-old with 2 days of cough, runny nose and sore throat. Rapid strep test negative. Assessment: viral upper respiratory infection. Plan: fluids, rest, children's ibuprofen as needed; return if worse.",
+      "release": {
+        "on": "fact",
+        "topics": [],
+        "fact_id": "f_urgent_care"
+      },
+      "source": {
+        "kind": "faculty"
+      },
+      "status": "approved"
+    }
+  ],
+  "diagnoses": [],
+  "medications": [],
+  "allergies": [],
+  "objectives": [
+    {
+      "id": "obj_viral",
+      "text": "Take a focused history and recognize a likely viral illness.",
+      "expected_discoveries": [
+        "f_cc",
+        "f_fever",
+        "f_cough_char",
+        "f_eating",
+        "f_urgent_care",
+        "f_sick_contacts"
+      ],
+      "expected_actions": [],
+      "rubric_domains": [
+        "information_gathering"
+      ],
+      "status": "approved"
+    },
+    {
+      "id": "obj_abx",
+      "text": "Explain why antibiotics are not needed while respecting the parent's worry.",
+      "expected_discoveries": [
+        "f_belief_abx",
+        "f_past_abx",
+        "f_worry_pneumonia"
+      ],
+      "expected_actions": [
+        "decline_antibiotics_explain"
+      ],
+      "rubric_domains": [
+        "explanation_and_shared_decisions"
+      ],
+      "status": "approved"
+    },
+    {
+      "id": "obj_plan",
+      "text": "Agree on supportive care and clear reasons to come back.",
+      "expected_discoveries": [
+        "f_meds",
+        "f_tried_cam",
+        "f_work_stress"
+      ],
+      "expected_actions": [
+        "supportive_care",
+        "safety_netting"
+      ],
+      "rubric_domains": [
+        "professionalism_safety_closure"
+      ],
+      "status": "approved"
+    }
+  ],
+  "topics": [],
+  "actions": [
+    {
+      "id": "decline_antibiotics_explain",
+      "description": "Explains that antibiotics do not help a viral cold and are not recommended here",
+      "keywords": [
+        "antibiotics? (won.?t|don.?t|do not|will not|wouldn.?t) (help|work|do)",
+        "virus(es)?.{0,40}antibiotic",
+        "antibiotics?.{0,40}virus",
+        "\\bviral\\b",
+        "(not|won.?t) (be )?(prescrib|giv)\\w*.{0,20}antibiotic"
+      ]
+    },
+    {
+      "id": "supportive_care",
+      "description": "Recommends supportive care: fluids, rest, honey for cough, saline, acetaminophen or ibuprofen for discomfort",
+      "keywords": [
+        "fluids",
+        "\\bhoney\\b",
+        "\\brest\\b",
+        "humidifier",
+        "saline",
+        "(tylenol|acetaminophen|motrin|ibuprofen).{0,30}(for|if|as needed)"
+      ]
+    },
+    {
+      "id": "counsel_cam",
+      "description": "Explains that supplements such as elderberry or vitamin C are not proven to help and are not recommended",
+      "keywords": [
+        "elderberry",
+        "vitamin c",
+        "supplements? (aren.?t|are not|isn.?t|is not) (proven|recommended)",
+        "no (good |strong )?evidence"
+      ]
+    }
+  ],
+  "rubric_id": "shp_patient_encounter_v1",
+  "documentation_template": "SOAP",
+  "trust": {
+    "start": 0,
+    "thresholds": {
+      "reluctant": 2,
+      "hidden": 4
+    }
+  },
+  "difficulty": {
+    "preset": "typical",
+    "params": {}
+  },
+  "visits": [
+    {
+      "id": "v1",
+      "label": "Sick visit",
+      "day": 0,
+      "changes": {
+        "add_facts": [],
+        "update_facts": {},
+        "remove_facts": [],
+        "vitals": [],
+        "labs": [],
+        "exam": [],
+        "artifacts": []
+      },
+      "decision_points": [
+        {
+          "id": "dp_no_abx",
+          "label": "Did not prescribe antibiotics",
+          "predicate": {
+            "not": {
+              "action": "prescribe_antibiotic"
+            }
+          },
+          "affects": "patient",
+          "rubric_domain": "clinical_reasoning_and_synthesis",
+          "feedback_if_yes": "You held off on antibiotics for a viral illness with a negative strep test.",
+          "feedback_if_no": "Antibiotics don't help a viral cold, and his strep test was negative. They add side effects and resistance without benefit."
+        },
+        {
+          "id": "dp_education",
+          "label": "Explained why antibiotics won't help",
+          "predicate": {
+            "action": "decline_antibiotics_explain"
+          },
+          "affects": "patient",
+          "rubric_domain": "explanation_and_shared_decisions",
+          "feedback_if_no": "Saying no without explaining usually sends the family to another clinic. Explain viruses versus bacteria in plain words."
+        },
+        {
+          "id": "dp_cam",
+          "label": "Addressed elderberry and other supplements",
+          "predicate": {
+            "action": "counsel_cam"
+          },
+          "affects": "score",
+          "rubric_domain": "explanation_and_shared_decisions",
+          "feedback_if_no": "She is giving elderberry syrup. Supplements like this are not proven to help; say so kindly."
+        },
+        {
+          "id": "dp_return",
+          "label": "Gave clear reasons to come back",
+          "predicate": {
+            "action": "safety_netting"
+          },
+          "affects": "score",
+          "rubric_domain": "professionalism_safety_closure",
+          "feedback_if_no": "Tell her what would mean coming back: trouble breathing, fever over 3 days, not drinking, or ear pain."
+        }
+      ],
+      "branches": [
+        {
+          "id": "b_good",
+          "label": "No antibiotics, and she understands why",
+          "when": {
+            "dp_no_abx": true,
+            "dp_education": true
+          },
+          "after_branches": [],
+          "summary": "She leaves without antibiotics and understands why. Eli is back to normal in about a week.",
+          "changes": {
+            "add_facts": [],
+            "update_facts": {},
+            "remove_facts": [],
+            "vitals": [],
+            "labs": [],
+            "exam": [],
+            "artifacts": []
+          },
+          "status": "approved"
+        },
+        {
+          "id": "b_frustrated",
+          "label": "No antibiotics, but no explanation",
+          "when": {
+            "dp_no_abx": true
+          },
+          "after_branches": [],
+          "summary": "She leaves frustrated and takes Eli to another urgent care, which prescribes antibiotics.",
+          "changes": {
+            "add_facts": [],
+            "update_facts": {},
+            "remove_facts": [],
+            "vitals": [],
+            "labs": [],
+            "exam": [],
+            "artifacts": []
+          },
+          "status": "approved"
+        },
+        {
+          "id": "b_abx",
+          "label": "Antibiotics prescribed",
+          "when": {
+            "dp_no_abx": false
+          },
+          "after_branches": [],
+          "summary": "Eli gets amoxicillin. On day 4 he has diarrhea and a rash. The cold runs its usual course anyway.",
+          "changes": {
+            "add_facts": [],
+            "update_facts": {},
+            "remove_facts": [],
+            "vitals": [],
+            "labs": [],
+            "exam": [],
+            "artifacts": []
+          },
+          "status": "approved"
+        }
+      ]
+    }
+  ],
+  "consistency_findings": [],
+  "credits": [
+    {
+      "what": "Case content",
+      "source": "Original synthetic case written by the team; TODO(clinical-review)"
+    }
+  ],
+  "created_by": "Team (golden case) TODO(clinical-review)",
+  "golden": true
+}

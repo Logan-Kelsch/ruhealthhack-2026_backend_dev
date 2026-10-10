@@ -1,0 +1,55 @@
+# Physical exam catalog. Every maneuver has a normal default finding, so a
+# maneuver nobody scripted still returns an approved answer, never an invented one.
+# Faculty override findings per case (case.exam). Keywords feed the offline classifier.
+# TODO(clinical-review): Ahmad to confirm wording of normal defaults.
+version: 1
+maneuvers:
+  # General
+  - {id: general_appearance, system: general, label: General appearance (inspection), normal: "Alert, in no acute distress.", keywords: ['general appearance', 'look at you overall', 'how you look']}
+  - {id: vital_signs_recheck, system: general, label: Recheck vital signs, normal: "Vital signs unchanged from intake.", keywords: ['recheck (your )?(vitals|blood pressure)', 'take your (blood pressure|pulse|temperature)']}
+  # Head, eyes, ears, nose, throat
+  - {id: eye_inspection, system: heent, label: Eye inspection, normal: "Conjunctivae clear, no scleral icterus.", keywords: ['look (at|in) your eyes', 'eyes']}
+  - {id: ear_otoscopy, system: heent, label: Ear exam (otoscope), normal: "Tympanic membranes gray and translucent bilaterally, no bulging or redness.", keywords: ['ear', 'otoscope']}
+  - {id: nose_inspection, system: heent, label: Nose inspection, normal: "Nasal mucosa pink, no discharge.", keywords: ['nose', 'nostril']}
+  - {id: oropharynx_inspection, system: heent, label: Throat and mouth inspection, normal: "Oropharynx without redness or exudate, tonsils normal size, moist mucous membranes, good dentition.", keywords: ['throat', 'say ah', 'mouth', 'tonsil', 'gums', 'teeth']}
+  - {id: neck_lymph_nodes, system: heent, label: Neck lymph node palpation, normal: "No cervical lymphadenopathy, no tenderness.", keywords: ['lymph node', 'glands', 'feel your neck']}
+  - {id: thyroid_palpation, system: heent, label: Thyroid palpation, normal: "Thyroid not enlarged, no nodules.", keywords: ['thyroid']}
+  # Cardiovascular
+  - {id: cardiac_auscultation, system: cardiovascular, label: Heart auscultation, normal: "Regular rate and rhythm, normal S1 and S2, no murmurs, rubs or gallops.", keywords: ['listen to your heart', 'heart sounds', 'auscultat.*heart', 'stethoscope.*chest']}
+  - {id: jvp_inspection, system: cardiovascular, label: Jugular venous pressure, normal: "Jugular venous pressure not elevated.", keywords: ['jugular', '\bjvp\b', 'neck veins']}
+  - {id: peripheral_pulses, system: cardiovascular, label: Peripheral pulse palpation, normal: "Radial, dorsalis pedis and posterior tibial pulses 2+ and symmetric.", keywords: ['pulse(s)? in your (feet|legs|wrist)', 'peripheral pulse', 'feel (your|the) pulse']}
+  - {id: edema_check, system: cardiovascular, label: Lower-extremity edema check, normal: "No lower-extremity edema.", keywords: ['swelling in your (legs|ankles|feet)', 'edema', 'press on your (legs|ankles|shin)']}
+  - {id: capillary_refill, system: cardiovascular, label: Capillary refill, normal: "Capillary refill under 2 seconds.", keywords: ['capillary refill', 'press on your (nail|finger)']}
+  # Respiratory
+  - {id: lung_auscultation, system: respiratory, label: Lung auscultation, normal: "Clear to auscultation bilaterally, no wheezes, crackles or rhonchi.", keywords: ['listen to your (lungs|breathing|back)', 'deep breath', 'lung sounds']}
+  - {id: chest_percussion, system: respiratory, label: Chest percussion, normal: "Resonant to percussion bilaterally.", keywords: ['percuss.*(chest|back|lung)', 'tap on your (chest|back)']}
+  - {id: work_of_breathing, system: respiratory, label: Work of breathing (inspection), normal: "Breathing comfortably, no accessory muscle use.", keywords: ['watch (you|your) breath', 'breathing effort']}
+  # Abdomen
+  - {id: abdominal_inspection, system: abdomen, label: Abdominal inspection, normal: "Abdomen flat, no distension or visible masses.", keywords: ['look at your (belly|abdomen|stomach)']}
+  - {id: abdominal_auscultation, system: abdomen, label: Abdominal auscultation, normal: "Normal bowel sounds in all four quadrants.", keywords: ['listen to your (belly|abdomen|stomach)', 'bowel sounds']}
+  - {id: abdominal_palpation, system: abdomen, label: Abdominal palpation, normal: "Soft, non-tender, no masses, no organ enlargement.", keywords: ['press on your (belly|abdomen|stomach)', 'palpat.*(belly|abdomen)', 'feel your (belly|abdomen|stomach)']}
+  - {id: abdominal_percussion, system: abdomen, label: Abdominal percussion, normal: "Tympanic throughout, normal liver span.", keywords: ['percuss.*(belly|abdomen)', 'tap on your (belly|abdomen)']}
+  - {id: murphys_sign, system: abdomen, label: "Murphy's sign (gallbladder)", normal: "Murphy's sign negative.", keywords: ["murphy", 'gallbladder', 'right upper (quadrant|side).*breath']}
+  - {id: mcburneys_point, system: abdomen, label: "McBurney's point tenderness (appendix)", normal: "No tenderness at McBurney's point, no rebound.", keywords: ['mcburney', 'appendix', 'rebound']}
+  # Musculoskeletal
+  - {id: spine_palpation, system: musculoskeletal, label: Spine and back palpation, normal: "No spinal or paraspinal tenderness, full range of motion.", keywords: ['(press|feel) (on|along) your (back|spine)', 'back exam']}
+  - {id: joint_inspection, system: musculoskeletal, label: Joint inspection and range of motion, normal: "No joint swelling, warmth or deformity; full range of motion.", keywords: ['joints?', 'range of motion', 'move your (arm|leg|knee|shoulder)']}
+  - {id: anterior_drawer, system: musculoskeletal, label: Anterior drawer test (knee), normal: "Anterior drawer negative, firm endpoint.", keywords: ['anterior drawer']}
+  - {id: posterior_drawer, system: musculoskeletal, label: Posterior drawer test (knee), normal: "Posterior drawer negative.", keywords: ['posterior drawer']}
+  - {id: lachman, system: musculoskeletal, label: Lachman test (knee), normal: "Lachman negative, firm endpoint.", keywords: ['lachman']}
+  - {id: mcmurray, system: musculoskeletal, label: "McMurray test (knee meniscus)", normal: "McMurray negative, no click or pain.", keywords: ['mcmurray', 'meniscus']}
+  - {id: valgus_stress, system: musculoskeletal, label: Valgus stress test (knee), normal: "No laxity or pain with valgus stress.", keywords: ['valgus']}
+  - {id: varus_stress, system: musculoskeletal, label: Varus stress test (knee), normal: "No laxity or pain with varus stress.", keywords: ['varus']}
+  - {id: empty_can, system: musculoskeletal, label: Empty can test (shoulder), normal: "Empty can test negative, full strength.", keywords: ['empty can', 'supraspinatus']}
+  - {id: tinel, system: musculoskeletal, label: "Tinel's sign (wrist)", normal: "Tinel's sign negative.", keywords: ['tinel', 'tap on your wrist', 'carpal tunnel']}
+  # Neurological
+  - {id: mental_status, system: neurological, label: Mental status and orientation, normal: "Alert and oriented to person, place and time; speech normal rate and volume.", keywords: ['what.?s today.?s date', 'oriented', 'mental status', 'where are you right now']}
+  - {id: cranial_nerves, system: neurological, label: Cranial nerve exam, normal: "Cranial nerves II through XII intact.", keywords: ['cranial nerve', 'follow my finger', 'smile for me']}
+  - {id: strength_testing, system: neurological, label: Strength testing, normal: "Strength 5/5 in all extremities.", keywords: ['strength', 'push against my hand', 'squeeze my fingers']}
+  - {id: reflexes, system: neurological, label: Deep tendon reflexes, normal: "Reflexes 2+ and symmetric.", keywords: ['reflex', 'hammer']}
+  - {id: sensation_monofilament, system: neurological, label: Foot sensation (monofilament), normal: "Monofilament sensation intact in both feet.", keywords: ['monofilament', 'feel this on your (foot|feet)', 'sensation in your feet']}
+  - {id: gait, system: neurological, label: Gait observation, normal: "Steady, normal gait.", keywords: ['walk (for me|across)', 'gait']}
+  # Skin and other
+  - {id: skin_inspection, system: skin, label: Skin inspection, normal: "Skin warm and dry, no rashes or lesions.", keywords: ['look at your skin', 'skin', 'rash']}
+  - {id: foot_inspection, system: skin, label: Foot inspection, normal: "Feet without ulcers, calluses or skin breakdown.", keywords: ['look at your feet', 'check your feet', 'foot exam']}
+  - {id: mental_status_affect, system: psychiatric, label: Mood and affect observation, normal: "Euthymic mood, congruent affect, linear thought process.", keywords: ['affect', 'thought process']}

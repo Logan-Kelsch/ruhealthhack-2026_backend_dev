@@ -1,0 +1,38 @@
+# Closed list of student actions the intent classifier may output.
+# Cases add their own (for example counsel_nsaid_risk) in case.actions.
+# `keywords` feed the offline keyword classifier only.
+version: 1
+actions:
+  - id: summarize
+    description: Student summarizes what the patient said back to them
+    keywords: ['let me (make sure|summarize)', 'so (to recap|to summarize|what i.?m hearing)', 'just to recap']
+  - id: check_understanding
+    description: Student checks the patient's understanding, asks them to explain back (teach-back)
+    keywords: ['does that make sense', 'can you tell me (back|in your own words)', 'what questions do you have', 'do you have any questions', 'teach.?back']
+  - id: ask_permission
+    description: Student asks permission before giving advice or discussing a topic
+    keywords: ['would it be (ok|okay|alright) if', 'can i (share|ask|talk)', 'mind if i', 'is it okay if']
+  - id: give_information
+    description: Student explains a finding, condition, medication or plan in plain terms
+    keywords: ['what this means', 'the reason is', 'this (is|happens) because', 'let me explain']
+  - id: plan_next_steps
+    description: Student proposes or agrees a plan, follow-up, referral or next steps
+    keywords: ['next step', 'follow.?up', 'come back', 'refer', 'plan (is|would be)', 'let.?s (try|plan)', 'schedule']
+  - id: safety_netting
+    description: Student explains warning signs and when to seek urgent help or return
+    keywords: ['if (it|things|you) get(s)? worse', 'come back (if|right away)', 'call (us|911)', 'go to the (er|emergency)', 'warning signs']
+  - id: closing
+    description: Student wraps up the encounter or says goodbye
+    keywords: ['thank you for (coming|your time)', 'that.?s all (for today|i have)', 'take care', 'goodbye', 'we.?re (all )?done']
+  - id: confront_or_lecture
+    description: Student lectures, warns without permission, labels or judges the patient (inconsistent with motivational interviewing)
+    keywords: ['you (need|have) to stop', 'you should(n.?t)? (be|have)', 'you.?re (going to|gonna) die', 'that.?s (bad|terrible) for you', 'you must']
+  - id: start_medication
+    description: Student starts or recommends starting a new medication
+    keywords: ['start you on', 'prescribe', 'begin (taking )?a', 'put you on']
+  - id: prescribe_antibiotic
+    description: Student prescribes or agrees to give antibiotics
+    keywords: ['(give|prescribe|write) (you |him |her )?(an? )?(antibiotic|amoxicillin)', 'start (him|her|you) on (an? )?antibiotic']
+  - id: order_test
+    description: Student orders a lab or test (map the test in `order`)
+    keywords: ['order', 'check (your|a|her|his) .*(level|labs?|a1c|panel|test)', 'draw (some )?blood', 'run (a|some) test']

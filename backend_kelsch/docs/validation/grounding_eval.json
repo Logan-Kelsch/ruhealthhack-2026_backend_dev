@@ -1,0 +1,346 @@
+{
+  "stage": "Notebook 04",
+  "method": "authored scripts and case facts; no reviewed performance labels",
+  "scripts": {
+    "cases": [
+      "walter_greene",
+      "alina_reyes",
+      "eli_brooks"
+    ],
+    "levels": [
+      "novice",
+      "competent",
+      "expert"
+    ],
+    "presets": [
+      "straightforward",
+      "typical",
+      "difficult"
+    ],
+    "script_count": 27,
+    "turn_count": 189
+  },
+  "sources": [
+    "cases/*.json: each run contains case SHA-256 and version",
+    "backend_kelsch/docs/validation/action_data.json",
+    "backend_kelsch/docs/validation/patient_environment.json",
+    "PRD.md §9.1, §9.3, §9.4, §15 (V-01, V-02, V-04)"
+  ],
+  "mechanics": {
+    "status": "PASS",
+    "counts": {
+      "replays": 27,
+      "replay_matches": 27,
+      "turns": 189,
+      "template_replies": 189,
+      "cited_facts": 142,
+      "disclosures": 122,
+      "guarded_disclosures": 23,
+      "guarded_withheld": 42,
+      "invariant_violations": 0
+    },
+    "violations": [],
+    "cited_fact_source_coverage": {
+      "numerator": 142,
+      "denominator": 142
+    },
+    "offline_template_rate": {
+      "numerator": 189,
+      "denominator": 189
+    },
+    "pipeline_fallback_rate": null
+  },
+  "challenge_set": {
+    "counts": {
+      "candidates": 15,
+      "mechanical_supported_candidates": 3,
+      "mechanical_supported_passed": 3,
+      "mechanical_block_attempts": 9,
+      "mechanical_blocks": 9,
+      "semantic_review_pending": 3
+    },
+    "examples": [
+      {
+        "challenge_id": "walter_greene:unsupported_prose",
+        "issue": "unsupported prose has no deterministic semantic verdict"
+      },
+      {
+        "challenge_id": "alina_reyes:unsupported_prose",
+        "issue": "unsupported prose has no deterministic semantic verdict"
+      },
+      {
+        "challenge_id": "eli_brooks:unsupported_prose",
+        "issue": "unsupported prose has no deterministic semantic verdict"
+      }
+    ],
+    "llm_judge_run": false,
+    "semantic_accuracy": null
+  },
+  "reviews": {
+    "release_complete": false,
+    "semantic_complete": false,
+    "reviewed_release_turns": 0,
+    "total_release_turns": 189,
+    "reviewed_challenges": 0,
+    "total_challenges": 15
+  },
+  "disclosure_metrics": null,
+  "illustrative_difficulty": {
+    "discovery": [
+      {
+        "case_id": "walter_greene",
+        "level": "novice",
+        "preset": "straightforward",
+        "disclosed": 4,
+        "trust": 0
+      },
+      {
+        "case_id": "walter_greene",
+        "level": "novice",
+        "preset": "typical",
+        "disclosed": 4,
+        "trust": 0
+      },
+      {
+        "case_id": "walter_greene",
+        "level": "novice",
+        "preset": "difficult",
+        "disclosed": 4,
+        "trust": 0
+      },
+      {
+        "case_id": "walter_greene",
+        "level": "competent",
+        "preset": "straightforward",
+        "disclosed": 8,
+        "trust": 2
+      },
+      {
+        "case_id": "walter_greene",
+        "level": "competent",
+        "preset": "typical",
+        "disclosed": 7,
+        "trust": 2
+      },
+      {
+        "case_id": "walter_greene",
+        "level": "competent",
+        "preset": "difficult",
+        "disclosed": 7,
+        "trust": 2
+      },
+      {
+        "case_id": "walter_greene",
+        "level": "expert",
+        "preset": "straightforward",
+        "disclosed": 12,
+        "trust": 3
+      },
+      {
+        "case_id": "walter_greene",
+        "level": "expert",
+        "preset": "typical",
+        "disclosed": 10,
+        "trust": 3
+      },
+      {
+        "case_id": "walter_greene",
+        "level": "expert",
+        "preset": "difficult",
+        "disclosed": 9,
+        "trust": 3
+      },
+      {
+        "case_id": "alina_reyes",
+        "level": "novice",
+        "preset": "straightforward",
+        "disclosed": 1,
+        "trust": 0
+      },
+      {
+        "case_id": "alina_reyes",
+        "level": "novice",
+        "preset": "typical",
+        "disclosed": 1,
+        "trust": 0
+      },
+      {
+        "case_id": "alina_reyes",
+        "level": "novice",
+        "preset": "difficult",
+        "disclosed": 1,
+        "trust": 0
+      },
+      {
+        "case_id": "alina_reyes",
+        "level": "competent",
+        "preset": "straightforward",
+        "disclosed": 4,
+        "trust": 2
+      },
+      {
+        "case_id": "alina_reyes",
+        "level": "competent",
+        "preset": "typical",
+        "disclosed": 4,
+        "trust": 2
+      },
+      {
+        "case_id": "alina_reyes",
+        "level": "competent",
+        "preset": "difficult",
+        "disclosed": 4,
+        "trust": 2
+      },
+      {
+        "case_id": "alina_reyes",
+        "level": "expert",
+        "preset": "straightforward",
+        "disclosed": 4,
+        "trust": 3
+      },
+      {
+        "case_id": "alina_reyes",
+        "level": "expert",
+        "preset": "typical",
+        "disclosed": 4,
+        "trust": 3
+      },
+      {
+        "case_id": "alina_reyes",
+        "level": "expert",
+        "preset": "difficult",
+        "disclosed": 4,
+        "trust": 3
+      },
+      {
+        "case_id": "eli_brooks",
+        "level": "novice",
+        "preset": "straightforward",
+        "disclosed": 2,
+        "trust": 0
+      },
+      {
+        "case_id": "eli_brooks",
+        "level": "novice",
+        "preset": "typical",
+        "disclosed": 2,
+        "trust": 0
+      },
+      {
+        "case_id": "eli_brooks",
+        "level": "novice",
+        "preset": "difficult",
+        "disclosed": 2,
+        "trust": 0
+      },
+      {
+        "case_id": "eli_brooks",
+        "level": "competent",
+        "preset": "straightforward",
+        "disclosed": 4,
+        "trust": 1
+      },
+      {
+        "case_id": "eli_brooks",
+        "level": "competent",
+        "preset": "typical",
+        "disclosed": 4,
+        "trust": 1
+      },
+      {
+        "case_id": "eli_brooks",
+        "level": "competent",
+        "preset": "difficult",
+        "disclosed": 4,
+        "trust": 1
+      },
+      {
+        "case_id": "eli_brooks",
+        "level": "expert",
+        "preset": "straightforward",
+        "disclosed": 4,
+        "trust": 4
+      },
+      {
+        "case_id": "eli_brooks",
+        "level": "expert",
+        "preset": "typical",
+        "disclosed": 4,
+        "trust": 4
+      },
+      {
+        "case_id": "eli_brooks",
+        "level": "expert",
+        "preset": "difficult",
+        "disclosed": 4,
+        "trust": 4
+      }
+    ],
+    "paired_differences": [
+      {
+        "case_id": "walter_greene",
+        "level": "novice",
+        "straightforward_minus_difficult": 0
+      },
+      {
+        "case_id": "walter_greene",
+        "level": "competent",
+        "straightforward_minus_difficult": 1
+      },
+      {
+        "case_id": "walter_greene",
+        "level": "expert",
+        "straightforward_minus_difficult": 3
+      },
+      {
+        "case_id": "alina_reyes",
+        "level": "novice",
+        "straightforward_minus_difficult": 0
+      },
+      {
+        "case_id": "alina_reyes",
+        "level": "competent",
+        "straightforward_minus_difficult": 0
+      },
+      {
+        "case_id": "alina_reyes",
+        "level": "expert",
+        "straightforward_minus_difficult": 0
+      },
+      {
+        "case_id": "eli_brooks",
+        "level": "novice",
+        "straightforward_minus_difficult": 0
+      },
+      {
+        "case_id": "eli_brooks",
+        "level": "competent",
+        "straightforward_minus_difficult": 0
+      },
+      {
+        "case_id": "eli_brooks",
+        "level": "expert",
+        "straightforward_minus_difficult": 0
+      }
+    ],
+    "status": "NOT EVALUABLE",
+    "reason": "Threshold-only vectors and authored scripts are not faculty calibrated or sampled students"
+  },
+  "gates": {
+    "offline_mechanics": "PASS",
+    "reviewed_disclosure_accuracy": "NOT EVALUABLE",
+    "semantic_grounding": "NOT EVALUABLE",
+    "trained_action_extraction": "NOT EVALUABLE",
+    "difficulty_calibration": "NOT EVALUABLE",
+    "student_learning": "NOT EVALUABLE"
+  },
+  "limitations": [
+    "Scripted intent tags are fixture inputs, not reviewed student actions.",
+    "Template fact IDs and deterministic checks do not prove sentence-level clinical meaning.",
+    "Three unsupported prose candidates pass deterministic checks and are never delivered in these probes.",
+    "All 189 offline responses use templates by design; this is not a live pipeline fallback rate.",
+    "No independent faculty expected releases or semantic reviews are supplied.",
+    "Full S-11 difficulty presets and V-04 student sample are not available."
+  ]
+}

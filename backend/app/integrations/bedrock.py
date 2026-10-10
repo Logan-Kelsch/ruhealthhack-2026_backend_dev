@@ -9,10 +9,10 @@ import json
 import logging
 import re
 import time
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from functools import lru_cache
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 from app.settings import aws_session, get_settings
 
@@ -21,7 +21,9 @@ PROMPT_DIR = Path(__file__).resolve().parent.parent / "prompts"
 
 
 class LLMUnavailable(Exception):
-    pass
+    def __init__(self, message: str, *, call: LLMCall | None = None):
+        super().__init__(message)
+        self.call = call
 
 
 @dataclass
@@ -33,9 +35,21 @@ class LLMCall:
     latency_ms: int
     ok: bool
     error: str | None = None
+    input_tokens: int | None = None
+    output_tokens: int | None = None
+    total_tokens: int | None = None
+    cache_read_input_tokens: int | None = None
+    cache_write_input_tokens: int | None = None
+    previous_calls: list[LLMCall] = field(default_factory=list, repr=False)
 
     def to_dict(self) -> dict:
-        return asdict(self)
+        record = asdict(self)
+        record.pop("previous_calls")
+        return record
+
+    def to_dicts(self) -> list[dict]:
+        """Keep each paid request separate, including a failed formatting attempt."""
+        return [c.to_dict() for c in self.previous_calls] + [self.to_dict()]
 
 
 def load_prompt(name: str) -> tuple[str, str]:
@@ -69,7 +83,7 @@ def _extract_json(text: str) -> Any:
     return json.loads(text)
 
 
-def complete_json(
+def _complete_json_once(
     *,
     purpose: str,
     prompt_name: str,
@@ -79,7 +93,7 @@ def complete_json(
     temperature: float = 0.0,
     system_extra: str = "",
 ) -> tuple[Any, LLMCall]:
-    """Call Claude on Bedrock and parse a JSON reply. Raises LLMUnavailable on any failure."""
+    """Make one Converse request and strictly parse its JSON response."""
     s = get_settings()
     model = s.bedrock_model_strong if strong else s.bedrock_model_fast
     system, version = load_prompt(prompt_name)
@@ -96,6 +110,12 @@ def complete_json(
             messages=[{"role": "user", "content": [{"text": user}]}],
             inferenceConfig={"maxTokens": max_tokens, "temperature": temperature},
         )
+        usage = resp.get("usage") or {}
+        call.input_tokens = usage.get("inputTokens")
+        call.output_tokens = usage.get("outputTokens")
+        call.total_tokens = usage.get("totalTokens")
+        call.cache_read_input_tokens = usage.get("cacheReadInputTokens")
+        call.cache_write_input_tokens = usage.get("cacheWriteInputTokens")
         text = "".join(block.get("text", "") for block in resp["output"]["message"]["content"])
         data = _extract_json(text)
         call.ok = True
@@ -103,11 +123,66 @@ def complete_json(
     except Exception as exc:  # network, auth, throttling, bad JSON: all mean "use the fallback"
         call.error = f"{type(exc).__name__}: {str(exc)[:200]}"
         log.warning("bedrock %s failed: %s", purpose, call.error)
-        raise LLMUnavailable(call.error) from exc
+        raise LLMUnavailable(call.error, call=call) from exc
     finally:
         call.latency_ms = int((time.perf_counter() - t0) * 1000)
         if not call.ok:
             _last_failed_call[purpose] = call
+
+
+def complete_json(
+    *,
+    purpose: str,
+    prompt_name: str,
+    user: str,
+    strong: bool = False,
+    max_tokens: int = 1200,
+    temperature: float = 0.0,
+    system_extra: str = "",
+    response_validator: Callable[[Any], bool] | None = None,
+) -> tuple[Any, LLMCall]:
+    """Retry encounter output formatting once; never retry an access/network error.
+
+    No malformed output is repaired or treated as approval. Callers without a
+    response validator retain the existing single-request behavior.
+    """
+    previous: list[LLMCall] = []
+    for attempt in range(2 if response_validator is not None else 1):
+        instruction = system_extra
+        if attempt:
+            instruction += (
+                "\nYour previous response had invalid JSON formatting or fields. "
+                "Return exactly ONE JSON OBJECT with every field required by the "
+                "output contract. No bare arrays, code fences, explanation, or text "
+                "before or after the object. Reevaluate the original input; do not "
+                "change a factual verdict just to satisfy the format."
+            )
+        try:
+            data, call = _complete_json_once(
+                purpose=purpose, prompt_name=prompt_name, user=user, strong=strong,
+                max_tokens=max_tokens, temperature=temperature, system_extra=instruction,
+            )
+        except LLMUnavailable as exc:
+            call = exc.call
+            if call is None:
+                raise
+            call.previous_calls = previous.copy()
+            if attempt == 0 and response_validator is not None and (call.error or "").startswith("JSONDecodeError:"):
+                previous.append(call)
+                continue
+            raise
+        call.previous_calls = previous.copy()
+        if response_validator is None or response_validator(data):
+            _last_failed_call.pop(purpose, None)
+            return data, call
+        call.ok = False
+        call.error = "ResponseShapeError: response does not match the required JSON fields"
+        _last_failed_call[purpose] = call
+        if attempt == 0:
+            previous.append(call)
+            continue
+        raise LLMUnavailable(call.error, call=call)
+    raise AssertionError("format retry exhausted without a result")
 
 
 # Keeps the most recent failed call per purpose so callers can log it after catching.

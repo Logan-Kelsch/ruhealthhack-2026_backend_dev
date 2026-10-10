@@ -1,0 +1,7 @@
+# Install inside the backend environment to run notebooks and regenerate figures.
+jupyter>=1.1
+pandas>=2.2
+matplotlib>=3.9
+
+scikit-learn>=1.5
+nbclient>=0.10

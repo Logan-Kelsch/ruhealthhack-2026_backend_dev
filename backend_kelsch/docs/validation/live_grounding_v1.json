@@ -1,0 +1,124 @@
+{
+  "version": "live_grounding_v1",
+  "mode": "offline",
+  "scope": "authored engineering probes; no reviewed clinical/student labels",
+  "sources": {
+    "cases": {
+      "walter_greene": {
+        "path": "cases/walter_greene.json",
+        "sha256": "af9b64eded4aae898af7f47714aa95883d87bc9f2f7fa4c3b73866c73225b7bf",
+        "version": 1
+      },
+      "alina_reyes": {
+        "path": "cases/alina_reyes.json",
+        "sha256": "624f4713b587550865b5a6a378de6f3c678b13454ee3c0af26a5ffe7d5728c98",
+        "version": 1
+      },
+      "eli_brooks": {
+        "path": "cases/eli_brooks.json",
+        "sha256": "59c5c783e1baea71271f0fc49d96be907f5bbbbceea490ec0d8136dc18527c0b",
+        "version": 1
+      }
+    },
+    "prompts": {
+      "classifier": {
+        "version": "1",
+        "sha256": "a74bd510f98c1cd3d907578549d99dbf597a9575f9d47553c82fa1bd6cb2579f"
+      },
+      "phraser": {
+        "version": "1",
+        "sha256": "dadb059e3ffd00175dc159516e8080adfd5df7988c44616b214db335ce429b7e"
+      },
+      "verifier": {
+        "version": "5",
+        "sha256": "09cbaa5f3728915336a99567a667f284a2e576884ddfc2111de9fbcbb5a19a22"
+      }
+    },
+    "code_sha256": {
+      "backend_kelsch/app/grounding/live.py": "badf832a878c17eaca686bc7999e8b94a74ac3fc7a36f75698d0fa86366e974f",
+      "backend_kelsch/app/grounding/evaluation.py": "42fc94d330fdafc98c39f26509345dc926bc8faaf5143749ea86f632df8043dc",
+      "backend_kelsch/scripts/eval_live_grounding.py": "3b4b266032470499ee67c4ccaaa7ac4a714849e0b63b8e21a091156e25faa85e",
+      "backend/app/encounter/pipeline.py": "d59d48eb8f9b2f4f927186b0f1502ac132a9253135840989a56943899ed2fba6",
+      "backend/app/encounter/verifier.py": "f17468e1ee3eb7716d5e16aa7c07cebe1e34a3200df7f145380abea686d67958",
+      "backend/app/integrations/bedrock.py": "aaccd7778a537df84281a2439386ade9c19eb849611d03ac1508a2ba20c32189"
+    },
+    "notebook_04_report_sha256": "7db60b10d4a74806c4449db565a9f0c439db6d46ca36571c5e70d830df2c1e08"
+  },
+  "model_config": {
+    "region": "us-east-1",
+    "fast_model_id": "us.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "strong_model_id": "us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+    "invoked": false
+  },
+  "scripts": 9,
+  "turns": 63,
+  "cases": 3,
+  "delivered": {
+    "replies": 63,
+    "fallback_replies": 63,
+    "fallback_rate": 1.0,
+    "verifier_blocked_attempts": 0,
+    "semantic_status_counts": {
+      "template_source_linked_unreviewed": 63
+    },
+    "delivery_violations": []
+  },
+  "challenges": {
+    "total": 27,
+    "counts": {
+      "candidates": 27,
+      "mechanical_supported_candidates": 3,
+      "mechanical_supported_passed": 3,
+      "mechanical_block_attempts": 9,
+      "mechanical_blocks": 9,
+      "semantic_review_pending": 15
+    },
+    "semantic_status_counts": {
+      "unchecked_semantic": 18,
+      "mechanically_blocked": 9
+    },
+    "unchecked_semantic_ids": [
+      "walter_greene:approved_exact",
+      "walter_greene:unsupported_prose",
+      "alina_reyes:approved_exact",
+      "alina_reyes:unsupported_prose",
+      "eli_brooks:approved_exact",
+      "eli_brooks:unsupported_prose",
+      "walter_greene:negated_history",
+      "walter_greene:echoed_invented_value",
+      "walter_greene:wrong_unit",
+      "walter_greene:unsupported_conclusion",
+      "alina_reyes:negated_history",
+      "alina_reyes:echoed_invented_value",
+      "alina_reyes:wrong_unit",
+      "alina_reyes:unsupported_conclusion",
+      "eli_brooks:negated_history",
+      "eli_brooks:echoed_invented_value",
+      "eli_brooks:wrong_unit",
+      "eli_brooks:unsupported_conclusion"
+    ]
+  },
+  "usage_and_cost": {
+    "model_calls": 0,
+    "by_purpose": {},
+    "estimated_total_usd": 0,
+    "unpriced_calls": 0,
+    "pricing_status": "NO_MODEL_CALLS",
+    "pricing_source": null
+  },
+  "gates": {
+    "delivered_source_checks": "PASS",
+    "mechanical_challenges": "PASS",
+    "clinical_grounding": "NOT EVALUABLE",
+    "semantic_accuracy": "NOT EVALUABLE",
+    "student_performance": "NOT EVALUABLE"
+  },
+  "limitations": [
+    "Authored student turns and case text are not observed learners or independent clinical labels.",
+    "A mechanically permitted reply, a template citation, or a judge pass is not faculty-reviewed semantic grounding.",
+    "Usage is unavailable when a model request fails before Bedrock returns a response.",
+    "Cost is unknown unless every call has usage and a sourced rate for its exact model and region."
+  ],
+  "requested_live": false,
+  "live_status": "NOT EVALUABLE"
+}

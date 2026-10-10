@@ -1,0 +1,80 @@
+{
+  "stage": "Notebook 03",
+  "method": "authored deterministic probes; no trained extractor",
+  "sources": [
+    {
+      "path": "cases/walter_greene.json",
+      "sha256": "af9b64eded4aae898af7f47714aa95883d87bc9f2f7fa4c3b73866c73225b7bf"
+    },
+    {
+      "path": "cases/alina_reyes.json",
+      "sha256": "624f4713b587550865b5a6a378de6f3c678b13454ee3c0af26a5ffe7d5728c98"
+    },
+    "PRD.md \u00a79.1, \u00a79.3, \u00a79.4, V-01/V-02/V-04",
+    "backend_kelsch/docs/validation/action_data.json"
+  ],
+  "checks": {
+    "premature_disclosure": {
+      "status": "PASS",
+      "detail": "At trust 0, both guarded facts remain withheld on an on-topic question."
+    },
+    "expected_transition": {
+      "status": "PASS",
+      "detail": "Three sourced rapport events unlock the reluctant fact, but not the hidden fact."
+    },
+    "memory": {
+      "status": "PASS",
+      "detail": "Previously disclosed facts are recalled without a second disclosure entry."
+    },
+    "trust_evidence": {
+      "status": "PASS",
+      "detail": "Every trust event has a verbatim student span."
+    },
+    "difficulty_order": {
+      "status": "PASS",
+      "detail": "Same authored script; threshold vectors yield strictly ordered discovery counts."
+    },
+    "deterministic_replay": {
+      "status": "PASS",
+      "detail": "Replayed intents reproduce full state and event trace on all three presets."
+    },
+    "unauthorized_knowledge": {
+      "status": "PASS",
+      "detail": "Student view and fact lookup deny the undisclosed hidden fact."
+    },
+    "unsupported_reply": {
+      "status": "PASS",
+      "detail": "Unbacked numeric claim and citation to a withheld fact are rejected."
+    },
+    "dependency_and_screening": {
+      "status": "PASS",
+      "detail": "SI screening costs no trust; prerequisite fact appears before plan detail."
+    },
+    "provenance": {
+      "status": "PASS",
+      "detail": "Every cited fact links to a source entry in the authored case."
+    }
+  },
+  "passed": 10,
+  "total": 10,
+  "discovery_counts_by_probe_preset": {
+    "straightforward": 5,
+    "typical": 4,
+    "difficult": 3
+  },
+  "gates": {
+    "controlled_environment": "PASS",
+    "trained_action_extraction": "NOT EVALUABLE",
+    "clinical_semantic_grounding": "NOT EVALUABLE",
+    "difficulty_calibration": "NOT EVALUABLE",
+    "student_learning": "NOT EVALUABLE"
+  },
+  "limitations": [
+    "The intents and expected transitions are authored probes, not reviewed student labels.",
+    "Preset vectors adjust trust thresholds only; explicit per-fact min_trust overrides remain unchanged. Faculty calibration and V-04 significance are pending.",
+    "Deterministic checks catch uncited facts and stray numbers, not arbitrary unsupported prose. No LLM judge was invoked.",
+    "The local role view demonstrates fact visibility; production API authorization was not evaluated.",
+    "Notebook 02 trained model gates remain blocked by absent reviewed labels and unlicensed external content."
+  ],
+  "next_notebook": "Notebook 04: scripted test students and verifier challenge set; measure grounded template delivery and disclosure against independent faculty reviewed expectations, keep trained extraction blocked until reviewed split data exist."
+}

@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "historical_packets": 287,
+  "usability_sample": {
+    "packets": 12,
+    "cases": 3,
+    "kinds": 4,
+    "selection": "first hash-ordered packet per case and kind; not representative"
+  },
+  "supplement": {
+    "packets": 12,
+    "counts": {
+      "semantic": 12
+    },
+    "lock": {
+      "supplement_version": "semantic_supplement_v1",
+      "historical_protocol_lock": "8cc3e591b02dd241bbc3c26359e7596b4f38c10658a8c149d3816456293927f5",
+      "source_sha256": {
+        "backend_kelsch/app/grounding/live.py": "badf832a878c17eaca686bc7999e8b94a74ac3fc7a36f75698d0fa86366e974f",
+        "backend_kelsch/app/study/review_kit.py": "4422e7db60372ea78c7d6183abf6f8c22612d73009e0410d0e4ac7468298c48e",
+        "backend_kelsch/app/study/workflow.py": "67210ba9e0752e4c709c5287daed421f4b2129f970920c648b033462a9de652f",
+        "backend_kelsch/app/study/reviewer.html": "bf77734049043f1738a2a75940b0f596c8deb21bf2e6b722d6a6655a510ab2c4"
+      },
+      "candidate_sha256": "9c6c026d42a380891c0d9d4ba1349b74f834619d0735e03925c4d75cc3badbd3",
+      "lock_id": "e016f318912a9010d98cef8e9b9ce21a1e68980573ed5cba6c354a459e6b0cde"
+    }
+  },
+  "human_reviews_imported_by_this_run": 0,
+  "gates": {
+    "review_preparation": "PASS",
+    "clinical_approval": "NOT EVALUABLE",
+    "semantic_accuracy": "NOT EVALUABLE",
+    "rubric_accuracy": "NOT EVALUABLE",
+    "trained_action_extraction": "NOT EVALUABLE",
+    "difficulty_calibration": "NOT EVALUABLE",
+    "learning_gain": "NOT EVALUABLE"
+  },
+  "verification": {
+    "command": "LLM_ENABLED=false PYTHONPATH=backend python -m pytest -q backend_kelsch/tests backend/tests",
+    "passed": 94,
+    "failed": 0,
+    "seconds": 127.02,
+    "new_tests": 4,
+    "http_api_tests": 7,
+    "live_credentials_ready": false,
+    "document_pages_visually_reviewed": 5
+  }
+}

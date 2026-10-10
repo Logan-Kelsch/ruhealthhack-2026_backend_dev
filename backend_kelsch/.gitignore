@@ -1,0 +1,11 @@
+# Defense in depth: workflow commands also reject all Git checkout destinations.
+private/
+reviewer_a.html
+reviewer_b.html
+adjudicator.html
+submission_*.json
+validated_reviews.jsonl
+pair_check.jsonl
+evidence_receipt.json
+quality.json
+audit.json

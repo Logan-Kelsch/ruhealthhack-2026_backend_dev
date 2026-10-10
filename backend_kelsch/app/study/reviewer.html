@@ -1,0 +1,41 @@
+<!doctype html><html lang="en"><meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'none'; img-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Private independent review</title><style>
+body{font:16px system-ui;background:#111827;color:#eef2ff;margin:0 auto;padding:24px;max-width:1100px}h1{font-size:26px}input,textarea,button,select{font:inherit;padding:10px;border-radius:6px}textarea{width:96%;background:#fff;color:#111827}button{background:#c7d2fe;color:#111827;cursor:pointer;margin:5px}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#1f2937;padding:14px}section{border:1px solid #64748b;margin:16px 0;padding:16px}label{display:block;margin:12px 0}.note{color:#fde68a}#message{white-space:pre-wrap}details{margin:16px 0}
+</style><h1>Private independent review</h1><p id="mode" class="note"></p>
+<p>Review the source evidence independently. The files do not communicate with a server. Nothing is saved until you download a submission. Store downloads in the private workspace outside Git. Coordinator verification of faculty role and independence is required.</p>
+<label>Your private reviewer pseudonym <input id="reviewer" autocomplete="off"></label>
+<button id="restore">Restore this slot’s downloaded submission</button><input id="file" type="file" accept="application/json" hidden>
+<label>Packet <select id="choose"></select></label><div id="task"></div>
+<section><h2>Your answer</h2><p id="instructions"></p><textarea id="answer" rows="8" spellcheck="false"></textarea>
+<p>Evidence offsets count Unicode characters, with an exclusive end. For a transcript citation, select text in an exact-context box below, then use its button. For a source fact, use its citation button. Review every citation before saving.</p>
+<textarea id="evidence" rows="6" spellcheck="false"></textarea><label>Private rationale (especially absence of support)<textarea id="rationale" rows="3"></textarea></label>
+<button id="save">Save answer in memory</button><button id="download">Download submitted answers</button><p id="message" role="status"></p></section>
+<script>
+const data=__DATA__;
+const $=id=>document.getElementById(id), answers=new Map();
+$('mode').textContent=(data.manifest.toy?'TOY DEMONSTRATION — NOT FACULTY REVIEWS. ':'')+'Slot: '+data.slot+'. Protocol: '+data.manifest.protocol_lock;
+for(const t of data.tasks){const o=document.createElement('option');o.value=t.packet_id;o.textContent=t.kind+' · '+t.packet_id;$('choose').append(o)}
+function showJSON(parent,obj){const pre=document.createElement('pre');pre.textContent=JSON.stringify(obj,null,2);parent.append(pre)}
+function addEvidence(ref){const refs=JSON.parse($('evidence').value);refs.push(ref);$('evidence').value=JSON.stringify(refs,null,2)}
+function render(){const t=data.tasks.find(t=>t.packet_id===$('choose').value);$('task').replaceChildren();if(!t)return;
+const heading=document.createElement('h2');heading.textContent='Case '+t.case.case_id+' · version '+t.case_version;$('task').append(heading);
+const details=document.createElement('details'), summary=document.createElement('summary');summary.textContent='Approved facts and authored trust rules';details.append(summary);
+showJSON(details,{source_ref:t.case.source_ref,sha256:t.case.sha256,authored_trust_rules:t.case.authored_trust_rules,trust_event_catalog:t.case.trust_event_catalog,trust_event_source:t.case.trust_event_source});
+for(const f of t.case.facts){showJSON(details,f);const b=document.createElement('button');b.textContent='Cite '+f.id;b.onclick=()=>addEvidence({kind:'source_fact',fact_id:f.id,case_sha256:t.case_sha256});details.append(b)}$('task').append(details);
+showJSON($('task'),t.context);
+for(const unit of t.text_units){const s=document.createElement('section'), title=document.createElement('p');title.textContent='Exact context · turn '+unit.turn+' · '+unit.speaker;
+const box=document.createElement('textarea');box.readOnly=true;box.value=unit.text;box.rows=3;
+const b=document.createElement('button');b.textContent='Cite selected span';b.onclick=()=>{const start=Array.from(box.value.slice(0,box.selectionStart)).length,end=Array.from(box.value.slice(0,box.selectionEnd)).length;if(start===end)return;$('message').textContent='';addEvidence({kind:'transcript_span',turn:unit.turn,speaker:unit.speaker,start,end,quote:Array.from(box.value).slice(start,end).join('')})};s.append(title,box,b);$('task').append(s)}
+if(data.independent_answers){showJSON($('task'),{independent_answers:data.independent_answers[t.packet_id]})}
+const examples={release:{expected_fact_ids:[]},semantic:{expected_supported:false},claim:{expected_supported:false},domain:{score:'N/A',na_reason:'',evidence:[]},action:{annotations:[]}};
+const guidance={release:'List newly expected approved fact IDs; an empty list is a reviewed negative. Cite the question/history and relevant facts or omissions.',semantic:'Label the candidate supported or unsupported. Cite the exact contested/supported reply span and relevant fact IDs. Missing support can be established by citing the claim and explaining the absence in your private rationale.',claim:'Judge the candidate claim against the exact transcript/source facts. No score or confidence is supplied.',domain:'Score 1–4 with exact transcript evidence in the answer, or N/A with a specific reason and no evidence. Scores for domains 6/7 require clinical review; this is a faculty judgment, not an automated grade.',action:'Annotate exact spans using the locked student_skill vocabulary and rubric domains; reviewed negative uses other. No classifier predictions are shown.'};
+$('instructions').textContent=guidance[t.kind];const old=answers.get(t.packet_id);$('answer').value=JSON.stringify(old?.answer??examples[t.kind],null,2);$('evidence').value=JSON.stringify(old?.evidence??[],null,2);$('rationale').value=old?.rationale??'';
+}
+$('choose').onchange=render;
+$('save').onclick=()=>{try{const t=data.tasks.find(t=>t.packet_id===$('choose').value),a=JSON.parse($('answer').value),e=JSON.parse($('evidence').value);if(!Array.isArray(e))throw Error('Evidence must be a list');if(a.score==='N/A'){if(!a.na_reason?.trim()||e.length)throw Error('N/A requires a specific reason and no evidence')}else if(!e.length)throw Error('Exact evidence required');if(t.kind==='domain'&&a.score!=='N/A')a.evidence=e.filter(r=>r.kind==='transcript_span');answers.set(t.packet_id,{packet_id:t.packet_id,answer:a,evidence:e,rationale:$('rationale').value,reviewed_at:new Date().toISOString()});$('message').textContent='Saved in memory. '+answers.size+' answers. Download before closing. Final validity is checked by the Python importer.'}catch(e){$('message').textContent=e.message}};
+$('download').onclick=()=>{if(!$('reviewer').value.trim()){$('message').textContent='Enter your pseudonym';return}const blob=new Blob([JSON.stringify({manifest:data.manifest,slot:data.slot,reviewer_id:$('reviewer').value.trim(),answers:[...answers.values()]},null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='submission_'+data.slot+'.json';a.click();URL.revokeObjectURL(url)};
+$('restore').onclick=()=>$('file').click();$('file').onchange=async()=>{try{const x=JSON.parse(await $('file').files[0].text());if(x.slot!==data.slot||JSON.stringify(x.manifest)!==JSON.stringify(data.manifest))throw Error('Wrong slot or manifest');answers.clear();for(const r of x.answers){if(!data.tasks.some(t=>t.packet_id===r.packet_id))throw Error('Unknown packet');answers.set(r.packet_id,r)}$('reviewer').value=x.reviewer_id;render();$('message').textContent='Restored '+answers.size+' answers'}catch(e){$('message').textContent=e.message}};
+window.onbeforeunload=()=>answers.size?'Download your answers before leaving.':null;
+render();
+</script></html>

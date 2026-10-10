@@ -1,0 +1,12 @@
+{
+  "stage": "Notebook 02",
+  "preparation_tests": "PASS",
+  "backend_test_command": "LLM_ENABLED=false python -m pytest -q",
+  "backend_tests_passed": 44,
+  "notebook_code_cells_executed": 8,
+  "notebook_execution": "PASS in fresh Python process with shared cell namespace",
+  "jupyter_kernel_execution": "NOT EVALUABLE: runtime denied kernel TCP interface initialization",
+  "figures": "Two figures rendered; source-count figure visually inspected",
+  "supervised_performance": "NOT EVALUABLE",
+  "human_learning_efficiency": "NOT EVALUABLE"
+}

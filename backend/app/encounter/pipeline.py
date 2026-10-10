@@ -45,7 +45,7 @@ def run_turn(
     t0 = time.perf_counter()
     last_patient = history[-1][1] if history else None
     intent, c_calls = classifier.classify(utterance, case, last_patient)
-    calls += [c.to_dict() for c in c_calls]
+    calls += [record for c in c_calls for record in c.to_dicts()]
     latency["classify"] = _ms(t0)
 
     t0 = time.perf_counter()
@@ -63,8 +63,10 @@ def run_turn(
             t0 = time.perf_counter()
             try:
                 text, cit, p_calls = phraser.phrase(case, res, utterance, history, previously, retry_reason)
-                calls += [c.to_dict() for c in p_calls]
+                calls += [record for c in p_calls for record in c.to_dicts()]
             except LLMUnavailable as exc:
+                if exc.call is not None:
+                    calls.extend(exc.call.to_dicts())
                 attempts.append({"attempt": attempt + 1, "error": str(exc)})
                 latency[f"phrase_{attempt + 1}"] = _ms(t0)
                 break
@@ -75,9 +77,11 @@ def run_turn(
             if not problems:
                 try:
                     judge_problems, j_call = verifier.judge(case, text, res.allowed_fact_ids, permitted_prev, student_said)
-                    calls.append(j_call.to_dict())
+                    calls.extend(j_call.to_dicts())
                     problems = judge_problems
                 except LLMUnavailable as exc:
+                    if exc.call is not None:
+                        calls.extend(exc.call.to_dicts())
                     problems = [f"judge unavailable: {exc}"]  # fail closed
             latency[f"verify_{attempt + 1}"] = _ms(t0)
             attempts.append({"attempt": attempt + 1, "reply": text, "cited": cit, "problems": problems})
@@ -86,7 +90,9 @@ def run_turn(
                 break
             retry_reason = "; ".join(problems)
     if not reply:
+        t0 = time.perf_counter()
         reply, cited = phraser.template_reply(case, res, intent.topic_ids(), intent.action_ids(), bool(intent.empathy))
+        latency["template"] = _ms(t0)
         fallback = True
 
     blocked = sum(1 for a in attempts if a.get("problems"))

@@ -1,0 +1,34 @@
+{
+  "protocol_id": "notebook06_prospective_v1",
+  "status": "proposed_pending_faculty_and_ethics_review",
+  "registration_rule": "Lock this file and source manifest before collecting pilot outcomes; publish changes as a new protocol version with reasons.",
+  "population": "Consenting health-professions learners practicing on synthetic authored cases; no patient records.",
+  "design": "Feasibility run: independent faculty review of authored probes. Later efficacy study: randomized parallel assignment to system feedback or standard practice, baseline and held-out follow-up cases, blinded faculty outcome raters; one learner is the analysis unit.",
+  "outcomes": {
+    "primary_future": "Between-arm difference in each learner's mean change per common scored faculty-reviewed rubric domain on a held-out follow-up case; exclude N/A domains instead of imputing a score. No learning result from authored fixtures.",
+    "secondary_future": ["Safety-critical action recall on held-out learner transcripts", "Fact-level disclosure precision/recall on fully faculty-reviewed turns", "Semantic reply supported/unsupported agreement with independent faculty labels", "Per-domain quadratic weighted Cohen kappa of independent faculty scores", "Difficulty discovery effect with faculty-approved full presets and sampled learners"],
+    "analysis": "Intention-to-treat by assigned learner, report missing outcomes by arm; compare arm mean change with a two-sided 95% confidence interval. Cluster repeated visits within learner. No interim significance testing or post hoc target changes."
+  },
+  "proposed_engineering_targets_not_approved": {
+    "trained_macro_f1": 0.85,
+    "critical_action_recall": 0.95,
+    "min_test_positives_per_critical_action": 10,
+    "critical_actions": ["safety_netting", "prescribe_antibiotic", "start_medication"],
+    "clinical_release_false_positive_and_negative": 0,
+    "semantic_unsupported_permitted": 0,
+    "grader_min_transcripts_per_domain": 20
+  },
+  "sample_size_rationale": {
+    "grader_feasibility": "The PRD mentions 15–20 double-rated transcripts; target 20 as a feasibility floor, with broad confidence intervals and no power claim.",
+    "release_precision": "About 100 independent fact-level judgments would yield a worst-case normal-approximation 95% margin near 0.10 at p=0.5; correlated facts and turns reduce effective information, so report clustered intervals when data permit.",
+    "efficacy_planning": "For a future parallel-arm comparison with standardized effect 0.5, two-sided alpha 0.05 and 80% power, normal approximation gives about 63 learners per arm; allowing 15% loss suggests about 74 per arm. This is a planning assumption, not a justified clinical effect or current recruitment target."
+  },
+  "privacy": {
+    "cases": "Synthetic authored cases only; never import real patient data.",
+    "learner_consent": "Obtain documented opt-in and institutional ethics/IRB determination before collecting learner audio, transcript, or scores; refusal must not affect grading.",
+    "minimization": "Pseudonymous learner IDs, no names, email, audio or free-text identifiers in this repository; redact incidental personal information before annotation.",
+    "storage": "Keep consent linkage, raw recordings and reviewer identities in institution-controlled private storage under an approved retention/deletion schedule. Only aggregate metrics and source-locked synthetic fixtures may be committed.",
+    "access": "Blinded reviewers receive case context and transcript but not model predictions, level labels, actual releases, provisional rubric grades or group assignment. Confirm organizational independence outside metadata checks."
+  },
+  "ethics_reference": "https://www.hhs.gov/ohrp/coded-private-information-or-biospecimens-used-research.html"
+}

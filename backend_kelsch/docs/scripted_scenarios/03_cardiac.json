@@ -1,0 +1,111 @@
+{
+  "format": "clinical_script_review_v1",
+  "scenario_id": 3,
+  "title": "Nausea, fatigue, and chest unease",
+  "patient": {
+    "name": "Leah Carter",
+    "age_years": 45,
+    "sex": "female",
+    "presenting_concern": "Nausea, sweating, unusual fatigue, and vague chest unease",
+    "history": [
+      "Panic attacks",
+      "Anxiety"
+    ]
+  },
+  "learning_goal": "Recognize ST elevation on the released ECG, avoid anchoring on anxiety, and escalate immediately to the supervising emergency team.",
+  "educator_description": "Leah Carter is a 45-year-old woman with panic attacks and anxiety. She presents to an emergency department with nausea, sweating, fatigue, and vague chest unease that began 40 minutes ago. Symptoms started while carrying groceries. An ECG shows ST elevation in II, III, and aVF with reciprocal depression in I and aVL. The goal is to recognize a time-critical cardiac presentation despite the anxiety history.",
+  "learner_role": "medical student under supervision",
+  "teaching_notes": [
+    "Use the fixed suggested sequence for a coherent rehearsal.",
+    "This is an authored demonstration, not a diagnosis or grading engine."
+  ],
+  "sources": [
+    {
+      "title": "2025 ACC/AHA acute coronary syndromes guideline",
+      "url": "https://www.jacc.org/doi/10.1016/j.jacc.2024.11.009"
+    },
+    {
+      "title": "AHA: heart attack symptoms in women",
+      "url": "https://www.heart.org/en/health-topics/heart-attack/warning-signs-of-a-heart-attack/heart-attack-symptoms-in-women"
+    }
+  ],
+  "dialogue": [
+    {
+      "student": "Hello, I am the medical student with the emergency team. Tell me what feels different today.",
+      "patient": "I feel sick to my stomach and sweaty. There is a strange heaviness here, but it is not sharp pain. Maybe it is my anxiety.",
+      "chart": []
+    },
+    {
+      "student": "When did it begin, and what were you doing?",
+      "patient": "About forty minutes ago, carrying groceries. I sat down, but it did not go away. I feel unusually tired and a little short of breath.",
+      "chart": []
+    },
+    {
+      "student": "I do not want to assume this is anxiety. I will alert my supervisor and arrange an ECG and vital signs now while we continue.",
+      "patient": "All right. I have had panic attacks before, but this feels different.",
+      "chart": [
+        {
+          "id": "cardiac.vitals",
+          "label": "Vital signs",
+          "text": "Blood pressure 132/84 mmHg; heart rate 96/min; respiratory rate 22/min; oxygen saturation 97% on room air. Authored snapshot, not a reassurance of cardiac safety.",
+          "source": "Authored example values",
+          "urgent": false
+        },
+        {
+          "id": "cardiac.ecg",
+          "label": "12-lead ECG",
+          "text": "Sinus rhythm. ST elevation of 2 mm in II, III, and aVF, with reciprocal ST depression in I and aVL. Synthetic teaching report; no real patient tracing.",
+          "source": "https://www.jacc.org/doi/10.1016/j.jacc.2024.11.009",
+          "urgent": true
+        }
+      ]
+    },
+    {
+      "student": "While the team reviews the ECG, how does this compare with your past panic attacks?",
+      "patient": "Usually I get frightened first, my heart races, and it settles down. This started with the sick feeling and heaviness, and it has stayed.",
+      "chart": []
+    },
+    {
+      "student": "The ECG has changes that need immediate review. I am escalating now to the emergency clinician and cardiac team rather than waiting for more questions or blood-test results.",
+      "patient": "Is something wrong with my heart? I thought I was having another panic attack.",
+      "chart": []
+    },
+    {
+      "student": "The tracing raises concern for a serious heart problem. The team is acting urgently and will explain the next steps. You have done the right thing by coming in.",
+      "patient": "Please stay with me until they get here. I am scared.",
+      "chart": []
+    },
+    {
+      "student": "I will stay with you while we hand over. Do you have any medication allergies, and what medicines have you taken today?",
+      "patient": "No known medicine allergies. I take sertraline every day. I have not taken anything else today.",
+      "chart": []
+    },
+    {
+      "student": "I am handing over your symptoms, their timing, and the ECG changes to the emergency clinician now.",
+      "patient": "Thank you for taking me seriously. Please tell them when it started.",
+      "chart": []
+    }
+  ],
+  "debrief": [
+    {
+      "after_turn": 1,
+      "rubric_domain": "Clinical reasoning and synthesis",
+      "question": "What alternative explanations deserve attention before accepting the patient initial explanation?"
+    },
+    {
+      "after_turn": 3,
+      "rubric_domain": "Information gathering",
+      "question": "Which parts of the history justified early testing rather than a longer interview first?"
+    },
+    {
+      "after_turn": 5,
+      "rubric_domain": "Clinical reasoning and synthesis",
+      "question": "What evidence changed the urgency of your plan, and how would you communicate it in a handover?"
+    },
+    {
+      "after_turn": 6,
+      "rubric_domain": "Rapport, respect, and empathy",
+      "question": "How can you acknowledge fear while avoiding premature reassurance?"
+    }
+  ]
+}

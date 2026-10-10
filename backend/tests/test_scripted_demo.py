@@ -195,3 +195,23 @@ def test_runner_uses_actual_http_and_restores_configuration(tmp_path):
         assert a['session']['transcript']==b['session']['transcript']
         assert a['session']['chart']==b['session']['chart']
         assert a['debrief']['reflections']==b['debrief']['reflections']
+
+
+def test_imported_script_reaches_new_http_sessions_without_changing_old(client, tmp_path, monkeypatch):
+    import json
+    from app.demo.authoring import export_scripts, import_scripts
+    fixture = tmp_path / 'fixture.json'
+    fixture.write_bytes(service.FIXTURE.read_bytes())
+    monkeypatch.setattr(service, 'FIXTURE', fixture)
+    old = start(client, 1)
+    reviews = export_scripts(tmp_path / 'review', fixture)
+    data = json.loads(reviews[0].read_text())
+    data['dialogue'][0]['patient'] = 'I would like to explain what brought me in.'
+    reviews[0].write_text(json.dumps(data))
+    import_scripts([reviews[0]], fixture)
+    new = start(client, 1)
+    old_reply = send(client, old['session_id'], 1, 'Hello').json()
+    new_reply = send(client, new['session_id'], 1, 'Hello').json()
+    assert old_reply['turn']['patient_text'] != data['dialogue'][0]['patient']
+    assert new_reply['turn']['patient_text'] == data['dialogue'][0]['patient']
+    assert old['fixture_sha256'] != new['fixture_sha256']

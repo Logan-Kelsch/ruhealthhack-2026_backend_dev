@@ -22,14 +22,17 @@ These are authored synthetic teaching scripts awaiting clinical review.
 - `chart`: findings shown after that dialogue entry. Move a finding to another
   entry to change when it appears. Keep its `id` unique. For a new finding, use a
   unique short ID, label, text, source, and `urgent: true` or `false`.
-- `debrief`: reflection questions. `after_turn: 4` means the question quotes the
-  fourth student/patient exchange; it only appears if that exchange was completed.
-  Adjust these numbers when changing the dialogue order. `rubric_domain` uses an
-  official domain name listed below.
+- `debrief`: the separate review delivered **after the encounter has ended**.
+  `after_turn: 4` identifies evidence from the fourth student/patient exchange;
+  it does not schedule a question after the fourth turn. No debrief question or
+  coaching notice appears during conversation. Only completed exchanges may be
+  cited. Adjust these evidence numbers when changing the dialogue order.
+  `rubric_domain` uses an official domain name listed below.
 
 Keep `format` and `scenario_id` unchanged. Background, dialogue, findings, and goals
 should agree. Debrief questions should guide reflection without giving away the
-answer. Mark urgent findings directly; urgent notices do not wait for reflection.
+answer. Mark urgent chart findings directly; chart data still appears during the
+encounter. Teaching guidance about those findings belongs in the later debrief.
 The importer checks structure and references, not medical correctness.
 
 The dialogue remains a fixed sequence: any student input receives the next patient

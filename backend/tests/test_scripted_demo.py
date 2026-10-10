@@ -50,11 +50,15 @@ def test_complete_http_paths(client,i):
     for n,t in enumerate(case['turns'],1):
         r=send(client,sid,n,t['suggested_student_text']);assert r.status_code==200,r.text
         out=r.json();assert out['turn']['patient_text']==t['patient_text']
+        assert out['safety_notice'] is None
+        assert 'reflections' not in out and 'interpretation' not in out
+        assert client.get(f'/api/demo/sessions/{sid}/debrief').status_code==409
         assert out['actual_model_calls']==0
         assert out['turn']['simulated_delay_ms']==t['simulated_delay_ms']
         assert {c['id'] for c in out['chart_added']}==set(t['release_chart_ids'])
     assert out['complete'] and out['next_step'] is None
     assert client.get(f'/api/demo/sessions/{sid}').json()['status']=='ready_to_end'
+    assert client.get(f'/api/demo/sessions/{sid}/debrief').status_code==409
     assert send(client,sid,len(case['turns'])+1,'extra').status_code==409
     assert client.post(f'/api/demo/sessions/{sid}/end').status_code==200
     d=client.get(f'/api/demo/sessions/{sid}/debrief').json()
@@ -118,7 +122,7 @@ def test_early_end_filters_reflections_and_ecg_release(client):
     for n in range(1,4):
         out=send(client,sid,n,'Rehearsal').json()
         if n<3: assert out['chart_added']==[]
-    assert out['safety_notice'] and any('ST elevation' in c['text'] for c in out['chart_added'])
+    assert out['safety_notice'] is None and any('ST elevation' in c['text'] for c in out['chart_added'])
     client.post(f'/api/demo/sessions/{sid}/end')
     d=client.get(f'/api/demo/sessions/{sid}/debrief').json()
     assert d['completed_steps']==3 and all(q['anchor_step']<=3 for q in d['reflections'])
@@ -215,3 +219,46 @@ def test_imported_script_reaches_new_http_sessions_without_changing_old(client, 
     assert old_reply['turn']['patient_text'] != data['dialogue'][0]['patient']
     assert new_reply['turn']['patient_text'] == data['dialogue'][0]['patient']
     assert old['fixture_sha256'] != new['fixture_sha256']
+
+
+@pytest.mark.parametrize('completed_steps', [3, 8])
+def test_debrief_is_separate_read_only_post_encounter_review(client, completed_steps):
+    state = start(client, 3)
+    sid = state['session_id']
+    case = service.scenarios()[2]
+    for n in range(1, completed_steps + 1):
+        response = send(client, sid, n, case['turns'][n-1]['suggested_student_text']).json()
+        assert response['safety_notice'] is None
+        assert not {'reflections', 'question', 'interpretation'} & response.keys()
+    before = client.get(f'/api/demo/sessions/{sid}').json()
+    assert client.get(f'/api/demo/sessions/{sid}/debrief').status_code == 409
+    assert client.get(f'/api/demo/sessions/{sid}').json() == before
+    ended = client.post(f'/api/demo/sessions/{sid}/end').json()
+    assert ended['status'] == 'ended' and 'reflections' not in ended
+    first = client.get(f'/api/demo/sessions/{sid}/debrief').json()
+    assert first['safety_notice'] and 'completed encounter' in first['safety_notice']
+    assert first['completed_steps'] == completed_steps
+    assert all(q['anchor_step'] <= completed_steps for q in first['reflections'])
+    assert client.get(f'/api/demo/sessions/{sid}/debrief').json() == first
+    assert client.get(f'/api/demo/sessions/{sid}').json() == ended
+    assert send(client, sid, completed_steps + 1, 'One more question').status_code == 409
+
+
+def test_legacy_retry_cannot_replay_inline_coaching(tmp_path):
+    engine = create_engine(f'sqlite:///{tmp_path}/legacy.sqlite')
+    Base.metadata.create_all(engine)
+    with Session(engine, expire_on_commit=False) as db:
+        p = service.prepare(db, 3, service.scenarios()[2]['educator']['example_description'])
+        sid = p['preparation_id']
+        service.start(db, sid)
+        for n in range(1, 4):
+            service.turn(db, sid, n, f'turn_{n}', 'Question')
+        row = service.load(db, sid)
+        payload = copy.deepcopy(row.payload)
+        payload['requests']['turn_3']['response']['safety_notice'] = 'Old inline coaching'
+        service.save(db, row, payload, row.status)
+        retried = service.turn(db, sid, 3, 'turn_3', 'Question')
+        assert retried['safety_notice'] is None
+        assert any(c['id'] == 'cardiac.ecg' for c in retried['chart_added'])
+        assert len(service.view(db, sid)['transcript']) == 3
+    engine.dispose()

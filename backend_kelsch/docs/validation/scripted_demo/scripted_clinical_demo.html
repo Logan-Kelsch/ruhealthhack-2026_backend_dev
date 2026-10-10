@@ -7800,12 +7800,11 @@ a.anchor-link {
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h1 id="Three-clinical-encounters:-a-scripted-presenter-rehearsal">Three clinical encounters: a scripted presenter rehearsal<a class="anchor-link" href="#Three-clinical-encounters:-a-scripted-presenter-rehearsal">¶</a></h1><p><strong>Educator description → structured JSON → student conversation → guided debrief.</strong></p>
 <p>Choose <strong>1</strong> (pneumonia after Philadelphia hotel travel), <strong>2</strong> (tobacco use with no willingness to quit), or <strong>3</strong> (a 45-year-old woman with vague symptoms and an abnormal ECG).</p>
 <p>This notebook uses the actual <code>/api/demo</code> HTTP handlers. Patient replies and debrief questions are <strong>authored, static playback</strong> representing the intended LLM-assisted experience. <strong>No LLM is called, no latency is measured for a model, and no student is graded.</strong> Entered questions advance sequence position, even if unrelated. Follow the presenter sequence for a coherent encounter.</p>
-<p>The cases and individual values are synthetic and await clinical review. Urgent findings receive explicit escalation notices; keeping a debrief indirect must not withhold immediate safety guidance.</p>
+<p>The cases and individual values are synthetic and await clinical review. Chart findings appear during the encounter. All reflection questions and teaching feedback appear only after the conversation has ended, in a separate debrief.</p>
 <p><strong>Presenter:</strong> “The repeatable script lets us rehearse the interface. Our existing live encounter pipeline is a separate mode.”</p>
 </div>
 </div>
@@ -7815,8 +7814,7 @@ a.anchor-link {
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="1.-Choose-the-case-and-connection">1. Choose the case and connection<a class="anchor-link" href="#1.-Choose-the-case-and-connection">¶</a></h2><p>Use your backend virtual environment as the notebook kernel. Install <code>backend_kelsch/requirements-notebooks.txt</code> there if needed. Local mode creates its own temporary SQLite database and does not use your cloud credentials. Your <code>.env</code> can stay in place.</p>
 <p>For a running server, set <code>API_BASE_URL = "http://localhost:8000"</code>; enable <code>SCRIPTED_DEMO_ENABLED=true</code> on that server and apply its migration first. Both modes exercise the same routes.</p>
 </div>
@@ -7828,15 +7826,13 @@ a.anchor-link {
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>/tmp/rounds-text-demo-venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+<pre>/tmp/rounds-script-review-venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
   from starlette.testclient import TestClient as TestClient  # noqa
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
 <p><strong>Selected:</strong> Fever and respiratory symptoms · <strong>Mode:</strong> scripted playback · <strong>Model calls:</strong> 0</p>
 </div>
@@ -7848,8 +7844,7 @@ a.anchor-link {
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="2.-Educator-mode:-categorize-a-natural-language-description">2. Educator mode: categorize a natural-language description<a class="anchor-link" href="#2.-Educator-mode:-categorize-a-natural-language-description">¶</a></h2><p>Change <code>EDUCATOR_TEXT</code>, or use the input below and click <strong>Prepare description</strong>. The structurer extracts explicit demographics and groups exact text spans into concerns, history, exposures, medicines, allergies, findings, and learning goals. It keeps negations and unclassified text.</p>
 <p><strong>The extracted metadata and the fixed patient are separate JSON objects.</strong> Differences are shown for review; pasted text never silently changes the static patient. To author a different patient, edit and version the fixture described at the end.</p>
 <p><strong>Presenter:</strong> “This JSON boundary can later accept a live model's structured output. Today the extraction is deterministic text rules.”</p>
@@ -7862,13 +7857,11 @@ a.anchor-link {
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
 <h3 id="Fixed-patient-metadata">Fixed patient metadata<a class="anchor-link" href="#Fixed-patient-metadata">¶</a></h3>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <pre>{
   "name": "Daniel Mercer",
@@ -7882,13 +7875,11 @@ a.anchor-link {
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
 <h3 id="Extracted,-source-linked-metadata">Extracted, source-linked metadata<a class="anchor-link" href="#Extracted,-source-linked-metadata">¶</a></h3>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div>
 <style scoped="">
@@ -7970,7 +7961,6 @@ a.anchor-link {
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
 <ul>
 <li>The fixed fixture defines the patient and replies. Extracted text is retained for educator review and does not change the dialogue.</li>
@@ -7978,7 +7968,6 @@ a.anchor-link {
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
 <ul>
 <li>This is rule-based structuring and scripted playback; no LLM has been called.</li>
@@ -7986,21 +7975,18 @@ a.anchor-link {
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Interactive controls: open the notebook with a Jupyter kernel to use them.</pre>
+<pre>Textarea(value='Daniel Mercer is a 58-year-old man with hypertension. He has four days of fever, dry cough, sh…</pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Interactive controls: open the notebook with a Jupyter kernel to use them.</pre>
+<pre>Button(description='Prepare description', style=ButtonStyle())</pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Interactive controls: open the notebook with a Jupyter kernel to use them.</pre>
+<pre>Output()</pre>
 </div>
 </div>
 </div>
@@ -8010,8 +7996,7 @@ a.anchor-link {
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="3.-Student-mode:-start-the-pinned-encounter">3. Student mode: start the pinned encounter<a class="anchor-link" href="#3.-Student-mode:-start-the-pinned-encounter">¶</a></h2><p>Student responses contain the current transcript and only released chart items. They omit the educator's goal, future replies, full history, and instructor material. The educator and presenter can inspect the suggested sequence separately.</p>
 <p>The patient is an actor in a fixed script: a question consumes the next reply. These endpoints do not interpret the question or replace the live production encounter API.</p>
 </div>
@@ -8023,7 +8008,6 @@ a.anchor-link {
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div>
 <style scoped="">
@@ -8063,13 +8047,11 @@ a.anchor-link {
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
 <p><strong>Presenter-only suggested sequence</strong></p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div>
 <style scoped="">
@@ -8156,10 +8138,10 @@ a.anchor-link {
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="4.-Enter-a-student-question;-receive-the-next-static-patient-reply">4. Enter a student question; receive the next static patient reply<a class="anchor-link" href="#4.-Enter-a-student-question;-receive-the-next-static-patient-reply">¶</a></h2><p>Use the text box for this presenter notebook, or call <code>next_turn("your question")</code> in another cell. Click <strong>Use suggested question</strong>, then <strong>Send question</strong>, for the intended sequence. If educator text was changed, click <strong>Start prepared case</strong> first.</p>
-<p>The response carries an assumed thinking delay of about 1–2.4 seconds. The notebook waits before displaying the patient bubble. The HTTP server does <strong>not</strong> sleep; the frontend controls presentation. Urgent chart information and notices appear immediately.</p>
+<p>The response carries an assumed thinking delay of about 1–2.4 seconds. The notebook waits before displaying the patient bubble. The HTTP server does <strong>not</strong> sleep; the frontend controls presentation. Released chart findings appear immediately. The conversation contains no teaching prompts or coaching notices.</p>
+<p><strong>When finished:</strong> click <strong>End encounter</strong>, then <strong>View debrief</strong>. Ending stops the conversation; it does not display feedback. The debrief opens in its own output area and cannot be requested while the encounter is active. An early ending reviews only exchanges that actually occurred.</p>
 <p><strong>Presenter:</strong> “The wait is a presentation estimate, not measured Bedrock or voice latency.”</p>
 </div>
 </div>
@@ -8170,21 +8152,28 @@ a.anchor-link {
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Interactive controls: open the notebook with a Jupyter kernel to use them.</pre>
+<pre>Textarea(value='', description='Student:', layout=Layout(height='85px', width='95%'))</pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Interactive controls: open the notebook with a Jupyter kernel to use them.</pre>
+<pre>HBox(children=(Button(description='Use suggested question', style=ButtonStyle()), Button(description='Send que…</pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Interactive controls: open the notebook with a Jupyter kernel to use them.</pre>
+<pre>Output()</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Button(description='View debrief', disabled=True, style=ButtonStyle())</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Output()</pre>
 </div>
 </div>
 </div>
@@ -8194,9 +8183,8 @@ a.anchor-link {
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="5.-Complete-rehearsals-for-all-three-examples">5. Complete rehearsals for all three examples<a class="anchor-link" href="#5.-Complete-rehearsals-for-all-three-examples">¶</a></h2><p>Run this cell to see the whole conversation, chart releases, and debrief for each fixed case. These are new sessions, separate from the interactive encounter above.</p>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="5.-Complete-rehearsals-for-all-three-examples">5. Complete rehearsals for all three examples<a class="anchor-link" href="#5.-Complete-rehearsals-for-all-three-examples">¶</a></h2><p>Run this cell to see the whole conversation and chart releases for each fixed case, then end that encounter and show its separate debrief. These are new sessions, separate from the interactive encounter above.</p>
 <p><strong>Clinical review questions:</strong></p>
 <ul>
 <li>Pneumonia: does the travel timeline support the investigation, while keeping the cause uncertain and treatment appropriately supervised?</li>
@@ -8213,73 +8201,61 @@ a.anchor-link {
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
 <h2 id="Scenario-1:-Fever-and-respiratory-symptoms">Scenario 1: Fever and respiratory symptoms<a class="anchor-link" href="#Scenario-1:-Fever-and-respiratory-symptoms">¶</a></h2>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e8edf5;padding:12px;border-radius:10px;margin:8px 0"><b>Student clinician:</b> Hello, I am the medical student working with your clinician. What has been bothering you most?</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e3f4ed;padding:12px;border-radius:10px;margin:8px 0"><b>Patient:</b> I am Daniel. I have had a fever and this cough, and now I get winded just walking across the room.</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e8edf5;padding:12px;border-radius:10px;margin:8px 0"><b>Student clinician:</b> When did this start, and how has it changed?</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e3f4ed;padding:12px;border-radius:10px;margin:8px 0"><b>Patient:</b> It started four days ago with aches and a fever. The cough came next. My breathing has gotten worse since yesterday.</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e8edf5;padding:12px;border-radius:10px;margin:8px 0"><b>Student clinician:</b> Have you had any other symptoms, like stomach problems or confusion?</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e3f4ed;padding:12px;border-radius:10px;margin:8px 0"><b>Patient:</b> I have had watery diarrhea and a headache. I have not felt confused, but I am worn out.</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e8edf5;padding:12px;border-radius:10px;margin:8px 0"><b>Student clinician:</b> Have you traveled or stayed away from home in the last two weeks?</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e3f4ed;padding:12px;border-radius:10px;margin:8px 0"><b>Patient:</b> Yes. I went to a convention in Philly nine days ago and stayed at a downtown hotel for three nights.</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e8edf5;padding:12px;border-radius:10px;margin:8px 0"><b>Student clinician:</b> Tell me about your health conditions, medicines, and allergies.</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e3f4ed;padding:12px;border-radius:10px;margin:8px 0"><b>Patient:</b> I have high blood pressure and take lisinopril. I do not know of any medicine allergies. I used to smoke but stopped five years ago.</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div>
 <style scoped="">
@@ -8317,25 +8293,16 @@ a.anchor-link {
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p><strong>Safety:</strong> Time-critical teaching finding: obtain immediate supervising-clinician review and escalation. Reflection must not delay urgent care.</p>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e8edf5;padding:12px;border-radius:10px;margin:8px 0"><b>Student clinician:</b> I would like to check your oxygen level and examine your chest. Is that okay?</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e3f4ed;padding:12px;border-radius:10px;margin:8px 0"><b>Patient:</b> Yes, please. I feel like I cannot get a full breath.</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div>
 <style scoped="">
@@ -8373,19 +8340,16 @@ a.anchor-link {
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e8edf5;padding:12px;border-radius:10px;margin:8px 0"><b>Student clinician:</b> The examination suggests pneumonia. I will ask my supervising clinician to review you now and arrange chest imaging and tests related to your recent travel.</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e3f4ed;padding:12px;border-radius:10px;margin:8px 0"><b>Patient:</b> Could something at the hotel have made me sick? I thought this was just the flu.</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div>
 <style scoped="">
@@ -8423,139 +8387,141 @@ a.anchor-link {
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e8edf5;padding:12px;border-radius:10px;margin:8px 0"><b>Student clinician:</b> Hotel travel is a clue, but it does not prove the cause. We will collect urine and a respiratory sample if possible, without delaying needed treatment.</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e3f4ed;padding:12px;border-radius:10px;margin:8px 0"><b>Patient:</b> Okay. I can try to cough up a sample. Will I need an antibiotic?</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e8edf5;padding:12px;border-radius:10px;margin:8px 0"><b>Student clinician:</b> I will discuss prompt pneumonia treatment with my supervising clinician, including coverage for Legionella, such as a macrolide or a respiratory fluoroquinolone, if appropriate for you.</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e3f4ed;padding:12px;border-radius:10px;margin:8px 0"><b>Patient:</b> Please explain the plan as we go. I am worried about how breathless I am.</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e8edf5;padding:12px;border-radius:10px;margin:8px 0"><b>Student clinician:</b> We are arranging monitored care and treatment. What questions do you have, and can you tell me what you understand so far?</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e3f4ed;padding:12px;border-radius:10px;margin:8px 0"><b>Patient:</b> You think I have pneumonia, and the hotel stay helps decide which tests to do. You are getting the clinician because my breathing needs attention.</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<h3 id="Guided-reflection-%E2%80%94-no-grade">Guided reflection — no grade<a class="anchor-link" href="#Guided-reflection-%E2%80%94-no-grade">¶</a></h3>
+<p><strong>Conversation ended.</strong></p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p>These are authored reflection questions, not a judgment that you made an error. Replies depend on sequence position, not interpretation of your input. No rubric score or learning outcome is assigned.</p>
+<h3 id="Post-encounter-debrief-%E2%80%94-no-grade">Post-encounter debrief — no grade<a class="anchor-link" href="#Post-encounter-debrief-%E2%80%94-no-grade">¶</a></h3>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p><strong>Information gathering · turn 4</strong></p>
+<p>The encounter has ended. Review the completed transcript using these authored reflection questions; turn numbers identify evidence, not feedback scheduled during conversation. These questions are not a judgment that you made an error. Replies depend on sequence position, not interpretation of your input. No rubric score or learning outcome is assigned.</p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
+<p><strong>Information gathering · evidence from turn 4</strong></p>
+</div>
+</div>
+<div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <blockquote><b>Your words:</b> Have you traveled or stayed away from home in the last two weeks?</blockquote>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<blockquote><b>Patient response:</b> Yes. I went to a convention in Philly nine days ago and stayed at a downtown hotel for three nights.</blockquote>
+</div>
+</div>
+<div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
 <p>What information from the travel history would you carry into your assessment, and what still needs confirmation?</p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p><strong>Clinical reasoning and synthesis · turn 6</strong></p>
+<p><strong>Clinical reasoning and synthesis · evidence from turn 6</strong></p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <blockquote><b>Your words:</b> I would like to check your oxygen level and examine your chest. Is that okay?</blockquote>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<blockquote><b>Patient response:</b> Yes, please. I feel like I cannot get a full breath.</blockquote>
+</div>
+</div>
+<div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
 <p>Which findings affect the urgency of your plan, independent of the eventual cause?</p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p><strong>Explanation and shared decisions · turn 9</strong></p>
+<p><strong>Explanation and shared decisions · evidence from turn 9</strong></p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <blockquote><b>Your words:</b> I will discuss prompt pneumonia treatment with my supervising clinician, including coverage for Legionella, such as a macrolide or a respiratory fluoroquinolone, if appropriate for you.</blockquote>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<blockquote><b>Patient response:</b> Please explain the plan as we go. I am worried about how breathless I am.</blockquote>
+</div>
+</div>
+<div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
 <p>How would you explain why a treatment is being considered without presenting an unconfirmed cause as certain?</p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
+<p><strong>Post-encounter safety review:</strong> This completed encounter included time-critical findings. Review when supervising-clinician escalation was needed and how you communicated the urgency.</p>
+</div>
+</div>
+<div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
 <h2 id="Scenario-2:-Tobacco-use-and-readiness-to-change">Scenario 2: Tobacco use and readiness to change<a class="anchor-link" href="#Scenario-2:-Tobacco-use-and-readiness-to-change">¶</a></h2>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e8edf5;padding:12px;border-radius:10px;margin:8px 0"><b>Student clinician:</b> Hello, I am the medical student working with your clinician. Would it be okay to talk about smoking for a few minutes?</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e3f4ed;padding:12px;border-radius:10px;margin:8px 0"><b>Patient:</b> We can talk, but I am telling you now: I am not quitting.</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e8edf5;padding:12px;border-radius:10px;margin:8px 0"><b>Student clinician:</b> What does smoking do for you during a usual day?</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e3f4ed;padding:12px;border-radius:10px;margin:8px 0"><b>Patient:</b> I smoke about a pack a day. With rotating shifts, those breaks are how I settle down.</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div>
 <style scoped="">
@@ -8593,193 +8559,186 @@ a.anchor-link {
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e8edf5;padding:12px;border-radius:10px;margin:8px 0"><b>Student clinician:</b> How do you feel about making a change right now?</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e3f4ed;padding:12px;border-radius:10px;margin:8px 0"><b>Patient:</b> I do not want to change. I know people say it is bad, but quitting is not on my list right now.</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e8edf5;padding:12px;border-radius:10px;margin:8px 0"><b>Student clinician:</b> You really need to stop; could you set a quit date this week?</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e3f4ed;padding:12px;border-radius:10px;margin:8px 0"><b>Patient:</b> No. That is what everyone says. If this is going to be another lecture, I would rather leave.</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e8edf5;padding:12px;border-radius:10px;margin:8px 0"><b>Student clinician:</b> I pushed ahead of where you are. You get to decide. What was difficult the last time you tried?</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e3f4ed;padding:12px;border-radius:10px;margin:8px 0"><b>Patient:</b> I barely slept, I was irritable at work, and I went back to smoking. I do not want to go through that again.</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e8edf5;padding:12px;border-radius:10px;margin:8px 0"><b>Student clinician:</b> It sounds like smoking helps you manage stress, and the last attempt was miserable. What matters most to you at the moment?</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e3f4ed;padding:12px;border-radius:10px;margin:8px 0"><b>Patient:</b> Keeping my job and getting through my shifts. My daughter hates the smell, but that does not mean I am ready to quit.</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e8edf5;padding:12px;border-radius:10px;margin:8px 0"><b>Student clinician:</b> Would you like information about support available if you ever choose to revisit this?</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e3f4ed;padding:12px;border-radius:10px;margin:8px 0"><b>Patient:</b> You can give me something to look at, but I am not promising to call anyone or take medicine.</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e8edf5;padding:12px;border-radius:10px;margin:8px 0"><b>Student clinician:</b> I hear that you are not ready. We can revisit it when you want. Is there anything you want us to understand before we finish?</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e3f4ed;padding:12px;border-radius:10px;margin:8px 0"><b>Patient:</b> Just do not make every visit about cigarettes. I want help with my health without being judged.</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<h3 id="Guided-reflection-%E2%80%94-no-grade">Guided reflection — no grade<a class="anchor-link" href="#Guided-reflection-%E2%80%94-no-grade">¶</a></h3>
+<p><strong>Conversation ended.</strong></p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p>These are authored reflection questions, not a judgment that you made an error. Replies depend on sequence position, not interpretation of your input. No rubric score or learning outcome is assigned.</p>
+<h3 id="Post-encounter-debrief-%E2%80%94-no-grade">Post-encounter debrief — no grade<a class="anchor-link" href="#Post-encounter-debrief-%E2%80%94-no-grade">¶</a></h3>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p><strong>Rapport, respect, and empathy · turn 4</strong></p>
+<p>The encounter has ended. Review the completed transcript using these authored reflection questions; turn numbers identify evidence, not feedback scheduled during conversation. These questions are not a judgment that you made an error. Replies depend on sequence position, not interpretation of your input. No rubric score or learning outcome is assigned.</p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
+<p><strong>Rapport, respect, and empathy · evidence from turn 4</strong></p>
+</div>
+</div>
+<div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <blockquote><b>Your words:</b> You really need to stop; could you set a quit date this week?</blockquote>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<blockquote><b>Patient response:</b> No. That is what everyone says. If this is going to be another lecture, I would rather leave.</blockquote>
+</div>
+</div>
+<div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
 <p>Compare the patient response before and after the quit-date question. What changed in the conversation?</p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p><strong>Listening and response to cues · turn 6</strong></p>
+<p><strong>Listening and response to cues · evidence from turn 6</strong></p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <blockquote><b>Your words:</b> It sounds like smoking helps you manage stress, and the last attempt was miserable. What matters most to you at the moment?</blockquote>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<blockquote><b>Patient response:</b> Keeping my job and getting through my shifts. My daughter hates the smell, but that does not mean I am ready to quit.</blockquote>
+</div>
+</div>
+<div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
 <p>Which of the patient priorities could you reflect back without treating them as a commitment to change?</p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p><strong>Explanation and shared decisions · turn 7</strong></p>
+<p><strong>Explanation and shared decisions · evidence from turn 7</strong></p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <blockquote><b>Your words:</b> Would you like information about support available if you ever choose to revisit this?</blockquote>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<blockquote><b>Patient response:</b> You can give me something to look at, but I am not promising to call anyone or take medicine.</blockquote>
+</div>
+</div>
+<div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
 <p>How would you distinguish permission to receive information from willingness to start treatment?</p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p><strong>Professionalism, safety, and closure · turn 8</strong></p>
+<p><strong>Professionalism, safety, and closure · evidence from turn 8</strong></p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <blockquote><b>Your words:</b> I hear that you are not ready. We can revisit it when you want. Is there anything you want us to understand before we finish?</blockquote>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<blockquote><b>Patient response:</b> Just do not make every visit about cigarettes. I want help with my health without being judged.</blockquote>
+</div>
+</div>
+<div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
 <p>What would a useful closing plan look like if the patient still declines change?</p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
 <h2 id="Scenario-3:-Nausea,-fatigue,-and-chest-unease">Scenario 3: Nausea, fatigue, and chest unease<a class="anchor-link" href="#Scenario-3:-Nausea,-fatigue,-and-chest-unease">¶</a></h2>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e8edf5;padding:12px;border-radius:10px;margin:8px 0"><b>Student clinician:</b> Hello, I am the medical student with the emergency team. Tell me what feels different today.</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e3f4ed;padding:12px;border-radius:10px;margin:8px 0"><b>Patient:</b> I feel sick to my stomach and sweaty. There is a strange heaviness here, but it is not sharp pain. Maybe it is my anxiety.</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e8edf5;padding:12px;border-radius:10px;margin:8px 0"><b>Student clinician:</b> When did it begin, and what were you doing?</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e3f4ed;padding:12px;border-radius:10px;margin:8px 0"><b>Patient:</b> About forty minutes ago, carrying groceries. I sat down, but it did not go away. I feel unusually tired and a little short of breath.</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div>
 <style scoped="">
@@ -8823,165 +8782,163 @@ a.anchor-link {
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p><strong>Safety:</strong> Time-critical teaching finding: obtain immediate supervising-clinician review and escalation. Reflection must not delay urgent care.</p>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e8edf5;padding:12px;border-radius:10px;margin:8px 0"><b>Student clinician:</b> I do not want to assume this is anxiety. I will alert my supervisor and arrange an ECG and vital signs now while we continue.</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e3f4ed;padding:12px;border-radius:10px;margin:8px 0"><b>Patient:</b> All right. I have had panic attacks before, but this feels different.</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e8edf5;padding:12px;border-radius:10px;margin:8px 0"><b>Student clinician:</b> While the team reviews the ECG, how does this compare with your past panic attacks?</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e3f4ed;padding:12px;border-radius:10px;margin:8px 0"><b>Patient:</b> Usually I get frightened first, my heart races, and it settles down. This started with the sick feeling and heaviness, and it has stayed.</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e8edf5;padding:12px;border-radius:10px;margin:8px 0"><b>Student clinician:</b> The ECG has changes that need immediate review. I am escalating now to the emergency clinician and cardiac team rather than waiting for more questions or blood-test results.</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e3f4ed;padding:12px;border-radius:10px;margin:8px 0"><b>Patient:</b> Is something wrong with my heart? I thought I was having another panic attack.</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e8edf5;padding:12px;border-radius:10px;margin:8px 0"><b>Student clinician:</b> The tracing raises concern for a serious heart problem. The team is acting urgently and will explain the next steps. You have done the right thing by coming in.</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e3f4ed;padding:12px;border-radius:10px;margin:8px 0"><b>Patient:</b> Please stay with me until they get here. I am scared.</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e8edf5;padding:12px;border-radius:10px;margin:8px 0"><b>Student clinician:</b> I will stay with you while we hand over. Do you have any medication allergies, and what medicines have you taken today?</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e3f4ed;padding:12px;border-radius:10px;margin:8px 0"><b>Patient:</b> No known medicine allergies. I take sertraline every day. I have not taken anything else today.</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e8edf5;padding:12px;border-radius:10px;margin:8px 0"><b>Student clinician:</b> I am handing over your symptoms, their timing, and the ECG changes to the emergency clinician now.</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div style="background:#e3f4ed;padding:12px;border-radius:10px;margin:8px 0"><b>Patient:</b> Thank you for taking me seriously. Please tell them when it started.</div>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<h3 id="Guided-reflection-%E2%80%94-no-grade">Guided reflection — no grade<a class="anchor-link" href="#Guided-reflection-%E2%80%94-no-grade">¶</a></h3>
+<p><strong>Conversation ended.</strong></p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p>These are authored reflection questions, not a judgment that you made an error. Replies depend on sequence position, not interpretation of your input. No rubric score or learning outcome is assigned.</p>
+<h3 id="Post-encounter-debrief-%E2%80%94-no-grade">Post-encounter debrief — no grade<a class="anchor-link" href="#Post-encounter-debrief-%E2%80%94-no-grade">¶</a></h3>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p><strong>Clinical reasoning and synthesis · turn 1</strong></p>
+<p>The encounter has ended. Review the completed transcript using these authored reflection questions; turn numbers identify evidence, not feedback scheduled during conversation. These questions are not a judgment that you made an error. Replies depend on sequence position, not interpretation of your input. No rubric score or learning outcome is assigned.</p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
+<p><strong>Clinical reasoning and synthesis · evidence from turn 1</strong></p>
+</div>
+</div>
+<div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <blockquote><b>Your words:</b> Hello, I am the medical student with the emergency team. Tell me what feels different today.</blockquote>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<blockquote><b>Patient response:</b> I feel sick to my stomach and sweaty. There is a strange heaviness here, but it is not sharp pain. Maybe it is my anxiety.</blockquote>
+</div>
+</div>
+<div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
 <p>What alternative explanations deserve attention before accepting the patient initial explanation?</p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p><strong>Information gathering · turn 3</strong></p>
+<p><strong>Information gathering · evidence from turn 3</strong></p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <blockquote><b>Your words:</b> I do not want to assume this is anxiety. I will alert my supervisor and arrange an ECG and vital signs now while we continue.</blockquote>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<blockquote><b>Patient response:</b> All right. I have had panic attacks before, but this feels different.</blockquote>
+</div>
+</div>
+<div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
 <p>Which parts of the history justified early testing rather than a longer interview first?</p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p><strong>Clinical reasoning and synthesis · turn 5</strong></p>
+<p><strong>Clinical reasoning and synthesis · evidence from turn 5</strong></p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <blockquote><b>Your words:</b> The ECG has changes that need immediate review. I am escalating now to the emergency clinician and cardiac team rather than waiting for more questions or blood-test results.</blockquote>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<blockquote><b>Patient response:</b> Is something wrong with my heart? I thought I was having another panic attack.</blockquote>
+</div>
+</div>
+<div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
 <p>What evidence changed the urgency of your plan, and how would you communicate it in a handover?</p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
-<p><strong>Rapport, respect, and empathy · turn 6</strong></p>
+<p><strong>Rapport, respect, and empathy · evidence from turn 6</strong></p>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <blockquote><b>Your words:</b> The tracing raises concern for a serious heart problem. The team is acting urgently and will explain the next steps. You have done the right thing by coming in.</blockquote>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<blockquote><b>Patient response:</b> Please stay with me until they get here. I am scared.</blockquote>
+</div>
+</div>
+<div class="jp-OutputArea-child">
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
 <p>How can you acknowledge fear while avoiding premature reassurance?</p>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
+<p><strong>Post-encounter safety review:</strong> This completed encounter included time-critical findings. Review when supervising-clinician escalation was needed and how you communicated the urgency.</p>
 </div>
 </div>
 </div>
@@ -8991,8 +8948,7 @@ a.anchor-link {
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="6.-Visualize-the-rehearsal,-not-learning-effectiveness">6. Visualize the rehearsal, not learning effectiveness<a class="anchor-link" href="#6.-Visualize-the-rehearsal,-not-learning-effectiveness">¶</a></h2><p>The first panel counts fixed exchanges and reflection prompts. The second shows the <strong>sum of assumed patient-display delays</strong>. Neither is learner encounter duration, model performance, or evidence of educational benefit.</p>
 </div>
 </div>
@@ -9003,7 +8959,6 @@ a.anchor-link {
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <div>
 <style scoped="">
@@ -9061,13 +9016,11 @@ a.anchor-link {
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedImage jp-OutputArea-output" tabindex="0">
 <img alt="No description has been provided for this image" class="" src="data:image/png;base64,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rkwn3rlq166N2rVrKzoMIiKicmX27NlwcnJC7dq10blzZxgYGODZs2c4ceIExo0bh5o1ayo6RCIiIpVQLhJvIiIiKr5q1aohNDQUa9euRUBAABISEmBnZ4djx46hS5cuig6PiIhIZTDxJiIiUmJGRkaYP3++osMgIiJSaWqKDoCIiIhKliAIeP36NYKDg5GcnKzocIiIiFQOE28iIiIldvDgQdja2sLKygqNGjWCvr4++vbti8jISEWHRkREpDKYeBMRESmpixcvYtiwYRgxYgRu376NJ0+e4NSpU3j79i169OgBQRAUHSIREZFK4DPeRERESmrXrl2YO3cufv75Z7GsVq1a6NChA6pXr4779++jcePGCoyQiIhINfCONxERkZKKj49H/fr185Tr6OjA1tYW8fHxCoiKiIhI9TDxJiIiUlINGjTA9u3bkZmZKVMeEBCA4OBg1KtXT0GRERERqRYONSciIlJS06dPR8uWLVGjRg107twZhoaGePr0Kc6cOYPZs2fD0tJS0SESERGpBCbeRERESsrc3BzBwcFYs2YNAgIC8PDhQ9jZ2eH06dNwdXVVdHhEREQqg4k3ERGREtPX18ePP/6o6DCIiIhUGp/xJiIiIiIiIipBvONNRESkpARBgJeXFw4fPozo6Gjk5OTIrP/rr7/w9ddfKyg6IiIi1cHEm4iISEmtX78eS5cuxcSJE2FjYwOJRCKzvkaNGgqKjIiISLUw8SYiIlJSfn5++PXXXzFmzBi5tPfy5Uv4+/vD3t4ezZo1y7fO/fv38fDhQ1SuXBlt2rSBurq6XPomIiIqz5h4ExERKSkTExOoqX35dC4vXrzAtGnTEBISgvj4eEycODHfxHvixInYu3cvvv76a9y7dw+VK1eGj48PDA0NvzgGIiKi8oyTqxERESmp8ePHY/Xq1Xj48OEXtZOamopx48YhLCwM1tbW+dY5duwYtm7disuXL+PEiRO4d+8e3r17h59++umL+iYiIlIGTLyJiIiUVL169aCvrw97e3sYGBjA1NRU5nPx4sUitWNvb4+ePXsWOmw8905348aNAQBGRkZwd3fH3r175bIvRERE5RmHmhMRESmpX3/9Fc+fP8eyZcvynVytfv36cusrJCQELi4uMmUNGjTAu3fvEBMTAzMzszzbZGRkICMjQ1yWSqVyi4eIiKgsYeJNRESkpO7d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"/>
 </div>
 </div>
 <div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-OutputArea-output" data-mime-type="text/markdown" tabindex="0">
 <p><strong>Executed HTTP requests:</strong> 41 · <strong>Model calls:</strong> 0 · <strong>Scores:</strong> none</p>
 </div>
@@ -9079,8 +9032,7 @@ a.anchor-link {
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="7.-Frontend-connection-contract">7. Frontend connection contract<a class="anchor-link" href="#7.-Frontend-connection-contract">¶</a></h2><table>
 <thead>
 <tr>
@@ -9113,21 +9065,21 @@ a.anchor-link {
 <tr>
 <td>Send committed student text</td>
 <td><code>POST /api/demo/sessions/{sid}/turns</code></td>
-<td><code>{expected_step, request_id, text}</code> → fixed reply, new chart, safety notice, assumed delay</td>
+<td><code>{expected_step, request_id, text}</code> → fixed reply, new chart, assumed delay; no teaching feedback</td>
 </tr>
 <tr>
 <td>Finish</td>
 <td><code>POST /api/demo/sessions/{sid}/end</code></td>
-<td>Public ended session; early ending allowed</td>
+<td>Public ended session; conversation stops, no feedback displayed</td>
 </tr>
 <tr>
 <td>Reflect</td>
 <td><code>GET /api/demo/sessions/{sid}/debrief</code></td>
-<td>Transcript-linked reflection questions; no score</td>
+<td>Separate post-encounter review of transcript evidence; 409 until ended, no score</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Frontend sequence:</strong> preserve the session ID; disable send until the response returns; use one <code>request_id</code> per logical turn and reuse it for an identical retry. After a 409, reload the session. Display urgent chart/notices immediately, then optionally reveal the reply after its <code>simulated_delay_ms</code>. The server never delays urgent information.</p>
+<p><strong>Frontend sequence:</strong> preserve the session ID; disable send until the response returns; use one <code>request_id</code> per logical turn and reuse it for an identical retry. After a 409, reload the session. Display released chart findings, then optionally reveal the patient reply after its <code>simulated_delay_ms</code>. Do not render teaching feedback during turns. Call <code>/end</code> when the conversation is finished; only after it succeeds, request <code>/debrief</code> and render that response in a separate review area. The compatibility <code>safety_notice</code> field on turn responses is always null.</p>
 <p>Generated TypeScript contracts are in <code>frontend/src/api/schema.ts</code>; the typed <code>scriptedDemo</code> adapter is in <code>frontend/src/api/demo.ts</code>. Production spoken transcripts still use <code>/api/encounters/{id}/utterances</code>. A rehearsal text box belongs to a clearly labeled presenter surface; this PR adds no production student text box.</p>
 <h2 id="8.-Replace-the-static-ingredients-later">8. Replace the static ingredients later<a class="anchor-link" href="#8.-Replace-the-static-ingredients-later">¶</a></h2><ul>
 <li><strong>Dialogue, findings, instructor goal, descriptions, references and reflection questions:</strong> <code>backend/app/data/scripted_clinical_demo_v1.json</code>.</li>
@@ -9135,7 +9087,7 @@ a.anchor-link {
 <li><strong>Categorization / sequence behavior:</strong> <code>backend/app/demo/service.py</code>.</li>
 <li><strong>HTTP boundary:</strong> <code>backend/app/api/demo.py</code>.</li>
 </ul>
-<p>Increment <code>fixture_version</code> after an authored change. New preparations pin the new content and hash; existing sessions retain their saved snapshot. The fixture is a demo format, not the production <code>Case</code> schema. A live educator adapter can return <code>MetadataExtraction</code>, but must go through clinical authoring/review before changing real case facts. A RAG-guided debrief can later replace static prompts using approved hint material and explicit reveal rules; RAG is not used here.</p>
+<p>For nontechnical review, use the three JSON files in <code>backend_kelsch/docs/scripted_scenarios/</code> and the <code>scripts.update_scripted_clinical_demo</code> importer. Its debrief <code>after_turn</code> values cite completed transcript turns; they do not schedule feedback. The importer increments <code>fixture_version</code> after an authored change. New preparations pin the new content and hash; existing sessions retain their saved snapshot. The fixture is a demo format, not the production <code>Case</code> schema. A live educator adapter can return <code>MetadataExtraction</code>, but must go through clinical authoring/review before changing real case facts. A RAG-guided debrief can later replace static prompts using approved hint material and explicit reveal rules; RAG is not used here.</p>
 <p>References supporting the authored patterns: <a href="https://www.cdc.gov/legionella/hcp/clinical-guidance/index.html">CDC Legionella clinical guidance</a>, <a href="https://www.cdc.gov/legionella/hcp/clinical-signs/index.html">CDC symptoms</a>, <a href="https://www.dph.ncdhhs.gov/programs/chronic-disease-and-injury/tobacco-prevention-and-control/quitlinenc/providers/treatment/motivational-interviewing">NCDHHS motivational interviewing</a>, <a href="https://www.jacc.org/doi/10.1016/j.jacc.2024.11.009">2025 ACS guideline</a>, and <a href="https://www.heart.org/en/health-topics/heart-attack/warning-signs-of-a-heart-attack/heart-attack-symptoms-in-women">AHA symptoms in women</a>. These support the teaching context, not approval of these particular cases.</p>
 <p><strong>Presenter closing:</strong> “We can now rehearse the full interface consistently. Clinical approval, actual model/voice timing, and evidence that learners improve remain separate work.”</p>
 </div>

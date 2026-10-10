@@ -89,7 +89,7 @@ class DemoTurnResult(StrictModel):
     session_id: str
     turn: TranscriptTurn
     chart_added: list[ChartItem]
-    safety_notice: str | None
+    safety_notice: str | None  # Compatibility field: always null; coaching is in DemoDebrief.
     next_step: int | None
     complete: bool
     execution_mode: Literal["scripted_playback"] = "scripted_playback"
@@ -145,7 +145,7 @@ class ScriptChart(ChartItem):
 class ScriptReflection(StrictModel):
     id: str
     domain_id: int = Field(ge=1, le=7)
-    anchor_step: int = Field(ge=1)
+    anchor_step: int = Field(ge=1)  # Transcript evidence, not a during-encounter trigger.
     question: str
 
 class ScriptEducator(StrictModel):

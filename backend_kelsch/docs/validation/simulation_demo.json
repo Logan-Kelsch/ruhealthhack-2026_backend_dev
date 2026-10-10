@@ -1,0 +1,2409 @@
+{
+  "version": "simulation_demo_v1",
+  "mode": "SIMULATION_ONLY",
+  "demo_readiness": "PASS",
+  "evidence_readiness": {
+    "clinical_approval": "NOT EVALUABLE",
+    "independent_human_labels": "NOT EVALUABLE",
+    "real_learner_action_performance": "NOT EVALUABLE",
+    "faculty_rubric_agreement": "NOT EVALUABLE",
+    "full_difficulty_calibration": "NOT EVALUABLE",
+    "authorization_and_consent": "NOT EVALUABLE",
+    "learning_effect": "NOT EVALUABLE"
+  },
+  "source_manifest_sha256": "187e8aa0f2fd8eb1306134ab43ee77fcba2d59eeb2f3c814d0f3eaec2943acc8",
+  "input_receipts": {
+    "version": "simulation_demo_v1",
+    "files": {
+      "action_corpus.json": "1a628fedb3161a993f755a883a8e3389d0add3dce4be56a8e3c992de87d95152",
+      "review_policy.json": "ee43647a7fff9c9cc283c3709a2cf0d40690fff08a1fa67cecd3a106e96bea3a",
+      "case_preset_decisions.json": "1a6e4a3d0a5e84e12307b9ec6a2c5d4847423abafb46c16c2c7b27494c8d310a",
+      "learner_scenarios.json": "ca91114bfebd1806695f7a001e89e68daec60b22120a81fd43e701bf137e2d3a"
+    }
+  },
+  "frozen_plan_sha256": "29e9c67c2ea4e2b750b138f00e6dec597f5dc8da0db14f509ca2705b7089265d",
+  "dependencies": {
+    "fastapi": "0.143.0",
+    "pydantic": "2.14.0",
+    "sqlalchemy": "2.1.4",
+    "scikit-learn": "1.9.1"
+  },
+  "actions": {
+    "mode": "OFFLINE EXECUTED",
+    "reference_kind": "SIMULATED AUTHOR LABELS",
+    "split_counts": {
+      "train": 36,
+      "validation": 12,
+      "test": 12
+    },
+    "annotation_counts": {
+      "train": 540,
+      "validation": 180,
+      "test": 180
+    },
+    "patients": 30,
+    "cross_split_links": 0,
+    "synthetic_group_held_out": true,
+    "real_learner_held_out": false,
+    "prediction_sha256": "438106a5c7d8c5f47bd89defff0434830f2a2ebda36be111d445d773aff77542",
+    "trained_sentence_classifier": {
+      "units": 180,
+      "macro_f1_over_observed_labels": 1.0,
+      "per_label": {
+        "ask_permission": {
+          "tp": 12,
+          "fp": 0,
+          "fn": 0,
+          "tn": 168,
+          "denominator": 180,
+          "precision": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "recall": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "agreement": {
+            "estimate": 1.0,
+            "lower": 0.9791045020783868,
+            "upper": 1.0,
+            "success": 180,
+            "denominator": 180,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+        },
+        "check_understanding": {
+          "tp": 12,
+          "fp": 0,
+          "fn": 0,
+          "tn": 168,
+          "denominator": 180,
+          "precision": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "recall": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "agreement": {
+            "estimate": 1.0,
+            "lower": 0.9791045020783868,
+            "upper": 1.0,
+            "success": 180,
+            "denominator": 180,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+        },
+        "closing": {
+          "tp": 12,
+          "fp": 0,
+          "fn": 0,
+          "tn": 168,
+          "denominator": 180,
+          "precision": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "recall": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "agreement": {
+            "estimate": 1.0,
+            "lower": 0.9791045020783868,
+            "upper": 1.0,
+            "success": 180,
+            "denominator": 180,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+        },
+        "confront_or_lecture": {
+          "tp": 12,
+          "fp": 0,
+          "fn": 0,
+          "tn": 168,
+          "denominator": 180,
+          "precision": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "recall": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "agreement": {
+            "estimate": 1.0,
+            "lower": 0.9791045020783868,
+            "upper": 1.0,
+            "success": 180,
+            "denominator": 180,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+        },
+        "give_information": {
+          "tp": 12,
+          "fp": 0,
+          "fn": 0,
+          "tn": 168,
+          "denominator": 180,
+          "precision": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "recall": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "agreement": {
+            "estimate": 1.0,
+            "lower": 0.9791045020783868,
+            "upper": 1.0,
+            "success": 180,
+            "denominator": 180,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+        },
+        "order_test": {
+          "tp": 12,
+          "fp": 0,
+          "fn": 0,
+          "tn": 168,
+          "denominator": 180,
+          "precision": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "recall": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "agreement": {
+            "estimate": 1.0,
+            "lower": 0.9791045020783868,
+            "upper": 1.0,
+            "success": 180,
+            "denominator": 180,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+        },
+        "other": {
+          "tp": 48,
+          "fp": 0,
+          "fn": 0,
+          "tn": 132,
+          "denominator": 180,
+          "precision": {
+            "estimate": 1.0,
+            "lower": 0.9258998703338824,
+            "upper": 0.9999999999999999,
+            "success": 48,
+            "denominator": 48,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "recall": {
+            "estimate": 1.0,
+            "lower": 0.9258998703338824,
+            "upper": 0.9999999999999999,
+            "success": 48,
+            "denominator": 48,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "agreement": {
+            "estimate": 1.0,
+            "lower": 0.9791045020783868,
+            "upper": 1.0,
+            "success": 180,
+            "denominator": 180,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+        },
+        "plan_next_steps": {
+          "tp": 18,
+          "fp": 0,
+          "fn": 0,
+          "tn": 162,
+          "denominator": 180,
+          "precision": {
+            "estimate": 1.0,
+            "lower": 0.8241207763533425,
+            "upper": 1.0,
+            "success": 18,
+            "denominator": 18,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "recall": {
+            "estimate": 1.0,
+            "lower": 0.8241207763533425,
+            "upper": 1.0,
+            "success": 18,
+            "denominator": 18,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "agreement": {
+            "estimate": 1.0,
+            "lower": 0.9791045020783868,
+            "upper": 1.0,
+            "success": 180,
+            "denominator": 180,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+        },
+        "prescribe_antibiotic": {
+          "tp": 12,
+          "fp": 0,
+          "fn": 0,
+          "tn": 168,
+          "denominator": 180,
+          "precision": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "recall": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "agreement": {
+            "estimate": 1.0,
+            "lower": 0.9791045020783868,
+            "upper": 1.0,
+            "success": 180,
+            "denominator": 180,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+        },
+        "safety_netting": {
+          "tp": 12,
+          "fp": 0,
+          "fn": 0,
+          "tn": 168,
+          "denominator": 180,
+          "precision": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "recall": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "agreement": {
+            "estimate": 1.0,
+            "lower": 0.9791045020783868,
+            "upper": 1.0,
+            "success": 180,
+            "denominator": 180,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+        },
+        "start_medication": {
+          "tp": 24,
+          "fp": 0,
+          "fn": 0,
+          "tn": 156,
+          "denominator": 180,
+          "precision": {
+            "estimate": 1.0,
+            "lower": 0.8620237953250198,
+            "upper": 1.0,
+            "success": 24,
+            "denominator": 24,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "recall": {
+            "estimate": 1.0,
+            "lower": 0.8620237953250198,
+            "upper": 1.0,
+            "success": 24,
+            "denominator": 24,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "agreement": {
+            "estimate": 1.0,
+            "lower": 0.9791045020783868,
+            "upper": 1.0,
+            "success": 180,
+            "denominator": 180,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+        },
+        "summarize": {
+          "tp": 12,
+          "fp": 0,
+          "fn": 0,
+          "tn": 168,
+          "denominator": 180,
+          "precision": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "recall": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "agreement": {
+            "estimate": 1.0,
+            "lower": 0.9791045020783868,
+            "upper": 1.0,
+            "success": 180,
+            "denominator": 180,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+        }
+      },
+      "critical_recall": {
+        "prescribe_antibiotic": {
+          "positive_support": 12,
+          "recall": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "adequacy": "ENOUGH FIXTURE POSITIVES"
+        },
+        "start_medication": {
+          "positive_support": 24,
+          "recall": {
+            "estimate": 1.0,
+            "lower": 0.8620237953250198,
+            "upper": 1.0,
+            "success": 24,
+            "denominator": 24,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "adequacy": "ENOUGH FIXTURE POSITIVES"
+        },
+        "safety_netting": {
+          "positive_support": 12,
+          "recall": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "adequacy": "ENOUGH FIXTURE POSITIVES"
+        }
+      }
+    },
+    "keyword_sentence_classifier": {
+      "units": 180,
+      "macro_f1_over_observed_labels": 1.0,
+      "per_label": {
+        "ask_permission": {
+          "tp": 12,
+          "fp": 0,
+          "fn": 0,
+          "tn": 168,
+          "denominator": 180,
+          "precision": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "recall": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "agreement": {
+            "estimate": 1.0,
+            "lower": 0.9791045020783868,
+            "upper": 1.0,
+            "success": 180,
+            "denominator": 180,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+        },
+        "check_understanding": {
+          "tp": 12,
+          "fp": 0,
+          "fn": 0,
+          "tn": 168,
+          "denominator": 180,
+          "precision": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "recall": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "agreement": {
+            "estimate": 1.0,
+            "lower": 0.9791045020783868,
+            "upper": 1.0,
+            "success": 180,
+            "denominator": 180,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+        },
+        "closing": {
+          "tp": 12,
+          "fp": 0,
+          "fn": 0,
+          "tn": 168,
+          "denominator": 180,
+          "precision": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "recall": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "agreement": {
+            "estimate": 1.0,
+            "lower": 0.9791045020783868,
+            "upper": 1.0,
+            "success": 180,
+            "denominator": 180,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+        },
+        "confront_or_lecture": {
+          "tp": 12,
+          "fp": 0,
+          "fn": 0,
+          "tn": 168,
+          "denominator": 180,
+          "precision": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "recall": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "agreement": {
+            "estimate": 1.0,
+            "lower": 0.9791045020783868,
+            "upper": 1.0,
+            "success": 180,
+            "denominator": 180,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+        },
+        "give_information": {
+          "tp": 12,
+          "fp": 0,
+          "fn": 0,
+          "tn": 168,
+          "denominator": 180,
+          "precision": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "recall": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "agreement": {
+            "estimate": 1.0,
+            "lower": 0.9791045020783868,
+            "upper": 1.0,
+            "success": 180,
+            "denominator": 180,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+        },
+        "order_test": {
+          "tp": 12,
+          "fp": 0,
+          "fn": 0,
+          "tn": 168,
+          "denominator": 180,
+          "precision": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "recall": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "agreement": {
+            "estimate": 1.0,
+            "lower": 0.9791045020783868,
+            "upper": 1.0,
+            "success": 180,
+            "denominator": 180,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+        },
+        "other": {
+          "tp": 48,
+          "fp": 0,
+          "fn": 0,
+          "tn": 132,
+          "denominator": 180,
+          "precision": {
+            "estimate": 1.0,
+            "lower": 0.9258998703338824,
+            "upper": 0.9999999999999999,
+            "success": 48,
+            "denominator": 48,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "recall": {
+            "estimate": 1.0,
+            "lower": 0.9258998703338824,
+            "upper": 0.9999999999999999,
+            "success": 48,
+            "denominator": 48,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "agreement": {
+            "estimate": 1.0,
+            "lower": 0.9791045020783868,
+            "upper": 1.0,
+            "success": 180,
+            "denominator": 180,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+        },
+        "plan_next_steps": {
+          "tp": 18,
+          "fp": 0,
+          "fn": 0,
+          "tn": 162,
+          "denominator": 180,
+          "precision": {
+            "estimate": 1.0,
+            "lower": 0.8241207763533425,
+            "upper": 1.0,
+            "success": 18,
+            "denominator": 18,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "recall": {
+            "estimate": 1.0,
+            "lower": 0.8241207763533425,
+            "upper": 1.0,
+            "success": 18,
+            "denominator": 18,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "agreement": {
+            "estimate": 1.0,
+            "lower": 0.9791045020783868,
+            "upper": 1.0,
+            "success": 180,
+            "denominator": 180,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+        },
+        "prescribe_antibiotic": {
+          "tp": 12,
+          "fp": 0,
+          "fn": 0,
+          "tn": 168,
+          "denominator": 180,
+          "precision": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "recall": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "agreement": {
+            "estimate": 1.0,
+            "lower": 0.9791045020783868,
+            "upper": 1.0,
+            "success": 180,
+            "denominator": 180,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+        },
+        "safety_netting": {
+          "tp": 12,
+          "fp": 0,
+          "fn": 0,
+          "tn": 168,
+          "denominator": 180,
+          "precision": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "recall": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "agreement": {
+            "estimate": 1.0,
+            "lower": 0.9791045020783868,
+            "upper": 1.0,
+            "success": 180,
+            "denominator": 180,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+        },
+        "start_medication": {
+          "tp": 24,
+          "fp": 0,
+          "fn": 0,
+          "tn": 156,
+          "denominator": 180,
+          "precision": {
+            "estimate": 1.0,
+            "lower": 0.8620237953250198,
+            "upper": 1.0,
+            "success": 24,
+            "denominator": 24,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "recall": {
+            "estimate": 1.0,
+            "lower": 0.8620237953250198,
+            "upper": 1.0,
+            "success": 24,
+            "denominator": 24,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "agreement": {
+            "estimate": 1.0,
+            "lower": 0.9791045020783868,
+            "upper": 1.0,
+            "success": 180,
+            "denominator": 180,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+        },
+        "summarize": {
+          "tp": 12,
+          "fp": 0,
+          "fn": 0,
+          "tn": 168,
+          "denominator": 180,
+          "precision": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "recall": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "agreement": {
+            "estimate": 1.0,
+            "lower": 0.9791045020783868,
+            "upper": 1.0,
+            "success": 180,
+            "denominator": 180,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+        }
+      },
+      "critical_recall": {
+        "prescribe_antibiotic": {
+          "positive_support": 12,
+          "recall": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "adequacy": "ENOUGH FIXTURE POSITIVES"
+        },
+        "start_medication": {
+          "positive_support": 24,
+          "recall": {
+            "estimate": 1.0,
+            "lower": 0.8620237953250198,
+            "upper": 1.0,
+            "success": 24,
+            "denominator": 24,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "adequacy": "ENOUGH FIXTURE POSITIVES"
+        },
+        "safety_netting": {
+          "positive_support": 12,
+          "recall": {
+            "estimate": 1.0,
+            "lower": 0.7575059933447592,
+            "upper": 1.0,
+            "success": 12,
+            "denominator": 12,
+            "method": "Wilson 95%; descriptive, treats units as independent"
+          },
+          "adequacy": "ENOUGH FIXTURE POSITIVES"
+        }
+      }
+    },
+    "exact_span_keyword": {
+      "tp": 198,
+      "fp": 0,
+      "fn": 0
+    },
+    "limitations": [
+      "Training and test use shared authored phrase banks and synthetic neutral context.",
+      "No prompted LLM predictions; no production classifier replacement or real learner performance.",
+      "The trained baseline classifies supplied whole-sentence spans; it does not learn arbitrary span boundaries.",
+      "Wilson intervals and positive-support floors are descriptive engineering diagnostics on template data."
+    ]
+  },
+  "difficulty": {
+    "mode": "OFFLINE EXECUTED",
+    "runs": 27,
+    "turns": 189,
+    "replay_matches": 27,
+    "clinical_content_unchanged": true,
+    "ordered_discoveries": true,
+    "threshold_offsets": {
+      "straightforward": -2,
+      "typical": 0,
+      "difficult": 2
+    },
+    "discoveries": [
+      {
+        "case_id": "walter_greene",
+        "scripted_level": "novice",
+        "straightforward": 4,
+        "typical": 4,
+        "difficult": 4
+      },
+      {
+        "case_id": "walter_greene",
+        "scripted_level": "competent",
+        "straightforward": 8,
+        "typical": 7,
+        "difficult": 7
+      },
+      {
+        "case_id": "walter_greene",
+        "scripted_level": "expert",
+        "straightforward": 12,
+        "typical": 10,
+        "difficult": 9
+      },
+      {
+        "case_id": "alina_reyes",
+        "scripted_level": "novice",
+        "straightforward": 1,
+        "typical": 1,
+        "difficult": 1
+      },
+      {
+        "case_id": "alina_reyes",
+        "scripted_level": "competent",
+        "straightforward": 4,
+        "typical": 4,
+        "difficult": 4
+      },
+      {
+        "case_id": "alina_reyes",
+        "scripted_level": "expert",
+        "straightforward": 4,
+        "typical": 4,
+        "difficult": 4
+      },
+      {
+        "case_id": "eli_brooks",
+        "scripted_level": "novice",
+        "straightforward": 2,
+        "typical": 2,
+        "difficult": 2
+      },
+      {
+        "case_id": "eli_brooks",
+        "scripted_level": "competent",
+        "straightforward": 4,
+        "typical": 4,
+        "difficult": 4
+      },
+      {
+        "case_id": "eli_brooks",
+        "scripted_level": "expert",
+        "straightforward": 4,
+        "typical": 4,
+        "difficult": 4
+      }
+    ],
+    "straightforward_minus_difficult_mean": 0.4444444444444444,
+    "authored_followup_replays": 4,
+    "uncertain_branch_records": 2,
+    "progression": {
+      "mode": "OFFLINE SIMULATION ADAPTER EXECUTED",
+      "policy": {
+        "version": "simulation_progression_v1",
+        "typical_min_score": 2,
+        "difficult_min_score": 3,
+        "safety_review_max_score": 1,
+        "role_policy": "exact role match",
+        "unavailable_next_case": "repeat compatible current case",
+        "scope": "Simulation adapter only; no persisted learner recommendation or clinical approval"
+      },
+      "controls": [
+        {
+          "control": "strong",
+          "synthetic_scores": {
+            "1": 4,
+            "2": 4,
+            "3": 4,
+            "4": 4,
+            "5": 4,
+            "6": 4,
+            "7": 4
+          },
+          "recommendation": {
+            "status": "PROVISIONAL_SIMULATION",
+            "case_id": "walter_greene",
+            "preset": "difficult",
+            "new_compatible_case_available": false,
+            "learner_role": "Dietetics student (supervised practice)",
+            "reason": "repeat current case; no compatible alternative in catalog"
+          },
+          "pass": true
+        },
+        {
+          "control": "middle",
+          "synthetic_scores": {
+            "1": 2,
+            "2": 2,
+            "3": 2,
+            "4": 2,
+            "5": 2,
+            "6": 2,
+            "7": 2
+          },
+          "recommendation": {
+            "status": "PROVISIONAL_SIMULATION",
+            "case_id": "walter_greene",
+            "preset": "typical",
+            "new_compatible_case_available": false,
+            "learner_role": "Dietetics student (supervised practice)",
+            "reason": "repeat current case; no compatible alternative in catalog"
+          },
+          "pass": true
+        },
+        {
+          "control": "weak",
+          "synthetic_scores": {
+            "1": 1,
+            "2": 1,
+            "3": 1,
+            "4": 1,
+            "5": 1,
+            "6": 2,
+            "7": 2
+          },
+          "recommendation": {
+            "status": "PROVISIONAL_SIMULATION",
+            "case_id": "walter_greene",
+            "preset": "straightforward",
+            "new_compatible_case_available": false,
+            "learner_role": "Dietetics student (supervised practice)",
+            "reason": "repeat current case; no compatible alternative in catalog"
+          },
+          "pass": true
+        },
+        {
+          "control": "missing",
+          "synthetic_scores": {
+            "1": "N/A",
+            "2": "N/A",
+            "3": "N/A",
+            "4": "N/A",
+            "5": "N/A",
+            "6": "N/A",
+            "7": "N/A"
+          },
+          "recommendation": {
+            "status": "ABSTAIN",
+            "reason": "no scored domains",
+            "case_id": null,
+            "preset": null
+          },
+          "pass": true
+        },
+        {
+          "control": "safety",
+          "synthetic_scores": {
+            "1": 4,
+            "2": 4,
+            "3": 4,
+            "4": 4,
+            "5": 4,
+            "6": 4,
+            "7": 1
+          },
+          "recommendation": {
+            "status": "REVIEW_REQUIRED",
+            "reason": "provisional safety flag",
+            "case_id": null,
+            "preset": null
+          },
+          "pass": true
+        }
+      ],
+      "status": "PASS",
+      "limitation": "Three authored cases have different learner roles; no compatible new-case transfer is available. Recommendations remain local simulation outputs, not a production routing policy."
+    },
+    "status": "PASS",
+    "full_preset_approval": "SIMULATED ASSUMPTION ONLY",
+    "observed_learner_difficulty": "NOT EVALUABLE"
+  },
+  "reviews": {
+    "mode": "OFFLINE EXECUTED WITH SIMULATED REFERENCES",
+    "batches": {
+      "action": {
+        "reference_kind": "SIMULATED",
+        "tasks": 23,
+        "transport": "PASS",
+        "paired_agreement": 23,
+        "disagreements": 0,
+        "diagnostic_differences": 0,
+        "comparison": {
+          "scope": "replaceable development reference, not faculty validation",
+          "metrics": {
+            "action": {
+              "tp": 26,
+              "fp": 0,
+              "fn": 0,
+              "span_unit": "exact start/end plus action label",
+              "critical_recall": {
+                "safety_netting": {
+                  "estimate": 1.0,
+                  "lower": 0.20654931437723745,
+                  "upper": 1.0,
+                  "success": 1,
+                  "denominator": 1,
+                  "method": "Wilson 95%; descriptive, treats units as independent"
+                },
+                "prescribe_antibiotic": {
+                  "estimate": 1.0,
+                  "lower": 0.34238022750665303,
+                  "upper": 1.0,
+                  "success": 2,
+                  "denominator": 2,
+                  "method": "Wilson 95%; descriptive, treats units as independent"
+                },
+                "start_medication": {
+                  "estimate": 1.0,
+                  "lower": 0.4385029682449546,
+                  "upper": 1.0,
+                  "success": 3,
+                  "denominator": 3,
+                  "method": "Wilson 95%; descriptive, treats units as independent"
+                }
+              }
+            }
+          },
+          "model_ids": [
+            "keyword_baseline"
+          ],
+          "prompt_versions": [
+            "not_applicable_rule_based"
+          ],
+          "held_out": false,
+          "reason": "Source hash pins predictions but cannot prove they were made without reference access. Use existing grouped action-data training workflow for held-out evaluation."
+        },
+        "domain_agreement": null
+      },
+      "claim": {
+        "reference_kind": "SIMULATED",
+        "tasks": 41,
+        "transport": "PASS",
+        "paired_agreement": 36,
+        "disagreements": 5,
+        "diagnostic_differences": 3,
+        "comparison": {
+          "scope": "replaceable development reference, not faculty validation",
+          "metrics": {
+            "claim": {
+              "tp": 38,
+              "fp": 3,
+              "fn": 0,
+              "tn": 0,
+              "denominator": 41,
+              "precision": {
+                "estimate": 0.926829268292683,
+                "lower": 0.8057255146228096,
+                "upper": 0.9748021693660901,
+                "success": 38,
+                "denominator": 41,
+                "method": "Wilson 95%; descriptive, treats units as independent"
+              },
+              "recall": {
+                "estimate": 1.0,
+                "lower": 0.908190131774416,
+                "upper": 0.9999999999999999,
+                "success": 38,
+                "denominator": 38,
+                "method": "Wilson 95%; descriptive, treats units as independent"
+              },
+              "agreement": {
+                "estimate": 0.926829268292683,
+                "lower": 0.8057255146228096,
+                "upper": 0.9748021693660901,
+                "success": 38,
+                "denominator": 41,
+                "method": "Wilson 95%; descriptive, treats units as independent"
+              },
+              "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+            }
+          },
+          "model_ids": [
+            "emitted_claim_support_assumption"
+          ],
+          "prompt_versions": [
+            "not_applicable_rule_based"
+          ],
+          "held_out": false,
+          "reason": "Source hash pins predictions but cannot prove they were made without reference access. Use existing grouped action-data training workflow for held-out evaluation."
+        },
+        "domain_agreement": null
+      },
+      "domain": {
+        "reference_kind": "SIMULATED",
+        "tasks": 42,
+        "transport": "PASS",
+        "paired_agreement": 38,
+        "disagreements": 4,
+        "diagnostic_differences": 6,
+        "comparison": {
+          "scope": "replaceable development reference, not faculty validation",
+          "metrics": {
+            "domain": {
+              "total_pairs": 42,
+              "numeric_pairs": 38,
+              "na_mismatches": 4,
+              "mean_absolute_error": 0.05263157894736842,
+              "quadratic_kappa": 0.958011049723757,
+              "confidence_interval": null
+            }
+          },
+          "model_ids": [
+            "rule_based_rubric"
+          ],
+          "prompt_versions": [
+            "not_applicable_rule_based"
+          ],
+          "held_out": false,
+          "reason": "Source hash pins predictions but cannot prove they were made without reference access. Use existing grouped action-data training workflow for held-out evaluation."
+        },
+        "domain_agreement": {
+          "scope": "declared reference sources; reviewer authority not verified",
+          "domains": {
+            "2": {
+              "numeric_pairs": 6,
+              "quadratic_kappa": 1.0
+            },
+            "7": {
+              "numeric_pairs": 6,
+              "quadratic_kappa": 0.5714285714285714
+            },
+            "3": {
+              "numeric_pairs": 6,
+              "quadratic_kappa": 0.0
+            },
+            "4": {
+              "numeric_pairs": 6,
+              "quadratic_kappa": 0.0
+            },
+            "1": {
+              "numeric_pairs": 3,
+              "quadratic_kappa": 1.0
+            },
+            "5": {
+              "numeric_pairs": 5,
+              "quadratic_kappa": 0.0
+            },
+            "6": {
+              "numeric_pairs": 6,
+              "quadratic_kappa": 1.0
+            }
+          },
+          "pairs_with_na_by_domain": {
+            "1": 3,
+            "5": 1
+          },
+          "confidence_intervals": null,
+          "reason": "No cluster-aware confidence interval or faculty agreement gate from this development adapter."
+        }
+      },
+      "release": {
+        "reference_kind": "SIMULATED",
+        "tasks": 189,
+        "transport": "PASS",
+        "paired_agreement": 180,
+        "disagreements": 9,
+        "diagnostic_differences": 3,
+        "comparison": {
+          "scope": "replaceable development reference, not faculty validation",
+          "metrics": {
+            "release": {
+              "units": 189,
+              "macro_f1_over_observed_labels": 0.9841421736158579,
+              "per_label": {
+                "f_anhedonia": {
+                  "tp": 6,
+                  "fp": 0,
+                  "fn": 0,
+                  "tn": 183,
+                  "denominator": 189,
+                  "precision": {
+                    "estimate": 1.0,
+                    "lower": 0.6096657120978346,
+                    "upper": 1.0,
+                    "success": 6,
+                    "denominator": 6,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "recall": {
+                    "estimate": 1.0,
+                    "lower": 0.6096657120978346,
+                    "upper": 1.0,
+                    "success": 6,
+                    "denominator": 6,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "agreement": {
+                    "estimate": 1.0,
+                    "lower": 0.9800797046227183,
+                    "upper": 1.0,
+                    "success": 189,
+                    "denominator": 189,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+                },
+                "f_belief_abx": {
+                  "tp": 9,
+                  "fp": 0,
+                  "fn": 0,
+                  "tn": 180,
+                  "denominator": 189,
+                  "precision": {
+                    "estimate": 1.0,
+                    "lower": 0.7008549515804559,
+                    "upper": 1.0,
+                    "success": 9,
+                    "denominator": 9,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "recall": {
+                    "estimate": 1.0,
+                    "lower": 0.7008549515804559,
+                    "upper": 1.0,
+                    "success": 9,
+                    "denominator": 9,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "agreement": {
+                    "estimate": 1.0,
+                    "lower": 0.9800797046227183,
+                    "upper": 1.0,
+                    "success": 189,
+                    "denominator": 189,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+                },
+                "f_cc": {
+                  "tp": 17,
+                  "fp": 1,
+                  "fn": 0,
+                  "tn": 171,
+                  "denominator": 189,
+                  "precision": {
+                    "estimate": 0.9444444444444444,
+                    "lower": 0.7424269921812741,
+                    "upper": 0.990124809021697,
+                    "success": 17,
+                    "denominator": 18,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "recall": {
+                    "estimate": 1.0,
+                    "lower": 0.8156818649911483,
+                    "upper": 1.0,
+                    "success": 17,
+                    "denominator": 17,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "agreement": {
+                    "estimate": 0.9947089947089947,
+                    "lower": 0.970643094555003,
+                    "upper": 0.9990653962621839,
+                    "success": 188,
+                    "denominator": 189,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+                },
+                "f_complains_pills": {
+                  "tp": 9,
+                  "fp": 0,
+                  "fn": 0,
+                  "tn": 180,
+                  "denominator": 189,
+                  "precision": {
+                    "estimate": 1.0,
+                    "lower": 0.7008549515804559,
+                    "upper": 1.0,
+                    "success": 9,
+                    "denominator": 9,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "recall": {
+                    "estimate": 1.0,
+                    "lower": 0.7008549515804559,
+                    "upper": 1.0,
+                    "success": 9,
+                    "denominator": 9,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "agreement": {
+                    "estimate": 1.0,
+                    "lower": 0.9800797046227183,
+                    "upper": 1.0,
+                    "success": 189,
+                    "denominator": 189,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+                },
+                "f_doctor_sent": {
+                  "tp": 9,
+                  "fp": 0,
+                  "fn": 0,
+                  "tn": 180,
+                  "denominator": 189,
+                  "precision": {
+                    "estimate": 1.0,
+                    "lower": 0.7008549515804559,
+                    "upper": 1.0,
+                    "success": 9,
+                    "denominator": 9,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "recall": {
+                    "estimate": 1.0,
+                    "lower": 0.7008549515804559,
+                    "upper": 1.0,
+                    "success": 9,
+                    "denominator": 9,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "agreement": {
+                    "estimate": 1.0,
+                    "lower": 0.9800797046227183,
+                    "upper": 1.0,
+                    "success": 189,
+                    "denominator": 189,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+                },
+                "f_dont_die_couch": {
+                  "tp": 9,
+                  "fp": 0,
+                  "fn": 0,
+                  "tn": 180,
+                  "denominator": 189,
+                  "precision": {
+                    "estimate": 1.0,
+                    "lower": 0.7008549515804559,
+                    "upper": 1.0,
+                    "success": 9,
+                    "denominator": 9,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "recall": {
+                    "estimate": 1.0,
+                    "lower": 0.7008549515804559,
+                    "upper": 1.0,
+                    "success": 9,
+                    "denominator": 9,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "agreement": {
+                    "estimate": 1.0,
+                    "lower": 0.9800797046227183,
+                    "upper": 1.0,
+                    "success": 189,
+                    "denominator": 189,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+                },
+                "f_failed_family": {
+                  "tp": 3,
+                  "fp": 0,
+                  "fn": 0,
+                  "tn": 186,
+                  "denominator": 189,
+                  "precision": {
+                    "estimate": 1.0,
+                    "lower": 0.4385029682449546,
+                    "upper": 1.0,
+                    "success": 3,
+                    "denominator": 3,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "recall": {
+                    "estimate": 1.0,
+                    "lower": 0.4385029682449546,
+                    "upper": 1.0,
+                    "success": 3,
+                    "denominator": 3,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "agreement": {
+                    "estimate": 1.0,
+                    "lower": 0.9800797046227183,
+                    "upper": 1.0,
+                    "success": 189,
+                    "denominator": 189,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+                },
+                "f_fixed_income": {
+                  "tp": 3,
+                  "fp": 0,
+                  "fn": 0,
+                  "tn": 186,
+                  "denominator": 189,
+                  "precision": {
+                    "estimate": 1.0,
+                    "lower": 0.4385029682449546,
+                    "upper": 1.0,
+                    "success": 3,
+                    "denominator": 3,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "recall": {
+                    "estimate": 1.0,
+                    "lower": 0.4385029682449546,
+                    "upper": 1.0,
+                    "success": 3,
+                    "denominator": 3,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "agreement": {
+                    "estimate": 1.0,
+                    "lower": 0.9800797046227183,
+                    "upper": 1.0,
+                    "success": 189,
+                    "denominator": 189,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+                },
+                "f_grocery_trouble": {
+                  "tp": 3,
+                  "fp": 0,
+                  "fn": 0,
+                  "tn": 186,
+                  "denominator": 189,
+                  "precision": {
+                    "estimate": 1.0,
+                    "lower": 0.4385029682449546,
+                    "upper": 1.0,
+                    "success": 3,
+                    "denominator": 3,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "recall": {
+                    "estimate": 1.0,
+                    "lower": 0.4385029682449546,
+                    "upper": 1.0,
+                    "success": 3,
+                    "denominator": 3,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "agreement": {
+                    "estimate": 1.0,
+                    "lower": 0.9800797046227183,
+                    "upper": 1.0,
+                    "success": 189,
+                    "denominator": 189,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+                },
+                "f_ibuprofen": {
+                  "tp": 5,
+                  "fp": 1,
+                  "fn": 0,
+                  "tn": 183,
+                  "denominator": 189,
+                  "precision": {
+                    "estimate": 0.8333333333333334,
+                    "lower": 0.43649717781352987,
+                    "upper": 0.9699466302516935,
+                    "success": 5,
+                    "denominator": 6,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "recall": {
+                    "estimate": 1.0,
+                    "lower": 0.5655175352168251,
+                    "upper": 1.0,
+                    "success": 5,
+                    "denominator": 5,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "agreement": {
+                    "estimate": 0.9947089947089947,
+                    "lower": 0.970643094555003,
+                    "upper": 0.9990653962621839,
+                    "success": 188,
+                    "denominator": 189,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+                },
+                "f_melatonin": {
+                  "tp": 5,
+                  "fp": 1,
+                  "fn": 0,
+                  "tn": 183,
+                  "denominator": 189,
+                  "precision": {
+                    "estimate": 0.8333333333333334,
+                    "lower": 0.43649717781352987,
+                    "upper": 0.9699466302516935,
+                    "success": 5,
+                    "denominator": 6,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "recall": {
+                    "estimate": 1.0,
+                    "lower": 0.5655175352168251,
+                    "upper": 1.0,
+                    "success": 5,
+                    "denominator": 5,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "agreement": {
+                    "estimate": 0.9947089947089947,
+                    "lower": 0.970643094555003,
+                    "upper": 0.9990653962621839,
+                    "success": 188,
+                    "denominator": 189,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+                },
+                "f_no_plan": {
+                  "tp": 6,
+                  "fp": 0,
+                  "fn": 0,
+                  "tn": 183,
+                  "denominator": 189,
+                  "precision": {
+                    "estimate": 1.0,
+                    "lower": 0.6096657120978346,
+                    "upper": 1.0,
+                    "success": 6,
+                    "denominator": 6,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "recall": {
+                    "estimate": 1.0,
+                    "lower": 0.6096657120978346,
+                    "upper": 1.0,
+                    "success": 6,
+                    "denominator": 6,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "agreement": {
+                    "estimate": 1.0,
+                    "lower": 0.9800797046227183,
+                    "upper": 1.0,
+                    "success": 189,
+                    "denominator": 189,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+                },
+                "f_passive_si": {
+                  "tp": 6,
+                  "fp": 0,
+                  "fn": 0,
+                  "tn": 183,
+                  "denominator": 189,
+                  "precision": {
+                    "estimate": 1.0,
+                    "lower": 0.6096657120978346,
+                    "upper": 1.0,
+                    "success": 6,
+                    "denominator": 6,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "recall": {
+                    "estimate": 1.0,
+                    "lower": 0.6096657120978346,
+                    "upper": 1.0,
+                    "success": 6,
+                    "denominator": 6,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "agreement": {
+                    "estimate": 1.0,
+                    "lower": 0.9800797046227183,
+                    "upper": 1.0,
+                    "success": 189,
+                    "denominator": 189,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+                },
+                "f_scared_future": {
+                  "tp": 1,
+                  "fp": 0,
+                  "fn": 0,
+                  "tn": 188,
+                  "denominator": 189,
+                  "precision": {
+                    "estimate": 1.0,
+                    "lower": 0.20654931437723745,
+                    "upper": 1.0,
+                    "success": 1,
+                    "denominator": 1,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "recall": {
+                    "estimate": 1.0,
+                    "lower": 0.20654931437723745,
+                    "upper": 1.0,
+                    "success": 1,
+                    "denominator": 1,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "agreement": {
+                    "estimate": 1.0,
+                    "lower": 0.9800797046227183,
+                    "upper": 1.0,
+                    "success": 189,
+                    "denominator": 189,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+                },
+                "f_student_young": {
+                  "tp": 5,
+                  "fp": 1,
+                  "fn": 0,
+                  "tn": 183,
+                  "denominator": 189,
+                  "precision": {
+                    "estimate": 0.8333333333333334,
+                    "lower": 0.43649717781352987,
+                    "upper": 0.9699466302516935,
+                    "success": 5,
+                    "denominator": 6,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "recall": {
+                    "estimate": 1.0,
+                    "lower": 0.5655175352168251,
+                    "upper": 1.0,
+                    "success": 5,
+                    "denominator": 5,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "agreement": {
+                    "estimate": 0.9947089947089947,
+                    "lower": 0.970643094555003,
+                    "upper": 0.9990653962621839,
+                    "success": 188,
+                    "denominator": 189,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+                },
+                "f_unused_savings": {
+                  "tp": 1,
+                  "fp": 0,
+                  "fn": 0,
+                  "tn": 188,
+                  "denominator": 189,
+                  "precision": {
+                    "estimate": 1.0,
+                    "lower": 0.20654931437723745,
+                    "upper": 1.0,
+                    "success": 1,
+                    "denominator": 1,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "recall": {
+                    "estimate": 1.0,
+                    "lower": 0.20654931437723745,
+                    "upper": 1.0,
+                    "success": 1,
+                    "denominator": 1,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "agreement": {
+                    "estimate": 1.0,
+                    "lower": 0.9800797046227183,
+                    "upper": 1.0,
+                    "success": 189,
+                    "denominator": 189,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+                },
+                "f_weight_loss": {
+                  "tp": 9,
+                  "fp": 0,
+                  "fn": 0,
+                  "tn": 180,
+                  "denominator": 189,
+                  "precision": {
+                    "estimate": 1.0,
+                    "lower": 0.7008549515804559,
+                    "upper": 1.0,
+                    "success": 9,
+                    "denominator": 9,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "recall": {
+                    "estimate": 1.0,
+                    "lower": 0.7008549515804559,
+                    "upper": 1.0,
+                    "success": 9,
+                    "denominator": 9,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "agreement": {
+                    "estimate": 1.0,
+                    "lower": 0.9800797046227183,
+                    "upper": 1.0,
+                    "success": 189,
+                    "denominator": 189,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+                },
+                "f_work_stress": {
+                  "tp": 6,
+                  "fp": 0,
+                  "fn": 0,
+                  "tn": 183,
+                  "denominator": 189,
+                  "precision": {
+                    "estimate": 1.0,
+                    "lower": 0.6096657120978346,
+                    "upper": 1.0,
+                    "success": 6,
+                    "denominator": 6,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "recall": {
+                    "estimate": 1.0,
+                    "lower": 0.6096657120978346,
+                    "upper": 1.0,
+                    "success": 6,
+                    "denominator": 6,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "agreement": {
+                    "estimate": 1.0,
+                    "lower": 0.9800797046227183,
+                    "upper": 1.0,
+                    "success": 189,
+                    "denominator": 189,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+                },
+                "f_worry_pneumonia": {
+                  "tp": 6,
+                  "fp": 0,
+                  "fn": 0,
+                  "tn": 183,
+                  "denominator": 189,
+                  "precision": {
+                    "estimate": 1.0,
+                    "lower": 0.6096657120978346,
+                    "upper": 1.0,
+                    "success": 6,
+                    "denominator": 6,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "recall": {
+                    "estimate": 1.0,
+                    "lower": 0.6096657120978346,
+                    "upper": 1.0,
+                    "success": 6,
+                    "denominator": 6,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "agreement": {
+                    "estimate": 1.0,
+                    "lower": 0.9800797046227183,
+                    "upper": 1.0,
+                    "success": 189,
+                    "denominator": 189,
+                    "method": "Wilson 95%; descriptive, treats units as independent"
+                  },
+                  "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+                }
+              },
+              "critical_recall": {}
+            }
+          },
+          "model_ids": [
+            "disclosure_engine_echo"
+          ],
+          "prompt_versions": [
+            "not_applicable"
+          ],
+          "held_out": false,
+          "reason": "Source hash pins predictions but cannot prove they were made without reference access. Use existing grouped action-data training workflow for held-out evaluation."
+        },
+        "domain_agreement": null
+      },
+      "semantic": {
+        "reference_kind": "SIMULATED",
+        "tasks": 9,
+        "transport": "PASS",
+        "paired_agreement": 9,
+        "disagreements": 0,
+        "diagnostic_differences": 4,
+        "comparison": {
+          "scope": "replaceable development reference, not faculty validation",
+          "metrics": {
+            "semantic": {
+              "tp": 2,
+              "fp": 4,
+              "fn": 0,
+              "tn": 3,
+              "denominator": 9,
+              "precision": {
+                "estimate": 0.3333333333333333,
+                "lower": 0.09677141110578041,
+                "upper": 0.700006684861608,
+                "success": 2,
+                "denominator": 6,
+                "method": "Wilson 95%; descriptive, treats units as independent"
+              },
+              "recall": {
+                "estimate": 1.0,
+                "lower": 0.34238022750665303,
+                "upper": 1.0,
+                "success": 2,
+                "denominator": 2,
+                "method": "Wilson 95%; descriptive, treats units as independent"
+              },
+              "agreement": {
+                "estimate": 0.5555555555555556,
+                "lower": 0.26665129349549305,
+                "upper": 0.8112214789023355,
+                "success": 5,
+                "denominator": 9,
+                "method": "Wilson 95%; descriptive, treats units as independent"
+              },
+              "interval_warning": "Wilson intervals are descriptive; repeated turns and cases are correlated."
+            }
+          },
+          "model_ids": [
+            "mechanical_check_surrogate_not_semantic_judge"
+          ],
+          "prompt_versions": [
+            "not_applicable"
+          ],
+          "held_out": false,
+          "reason": "Source hash pins predictions but cannot prove they were made without reference access. Use existing grouped action-data training workflow for held-out evaluation."
+        },
+        "domain_agreement": null
+      }
+    },
+    "independent_human_reviews": 0,
+    "generation_description": "Seeded perturbations of frozen rule-based/constructor labels. Two synthetic source IDs plus a synthetic tie breaker exercise transport, disagreement and adjudication. They are correlated simulations, not independent people, clinical judgments or gold labels.",
+    "limitations": [
+      "Disclosure expectations echo the engine; not independent disclosure accuracy.",
+      "Action, claim and numeric domain references start from baseline predictions and are perturbed.",
+      "Simulated adjudication chooses A; agreement and errors are partly constructed.",
+      "Constructor semantic labels test known injected examples, not a clinically validated semantic judge."
+    ]
+  },
+  "api": {
+    "mode": "OFFLINE HTTP EXECUTED",
+    "database": "isolated SQLite",
+    "status": "PASS",
+    "requests": 29,
+    "studio_created_and_published": true,
+    "new_patient_encounter_and_debrief": true,
+    "authored_followup_visit": "v2",
+    "golden_preview_replies_failing_mechanical_audit": 0,
+    "authoring_approval_interpretation": "Code set schema authoring statuses inside disposable simulation; no clinical approval.",
+    "bedrock": "NOT RUN",
+    "voice": "MOCKED/UNAVAILABLE: text entry and 204 TTS fallback only",
+    "voice_first_audio_latency_ms": null,
+    "cloud_database": "NOT RUN",
+    "cost_usd": null
+  },
+  "mcpt": {
+    "no_effect": {
+      "scope": "SYNTHETIC MATHEMATICAL SCENARIO; no learning-effect evidence",
+      "input_sha256": "14356c51b9a543e6a74ecbccd785e89d240c4a535b08f7dbc2f70cb24e99fd57",
+      "generation_description": "Balanced randomized synthetic roster; baseline=2, background cycle=-1/0/+1 matched by arm, assumed feedback shift, scores clipped to 1–4. N/A, phase loss and duplicate score records exercise analysis mechanics. Case IDs are disjoint arithmetic fixtures, not independently validated clinical transfer cases. Matching background changes makes the null an exact test control, not a power simulation.",
+      "assumed_feedback_shift": 0,
+      "plan": {
+        "version": "development_mcpt_v1",
+        "population": "synthetic fixtures only; observed intake requires the separate authorization workflow",
+        "design": "unstratified parallel assignment; fixed assigned arms feedback and standard",
+        "outcome": "mean followup-minus-baseline change over common scored domains 1–7 per learner",
+        "repeated_encounters": "average each scored domain within phase before common-domain change",
+        "missingness": "retain roster counts, report incomplete learners by arm, do not impute N/A",
+        "statistic": "mean learner change in feedback minus mean learner change in standard",
+        "tail": "absolute statistic at least as extreme as observed; ties included",
+        "draws": 4999,
+        "bootstrap_draws": 1999,
+        "seed": 2026,
+        "p_value": "(extreme + 1) / (draws + 1)",
+        "effect_interval": "within-arm learner bootstrap percentile 95%; descriptive on small samples",
+        "multiple_testing": "one primary statistic; secondary outcomes require a separate prespecified correction",
+        "method_reference": "https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.permutation_test.html"
+      },
+      "plan_sha256": "61fe5c2a38de0acd2e795f77fe1243f76d1a9e3863064e1874f6eaa37e1da863",
+      "denominators": {
+        "roster_by_arm": {
+          "feedback": 12,
+          "standard": 12
+        },
+        "scored_by_arm": {
+          "feedback": 12,
+          "standard": 12
+        },
+        "missing_by_arm": {
+          "feedback": {},
+          "standard": {}
+        },
+        "encounters": 48,
+        "analysis_unit": "learner",
+        "missingness_interpretation": "assigned-arm available-case analysis; no claim of complete intention-to-treat inference"
+      },
+      "statistics": {
+        "effect": 0,
+        "effect_ci95": [
+          -0.6666666666666667,
+          0.6666666666666666
+        ],
+        "p_value": 1.0,
+        "extreme_draws": 4999,
+        "draws": 4999,
+        "monte_carlo_tail_ci95": {
+          "estimate": 1.0,
+          "lower": 0.9992321446017599,
+          "upper": 0.9999999999999999,
+          "success": 4999,
+          "denominator": 4999,
+          "method": "Wilson 95%; descriptive, treats units as independent"
+        },
+        "bootstrap_draws": 1999,
+        "seed": 2026,
+        "tail": "two-sided absolute mean difference",
+        "analysis_unit": "learner"
+      },
+      "status": "EVALUATED"
+    },
+    "beneficial_effect": {
+      "scope": "SYNTHETIC MATHEMATICAL SCENARIO; no learning-effect evidence",
+      "input_sha256": "263ef124b49398354eb47c089dd8800487172d1627da68ebcad9ca644f17e846",
+      "generation_description": "Balanced randomized synthetic roster; baseline=2, background cycle=-1/0/+1 matched by arm, assumed feedback shift, scores clipped to 1–4. N/A, phase loss and duplicate score records exercise analysis mechanics. Case IDs are disjoint arithmetic fixtures, not independently validated clinical transfer cases. Matching background changes makes the null an exact test control, not a power simulation.",
+      "assumed_feedback_shift": 1,
+      "plan": {
+        "version": "development_mcpt_v1",
+        "population": "synthetic fixtures only; observed intake requires the separate authorization workflow",
+        "design": "unstratified parallel assignment; fixed assigned arms feedback and standard",
+        "outcome": "mean followup-minus-baseline change over common scored domains 1–7 per learner",
+        "repeated_encounters": "average each scored domain within phase before common-domain change",
+        "missingness": "retain roster counts, report incomplete learners by arm, do not impute N/A",
+        "statistic": "mean learner change in feedback minus mean learner change in standard",
+        "tail": "absolute statistic at least as extreme as observed; ties included",
+        "draws": 4999,
+        "bootstrap_draws": 1999,
+        "seed": 2026,
+        "p_value": "(extreme + 1) / (draws + 1)",
+        "effect_interval": "within-arm learner bootstrap percentile 95%; descriptive on small samples",
+        "multiple_testing": "one primary statistic; secondary outcomes require a separate prespecified correction",
+        "method_reference": "https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.permutation_test.html"
+      },
+      "plan_sha256": "61fe5c2a38de0acd2e795f77fe1243f76d1a9e3863064e1874f6eaa37e1da863",
+      "denominators": {
+        "roster_by_arm": {
+          "feedback": 12,
+          "standard": 12
+        },
+        "scored_by_arm": {
+          "feedback": 12,
+          "standard": 12
+        },
+        "missing_by_arm": {
+          "feedback": {},
+          "standard": {}
+        },
+        "encounters": 48,
+        "analysis_unit": "learner",
+        "missingness_interpretation": "assigned-arm available-case analysis; no claim of complete intention-to-treat inference"
+      },
+      "statistics": {
+        "effect": 1,
+        "effect_ci95": [
+          0.3333333333333333,
+          1.6666666666666665
+        ],
+        "p_value": 0.0208,
+        "extreme_draws": 103,
+        "draws": 4999,
+        "monte_carlo_tail_ci95": {
+          "estimate": 0.020604120824164834,
+          "lower": 0.01701868350009303,
+          "upper": 0.02492577157567495,
+          "success": 103,
+          "denominator": 4999,
+          "method": "Wilson 95%; descriptive, treats units as independent"
+        },
+        "bootstrap_draws": 1999,
+        "seed": 2026,
+        "tail": "two-sided absolute mean difference",
+        "analysis_unit": "learner"
+      },
+      "status": "EVALUATED"
+    },
+    "adverse_effect": {
+      "scope": "SYNTHETIC MATHEMATICAL SCENARIO; no learning-effect evidence",
+      "input_sha256": "9b4551d1abc529d46c630783e48bf0e1bf0ab411dc88efb9c509864cd71dc95e",
+      "generation_description": "Balanced randomized synthetic roster; baseline=2, background cycle=-1/0/+1 matched by arm, assumed feedback shift, scores clipped to 1–4. N/A, phase loss and duplicate score records exercise analysis mechanics. Case IDs are disjoint arithmetic fixtures, not independently validated clinical transfer cases. Matching background changes makes the null an exact test control, not a power simulation.",
+      "assumed_feedback_shift": -1,
+      "plan": {
+        "version": "development_mcpt_v1",
+        "population": "synthetic fixtures only; observed intake requires the separate authorization workflow",
+        "design": "unstratified parallel assignment; fixed assigned arms feedback and standard",
+        "outcome": "mean followup-minus-baseline change over common scored domains 1–7 per learner",
+        "repeated_encounters": "average each scored domain within phase before common-domain change",
+        "missingness": "retain roster counts, report incomplete learners by arm, do not impute N/A",
+        "statistic": "mean learner change in feedback minus mean learner change in standard",
+        "tail": "absolute statistic at least as extreme as observed; ties included",
+        "draws": 4999,
+        "bootstrap_draws": 1999,
+        "seed": 2026,
+        "p_value": "(extreme + 1) / (draws + 1)",
+        "effect_interval": "within-arm learner bootstrap percentile 95%; descriptive on small samples",
+        "multiple_testing": "one primary statistic; secondary outcomes require a separate prespecified correction",
+        "method_reference": "https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.permutation_test.html"
+      },
+      "plan_sha256": "61fe5c2a38de0acd2e795f77fe1243f76d1a9e3863064e1874f6eaa37e1da863",
+      "denominators": {
+        "roster_by_arm": {
+          "feedback": 12,
+          "standard": 12
+        },
+        "scored_by_arm": {
+          "feedback": 12,
+          "standard": 12
+        },
+        "missing_by_arm": {
+          "feedback": {},
+          "standard": {}
+        },
+        "encounters": 48,
+        "analysis_unit": "learner",
+        "missingness_interpretation": "assigned-arm available-case analysis; no claim of complete intention-to-treat inference"
+      },
+      "statistics": {
+        "effect": -0.6666666666666666,
+        "effect_ci95": [
+          -1.25,
+          -0.16666666666666663
+        ],
+        "p_value": 0.0552,
+        "extreme_draws": 275,
+        "draws": 4999,
+        "monte_carlo_tail_ci95": {
+          "estimate": 0.05501100220044009,
+          "lower": 0.0490254820281443,
+          "upper": 0.06167989678097144,
+          "success": 275,
+          "denominator": 4999,
+          "method": "Wilson 95%; descriptive, treats units as independent"
+        },
+        "bootstrap_draws": 1999,
+        "seed": 2026,
+        "tail": "two-sided absolute mean difference",
+        "analysis_unit": "learner"
+      },
+      "status": "EVALUATED"
+    },
+    "missingness": {
+      "scope": "SYNTHETIC MATHEMATICAL SCENARIO; no learning-effect evidence",
+      "input_sha256": "5b2d619f71b5aa6a19ea86091129b30f14c96b4b72abd6da6eb8b99bf238820d",
+      "generation_description": "Balanced randomized synthetic roster; baseline=2, background cycle=-1/0/+1 matched by arm, assumed feedback shift, scores clipped to 1–4. N/A, phase loss and duplicate score records exercise analysis mechanics. Case IDs are disjoint arithmetic fixtures, not independently validated clinical transfer cases. Matching background changes makes the null an exact test control, not a power simulation.",
+      "assumed_feedback_shift": 1,
+      "plan": {
+        "version": "development_mcpt_v1",
+        "population": "synthetic fixtures only; observed intake requires the separate authorization workflow",
+        "design": "unstratified parallel assignment; fixed assigned arms feedback and standard",
+        "outcome": "mean followup-minus-baseline change over common scored domains 1–7 per learner",
+        "repeated_encounters": "average each scored domain within phase before common-domain change",
+        "missingness": "retain roster counts, report incomplete learners by arm, do not impute N/A",
+        "statistic": "mean learner change in feedback minus mean learner change in standard",
+        "tail": "absolute statistic at least as extreme as observed; ties included",
+        "draws": 4999,
+        "bootstrap_draws": 1999,
+        "seed": 2026,
+        "p_value": "(extreme + 1) / (draws + 1)",
+        "effect_interval": "within-arm learner bootstrap percentile 95%; descriptive on small samples",
+        "multiple_testing": "one primary statistic; secondary outcomes require a separate prespecified correction",
+        "method_reference": "https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.permutation_test.html"
+      },
+      "plan_sha256": "61fe5c2a38de0acd2e795f77fe1243f76d1a9e3863064e1874f6eaa37e1da863",
+      "denominators": {
+        "roster_by_arm": {
+          "feedback": 12,
+          "standard": 12
+        },
+        "scored_by_arm": {
+          "feedback": 10,
+          "standard": 9
+        },
+        "missing_by_arm": {
+          "feedback": {
+            "missing_phase": 2
+          },
+          "standard": {
+            "missing_phase": 2,
+            "no_common_scored_domains": 1
+          }
+        },
+        "encounters": 44,
+        "analysis_unit": "learner",
+        "missingness_interpretation": "assigned-arm available-case analysis; no claim of complete intention-to-treat inference"
+      },
+      "statistics": {
+        "effect": 0.9888888888888889,
+        "effect_ci95": [
+          0.24444444444444446,
+          1.7444444444444445
+        ],
+        "p_value": 0.0414,
+        "extreme_draws": 206,
+        "draws": 4999,
+        "monte_carlo_tail_ci95": {
+          "estimate": 0.04120824164832967,
+          "lower": 0.03604127325521097,
+          "upper": 0.047079781498085026,
+          "success": 206,
+          "denominator": 4999,
+          "method": "Wilson 95%; descriptive, treats units as independent"
+        },
+        "bootstrap_draws": 1999,
+        "seed": 2026,
+        "tail": "two-sided absolute mean difference",
+        "analysis_unit": "learner"
+      },
+      "status": "EVALUATED"
+    },
+    "repeated_encounters": {
+      "scope": "SYNTHETIC MATHEMATICAL SCENARIO; no learning-effect evidence",
+      "input_sha256": "4e03bac94b37854aff1e145a96873c0628e339b240fe354bfa2fbc10bec8f864",
+      "generation_description": "Balanced randomized synthetic roster; baseline=2, background cycle=-1/0/+1 matched by arm, assumed feedback shift, scores clipped to 1–4. N/A, phase loss and duplicate score records exercise analysis mechanics. Case IDs are disjoint arithmetic fixtures, not independently validated clinical transfer cases. Matching background changes makes the null an exact test control, not a power simulation.",
+      "assumed_feedback_shift": 1,
+      "plan": {
+        "version": "development_mcpt_v1",
+        "population": "synthetic fixtures only; observed intake requires the separate authorization workflow",
+        "design": "unstratified parallel assignment; fixed assigned arms feedback and standard",
+        "outcome": "mean followup-minus-baseline change over common scored domains 1–7 per learner",
+        "repeated_encounters": "average each scored domain within phase before common-domain change",
+        "missingness": "retain roster counts, report incomplete learners by arm, do not impute N/A",
+        "statistic": "mean learner change in feedback minus mean learner change in standard",
+        "tail": "absolute statistic at least as extreme as observed; ties included",
+        "draws": 4999,
+        "bootstrap_draws": 1999,
+        "seed": 2026,
+        "p_value": "(extreme + 1) / (draws + 1)",
+        "effect_interval": "within-arm learner bootstrap percentile 95%; descriptive on small samples",
+        "multiple_testing": "one primary statistic; secondary outcomes require a separate prespecified correction",
+        "method_reference": "https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.permutation_test.html"
+      },
+      "plan_sha256": "61fe5c2a38de0acd2e795f77fe1243f76d1a9e3863064e1874f6eaa37e1da863",
+      "denominators": {
+        "roster_by_arm": {
+          "feedback": 12,
+          "standard": 12
+        },
+        "scored_by_arm": {
+          "feedback": 12,
+          "standard": 12
+        },
+        "missing_by_arm": {
+          "feedback": {},
+          "standard": {}
+        },
+        "encounters": 80,
+        "analysis_unit": "learner",
+        "missingness_interpretation": "assigned-arm available-case analysis; no claim of complete intention-to-treat inference"
+      },
+      "statistics": {
+        "effect": 1,
+        "effect_ci95": [
+          0.3333333333333333,
+          1.6666666666666665
+        ],
+        "p_value": 0.0208,
+        "extreme_draws": 103,
+        "draws": 4999,
+        "monte_carlo_tail_ci95": {
+          "estimate": 0.020604120824164834,
+          "lower": 0.01701868350009303,
+          "upper": 0.02492577157567495,
+          "success": 103,
+          "denominator": 4999,
+          "method": "Wilson 95%; descriptive, treats units as independent"
+        },
+        "bootstrap_draws": 1999,
+        "seed": 2026,
+        "tail": "two-sided absolute mean difference",
+        "analysis_unit": "learner"
+      },
+      "status": "EVALUATED"
+    }
+  },
+  "case_preset_assumptions": {
+    "version": "simulation_demo_v1",
+    "source_kind": "synthetic_fixture",
+    "component": "case_preset_decisions",
+    "generation_description": "Assume current authored case content and outcomes for a demo only; copy case hashes and threshold-probe offsets. Code-authored progression estimates use mean rubric thresholds 2/3, the existing domain 6/7 score-1 review flag, and exact-role compatibility. No case or progression estimate is clinically approved.",
+    "decision": "ASSUMED_FOR_SIMULATION",
+    "difficulty_probe_offsets": {
+      "straightforward": -2,
+      "typical": 0,
+      "difficult": 2
+    },
+    "clinical_review": "PENDING",
+    "full_presets": "UNVALIDATED THRESHOLD PROBE ESTIMATES",
+    "progression_policy": {
+      "version": "simulation_progression_v1",
+      "typical_min_score": 2,
+      "difficult_min_score": 3,
+      "safety_review_max_score": 1,
+      "role_policy": "exact role match",
+      "unavailable_next_case": "repeat compatible current case",
+      "scope": "Simulation adapter only; no persisted learner recommendation or clinical approval"
+    },
+    "case_sha256": {
+      "walter_greene": "af9b64eded4aae898af7f47714aa95883d87bc9f2f7fa4c3b73866c73225b7bf",
+      "alina_reyes": "624f4713b587550865b5a6a378de6f3c678b13454ee3c0af26a5ffe7d5728c98",
+      "eli_brooks": "59c5c783e1baea71271f0fc49d96be907f5bbbbceea490ec0d8136dc18527c0b"
+    }
+  },
+  "replacement_map": [
+    {
+      "component": "action spans",
+      "simulation_input": "inputs/action_corpus.json",
+      "human_adapter": "backend_kelsch.scripts.prepare_action_data --corpus --annotations; reviewed grouped corpus",
+      "remaining": "Independent exact-span labels, critical positives and genuinely held-out case/family language"
+    },
+    {
+      "component": "semantic/disclosure/feedback/rubric reviews",
+      "simulation_input": "inputs/review_policy.json; review_stage/<kind>/synthetic_*.json",
+      "human_adapter": "eval_development configure/evaluate with actual submissions; eval_next_review report for action/claim/domain",
+      "remaining": "Independent qualified answers and disagreement decisions; do not rename simulated sources human"
+    },
+    {
+      "component": "clinical cases, full presets and progression",
+      "simulation_input": "inputs/case_preset_decisions.json",
+      "human_adapter": "Qualified decisions, versioned case corrections and a fresh frozen review batch",
+      "remaining": "Clinical facts/disclosure/safety, full presets, next-case routing and actual learner difficulty"
+    },
+    {
+      "component": "protocol, authorization and consent",
+      "simulation_input": "frozen_plan.json (proposed synthetic analysis only)",
+      "human_adapter": "Existing backend_kelsch.app.integration.quality trusted authorization workflow",
+      "remaining": "Faculty/ethics decision, consent and externally verified authority; real intake remains blocked"
+    },
+    {
+      "component": "learner outcomes",
+      "simulation_input": "inputs/learner_scenarios.json",
+      "human_adapter": "Authorized roster and genuine blinded baseline/follow-up scores under a frozen supported analysis plan",
+      "remaining": "Real baseline/follow-up encounters, valid transfer cases and blinded independent scoring"
+    }
+  ],
+  "operational_blockers": [
+    "Live Bedrock access and current-model evaluation were not executed in this offline command.",
+    "Microphone, speech recognition, playback, echo/barge-in and voice first-audio latency need the integrated frontend rehearsal.",
+    "Postgres/cloud deployment and full service costs are unevaluated; no guessed latency or cost numbers are presented.",
+    "Case content, safety/disclosure, full presets and next-case routing still need qualified decisions.",
+    "Independent labels and authorized genuine learner outcomes must replace simulations before a learning-effect claim."
+  ],
+  "report_sha256": "494f838423e87216150dc85d61489384d912b1684ba7b7d0cbbdfa39c9da8e2b"
+}

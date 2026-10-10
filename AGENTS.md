@@ -110,7 +110,7 @@ Docs never refer to "the coder" as a particular person and never take sides betw
 - **Tests before merge:**
   - `pytest` for the backend;
   - type check and build for the frontend;
-  - for pipeline changes, run `backend/scripts/run_test_students.py` on the golden cases (once it exists).
+  - for pipeline changes, run `python -m scripts.run_test_students` (from `backend/`) on the golden cases; it exits non-zero if any reply fails the audit.
 - **Golden-case gate:** before recording any video, run the test students on all golden cases and check that grounding is 100% and nothing regressed.
 - **Commit messages:** imperative mood, plain language, reference feature IDs. No AI co-author trailers or "generated with" lines; commits are authored by the person who pushes them.
 
@@ -136,6 +136,7 @@ cd backend && .venv/Scripts/python -m uvicorn app.main:app --reload
 
 Checks:
 - Tests (offline, SQLite): `cd backend && LLM_ENABLED=false .venv/Scripts/python -m pytest -q`
+- Test students on the golden cases, no database: `.venv/Scripts/python -m scripts.run_test_students` (`--offline` for no Bedrock, `--transcript` to print the conversations, `--save` to write `docs/validation/test_students.json`)
 - Verifier on labeled lines (needs Bedrock): `.venv/Scripts/python -m scripts.eval_verifier --runs 2`
 - Set `LLM_ENABLED=false` to run everything without AWS (keyword classifier and template replies).
 
